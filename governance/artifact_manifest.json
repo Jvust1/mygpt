@@ -1,14 +1,30 @@
 {
   "schema_version": "mygpt_artifact_manifest_v1",
-  "updated_date": "2026-09-21",
+  "updated_date": "2026-09-22",
   "project": {
     "repository": "Jvust2/mygpt",
     "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
     "drive_root_name": "mygpt"
   },
-  "artifacts": [],
+  "artifacts": [
+    {
+      "artifact_id": "mygpt-jonah-companion-v0.1",
+      "file_name": "mygpt-jonah-companion-v0.1.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "1jZ_MmRquovmrQdBJpyPjP9PRtZlJYpWh",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "84ab85ce9f39fd5bc9412dd8f4d0d7a26014835c9f367bb976ab6eb9b3145a86",
+      "size_bytes": 2580904,
+      "version": "0.1.0",
+      "created_at": "2026-09-22T01:47:28.255Z",
+      "source": "assistant_generated",
+      "related_branch": "feat/jonah-companion-20260922",
+      "purpose": "Recoverable Jonah companion source package with mobile/desktop screenshots and browser validation report. The archive intentionally excludes this manifest to avoid recursive artifact identity.",
+      "status": "review_candidate"
+    }
+  ],
   "notes": [
-    "No binary or generated project artifact has been archived yet.",
+    "The first generated artifact is the review-candidate Jonah companion source/evidence package.",
     "Book, StudyMate, and ChatContextVault artifacts remain in their own authoritative stores and are referenced rather than copied by default."
   ]
 }

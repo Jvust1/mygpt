@@ -1,6 +1,6 @@
 # Current State
 
-Date: 2026-09-21
+Date: 2026-09-22
 
 ## Project status
 
@@ -12,6 +12,19 @@ Date: 2026-09-21
 - Security bootstrap files are present on the non-default foundation branch.
 - The Drive global safety baseline and branch `SECURITY_POLICY.md` have been re-read successfully after bootstrap.
 - No merge is authorized by this synchronization.
+
+## Jonah companion UI candidate
+
+- Feature branch: `feat/jonah-companion-20260922`, based on the unmerged foundation head so its governance remains visible in the review diff.
+- Added a framework-neutral `<mygpt-pet>` Web Component and a runnable mobile/desktop preview.
+- Reused the verified Jonah sprite atlas: SHA-256 `828b0fb468382f37aaf0d62a3e86cb33e5fcad5dbde8aeb091d6778b32a77790`.
+- Implemented nine animation states, sixteen look directions, bottom-right anchoring, touch dragging, keyboard movement, hide/restore, size controls, reduced-motion support, and local preference fallback.
+- The component emits a chat-request event and accepts explicit host task states. It does not infer distraction, read other apps, capture screens, or claim that a model/Book bridge exists.
+- Deterministic atlas tests: 3/3 pass.
+- Headless Chromium interaction checks: 45/45 pass, including real touch events, reload persistence, narrow/landscape/desktop viewports, reduced motion, disconnected cleanup, disabled storage, runtime errors, and external requests.
+- Visual screenshots were inspected. The test runtime lacked a CJK font, so Chinese labels rendered as fallback squares in those screenshots; the component uses system fonts and does not download a web font.
+- Not yet verified: Android physical device, Android soft keyboard, native Android overlay, production mygpt host integration, production chat/Book bridge, and independent human review.
+- This candidate appears inside a mygpt web/app surface. Cross-application Android floating UI requires a separate Android Studio implementation and system overlay permission.
 
 ## Product direction
 
@@ -83,4 +96,4 @@ A first acceptance target:
 
 > During a 30-minute Book study session, mygpt can know the current learning location and mode, detect meaningful study transitions, stay quiet by default, answer context-dependent questions, and selectively prompt for clarification or recall without continuous screen capture.
 
-No production implementation has been started in this repository yet.
+No production backend, Book event bridge, or Android application has been started in this repository yet. The Jonah companion is the first executable UI candidate and remains unmerged.

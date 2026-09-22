@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-21",
+  "updated_date": "2026-09-22",
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
-  "active_branch": "chore/security-bootstrap-and-project-foundation-20260921",
-  "phase": "PROJECT_FOUNDATION",
-  "status": "FOUNDATION_DOCS_REVIEW_PENDING",
+  "active_branch": "feat/jonah-companion-20260922",
+  "phase": "COMPANION_UI_PROTOTYPE",
+  "status": "JONAH_COMPANION_IMPLEMENTED_TESTS_PASS_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -33,5 +33,17 @@
     "blocking_count": 0,
     "source": "governance/pending_sync.json"
   },
-  "next_step": "Design the v0.1 Book-to-mygpt StudyContext snapshot and StudyEvent contract on a reviewable non-default branch; do not start continuous screen capture before validating the semantic-context path."
+  "ui_candidate": {
+    "name": "Jonah companion",
+    "surface": "framework-neutral Web Component and preview",
+    "sprite_sha256": "828b0fb468382f37aaf0d62a3e86cb33e5fcad5dbde8aeb091d6778b32a77790",
+    "validation": "3 deterministic checks and 45 headless Chromium interaction checks pass",
+    "unverified": [
+      "Android physical device and soft keyboard",
+      "native Android overlay",
+      "production chat and Book bridge",
+      "independent human review"
+    ]
+  },
+  "next_step": "Review the foundation and stacked Jonah companion PRs, select the production host, then integrate explicit Book/mygpt task state and validate on Xiaomi 14 through Android Studio; do not start continuous screen capture before validating the semantic-context path."
 }

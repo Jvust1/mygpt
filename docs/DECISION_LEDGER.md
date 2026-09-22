@@ -38,3 +38,9 @@ Continuous presence should mostly be local and event-driven; expensive cloud rea
 
 ## D013 — real relationships are not competitors
 The product must not frame itself as the only entity that understands the user or push the user away from real-world relationships.
+
+## D014 — Jonah is the first companion surface candidate
+Use the already validated Jonah sprite as mygpt's initial visual companion. Keep the renderer framework-neutral until a production host is selected. The component accepts explicit states and emits user actions; product logic remains outside the visual layer.
+
+## D015 — mobile app surface before system overlay
+First validate Jonah inside the mygpt mobile surface with touch, safe-area, reduced-motion, and hide/restore behavior. Treat an Android cross-application floating window as a separate Android Studio milestone with explicit OS permission and physical-device acceptance evidence.

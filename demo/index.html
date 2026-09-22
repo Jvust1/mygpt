@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f5fc">
+  <title>约拿 · mygpt 陪伴预览</title>
+  <link rel="stylesheet" href="/demo/style.css">
+  <script type="module" src="/demo/demo.js"></script>
+</head>
+<body>
+  <header><a class="brand" href="#">mygpt<span>陪伴预览</span></a><button id="visibility" type="button">隐藏约拿</button></header>
+  <main>
+    <div class="eyebrow">一点陪伴，留给专注的你</div>
+    <h1>你慢慢来，<br>约拿就在这里。</h1>
+    <p class="intro">安静待在右下角。需要时点一下，也可以拖到顺手的位置。</p>
+    <section class="card" aria-labelledby="presence-title">
+      <div class="card-top"><span class="dot"></span><h2 id="presence-title">陪伴状态</h2><span class="tag">交互演示</span></div>
+      <p>选一个状态，看看约拿的反应。</p>
+      <div class="states" role="group" aria-label="状态选择">
+        <button data-status="idle" aria-pressed="true">安静陪伴</button>
+        <button data-status="working" aria-pressed="false">正在处理</button>
+        <button data-status="needs-input" aria-pressed="false">等我回应</button>
+        <button data-status="ready" aria-pressed="false">有新进展</button>
+        <button data-status="blocked" aria-pressed="false">需要处理</button>
+      </div>
+    </section>
+    <section class="card settings" aria-labelledby="settings-title">
+      <h2 id="settings-title">舒服一点</h2>
+      <label for="size">宠物大小 <output id="size-value">112</output> px</label>
+      <input id="size" type="range" min="72" max="160" value="112">
+      <label class="check"><input type="checkbox" id="pause">暂停动画</label>
+      <button id="reset" type="button">放回右下角</button>
+    </section>
+    <details class="card"><summary>看看所有动作</summary>
+      <div class="actions" id="animations"></div>
+      <label for="look">视线方向 <output id="look-value">0°</output></label>
+      <input type="range" id="look" min="0" max="337.5" step="22.5" value="0">
+      <button id="resume" type="button">恢复陪伴状态</button>
+    </details>
+    <p class="note">这是 mygpt 的宠物界面预览。聊天和真实任务状态尚未接通。</p>
+    <section class="card" id="chat" hidden tabindex="-1" aria-label="聊天入口"><h2>约拿在这里</h2><p>聊天入口已触发。接入 mygpt 聊天模块后，这里就能开始对话。</p><button id="close-chat">收起</button></section>
+  </main>
+  <footer>轻一点的界面 · 安静一点的陪伴</footer>
+  <mygpt-pet id="pet" status="idle"></mygpt-pet>
+</body>
+</html>

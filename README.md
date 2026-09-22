@@ -1,5 +1,14 @@
 # mygpt
 
+Long-term companion and learning orchestrator.
+
+## Current review branches
+
+- Project foundation: `chore/security-bootstrap-and-project-foundation-20260921` / PR #1.
+- Jonah companion UI: `feat/jonah-companion-20260922`, based on the foundation branch.
+
+The Jonah integration is a framework-neutral, mobile-friendly Web Component and interactive preview. See [`docs/JONAH_COMPANION.md`](docs/JONAH_COMPANION.md) for scope, API, validation evidence, and the Android boundary.
+
 mygpt is a long-term companion and learning orchestrator.
 
 It is designed around a simple idea: **presence without pressure**.
