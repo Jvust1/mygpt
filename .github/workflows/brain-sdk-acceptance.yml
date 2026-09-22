@@ -2,7 +2,7 @@ name: Brain SDK acceptance (no live model)
 
 on:
   push:
-    branches: [feat/book-context-brain-20260922]
+    branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1]
     paths:
       - 'brain/mygpt_brain/**'
       - 'brain/tests/**'
@@ -69,6 +69,7 @@ jobs:
           "$PY" -m pip check
           "$PY" scripts/verify_integrations.py --output "$RUNNER_TEMP/brain-evidence/reinstall"
           "$PY" -m mygpt_brain > "$RUNNER_TEMP/brain-evidence/demo.jsonl"
+          "$PY" -m mygpt_brain.reader_demo > "$RUNNER_TEMP/brain-evidence/reader-demo.json"
           "$PY" -m compileall -q mygpt_brain scripts tests
           git rev-parse HEAD > "$RUNNER_TEMP/brain-evidence/source-commit.txt"
           sha256sum "$RUNNER_TEMP/brain-evidence/requirements-linux-py313.lock" > "$RUNNER_TEMP/brain-evidence/lock.sha256"

@@ -12,8 +12,10 @@ import threading
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Annotated, Iterator, Literal
+from urllib.parse import quote
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (AwareDatetime, BaseModel, BeforeValidator, ConfigDict, Field,
+                      TypeAdapter, field_validator, model_validator)
 
 Identifier = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$")]
 Sequence = Annotated[int, Field(strict=True, ge=1, le=2**53 - 1)]
@@ -64,6 +66,54 @@ class StudyContext(Contract):
         return self.course_id, self.book_id, self.book_version
 
 
+# v1 identifiers, references, and persisted receipts remain unchanged. Only the
+# explicitly versioned Reader context accepts the observed @-bearing versions.
+ReaderBookVersion = Annotated[str, Field(
+    strict=True, min_length=1, max_length=160, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.@-]{0,159}$")]
+
+
+class ReaderStudyContext(StudyContext):
+    schema_version: Literal["mygpt.reader-context.v2"] = "mygpt.reader-context.v2"
+    book_version: ReaderBookVersion
+    source_kind: Identifier
+    source_layer: Literal["source", "correction", "derived"]
+    layer_id: Identifier
+    source_serialization: Literal["reader-selected-json-v1"] = "reader-selected-json-v1"
+
+    @property
+    def reference(self) -> str:
+        # Each segment is escaped independently. Include bytes and layer identity:
+        # a correction or a changed body must never inherit the original's ref.
+        fields = (self.course_id, self.book_id, self.book_version, self.section_id,
+                  self.source_kind, self.source_id, self.source_layer, self.layer_id,
+                  self.source_serialization, self.source_sha256)
+        return "reader:v2:" + ":".join(quote(x, safe="") for x in fields)
+
+    @property
+    def identity(self) -> tuple[str, ...]:
+        # A session cannot silently change its context protocol.
+        return (*super().identity, self.schema_version)
+
+
+def _legacy_context_tag(value):
+    # Backward compatibility for original callers that omitted v1's default tag.
+    # Explicit unknown tags never fall back to v1.
+    if isinstance(value, dict) and "schema_version" not in value:
+        return {"schema_version": "mygpt.study-context.v1", **value}
+    return value
+
+
+ContextValue = Annotated[
+    StudyContext | ReaderStudyContext,
+    Field(discriminator="schema_version"), BeforeValidator(_legacy_context_tag),
+]
+_CONTEXT = TypeAdapter(ContextValue)
+
+
+def parse_context(value: dict | StudyContext | str) -> StudyContext | ReaderStudyContext:
+    return _CONTEXT.validate_json(value) if isinstance(value, str) else _CONTEXT.validate_python(value)
+
+
 class StudyEvent(Contract):
     schema_version: Literal["mygpt.study-event.v1"] = "mygpt.study-event.v1"
     event_id: Identifier
@@ -72,7 +122,7 @@ class StudyEvent(Contract):
     sequence: Sequence
     occurred_at: AwareDatetime
     kind: Kind
-    context: StudyContext | None = None
+    context: ContextValue | None = None
 
     @field_validator("occurred_at")
     @classmethod
@@ -256,7 +306,7 @@ class Brain:
                     return self._reject(event, "invalid_pause")
             context = event.context
             if context is None and row and row["context_json"]:
-                context = StudyContext.model_validate_json(row["context_json"])
+                context = parse_context(row["context_json"])
             if event.kind in CONTEXT_EVENTS:
                 status = "active"
             elif event.kind == "SESSION_PAUSED":
@@ -297,7 +347,7 @@ class Brain:
             if row is None:
                 return {"evidence_kind": "SIMULATED", "status": "no_session", "context": None,
                         "quiet": True, "host_state": "idle", "model_calls": 0}
-            context = StudyContext.model_validate_json(row["context_json"]) if row["context_json"] else None
+            context = parse_context(row["context_json"]) if row["context_json"] else None
             status = row["status"]
             if context and not (context.captured_at <= clock < context.expires_at):
                 context, status = None, "context_expired"
