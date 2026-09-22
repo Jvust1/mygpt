@@ -30,7 +30,7 @@ async def test_mcp_in_memory_read_only():
         server = make_mcp_server(brain, clock=lambda: clock[0])
         async with asyncio.timeout(15), Client(server) as client:
             tools = await client.list_tools()
-            assert {tool.name for tool in tools} == {
+            assert {tool.name for tool in tools.tools} == {
                 "get_study_status", "get_current_context", "get_recent_decisions"}
             result = await client.call_tool("get_current_context", {})
             assert result.structured_content["evidence_kind"] == "SIMULATED"
