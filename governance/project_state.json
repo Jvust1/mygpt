@@ -3,9 +3,9 @@
   "updated_date": "2026-09-22",
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/jonah-companion-20260922",
-  "phase": "COMPANION_UI_PROTOTYPE",
-  "status": "JONAH_COMPANION_IMPLEMENTED_TESTS_PASS_REVIEW_PENDING",
+  "active_branch": "feat/book-context-brain-20260922",
+  "phase": "BOOK_CONTEXT_CONTRACT_PROTOTYPE",
+  "status": "CORE_TESTS_PASS_SDK_INTEGRATION_BLOCKED_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -28,7 +28,9 @@
     "StudyMate": "study-session and low-cost device/activity signals",
     "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
   },
-  "blocking_items": [],
+  "blocking_items": [
+    "G2 SDK integration acceptance: optional dependencies unavailable in local runtime; no live feed enabled."
+  ],
   "pending_sync": {
     "blocking_count": 0,
     "source": "governance/pending_sync.json"
@@ -45,7 +47,7 @@
       "independent human review"
     ]
   },
-  "next_step": "Review the foundation and stacked Jonah companion PRs, select the production host, then integrate explicit Book/mygpt task state and validate on Xiaomi 14 through Android Studio; do not start continuous screen capture before validating the semantic-context path.",
+  "next_step": "Complete offline Pydantic AI TestModel and MCP v2 integration checks in an allowed environment with dependencies; then inspect real Book fields and agree on authenticated event/snapshot mapping. No paid model calls, direct main writes or automatic merges.",
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
@@ -63,6 +65,34 @@
       "missing_browser_cleanup": "PASS"
     },
     "evidence": "docs/EVALUATION_LEDGER.md#e003--input-recovery-and-isolated-browser-validation",
-    "remote_write_performed": false
-  }
+    "remote_write_performed": false,
+    "historical_snapshot": true,
+    "actual_publication": {
+      "pr": 3,
+      "head": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+      "status": "OPEN_DRAFT_UNMERGED"
+    }
+  },
+  "brain_candidate": {
+    "pr": 5,
+    "implementation_commit": "68c351b85511ccdd625036a6917b4303646b6704",
+    "base_commit": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+    "evidence_kind": "SIMULATED_ONLY",
+    "test_result": {
+      "passed": 95,
+      "skipped": 2,
+      "failed": 0,
+      "scope": "local core/source/CLI; optional SDK tests skipped"
+    },
+    "sdk_integration": "BLOCKED_DEPENDENCY_DOWNLOAD_DNS",
+    "remote_ci": "NOT_RUN",
+    "independent_review": "PENDING",
+    "live_book_feed": "NOT_CONNECTED",
+    "android": "NOT_RUN",
+    "paid_provider_calls": 0,
+    "artifact_id": "mygpt-brain-context-v0.1-20260922",
+    "checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md"
+  },
+  "decision_checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md#d016--本轮设计决定",
+  "evaluation_checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md#e004--实际验收"
 }
