@@ -1,0 +1,53 @@
+{
+  "schema_version": "mygpt.book-contract-candidate.v1",
+  "status": "STATIC_CONTRACT_AUDIT_REVIEW_CANDIDATE",
+  "repository": "Jvust2/mygpt",
+  "branch": "feat/book-contract-audit-v1",
+  "base_commit": "95fd2846f5ec535b1241b4bb565fbca92eda626e",
+  "book_reference": {
+    "repository": "Jvust2/Book",
+    "commit": "7283f2eef7610d67c6b92b2ef7c513e1225ad957",
+    "installed_apk_identity_verified": false,
+    "files": {
+      "app/api/models.py": "70a54b22ea55cd1b75b1a35cc756349ff033eac8",
+      "app/web/src/api/client.ts": "e6f6fd0ee20249c4c6dcb0d1a78cf7c624e86b47",
+      "app/web/src/state/sectionViewState.ts": "4388f81fb71fab5349596025399df9eb6193c67c"
+    }
+  },
+  "recovery_entry": "docs/BOOK_CONTRACT_AUDIT_V1.md",
+  "local_validation": {
+    "passed": 51,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "new static identity auditor with synthetic DTO subsets",
+    "python": "3.13.5"
+  },
+  "base_sdk_ci": {
+    "run_id": 35762870487,
+    "commit": "95fd2846f5ec535b1241b4bb565fbca92eda626e",
+    "passed_per_environment": 113,
+    "environments": 2,
+    "skipped": 0,
+    "validation_method": "observed existing exact-commit job logs"
+  },
+  "full_candidate_regression": "NOT_RUN",
+  "candidate_remote_ci": "NOT_RUN",
+  "live_book_connected": false,
+  "independent_review": "PENDING",
+  "next_step": "Verify the intended Book host/build identity and design an explicit read-only current-source export, with kind, version, source-byte identity and lifecycle. No automatic Book mutation or live feed activation.",
+  "concurrency": {
+    "original_local_gate_commit": "9f803155df061c9b1d02598c713387c773ab20ac",
+    "original_local_gate_status": "UNADOPTED_REF_NOT_UPDATED",
+    "shared_branch_modified_by_this_candidate": false
+  },
+  "artifact": {
+    "artifact_id": "mygpt-book-contract-audit-v1",
+    "file_name": "mygpt-book-contract-audit-v1.zip",
+    "drive_file_id": "1sScveH_MiR2XmJ7WMvRGnbwmrpKRDevh",
+    "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+    "size_bytes": 31730,
+    "sha256": "5b8ee045070341bb0f918f74d95350786598cd1ff1c6c09fa7be71fa61b891d1",
+    "verification": "Drive metadata plus downloaded bytes, CRC and internal hashes verified",
+    "archive_scope": "delta candidate, local evidence, observed SDK summaries and clearly UNADOPTED prior gate annex; not full repository or complete Actions artifact"
+  }
+}
