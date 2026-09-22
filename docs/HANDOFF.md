@@ -1,3 +1,17 @@
+## 最新验收 · 2026-09-23（+08）· PR #5
+
+代码 `95fd2846f5ec535b1241b4bb565fbca92eda626e` 已通过真实 SDK 集成；[GitHub run 35762870487](https://github.com/Jvust2/mygpt/actions/runs/35762870487) 在两个全新虚拟环境中分别 **113 passed / 0 skipped / 0 failed**。39 个依赖 wheel 已锁定哈希并验证重装；两次真实失败的原始证据保留。
+
+这是程序式 TestModel 与进程内 MCP 的验收，未调用真实模型、未连接 Book、未验收 Android。Book CURRENT r6 原包已只读核对，发现版本号 `@` 与当前标识符规则不兼容，且缺少显式选段/宿主会话事件；详见 [Reader 映射](BOOK_READER_BRIDGE_MAPPING_20260923.md)。
+
+[本轮 SDK 检查点](SDK_ACCEPTANCE_CHECKPOINT_20260923.md) 是最新验收与决策入口。恢复包 [mygpt-brain-sdk-acceptance-20260923.zip](https://drive.google.com/file/d/1kENqb7SLkEV6B4YK8BZ1rq9ceSiMR5Fs/view) 已归档并下载校验，SHA-256 `faf62347879a790f53826d43cb61f19a49a718a5faddf9987b36cf35ec3a98ba`。
+
+**下一步只做：** mygpt 分支内的 ReaderSnapshot 离线映射候选、版本兼容和显式选段/来源层回归；不改 Book、不开放网络服务、不增加付费调用。独立审阅仍待完成，PR 保持草稿，main 不变。
+
+---
+
+以下全部内容为保留的历史快照。旧的 SDK 阻塞与旧 next_step 已由上方验收/下一步替代；其他未验证的生产能力限制继续有效。
+
 ## 最新检查点 · 2026-09-22 · PR #5
 
 当前开发分支：`feat/book-context-brain-20260922`，基于 PR #3 的 `a8595c3ccaddcff5a6a95f8a37a963707f48c084`。

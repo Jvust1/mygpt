@@ -1,3 +1,28 @@
+## 最新 SDK 验收 · 2026-09-23（+08）
+
+在精确代码提交 `95fd2846f5ec535b1241b4bb565fbca92eda626e`，GitHub Actions run `35762870487` 已完成两个独立干净虚拟环境的验收：分别 **113 passed / 0 skipped / 0 failed**（2.17s、1.36s）。真实安装了 Pydantic AI 2.46.0 和 MCP 2.2.0；调用的仍是程序式 TestModel 与进程内 MCP，不是真实模型或 Book 数据。
+
+`requirements-linux-py313.lock` 固定了实际安装的 39 个 wheel 版本和 SHA-256。验收平台是 Ubuntu 24.04 / CPython 3.13.15 x86_64；该锁不声明 Windows、macOS、Android 或其他 Python ABI 兼容性。本地聊天沙盒仍缺两个 SDK，但不再阻塞已通过的远端验收。
+
+```sh
+# 在与锁兼容、已允许联网安装的环境中；仅安装阶段需要网络。
+cd brain
+python -m venv .venv
+.venv/bin/python -m pip install --only-binary=:all: --require-hashes -r requirements-linux-py313.lock
+.venv/bin/python -m pip check
+.venv/bin/python scripts/verify_integrations.py --output ./acceptance-new
+```
+
+证据目录必须尚不存在。严格脚本拒绝缺依赖、版本不匹配、测试缺失、跳过、失败及超时；测试中的 Python 网络调用被拦截，这不是操作系统级安全沙盒。
+
+两次实际失败及修正保留：工具列表必须读取 `ListToolsResult.tools`；结构化返回需要明确的 `dict[str, Any]` / `list[dict[str, Any]]` 和 `structured_output=True`。不得改为忽略引用/结构化结果断言来“跑绿”。
+
+详细证据：[SDK checkpoint](../docs/SDK_ACCEPTANCE_CHECKPOINT_20260923.md)。Book r6 实际源码已只读核对，版本格式与宿主事件仍有缺口：[Reader 映射](../docs/BOOK_READER_BRIDGE_MAPPING_20260923.md)。目前仍为模拟原型，没有真实 Book feed、Jonah 联动、安卓验收或真实回答质量证明。
+
+---
+
+以下为 2026-09-22 原始说明，逐字保留为历史。其“SDK 集成未验收 / DNS 阻塞”以本页最新验收节替代；尚未实现的生产能力限制仍然有效。
+
 # mygpt Brain · Book 上下文原型 v0.1
 
 **状态：可运行的本地模拟原型；不是正式 Book 联调、聊天服务或 Android APK。**
