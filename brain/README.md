@@ -1,3 +1,22 @@
+## 当前能力 · r6 Reader 选段 v1 / Brain context v2
+
+实际通过代码 `86734b51024a4f0ae7c254835c9fe0178151bee3`，GitHub run `35797671670`：两个干净环境分别 **269 passed / 0 skipped / 0 failed**。本地缺 SDK 时仍是 264 passed / 5 skipped；不混用两类结果。
+
+新增 `reader_snapshot.map_reader_snapshot`：明确选择原文、来源绑定的校正或 AI 推导；保留含 @ 的版本号，校验时效与宿主快照，按固定 JSON/UTF-8 计算实际正文及父来源哈希。原 v1 引用和旧数据不迁移。
+
+```sh
+cd brain
+python -m mygpt_brain.reader_demo
+# 已安装固定 SDK 时，使用已有严格验收脚本；输出目录必须为新目录。
+python scripts/verify_integrations.py --output ./acceptance-new
+```
+
+数据和宿主事件仍全部为 SIMULATED；TestModel 只返回固定程序内容。原文选择不是屏幕渲染复刻，不静默应用 render_text/render_latex/source_completion，不处理图片。未连接真实 Book、未开放网络监听、未调用真实模型、未验收 Android。
+
+完整合同、运行证据、回滚限制和下一步见 [Reader 检查点](../docs/READER_SELECTION_CHECKPOINT_20260923.md)。以下旧说明逐字保留为历史，SDK 阻塞及旧 next_step 以本节替代。
+
+---
+
 # mygpt Brain · Book 上下文原型 v0.1
 
 **状态：可运行的本地模拟原型；不是正式 Book 联调、聊天服务或 Android APK。**

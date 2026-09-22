@@ -1,3 +1,10 @@
+## 当前路线补充 · 2026-09-23
+
+当前手机内容目标已经核对为 **r6 Reader**，不采用本文旧 Web DTO 作为其输入。现已实现明确选段到 Brain v2 的离线映射，完整组合 269 项在两个全新 CI 环境通过。
+后续从 [Reader 选段检查点](READER_SELECTION_CHECKPOINT_20260923.md) 与 project_state 恢复。下面的旧静态审计及其 51 项本地证据保留，仍可服务旧 Web 接口；其旧 next_step 已被当前入口替代。
+
+---
+
 # Book → mygpt：真实字段核对与只读接入准备 v1
 
 状态：**STATIC_CONTRACT_AUDIT_CANDIDATE**。这是接口核对、纯函数校验器及测试，不是实时 Book 桥，也不是 Android 成品。

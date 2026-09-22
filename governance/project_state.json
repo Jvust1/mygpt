@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-22",
+  "updated_date": "2026-09-23",
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/book-context-brain-20260922",
-  "phase": "BOOK_CONTEXT_CONTRACT_PROTOTYPE",
-  "status": "CORE_TESTS_PASS_SDK_INTEGRATION_BLOCKED_REVIEW_PENDING",
+  "active_branch": "feat/book-contract-audit-v1",
+  "phase": "R6_READER_SELECTION_OFFLINE_ACCEPTED",
+  "status": "COMBINED_269_PASS_HOST_UI_NEXT_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -29,7 +29,7 @@
     "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
   },
   "blocking_items": [
-    "G2 SDK integration acceptance: optional dependencies unavailable in local runtime; no live feed enabled."
+    "Live Book integration is not enabled: a real host exporter, authenticated revocable transport and target-device validation remain unimplemented."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -45,9 +45,11 @@
       "native Android overlay",
       "production chat and Book bridge",
       "independent human review"
-    ]
+    ],
+    "historical_validation_only": true,
+    "not_rerun_this_batch": true
   },
-  "next_step": "Complete offline Pydantic AI TestModel and MCP v2 integration checks in an allowed environment with dependencies; then inspect real Book fields and agree on authenticated event/snapshot mapping. No paid model calls, direct main writes or automatic merges.",
+  "next_step": "Connect explicit Reader selection and explain-this-section actions in the mygpt host demo, show version/layer/expiry and bridge Jonah user events using synthetic inputs first. Book exporter, trusted handshake, revocable authorization and real integration require a separate preflight. No Book writes, paid model, direct main write or automatic PR merge.",
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
@@ -74,25 +76,103 @@
     }
   },
   "brain_candidate": {
-    "pr": 5,
-    "implementation_commit": "68c351b85511ccdd625036a6917b4303646b6704",
-    "base_commit": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+    "pr": 6,
+    "implementation_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
+    "base_commit": "41277d24498d1d2a122b100bb68a38cf30ca62dd",
     "evidence_kind": "SIMULATED_ONLY",
+    "context_protocols": [
+      "mygpt.study-context.v1",
+      "mygpt.reader-context.v2"
+    ],
     "test_result": {
-      "passed": 95,
-      "skipped": 2,
+      "passed": 269,
+      "skipped": 0,
       "failed": 0,
-      "scope": "local core/source/CLI; optional SDK tests skipped"
+      "scope": "combined Brain suite including legacy audit and r6 mapper; two clean environments, real TestModel and in-memory MCP SDKs"
     },
-    "sdk_integration": "BLOCKED_DEPENDENCY_DOWNLOAD_DNS",
-    "remote_ci": "NOT_RUN",
+    "sdk_integration": "PASS_SYNTHETIC_READER_LAYERS_AND_V1_COMPATIBILITY",
+    "remote_ci": {
+      "run_id": 35797671670,
+      "job_id": 106980616735,
+      "source_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
+      "conclusion": "success",
+      "first_seconds": 2.12,
+      "reinstall_seconds": 1.55,
+      "artifact_id": 10724052652,
+      "artifact_sha256": "a46aaa29d273fefe06017f2f6383d1c33e1c02797f78856b3359f5e4515ad193"
+    },
+    "local_environment": {
+      "python": "3.13.5",
+      "passed": 264,
+      "skipped": 5,
+      "failed": 0,
+      "scope": "local combined suite; SDK packages unavailable, not the accepted CI result"
+    },
+    "dependency_lock": {
+      "path": "brain/requirements-linux-py313.lock",
+      "sha256": "78a05ef99a580964c73cc2944ec9a1df4252e0b16d352f99ae30ce02faeae8c2",
+      "distribution_count": 39,
+      "platform": "Ubuntu 24.04 / CPython 3.13.15 x86_64",
+      "universal_lock": false
+    },
     "independent_review": "PENDING",
     "live_book_feed": "NOT_CONNECTED",
     "android": "NOT_RUN",
+    "root_ui_tests": "NOT_RERUN_THIS_BATCH",
     "paid_provider_calls": 0,
-    "artifact_id": "mygpt-brain-context-v0.1-20260922",
-    "checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md"
+    "artifact_id": "mygpt-reader-selection-v1-20260923",
+    "checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md",
+    "historical_checkpoints": [
+      {
+        "pr": 5,
+        "implementation_commit": "68c351b85511ccdd625036a6917b4303646b6704",
+        "base_commit": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+        "evidence_kind": "SIMULATED_ONLY",
+        "test_result": {
+          "passed": 95,
+          "skipped": 2,
+          "failed": 0,
+          "scope": "local core/source/CLI; optional SDK tests skipped"
+        },
+        "sdk_integration": "BLOCKED_DEPENDENCY_DOWNLOAD_DNS",
+        "remote_ci": "NOT_RUN",
+        "independent_review": "PENDING",
+        "live_book_feed": "NOT_CONNECTED",
+        "android": "NOT_RUN",
+        "paid_provider_calls": 0,
+        "artifact_id": "mygpt-brain-context-v0.1-20260922",
+        "checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md"
+      }
+    ]
   },
-  "decision_checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md#d016--本轮设计决定",
-  "evaluation_checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md#e004--实际验收"
+  "decision_checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md",
+  "evaluation_checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md",
+  "book_bridge_candidate": {
+    "status": "R6_EXPLICIT_SELECTION_OFFLINE_ACCEPTED",
+    "target": "r6 Reader /api/reader, not the legacy Web ModeResponse/SourceResponse",
+    "source_archive_drive_id": "1UiVow02Huh3r8qKBH8v4bL3D9OfkQ8_R",
+    "source_archive_sha256": "19315e8aeebe2db5cf2f4b55e0a38f550967966af106491dfef67212b430adc1",
+    "source_checkpoint_commit": "7283f2eef7610d67c6b92b2ef7c513e1225ad957",
+    "selected_members_verified": 7,
+    "installed_apk_identity_verified": false,
+    "mapper": "brain/mygpt_brain/reader_snapshot.py",
+    "supported_layers": [
+      "source",
+      "correction",
+      "derived"
+    ],
+    "selection_explicit": true,
+    "source_serialization": "reader-selected-json-v1",
+    "v1_reference_unchanged": true,
+    "live_connected": false,
+    "book_mutations": 0,
+    "raw_book_source_copied_to_mygpt": false,
+    "legacy_auditor": "brain/mygpt_brain/book_contract_audit.py"
+  },
+  "parallel_branch_reference": {
+    "pr": 5,
+    "head_at_reconciliation": "632b843c4e071a32b841caa7de8bdb0bbfebc059",
+    "modified_this_batch": false,
+    "note": "This candidate does not merge or overwrite PR #5. Its executable SDK baseline is inherited via 95fd284; both review branches remain unmerged."
+  }
 }

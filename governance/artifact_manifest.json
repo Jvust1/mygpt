@@ -1,6 +1,6 @@
 {
   "schema_version": "mygpt_artifact_manifest_v1",
-  "updated_date": "2026-09-22",
+  "updated_date": "2026-09-23",
   "project": {
     "repository": "Jvust2/mygpt",
     "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
@@ -38,11 +38,65 @@
       "purpose": "Standalone brain/ delta source, raw pytest outputs, deterministic demo, derived schemas and identity manifest; not the full mygpt repository and not a production integration. Excludes this archive registry to avoid recursive identity.",
       "status": "archived_review_candidate",
       "verification": "Drive metadata and downloaded bytes checked; SHA-256 matches local archive."
+    },
+    {
+      "artifact_id": "mygpt-brain-sdk-acceptance-20260923",
+      "file_name": "mygpt-brain-sdk-acceptance-20260923.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "1kENqb7SLkEV6B4YK8BZ1rq9ceSiMR5Fs",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "faf62347879a790f53826d43cb61f19a49a718a5faddf9987b36cf35ec3a98ba",
+      "size_bytes": 350075,
+      "version": "0.1.0-sdk-accepted",
+      "created_at": "2026-09-22T17:58:26.614Z",
+      "source": "assistant_generated_and_github_actions",
+      "related_branch": "feat/book-context-brain-20260922",
+      "related_commit": "95fd2846f5ec535b1241b4bb565fbca92eda626e",
+      "purpose": "Preserved earlier SDK acceptance and two failed-run evidence package. Reference reconciled from PR #5 manifest and current Drive metadata; not uploaded again.",
+      "status": "archived_review_candidate",
+      "verification": "Historical full-byte verification recorded on PR #5; current object name, size and folder rechecked this batch."
+    },
+    {
+      "artifact_id": "mygpt-book-contract-audit-v1",
+      "file_name": "mygpt-book-contract-audit-v1.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "1sScveH_MiR2XmJ7WMvRGnbwmrpKRDevh",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "5b8ee045070341bb0f918f74d95350786598cd1ff1c6c09fa7be71fa61b891d1",
+      "size_bytes": 31730,
+      "version": "1-static-audit",
+      "created_at": "2026-09-22T18:03:22.910Z",
+      "source": "assistant_generated",
+      "related_branch": "feat/book-contract-audit-v1",
+      "related_commit": "41277d24498d1d2a122b100bb68a38cf30ca62dd",
+      "purpose": "Preserved legacy Web DTO static audit and clearly UNADOPTED older-gate annex; not the r6 Reader mapper. Reference reconciled from the candidate registry, not uploaded again.",
+      "status": "archived_review_candidate",
+      "verification": "Historical verification in governance/book_contract_audit_v1.json; current object name, size and folder rechecked this batch."
+    },
+    {
+      "artifact_id": "mygpt-reader-selection-v1-20260923",
+      "file_name": "mygpt-reader-selection-v1-20260923.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "14XUwfwXg0lqgktMuKzeeE1OARwkQ6Z-j",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "800c77982249f5bbe92aa34bba0208e442fecd33a808c4b43f4b78e8ce5724cb",
+      "size_bytes": 189135,
+      "version": "1-reader-context-v2",
+      "created_at": "2026-09-22T23:37:46.693Z",
+      "source": "assistant_generated_and_github_actions",
+      "related_branch": "feat/book-contract-audit-v1",
+      "related_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
+      "purpose": "Brain source with r6 selection mapper, preserved v1 protocol, three explicit layers, exact-code 269-case dual-environment CI ZIP, local evidence, generated schemas and checkpoint docs. Not full mygpt/App/APK. Excludes Book raw source/text, Jonah atlas, credentials and recursive outer registries.",
+      "status": "archived_review_candidate",
+      "verification": "Drive metadata and downloaded full ZIP SHA-256 match; CRC passed; exact 42 members and all 41 self-excluded manifest entries verified."
     }
   ],
   "notes": [
     "The first generated artifact is the review-candidate Jonah companion source/evidence package.",
     "Book, StudyMate, and ChatContextVault artifacts remain in their own authoritative stores and are referenced rather than copied by default.",
-    "Brain archive does not contain or replace the existing Jonah package. SDK skips remain validation blockers, not missing synchronization artifacts."
+    "Brain archive does not contain or replace the existing Jonah package. SDK skips remain validation blockers, not missing synchronization artifacts.",
+    "2026-09-23: previous SDK-blocker note is historical. Exact implementation 86734b5 passed all 269 combined tests with zero skips in each of two clean environments.",
+    "The existing SDK and legacy-audit archives were indexed, not rewritten; old artifact IDs and original provenance are preserved.",
+    "The latest bundle excludes this outer artifact registry and project_state to avoid circular identities; GitHub remains the authoritative current-state registry."
   ]
 }
