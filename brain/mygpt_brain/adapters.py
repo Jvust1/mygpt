@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime
-from typing import Annotated, Callable, Literal
+from typing import Annotated, Any, Callable, Literal
 
 from pydantic import Field, model_validator
 
@@ -84,19 +84,19 @@ def make_mcp_server(brain: Brain, clock: Callable[[], datetime] = utc_now):
 
     server = MCPServer("mygpt-simulated-context")
 
-    @server.tool()
-    def get_study_status() -> dict:
+    @server.tool(structured_output=True)
+    def get_study_status() -> dict[str, Any]:
         """Return fresh local simulation state; never real Book activity."""
         return brain.view(now=clock())
 
-    @server.tool()
-    def get_current_context() -> dict:
+    @server.tool(structured_output=True)
+    def get_current_context() -> dict[str, Any]:
         """Return a fresh simulated source reference, or explicitly no context."""
         state = brain.view(now=clock())
         return {"evidence_kind": "SIMULATED", "status": state["status"], "context": state["context"]}
 
-    @server.tool()
-    def get_recent_decisions(limit: int = 20) -> list[dict]:
+    @server.tool(structured_output=True)
+    def get_recent_decisions(limit: int = 20) -> list[dict[str, Any]]:
         """Return at most 50 local decision receipts; this executes nothing."""
         return brain.recent_decisions(limit)
 

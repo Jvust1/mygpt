@@ -32,13 +32,16 @@ async def test_mcp_in_memory_read_only():
             tools = await client.list_tools()
             assert {tool.name for tool in tools.tools} == {
                 "get_study_status", "get_current_context", "get_recent_decisions"}
+            assert all(tool.output_schema is not None for tool in tools.tools)
             result = await client.call_tool("get_current_context", {})
             assert result.structured_content["evidence_kind"] == "SIMULATED"
             assert result.structured_content["context"]["section_id"] == "section-1"
             status = await client.call_tool("get_study_status", {})
             assert status.structured_content["status"] == "active"
             traces = await client.call_tool("get_recent_decisions", {"limit": 1})
-            assert traces.content  # list output encoding is SDK-owned
+            assert traces.structured_content is not None
+            assert len(traces.structured_content["result"]) == 1
+            assert traces.structured_content["result"][0]["event_id"] == "event-1"
             clock[0] = NOW + timedelta(seconds=121)
             stale = await client.call_tool("get_current_context", {})
             assert stale.structured_content["context"] is None
