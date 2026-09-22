@@ -12,11 +12,11 @@ from typing import Annotated, Any, Callable, Literal
 
 from pydantic import Field, model_validator
 
-from .core import Brain, Contract, StudyContext, checked_now, utc_now
+from .core import Brain, Contract, ContextValue, parse_context, checked_now, utc_now
 
 
 class EvidenceText(Contract):
-    context: StudyContext
+    context: ContextValue
     text: Annotated[str, Field(min_length=1, max_length=12000)]
 
     @model_validator(mode="after")
@@ -35,7 +35,7 @@ class GroundedReply(Contract):
 def validate_evidence(brain: Brain, evidence: EvidenceText, *, now: datetime | None = None) -> EvidenceText:
     evidence = EvidenceText.model_validate(evidence)
     current = brain.view(now=now)["context"]
-    if current is None or StudyContext.model_validate(current) != evidence.context:
+    if current is None or parse_context(current) != evidence.context:
         raise ValueError("source does not match the current fresh snapshot")
     return evidence
 
