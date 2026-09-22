@@ -26,6 +26,14 @@ Date: 2026-09-22
 - Not yet verified: Android physical device, Android soft keyboard, native Android overlay, production mygpt host integration, production chat/Book bridge, and independent human review.
 - This candidate appears inside a mygpt web/app surface. Cross-application Android floating UI requires a separate Android Studio implementation and system overlay permission.
 
+## 2026-09-22 interaction reliability candidate
+
+- Prepared from `feat/jonah-companion-20260922` at `64e73b257a79ec09787e2a96a43816b5864f9a1c`; the existing feature PR and foundation PR remain unmerged.
+- Corrected keyboard activation after touch cancellation, unrelated pointer events interrupting a drag, and missing focus transfer into the action panel.
+- The browser suite now creates its own preview on an available loopback port and cleans up even if Chromium cannot launch.
+- Validation at this local candidate: 3/3 deterministic checks and 49/49 Chromium checks; a deliberately occupied default port still permits the suite to pass, and a missing browser exits promptly with a failure status.
+- Remote publication is pending the all-repository preflight confirmation. Proposed review branch: `fix/companion-input-and-test-isolation-20260922`, targeting the existing feature branch. See E003 in `docs/EVALUATION_LEDGER.md` for reproduction evidence and remaining device limits.
+
 ## Product direction
 
 mygpt is the user's primary companion surface.

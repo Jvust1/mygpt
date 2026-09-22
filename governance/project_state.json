@@ -45,5 +45,24 @@
       "independent human review"
     ]
   },
-  "next_step": "Review the foundation and stacked Jonah companion PRs, select the production host, then integrate explicit Book/mygpt task state and validate on Xiaomi 14 through Android Studio; do not start continuous screen capture before validating the semantic-context path."
+  "next_step": "Review the foundation and stacked Jonah companion PRs, select the production host, then integrate explicit Book/mygpt task state and validate on Xiaomi 14 through Android Studio; do not start continuous screen capture before validating the semantic-context path.",
+  "optimization_candidate": {
+    "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
+    "base_branch": "feat/jonah-companion-20260922",
+    "base_sha": "64e73b257a79ec09787e2a96a43816b5864f9a1c",
+    "proposed_branch": "fix/companion-input-and-test-isolation-20260922",
+    "scope": [
+      "pointer identity and cancelled-touch recovery",
+      "keyboard focus in action panel",
+      "isolated browser-test server and failure cleanup"
+    ],
+    "validation": {
+      "deterministic_checks_passed": 3,
+      "browser_checks_passed": 49,
+      "occupied_default_port": "PASS",
+      "missing_browser_cleanup": "PASS"
+    },
+    "evidence": "docs/EVALUATION_LEDGER.md#e003--input-recovery-and-isolated-browser-validation",
+    "remote_write_performed": false
+  }
 }
