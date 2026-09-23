@@ -138,3 +138,12 @@ test('replay adapter cancellation before hashing and during delay rejects',async
   const second=new AbortController();const done=adapter(request,entry,{signal:second.signal});
   setTimeout(()=>second.abort(),5);await assert.rejects(done,{name:'AbortError'});
 });
+
+test('request carries a short UI lease and identifier-safe per-instance id',async()=>{
+  const h=harness();h.controller.choose('a-source');const state=h.controller.getState();
+  const done=h.controller.explain();await flush();const request=h.calls[0].request;
+  assert.match(request.request_id,/^ui-[A-Za-z0-9_.-]+-1$/);
+  assert.equal(Number.isSafeInteger(request.selection_expires_at_ms),true);
+  assert.equal(request.selection_expires_at_ms,state.expiresAt);
+  h.reply();await done;h.controller.dispose();
+});
