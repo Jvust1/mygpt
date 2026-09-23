@@ -59,10 +59,11 @@ def test_acceptance_rejects_bad_cases(tmp_path, child):
     assert inspect_junit(path)["accepted"] is False
 
 
-def test_acceptance_requires_both_integrations(tmp_path):
+def test_acceptance_requires_all_integrations(tmp_path):
     path = tmp_path / "results.xml"
     path.write_text('<testsuites><testsuite><testcase name="unrelated"/></testsuite></testsuites>')
-    assert len(inspect_junit(path)["missing_required_cases"]) == 2
+    assert len(inspect_junit(path)["missing_required_cases"]) == 3
     path.write_text('<testsuites><testsuite><testcase name="test_pydantic_ai_test_model_only"/>'
-                    '<testcase name="test_mcp_in_memory_read_only"/></testsuite></testsuites>')
+                    '<testcase name="test_mcp_in_memory_read_only"/>'
+                    '<testcase name="test_default_local_engine_runs_real_testmodel_without_provider"/></testsuite></testsuites>')
     assert inspect_junit(path)["accepted"] is True
