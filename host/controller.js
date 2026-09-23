@@ -1,5 +1,5 @@
-/** Small host-side UI state machine. It never claims to be the Python Brain.
- * The adapter is explicit synthetic replay, not a live Book/model transport.
+/** Small host-side UI state machine. It never claims transport/model truth.
+ * Adapters may be a fixed browser replay or the loopback Python Brain demo.
  * No source text is persisted. A lease belongs to this UI selection only.
  */
 const MODES = new Set(['preview', 'learn', 'review', 'practice']);
@@ -36,6 +36,8 @@ export function createHostController({catalogue, adapter, now = () => Date.now()
     entries.set(entry.id, entry);
   }
   const instance = ++instances;
+  const instanceKey = (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${instance}`)
+    .replace(/[^A-Za-z0-9_.-]/g,'-').slice(0,70);
   const listeners = new Set();
   let state = {status:'empty',mode:'learn',entry:null,reply:null,reason:'choose_a_record',
     revision:0,expiresAt:null,requests:0,modelCalls:0};
@@ -96,9 +98,10 @@ export function createHostController({catalogue, adapter, now = () => Date.now()
     if (!selectable() || !fresh()) return Promise.resolve({status:'not_available'});
     if (pending) return pending.promise; // one UI request, not one per tap
     const revision = state.revision, entry = state.entry, mode = state.mode;
-    const request = freeze({request_id:`ui-${instance}-${state.requests+1}`,
+    const request = freeze({request_id:`ui-${instanceKey}-${state.requests+1}`,
       revision,entry_id:entry.id,mode,source_ref:entry.source_ref,
-      source_sha256:entry.context.source_sha256,scope:'SYNTHETIC_FIXED_REPLAY'});
+      source_sha256:entry.context.source_sha256,selection_expires_at_ms:lease.wallEnd,
+      scope:'SYNTHETIC_FIXED_REPLAY'});
     const abort = new AbortController();
     let resolve;
     const promise = new Promise(done => {resolve = done;});

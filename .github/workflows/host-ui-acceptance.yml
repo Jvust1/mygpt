@@ -1,12 +1,18 @@
-name: Host UI acceptance (synthetic replay only)
+name: Host UI acceptance (synthetic local Brain only)
 on:
   push:
     branches: [feat/book-contract-audit-v1]
     paths:
       - 'host/**'
       - 'companion/**'
+      - 'brain/mygpt_brain/local_service.py'
+      - 'brain/mygpt_brain/adapters.py'
+      - 'brain/mygpt_brain/host_fixtures.py'
+      - 'brain/requirements-linux-py313.lock'
       - 'tests/host-*.mjs'
       - 'tests/host-browser.cjs'
+      - 'tests/brain-*.mjs'
+      - 'tests/brain-host-browser.cjs'
       - 'tests/browser.cjs'
       - 'tests/atlas.test.mjs'
       - 'scripts/serve.mjs'
@@ -20,14 +26,21 @@ jobs:
   browser:
     if: github.repository == 'Jvust2/mygpt'
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 12
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      PIP_NO_INPUT: '1'
+      OTEL_SDK_DISABLED: 'true'
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
           fetch-depth: 1
-      - name: Record environment and install isolated pinned browser test tools
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install isolated locked Python and pinned browser test tools
         shell: bash
         run: |
           set -euo pipefail
@@ -35,23 +48,28 @@ jobs:
           node -e "if(Number(process.versions.node.split('.')[0])<20)process.exit(1)"
           node --version > "$RUNNER_TEMP/host-evidence/node-version.txt"
           git rev-parse HEAD > "$RUNNER_TEMP/host-evidence/source-commit.txt"
+          python -m venv "$RUNNER_TEMP/brain-browser"
+          PY="$RUNNER_TEMP/brain-browser/bin/python"
+          "$PY" -m pip install --only-binary=:all: --require-hashes -r brain/requirements-linux-py313.lock --report "$RUNNER_TEMP/host-evidence/python-install-report.json"
+          "$PY" -m pip check | tee "$RUNNER_TEMP/host-evidence/python-pip-check.txt"
+          "$PY" --version > "$RUNNER_TEMP/host-evidence/python-version.txt"
           npm install --prefix "$RUNNER_TEMP/host-tools" --ignore-scripts --no-audit --no-fund --save-exact playwright@1.62.0
           cp "$RUNNER_TEMP/host-tools/package-lock.json" "$RUNNER_TEMP/host-evidence/npm-package-lock.json"
           node "$RUNNER_TEMP/host-tools/node_modules/playwright/cli.js" install --with-deps chromium
-          # Chinese labels must be visually inspectable; font files are not archived.
           sudo apt-get install -y fonts-noto-cjk
-      - name: Run Node unit and existing atlas tests
+      - name: Run Node contract/controller/atlas tests
         shell: bash
         run: |
           set -euo pipefail
-          node --test tests/atlas.test.mjs tests/host-controller.test.mjs | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
-      - name: Run existing Jonah and new host browser checks serially
+          node --test tests/atlas.test.mjs tests/host-controller.test.mjs tests/brain-adapter.test.mjs | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
+      - name: Run existing Jonah, replay host, and real loopback Python host checks serially
         shell: bash
         run: |
           set -euo pipefail
           export NODE_PATH="$RUNNER_TEMP/host-tools/node_modules"
           MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/jonah" node tests/browser.cjs | tee "$RUNNER_TEMP/host-evidence/jonah-run.txt"
-          MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/host" node tests/host-browser.cjs | tee "$RUNNER_TEMP/host-evidence/host-run.txt"
+          MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/replay-host" node tests/host-browser.cjs | tee "$RUNNER_TEMP/host-evidence/replay-host-run.txt"
+          MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/python-host" MYGPT_PYTHON="$RUNNER_TEMP/brain-browser/bin/python" node tests/brain-host-browser.cjs | tee "$RUNNER_TEMP/host-evidence/python-host-run.txt"
       - name: Preserve bounded source-linked evidence
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f

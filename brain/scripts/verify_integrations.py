@@ -12,7 +12,8 @@ import tomllib
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-REQUIRED_CASES = {"test_pydantic_ai_test_model_only", "test_mcp_in_memory_read_only"}
+REQUIRED_CASES = {"test_pydantic_ai_test_model_only", "test_mcp_in_memory_read_only",
+                  "test_default_local_engine_runs_real_testmodel_without_provider"}
 
 
 def inspect_junit(path: Path) -> dict:
