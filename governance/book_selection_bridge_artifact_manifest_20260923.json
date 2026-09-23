@@ -1,0 +1,42 @@
+{
+  "schema_version": "scoped_artifact_manifest_v1",
+  "updated_date": "2026-09-23",
+  "repository": "Jvust2/mygpt",
+  "includes": [
+    {
+      "path": "governance/artifact_manifest.json",
+      "scope": "All previously registered artifacts; existing registry and files remain unchanged."
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "mygpt-book-live-selection-v1-20260923",
+      "file_name": "mygpt-book-live-selection-v1-20260923.zip",
+      "drive_file_id": "1JLrTiZnRWLlN9WlZPO3tczop49ipyTjP",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "656a93710cd48b7414c9742208ab3872abcda7cc0607cf497663329b38b2d58c",
+      "size_bytes": 43805,
+      "zip_members": 27,
+      "indexed_members": 26,
+      "related_implementation_commit": "fa9f17a0eb4fb015d76b419865f1b49a2d325f0e",
+      "pr": 7,
+      "status": "ARCHIVED_REVIEW_CANDIDATE",
+      "verification": "Drive metadata and complete re-downloaded ZIP SHA-256, CRC, exact member count and every self-excluded manifest member verified.",
+      "contains": "Delta source, reproducible tests, raw first-failure/final evidence, checkpoint and internal manifest.",
+      "excludes": [
+        "raw Book corpus",
+        "fonts",
+        "credentials",
+        "private notes/answers",
+        "venv",
+        "dependency wheels",
+        "cache",
+        "duplicate Jonah atlas"
+      ]
+    }
+  ],
+  "pending_sync": {
+    "blocking_count": 0,
+    "scope": "this bridge artifact only; old pending_sync.json items retain their existing status"
+  }
+}

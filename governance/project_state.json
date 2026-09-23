@@ -3,292 +3,91 @@
   "updated_date": "2026-09-23",
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/book-contract-audit-v1",
-  "phase": "SYNTHETIC_LOOPBACK_BRAIN_ACCEPTED",
-  "status": "LOCAL_PYTHON_BRAIN_332_DUAL_ENV_HOST_23_BROWSER_PASS_BOOK_EXPORTER_NEXT_REVIEW_PENDING",
+  "active_branch": "feat/book-live-selection-v1-20260923",
+  "phase": "SCOPED_R6_READONLY_BOOK_BRIDGE",
+  "status": "ARCHIVE_BOOK_HTTP_TESTMODEL_ACCEPTED_BROWSER_AND_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
+  "scope_note": "Current state of this isolated review branch only. Legacy product workstreams, frozen invariants and independent human gates are preserved and not superseded or activated by this bridge.",
   "drive": {
     "folder_name": "mygpt",
     "folder_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK"
   },
+  "current_pr": {
+    "number": 7,
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "base_branch": "feat/book-contract-audit-v1"
+  },
+  "bridge_checkpoint": "docs/BOOK_SELECTION_BRIDGE_CHECKPOINT_20260923.md",
+  "bridge_state": "governance/book_selection_bridge_checkpoint_20260923.json",
+  "artifact_manifest": "governance/book_selection_bridge_artifact_manifest_20260923.json",
+  "legacy_artifact_manifest": "governance/artifact_manifest.json",
+  "pending_sync": {
+    "blocking_count": 0,
+    "source": "governance/pending_sync.json",
+    "bridge_artifact_blocking_count": 0,
+    "note": "Existing unrelated non-blocking items are not resolved or discarded by this checkpoint."
+  },
+  "historical_state": {
+    "source_commit": "ffa664a12b8bd65cd31fc7ef286722f8dea60937",
+    "project_state": "governance/history/project_state_before_book_bridge_20260923.json",
+    "project_state_blob": "ba99cd2cf24dffa1ca96c54ecfb9ece2423daff3",
+    "current_state": "docs/history/CURRENT_STATE_before_book_bridge_20260923.md",
+    "current_state_blob": "8f1aa4a3bb21391ebe35eb7848e6440e3b7a3005",
+    "handoff": "docs/history/HANDOFF_before_book_bridge_20260923.md",
+    "handoff_blob": "0c4572b34558f0bc8c2535484e5126e8f7698e05",
+    "preservation": "Exact pre-change Git blobs retained, not rewritten summaries. Read for every unrelated workstream or inherited gate."
+  },
+  "blocking_items": [
+    "Browser UI acceptance blocked by managed navigation policy in this environment; no bypass attempted.",
+    "Independent code review and Android identity/IPC/physical-device validation pending.",
+    "Existing mygpt PR #5/#6 integration conflict remains unresolved."
+  ],
+  "next_step": "Run exact Book PR #37 plus mygpt PR #7 in an authorized browser runtime with localhost access; verify explicit selection, layer/raw-display switching, navigation/visibility/expiry invalidation, cancellation/revocation races, mobile layout, and zero external requests/StudyRecord writes; then obtain independent review. No Android/paid provider activation or automatic PR merge.",
+  "boundaries": {
+    "main_write": false,
+    "auto_merge": false,
+    "studyrecord_write": false,
+    "notes_or_answers_export": false,
+    "chatcontextvault_access": false,
+    "paid_model_calls": 0,
+    "browser_policy_changed": false,
+    "legacy_simulated_protocols_unchanged": true
+  },
   "product": {
     "role": "long-term companion and learning orchestrator",
+    "default_companion_mode": "SILENT_PRESENCE",
     "perception_priority": [
       "BOOK_SEMANTIC_CONTEXT",
       "OS_APP_SIGNALS",
       "USER_DECLARED_CONTEXT",
       "OPT_IN_SCREEN_VISION"
     ],
-    "default_companion_mode": "SILENT_PRESENCE",
     "shadow_default": false,
     "autonomous_ui_control_v0_1": false
   },
   "dependencies": {
-    "Book": "authoritative structured learning/content context",
-    "StudyMate": "study-session and low-cost device/activity signals",
-    "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
+    "Book": "authoritative learning content and selection authority",
+    "StudyMate": "low-cost device/activity signals",
+    "ChatContextVault": "separate access-gated history; not accessed this turn"
   },
-  "blocking_items": [
-    "Real Book integration remains disabled: Book r6 does not yet emit an authenticated, revocable current-selection snapshot to mygpt.",
-    "Android physical-device validation and production multi-user transport remain unimplemented."
-  ],
-  "pending_sync": {
-    "blocking_count": 0,
-    "source": "governance/pending_sync.json"
+  "live_book_feed": {
+    "archive_backed_local_http": "ACCEPTED",
+    "user_android_book_apk": "NOT_CONNECTED",
+    "live_browser": "NOT_ACCEPTED",
+    "actual_provider": "NOT_ENABLED"
   },
-  "ui_candidate": {
-    "name": "Jonah companion",
-    "surface": "framework-neutral Web Component and preview",
-    "sprite_sha256": "828b0fb468382f37aaf0d62a3e86cb33e5fcad5dbde8aeb091d6778b32a77790",
-    "validation": "Current exact UI commit b688943: 3 atlas tests and 49 existing Jonah browser checks pass; independent Android validation remains pending.",
-    "unverified": [
-      "Android physical device and soft keyboard",
-      "native Android overlay",
-      "production chat and Book bridge",
-      "independent human review"
-    ],
-    "historical_validation_only": false,
-    "not_rerun_this_batch": false
-  },
-  "next_step": "In the Book repository, after its own current safety/governance preflight, create a non-default-branch read-only explicit-selection exporter candidate for r6. Export only bounded current record/layer/version/session/epoch/freshness identity; do not export notes/answers by default, write StudyRecord, call a paid model, write main, or auto-merge.",
-  "optimization_candidate": {
-    "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
-    "base_branch": "feat/jonah-companion-20260922",
-    "base_sha": "64e73b257a79ec09787e2a96a43816b5864f9a1c",
-    "proposed_branch": "fix/companion-input-and-test-isolation-20260922",
-    "scope": [
-      "pointer identity and cancelled-touch recovery",
-      "keyboard focus in action panel",
-      "isolated browser-test server and failure cleanup"
-    ],
-    "validation": {
-      "deterministic_checks_passed": 3,
-      "browser_checks_passed": 49,
-      "occupied_default_port": "PASS",
-      "missing_browser_cleanup": "PASS"
-    },
-    "evidence": "docs/EVALUATION_LEDGER.md#e003--input-recovery-and-isolated-browser-validation",
-    "remote_write_performed": false,
-    "historical_snapshot": true,
-    "actual_publication": {
-      "pr": 3,
-      "head": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
-      "status": "OPEN_DRAFT_UNMERGED"
-    }
-  },
-  "brain_candidate": {
-    "pr": 6,
-    "implementation_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
-    "base_commit": "b4634e482b5b72b92f4c3961a1a68d1e198ec6ee",
-    "evidence_kind": "SIMULATED_ONLY",
-    "context_protocols": [
-      "mygpt.study-context.v1",
-      "mygpt.reader-context.v2"
-    ],
-    "test_result": {
-      "passed": 332,
-      "skipped": 0,
-      "failed": 0,
-      "scope": "combined Python suite with actual Pydantic AI TestModel/MCP/local loopback service; two clean locked environments"
-    },
-    "sdk_integration": "PASS_TESTMODEL_MCP_AND_LOOPBACK_LOCAL_ENGINE",
-    "remote_ci": {
-      "run_id": 35816679199,
-      "job_id": 107039579688,
-      "source_commit": "ef31c36986ca0134c9c62bcdcdf2ebcdf155c431",
-      "conclusion": "success",
-      "artifact_id": 10732155955,
-      "artifact_sha256": "3973492a40347cbf029463ec589f5a74e9d97b07c297b7509456e19aaf3b7e2a",
-      "tests_per_environment": 332,
-      "skipped": 0,
-      "local_http_smoke_checks": 17
-    },
-    "local_environment": {
-      "python": "3.13.5",
-      "passed": 326,
-      "skipped": 6,
-      "failed": 0,
-      "scope": "local suite; pydantic_ai/mcp unavailable so six integration cases skip and are not acceptance"
-    },
-    "dependency_lock": {
-      "path": "brain/requirements-linux-py313.lock",
-      "sha256": "78a05ef99a580964c73cc2944ec9a1df4252e0b16d352f99ae30ce02faeae8c2",
-      "distribution_count": 39,
-      "platform": "Ubuntu 24.04 / CPython 3.13.15 x86_64",
-      "universal_lock": false
-    },
-    "independent_review": "PENDING",
-    "live_book_feed": "NOT_CONNECTED",
-    "android": "NOT_RUN",
-    "root_ui_tests": "PASS_EXACT_HEAD_2C23FA5",
-    "paid_provider_calls": 0,
-    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
-    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
-    "historical_checkpoints": [
-      {
-        "pr": 5,
-        "implementation_commit": "68c351b85511ccdd625036a6917b4303646b6704",
-        "base_commit": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
-        "evidence_kind": "SIMULATED_ONLY",
-        "test_result": {
-          "passed": 95,
-          "skipped": 2,
-          "failed": 0,
-          "scope": "local core/source/CLI; optional SDK tests skipped"
-        },
-        "sdk_integration": "BLOCKED_DEPENDENCY_DOWNLOAD_DNS",
-        "remote_ci": "NOT_RUN",
-        "independent_review": "PENDING",
-        "live_book_feed": "NOT_CONNECTED",
-        "android": "NOT_RUN",
-        "paid_provider_calls": 0,
-        "artifact_id": "mygpt-brain-context-v0.1-20260922",
-        "checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md"
-      },
-      {
-        "implementation_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
-        "test_result": {
-          "passed": 269,
-          "skipped": 0,
-          "failed": 0,
-          "scope": "combined Brain suite including legacy audit and r6 mapper; two clean environments, real TestModel and in-memory MCP SDKs"
-        },
-        "remote_ci": {
-          "run_id": 35797671670,
-          "job_id": 106980616735,
-          "source_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
-          "conclusion": "success",
-          "first_seconds": 2.12,
-          "reinstall_seconds": 1.55,
-          "artifact_id": 10724052652,
-          "artifact_sha256": "a46aaa29d273fefe06017f2f6383d1c33e1c02797f78856b3359f5e4515ad193"
-        },
-        "artifact_id": "mygpt-reader-selection-v1-20260923",
-        "checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md"
-      }
-    ],
-    "accepted_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1"
-  },
-  "decision_checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
-  "evaluation_checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
-  "book_bridge_candidate": {
-    "status": "R6_EXPLICIT_SELECTION_OFFLINE_ACCEPTED",
-    "target": "r6 Reader /api/reader, not the legacy Web ModeResponse/SourceResponse",
-    "source_archive_drive_id": "1UiVow02Huh3r8qKBH8v4bL3D9OfkQ8_R",
-    "source_archive_sha256": "19315e8aeebe2db5cf2f4b55e0a38f550967966af106491dfef67212b430adc1",
-    "source_checkpoint_commit": "7283f2eef7610d67c6b92b2ef7c513e1225ad957",
-    "selected_members_verified": 7,
-    "installed_apk_identity_verified": false,
-    "mapper": "brain/mygpt_brain/reader_snapshot.py",
-    "supported_layers": [
-      "source",
-      "correction",
-      "derived"
-    ],
-    "selection_explicit": true,
-    "source_serialization": "reader-selected-json-v1",
-    "v1_reference_unchanged": true,
-    "live_connected": false,
-    "book_mutations": 0,
-    "raw_book_source_copied_to_mygpt": false,
-    "legacy_auditor": "brain/mygpt_brain/book_contract_audit.py"
-  },
-  "parallel_branch_reference": {
-    "pr": 5,
-    "head_at_reconciliation": "632b843c4e071a32b841caa7de8bdb0bbfebc059",
-    "modified_this_batch": false,
-    "note": "This candidate does not merge or overwrite PR #5. Its executable SDK baseline is inherited via 95fd284; both review branches remain unmerged."
-  },
-  "host_ui_candidate": {
-    "status": "SYNTHETIC_LOOPBACK_PYTHON_BRAIN_ACCEPTED",
-    "pr": 6,
-    "implementation_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
-    "entry": "host/brain.html",
-    "usage": "host/README.md",
-    "runtime": "same-origin 127.0.0.1 Python Brain/TestModel for brain.html; legacy reader.html replay remains available",
-    "python_fixture_generation": "real Reader mapper and Brain; browser-to-Python live loopback is enabled only for fixed synthetic catalogue",
-    "selected_entries": 5,
-    "supported_modes": [
-      "preview",
-      "learn",
-      "review",
-      "practice"
-    ],
-    "node_tests_passed": 54,
-    "jonah_browser_checks_passed": 49,
-    "host_browser_checks_passed": 39,
-    "runtime_errors": 0,
-    "external_requests_in_browser_test": 0,
-    "remote_ci": {
-      "run_id": 35817053593,
-      "job_id": 107040710718,
-      "source_commit": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
-      "conclusion": "success",
-      "artifact_id": 10731589161,
-      "artifact_sha256": "1fee99805b6e2c70d22f55a06f617e10c1fc03b3df25ef5ba6ba4598ef672ba2",
-      "playwright": "1.62.0",
-      "chromium": "151.0.7922.34",
-      "node": "v22.23.2"
-    },
-    "historical_failure": {
-      "run_id": 35806749602,
-      "job_id": 107009208035,
-      "artifact_id": 10728255659,
-      "artifact_sha256": "9a71b9197810a675d5caf0de98b18e9879ff5db6f4670c023be6159c90f16cb5",
-      "cause": "test checked reduced-motion state before media event callback; original assertion preserved and awaited"
-    },
-    "visual_inspection": "final mobile and desktop screenshots reviewed; default dock no longer overlaps reading scrollport",
-    "live_book_connected": false,
-    "live_python_transport": true,
-    "paid_model_calls": 0,
-    "android": "NOT_RUN",
-    "independent_review": "PENDING",
-    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
-    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
-    "accepted_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
-    "replay_host_browser_checks_passed": 39,
-    "local_brain_browser_checks_passed": 23,
-    "test_model_only": true
-  },
-  "integration_conflicts": [
-    {
-      "pr": 6,
-      "base_pr": 5,
-      "status": "MERGEABLE_FALSE_REQUIRES_SEPARATE_THREE_WAY_RECONCILIATION",
-      "scope": "integration only; not an unsaved artifact",
-      "automatically_resolved": false
-    }
-  ],
-  "local_brain_transport_candidate": {
-    "status": "ACCEPTED_SYNTHETIC_LOOPBACK_ONLY",
-    "bind": "127.0.0.1 only; ephemeral port supported",
-    "authorization": "ephemeral in-memory HttpOnly SameSite=Strict cookie; exact Host/origin/fetch-site/client guards",
-    "endpoints": [
-      "GET /api/v1/status",
-      "POST /api/v1/explain",
-      "POST /api/v1/cancel",
-      "POST /api/v1/revoke"
-    ],
-    "request_body_max_bytes": 8192,
-    "receipt_capacity": 128,
-    "authorization_seconds_range": [
-      60,
-      3600
-    ],
-    "selection_seconds_max": 300,
-    "runtime_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
-    "sdk_test_commit": "ef31c36986ca0134c9c62bcdcdf2ebcdf155c431",
-    "latest_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
-    "sdk_run": 35816679199,
-    "host_run": 35817053593,
-    "sdk_tests_per_environment": 332,
-    "loopback_browser_checks": 23,
-    "local_http_smoke_checks": 17,
-    "live_book_connected": false,
-    "paid_model_calls": 0,
-    "persistent_source_text": false,
-    "production_multi_user_security": "NOT_CLAIMED",
-    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
-    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md"
+  "governance": {
+    "agent_entry": "AGENTS.md",
+    "security_policy": "SECURITY_POLICY.md",
+    "north_star": "docs/PROJECT_NORTH_STAR.md",
+    "architecture_invariants": "docs/ARCHITECTURE_INVARIANTS.md",
+    "current_state": "docs/CURRENT_STATE.md",
+    "handoff": "docs/HANDOFF.md",
+    "preflight": "docs/PRE_FLIGHT_CHECKLIST.md",
+    "decision_ledger": "docs/DECISION_LEDGER.md",
+    "evaluation_ledger": "docs/EVALUATION_LEDGER.md",
+    "active_decision_and_evaluation_checkpoint": "docs/BOOK_SELECTION_BRIDGE_CHECKPOINT_20260923.md"
   }
 }
