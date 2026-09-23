@@ -56,7 +56,14 @@ jobs:
           "$PY" -m pip install --no-index --find-links="$RUNNER_TEMP/bridge-wheels" --require-hashes -r requirements-linux-py313.lock
           "$PY" -m pip check
           "$PY" scripts/verify_integrations.py --output "$RUNNER_TEMP/bridge-evidence/first"
+          "$PY" scripts/assert_book_bridge_acceptance.py "$RUNNER_TEMP/bridge-evidence/first/tests.xml" --output "$RUNNER_TEMP/bridge-evidence/first/book-receiver.json"
           "$PY" -m compileall -q mygpt_brain scripts tests
+          python -m venv "$RUNNER_TEMP/bridge-venv-second"
+          PY2="$RUNNER_TEMP/bridge-venv-second/bin/python"
+          "$PY2" -m pip install --no-index --find-links="$RUNNER_TEMP/bridge-wheels" --require-hashes -r requirements-linux-py313.lock
+          "$PY2" -m pip check
+          "$PY2" scripts/verify_integrations.py --output "$RUNNER_TEMP/bridge-evidence/second"
+          "$PY2" scripts/assert_book_bridge_acceptance.py "$RUNNER_TEMP/bridge-evidence/second/tests.xml" --output "$RUNNER_TEMP/bridge-evidence/second/book-receiver.json"
       - name: Preserve tests and exact source (no git credentials)
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
