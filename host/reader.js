@@ -5,6 +5,7 @@ import { createReplayAdapter } from './replay.js';
 
 const $ = id => document.getElementById(id);
 const pet = $('pet'), panel = $('help-panel');
+const compact = matchMedia('(max-height:480px)');
 const labels = {source:'原文层（合成转录）',correction:'校正层（非官方勘误）',derived:'AI 推导层（非标准答案）'};
 const reasons = {empty:'请先选择具体内容',selected:'已选择 · 等你明确求助',working:'正在回放预写样本…',
   ready:'样本已就绪 · 不是实时 AI 回复',error:'回放失败，可重新选择后再试',expired:'选择已失效，请重新选择',
@@ -51,7 +52,7 @@ let renderedEntry = null;
 controller.subscribe(state=>{
   document.body.dataset.hostState = state.status;
   pet.setStatus(state.petStatus);
-  pet.toggleAttribute('paused',['paused','revoked','disposed'].includes(state.status));
+  pet.toggleAttribute('paused',compact.matches||['paused','revoked','disposed'].includes(state.status));
   $('state-label').textContent = state.reason==='request_timeout'?'等待已超时，没有自动重试。':reasons[state.status];
   $('model-calls').textContent = String(state.modelCalls);$('request-count').textContent = String(state.requests);
   $('explain').disabled = !['selected','ready','error'].includes(state.status);
@@ -95,10 +96,13 @@ panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();clo
 pet.addEventListener('pet-chat-request',()=>openPanel()); // opening is NOT sending
 pet.addEventListener('pet-error',()=>{$('pet-fallback').hidden=false;});
 pet.addEventListener('pet-visibility-change',()=>{
+  document.body.dataset.petHidden=String(pet.hidden);
   $('toggle-pet').textContent=pet.hidden?'显示约拿':'隐藏约拿';
   if(pet.hidden) controller.pause();
 });
+document.body.dataset.petHidden=String(pet.hidden);
 $('toggle-pet').textContent=pet.hidden?'显示约拿':'隐藏约拿';
+compact.addEventListener('change',()=>{pet.toggleAttribute('paused',compact.matches||['paused','revoked','disposed'].includes(controller.getState().status));});
 $('toggle-pet').addEventListener('click',()=>pet.hidden?pet.show():pet.hide());
 document.addEventListener('visibilitychange',()=>{if(document.hidden)controller.pause();});
 window.addEventListener('pagehide',()=>controller.pause());

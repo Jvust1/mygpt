@@ -48,6 +48,7 @@ function address(server) {
     check('simulation boundary is visible',await page.locator('.notice').innerText().then(t=>t.includes('Book 未连接')&&t.includes('预写样本')));
     check('local sprite loads',await page.$eval('#pet',p=>!p.hasAttribute('asset-error')));
     await fits('393px mobile has no horizontal overflow');
+    check('docked pet does not overlap the reading viewport',await page.evaluate(()=>document.querySelector('main').getBoundingClientRect().bottom<=document.querySelector('#pet').getBoundingClientRect().top));
     await page.screenshot({path:path.join(out,'host-mobile-initial.png')});
     await page.locator('mygpt-pet .avatar').tap();await page.locator('mygpt-pet [data-action="chat"]').tap();
     check('Jonah event opens panel without sending',await page.locator('#help-panel').isVisible()&&await count()==='0');
@@ -91,7 +92,7 @@ function address(server) {
     await page.locator('#explain').tap();await wait('expired');
     check('clock-expired selection is blocked before sending',await page.locator('#selected-context').isHidden()&&await page.$eval('#pet',p=>p.status==='blocked'));
     await page.reload();await wait('empty');await choose('a-source');
-    await page.emulateMedia({reducedMotion:'reduce'});check('reduced motion remains respected',await page.$eval('#pet',p=>p._timer===null));
+    await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>document.querySelector('#pet')._timer===null);check('reduced motion remains respected',await page.$eval('#pet',p=>p._timer===null));
     await page.locator('.scope summary').click();await page.locator('#revoke').click();await wait('revoked');
     check('disable closes this instance with selection controls disabled',await page.locator('#select-record-1').isDisabled()&&await page.locator('#mode').isDisabled());
     await page.reload();await wait('empty');
@@ -99,7 +100,8 @@ function address(server) {
     for(const size of [{width:320,height:568},{width:640,height:280},{width:1280,height:900}]){
       await page.setViewportSize(size);await fits(`${size.width}px viewport has no horizontal overflow`);
     }
-    await choose('a-solution');await page.locator('#explain').click();await wait('ready');await page.evaluate(()=>scrollTo(0,0));
+    await page.waitForTimeout(80);
+    await choose('a-solution');await page.locator('#explain').click();await wait('ready');await page.evaluate(()=>document.querySelector('main').scrollTo(0,0));
     await page.screenshot({path:path.join(out,'host-desktop-reply.png')});
     await page.locator('#close-panel').click();await page.locator('mygpt-pet .avatar').focus();await page.keyboard.press('Enter');
     await page.keyboard.press('Enter');check('keyboard can open Jonah then host panel',await page.locator('#help-panel').isVisible()&&await page.locator('#help-heading').evaluate(e=>document.activeElement===e));
