@@ -1,8 +1,8 @@
 {
   "updated_date": "2026-09-23",
-  "status": "ARCHIVE_BOOK_HTTP_TESTMODEL_ACCEPTED_UI_LAYER_STATE_REGRESSION_PASS_BROWSER_PENDING",
+  "status": "BROWSER_SHIM_UI_ACCEPTED_DIRECT_LOCALHOST_BLOCKED_REVIEW_PENDING",
   "checkpoint": "docs/BOOK_SELECTION_BRIDGE_CHECKPOINT_20260923.md",
-  "next_step": "Run exact Book PR #37 (including explicit multi-layer source choice at 114be2a) plus mygpt PR #7 in an authorized browser runtime with localhost access; verify explicit layer choice, two-stage share, navigation/visibility/expiry invalidation, cancellation/revocation races, mobile layout, and zero external requests/StudyRecord writes; then obtain independent review. No Android/paid provider activation or automatic PR merge.",
+  "next_step": "Obtain independent review of exact Book PR #37 and mygpt PR #7 while preserving the current browser-shim evidence. When an authorized browser runtime with direct localhost access is available, rerun the same flow without the transport/storage/WebCrypto test doubles. Do not start Android/paid-provider activation or merge any PR automatically.",
   "evidence": {
     "book_python_passed": 68,
     "book_node_projection_passed": 18,
@@ -23,7 +23,17 @@
     "independent_review": "PENDING",
     "paid_provider_calls": 0,
     "teaching_quality_validated": false,
-    "book_ui_state_node_passed": 1
+    "book_ui_state_node_passed": 1,
+    "chromium_shim_main_passed": 21,
+    "chromium_shim_timing_passed": 5,
+    "chromium_shim_page_errors": 0,
+    "chromium_shim_console_errors": 0,
+    "chromium_shim_native_network_requests": 0,
+    "direct_localhost_127": "ERR_BLOCKED_BY_ADMINISTRATOR",
+    "direct_localhost_name": "ERR_BLOCKED_BY_ADMINISTRATOR",
+    "browser_shim_scope": "REAL_CHROMIUM_UI_EXACT_JS_REAL_R6_REAL_BOOK_HTTP_REAL_MYGPT_TESTMODEL_VIA_EXPLICIT_TRANSPORT_SHIM",
+    "browser_storage_history": "EXPLICIT_TEST_DOUBLES",
+    "browser_webcrypto_randomuuid": "EXPLICIT_TEST_DOUBLES"
   },
   "source": {
     "book_r6_checkpoint": "7283f2eef7610d67c6b92b2ef7c513e1225ad957",
@@ -44,7 +54,7 @@
       "ci_artifact_sha256": "4214e74934bf6aaf63fc0e9e862c35ea750bca2d8b1bf657885076c910197755",
       "readback_matching_files": 16,
       "latest_ui_commit": "114be2a40f9e3ef364aca2e02492361ebf46e4b6",
-      "governance_head": "67db4beaea031cd8ea2b6867cbd047bb41602c0b",
+      "governance_head": "060d5bda49f6fbc964c4f5ef5987bf1b049aa210",
       "latest_ci_run": 35834149129,
       "latest_ci_artifact": 10738114864,
       "latest_ci_artifact_sha256": "26e7027f0697acccf8e8d50724ad1ec7bc9a9b3e3923eb8f57885f20d1c63b8e",
@@ -52,6 +62,13 @@
         "id": "1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz",
         "sha256": "506ba0a1f259431fed59358bcfb7ccb44c3ddee31c681c890a492b6e1054079a",
         "size_bytes": 103218
+      },
+      "browser_shim_artifact": {
+        "drive_id": "1l1XxGbVqS5__4RhSYevhTnNT5JT3ijs9",
+        "sha256": "71b10b3127eb60a61681d96a9712c17758ddf7eb3f00bf09a6bdb3f75d6834ba",
+        "size_bytes": 1673673,
+        "zip_members": 18,
+        "indexed_members": 17
       }
     },
     "mygpt": {

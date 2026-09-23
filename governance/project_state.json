@@ -5,7 +5,7 @@
   "default_branch": "main",
   "active_branch": "feat/book-live-selection-v1-20260923",
   "phase": "SCOPED_R6_READONLY_BOOK_BRIDGE",
-  "status": "ARCHIVE_BOOK_HTTP_TESTMODEL_ACCEPTED_UI_LAYER_STATE_REGRESSION_PASS_BROWSER_PENDING",
+  "status": "BROWSER_SHIM_UI_ACCEPTED_DIRECT_LOCALHOST_BLOCKED_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "scope_note": "Current state of this isolated review branch only. Legacy product workstreams, frozen invariants and independent human gates are preserved and not superseded or activated by this bridge.",
   "drive": {
@@ -40,11 +40,11 @@
     "preservation": "Exact pre-change Git blobs retained, not rewritten summaries. Read for every unrelated workstream or inherited gate."
   },
   "blocking_items": [
-    "Browser UI acceptance blocked by managed navigation policy in this environment; no bypass attempted.",
+    "Direct system Chromium navigation to both 127.0.0.1 and localhost remains ERR_BLOCKED_BY_ADMINISTRATOR; policy was not changed or bypassed.",
     "Independent code review and Android identity/IPC/physical-device validation pending.",
     "Existing mygpt PR #5/#6 integration conflict remains unresolved."
   ],
-  "next_step": "Run exact Book PR #37 (including explicit multi-layer source choice at 114be2a) plus mygpt PR #7 in an authorized browser runtime with localhost access; verify explicit layer choice, two-stage share, navigation/visibility/expiry invalidation, cancellation/revocation races, mobile layout, and zero external requests/StudyRecord writes; then obtain independent review. No Android/paid provider activation or automatic PR merge.",
+  "next_step": "Obtain independent review of exact Book PR #37 and mygpt PR #7 while preserving the current browser-shim evidence. When an authorized browser runtime with direct localhost access is available, rerun the same flow without the transport/storage/WebCrypto test doubles. Do not start Android/paid-provider activation or merge any PR automatically.",
   "boundaries": {
     "main_write": false,
     "auto_merge": false,
@@ -75,7 +75,7 @@
   "live_book_feed": {
     "archive_backed_local_http": "ACCEPTED",
     "user_android_book_apk": "NOT_CONNECTED",
-    "live_browser": "NOT_ACCEPTED",
+    "live_browser": "CHROMIUM_UI_REAL_BACKEND_SHIM_ACCEPTED_DIRECT_LOCALHOST_BLOCKED",
     "actual_provider": "NOT_ENABLED"
   },
   "governance": {
@@ -100,5 +100,21 @@
     "browser_e2e": "NOT_ACCEPTED",
     "book_drive_delta_id": "1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz",
     "book_drive_delta_sha256": "506ba0a1f259431fed59358bcfb7ccb44c3ddee31c681c890a492b6e1054079a"
+  },
+  "browser_acceptance": {
+    "scope": "REAL_CHROMIUM_UI_EXACT_JS_REAL_R6_REAL_BOOK_HTTP_REAL_MYGPT_TESTMODEL_VIA_PLAYWRIGHT_BINDING_SHIM",
+    "main_checks_passed": 21,
+    "timing_checks_passed": 5,
+    "direct_localhost": "BLOCKED_BY_ADMINISTRATOR",
+    "storage_history": "EXPLICIT_TEST_DOUBLES_DUE_NULL_ORIGIN",
+    "webcrypto_randomuuid": "EXPLICIT_TEST_DOUBLES_DUE_NULL_ORIGIN",
+    "page_errors": 0,
+    "console_errors": 0,
+    "native_browser_network_requests": 0,
+    "paid_provider_calls": 0,
+    "book_artifact_drive_id": "1l1XxGbVqS5__4RhSYevhTnNT5JT3ijs9",
+    "book_artifact_sha256": "71b10b3127eb60a61681d96a9712c17758ddf7eb3f00bf09a6bdb3f75d6834ba",
+    "book_governance_head": "060d5bda49f6fbc964c4f5ef5987bf1b049aa210",
+    "mygpt_runtime_commit": "fa9f17a0eb4fb015d76b419865f1b49a2d325f0e"
   }
 }

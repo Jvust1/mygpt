@@ -16,11 +16,19 @@
 
 Book PR #37 已前进到运行提交 `114be2a40f9e3ef364aca2e02492361ebf46e4b6`：当同一 record 同时存在原文/补录/AI 校正等多个候选层时，不再默认选最后一层；必须用户自己选择并核对预览，之后分享按钮才启用。预览本身仍不会产生 `/select` 授权。run 35834149129 的 68 Python、18 projection Node、1 DOM state regression 通过；这不是实际浏览器 E2E。Book 新增量归档 Drive `1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz` 已完成整包哈希/CRC/内部 manifest 回读验证。
 
+## Chromium UI + 真实后端 shim 验收
+
+在不修改浏览器管理策略的前提下，系统 Chromium 直连 `127.0.0.1` 与 `localhost` 均仍返回 `ERR_BLOCKED_BY_ADMINISTRATOR`。本轮改用明确的 Playwright binding 传输 shim：真实 Chromium 运行精确 Reader/Bridge JS，应用 fetch 被测试 harness 转发到真实 Book 127.0.0.1 服务；r6 数据、Book Authority、mygpt BookReceiver 与实际 Pydantic AI TestModel 均是真实实现。
+
+主 UI **21/21** 与额外时序 **5/5** 全过，覆盖 raw/display、多层显式选择、预览零 grant、分享、真实 TestModel、MathJax、导航/模式/翻组/隐藏/短租约过期失效、取消迟到回复、撤销、移动/桌面边界，0 页面/console error。null-origin 测试页所缺失的 storage/history、randomUUID/WebCrypto 为明确测试替身，因此此结果不能冒充 direct-localhost E2E。
+
+证据只在 Book 项目归档一份：Drive `1l1XxGbVqS5__4RhSYevhTnNT5JT3ijs9`，1,673,673 bytes，SHA-256 `71b10b3127eb60a61681d96a9712c17758ddf7eb3f00bf09a6bdb3f75d6834ba`；mygpt 不重复复制。
+
 ## 未完成与下一步
 
 托管浏览器以 `ERR_BLOCKED_BY_ADMINISTRATOR` 阻止 localhost 导航，未更改或绕过策略，因此 UI 端到端验收仍未完成。Android APK 身份、IPC/overlay、真机软键盘、真实教学模型、生产多用户安全和独立审阅未验收。旧 mygpt PR #5/#6 整合冲突未处理。
 
-唯一下一步：在允许 localhost 的受信任浏览器环境，对两个 PR 的精确实现做完整 UI 验收与独立审阅；不自动合并、不启用付费模型、不修改学习记录。
+下一步优先做独立代码审阅；当获得允许直连 localhost 的受信任浏览器环境时，再用同一流程去掉 transport/storage/WebCrypto 测试替身复验。Android、真实教学模型与 PR merge 仍不自动启动。
 
 ## 恢复入口
 

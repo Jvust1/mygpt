@@ -34,3 +34,12 @@ Book artifact 10736546209 的 SHA-256 为 `4214e74934bf6aaf63fc0e9e862c35ea750bc
 Book run 35834149129：68 Python + 18 projection Node + 1 DOM state regression 全过；artifact 10738114864 SHA-256 `26e7027f0697acccf8e8d50724ad1ec7bc9a9b3e3923eb8f57885f20d1c63b8e`。Book v1.1 增量归档 Drive `1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz`，103,218 bytes，SHA-256 `506ba0a1f259431fed59358bcfb7ccb44c3ddee31c681c890a492b6e1054079a`；旧 v1 不覆盖。
 
 mygpt `book_bridge.py` 未变；旧 receiver 验收仍有效。真实浏览器 localhost E2E、Android 和独立审阅继续 PENDING。
+
+
+## BRIDGE-E003 — Chromium UI + 真实 Book/mygpt 后端 shim
+
+冻结 r6 与 mygpt 精确源码重新恢复后，68 Python、18 projection Node、1 DOM state、19,174 conformance 和 56 HTTP / 5 TestModel / 0 paid 的既有结果全部重现。系统 Chromium 直接访问 `127.0.0.1` 和 `localhost` 均为 `ERR_BLOCKED_BY_ADMINISTRATOR`，策略未修改或绕过。
+
+显式 Playwright binding shim 中，真实 Chromium 执行精确 Reader/Bridge JS；应用 fetch 由 harness 转发至真实 Book 127.0.0.1 服务，Book Authority/r6/mygpt BookReceiver/TestModel 均不替换。由于测试页 null origin，localStorage/history、randomUUID/WebCrypto 为明确测试替身。
+
+主 UI 21/21、额外时序 5/5 通过，覆盖真实 raw/display、多层明确选层、预览零 grant、share、真实 TestModel reply、0 paid、MathJax、navigation/mode/group/visibility/expiry invalidation、cancel late reply、revoke、mobile/desktop layout、0 page/console errors。证据包仅归档在 Book：Drive `1l1XxGbVqS5__4RhSYevhTnNT5JT3ijs9`，SHA-256 `71b10b3127eb60a61681d96a9712c17758ddf7eb3f00bf09a6bdb3f75d6834ba`。该结果提升浏览器 UI/时序可信度，但 **direct browser -> localhost 仍 NOT ACCEPTED**。

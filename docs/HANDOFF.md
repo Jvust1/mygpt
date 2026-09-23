@@ -14,3 +14,6 @@ Book 运行目录必须来自固定 SHA 的 r6 归档；旧 Book `app/` 不是 r
 
 
 配套 Book PR #37 最新运行提交 `114be2a40f9e3ef364aca2e02492361ebf46e4b6`，治理 head `67db4beaea031cd8ea2b6867cbd047bb41602c0b`。多来源层必须显式选择后才能分享；run 35834149129 的 DOM 状态回归通过，但真实浏览器仍未验收。Book v1.1 增量包 Drive `1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz`；mygpt 接收端源码本轮未变。
+
+
+浏览器 shim 最新证据：Book Drive `1l1XxGbVqS5__4RhSYevhTnNT5JT3ijs9`，SHA-256 `71b10b3127eb60a61681d96a9712c17758ddf7eb3f00bf09a6bdb3f75d6834ba`。21 个主 UI + 5 个时序检查通过，使用精确 Reader/Bridge、真实 r6、Book localhost 服务和真实 mygpt/TestModel；direct 127.0.0.1/localhost 仍被管理策略阻止，storage/history/WebCrypto/randomUUID 为 null-origin 测试替身。mygpt runtime 没改。当前优先做独立审阅。
