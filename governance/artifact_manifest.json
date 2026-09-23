@@ -89,6 +89,24 @@
       "purpose": "Brain source with r6 selection mapper, preserved v1 protocol, three explicit layers, exact-code 269-case dual-environment CI ZIP, local evidence, generated schemas and checkpoint docs. Not full mygpt/App/APK. Excludes Book raw source/text, Jonah atlas, credentials and recursive outer registries.",
       "status": "archived_review_candidate",
       "verification": "Drive metadata and downloaded full ZIP SHA-256 match; CRC passed; exact 42 members and all 41 self-excluded manifest entries verified."
+    },
+    {
+      "artifact_id": "mygpt-host-ui-v1-20260923",
+      "file_name": "mygpt-host-ui-v1-20260923.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "1AocrSp1KJoT0Oxhw_R8LZ802-AZzpEJP",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "2c20314a848aa8b2a8515533025ac9f4dde02e00dbf85cf2cd7513647cdcc964",
+      "size_bytes": 2830618,
+      "version": "1-synthetic-host-ui",
+      "created_at": "2026-09-23T01:49:55.234Z",
+      "source": "assistant_generated_and_github_actions",
+      "related_branch": "feat/book-contract-audit-v1",
+      "related_commit": "b688943fe710537ff0e7807361a303bd7b7aa04e",
+      "python_source_commit": "d24802d9906c559f2099d44eedbb7d58b9148d3f",
+      "purpose": "Host UI delta source, fixture generator, tests, scoped workflows, usage/checkpoint, original Python success/UI failure/UI success ZIPs and local evidence. Requires existing baseline; not standalone APK or a live Book/model bridge. No duplicate atlas, fonts, third-party code, credentials or cache.",
+      "status": "archived_review_candidate",
+      "verification": "Drive metadata and full downloaded ZIP match; 29 members, ZIP CRC and 28/28 indexed member hashes verified."
     }
   ],
   "notes": [
@@ -97,6 +115,7 @@
     "Brain archive does not contain or replace the existing Jonah package. SDK skips remain validation blockers, not missing synchronization artifacts.",
     "2026-09-23: previous SDK-blocker note is historical. Exact implementation 86734b5 passed all 269 combined tests with zero skips in each of two clean environments.",
     "The existing SDK and legacy-audit archives were indexed, not rewritten; old artifact IDs and original provenance are preserved.",
-    "The latest bundle excludes this outer artifact registry and project_state to avoid circular identities; GitHub remains the authoritative current-state registry."
+    "The latest bundle excludes this outer artifact registry and project_state to avoid circular identities; GitHub remains the authoritative current-state registry.",
+    "Host UI checkpoint: existing five artifacts retained byte identities; one new delta archive. UI and Python exact-code evidence are separately identified. Browser fixture replay is not a live Python/Book transport."
   ]
 }

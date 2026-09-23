@@ -4,8 +4,8 @@
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
   "active_branch": "feat/book-contract-audit-v1",
-  "phase": "R6_READER_SELECTION_OFFLINE_ACCEPTED",
-  "status": "COMBINED_269_PASS_HOST_UI_NEXT_REVIEW_PENDING",
+  "phase": "SYNTHETIC_READER_HOST_UI_ACCEPTED",
+  "status": "HOST_39_BROWSER_AND_BRAIN_290_PASS_REAL_TRANSPORT_NEXT_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -39,17 +39,17 @@
     "name": "Jonah companion",
     "surface": "framework-neutral Web Component and preview",
     "sprite_sha256": "828b0fb468382f37aaf0d62a3e86cb33e5fcad5dbde8aeb091d6778b32a77790",
-    "validation": "3 deterministic checks and 45 headless Chromium interaction checks pass",
+    "validation": "Current exact UI commit b688943: 3 atlas tests and 49 existing Jonah browser checks pass; independent Android validation remains pending.",
     "unverified": [
       "Android physical device and soft keyboard",
       "native Android overlay",
       "production chat and Book bridge",
       "independent human review"
     ],
-    "historical_validation_only": true,
-    "not_rerun_this_batch": true
+    "historical_validation_only": false,
+    "not_rerun_this_batch": false
   },
-  "next_step": "Connect explicit Reader selection and explain-this-section actions in the mygpt host demo, show version/layer/expiry and bridge Jonah user events using synthetic inputs first. Book exporter, trusted handshake, revocable authorization and real integration require a separate preflight. No Book writes, paid model, direct main write or automatic PR merge.",
+  "next_step": "Design and validate the minimal host-to-real-Python-Brain request contract using synthetic data and TestModel only. Before adding a loopback transport, specify Origin/Host checks, temporary authorization, bounded endpoints, selection/source identity, expiry, cancellation and revocation in preflight. No real Book writes/feed, paid model calls, main writes or automatic merges.",
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
@@ -77,33 +77,33 @@
   },
   "brain_candidate": {
     "pr": 6,
-    "implementation_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
-    "base_commit": "41277d24498d1d2a122b100bb68a38cf30ca62dd",
+    "implementation_commit": "d24802d9906c559f2099d44eedbb7d58b9148d3f",
+    "base_commit": "070747683ebce299531c2d95d7aa9deb79b266cb",
     "evidence_kind": "SIMULATED_ONLY",
     "context_protocols": [
       "mygpt.study-context.v1",
       "mygpt.reader-context.v2"
     ],
     "test_result": {
-      "passed": 269,
+      "passed": 290,
       "skipped": 0,
       "failed": 0,
-      "scope": "combined Brain suite including legacy audit and r6 mapper; two clean environments, real TestModel and in-memory MCP SDKs"
+      "scope": "combined Python suite including deterministic generated host fixtures; two clean environments, real TestModel and in-memory MCP SDKs"
     },
     "sdk_integration": "PASS_SYNTHETIC_READER_LAYERS_AND_V1_COMPATIBILITY",
     "remote_ci": {
-      "run_id": 35797671670,
-      "job_id": 106980616735,
-      "source_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
+      "run_id": 35806749551,
+      "job_id": 107009207839,
+      "source_commit": "d24802d9906c559f2099d44eedbb7d58b9148d3f",
       "conclusion": "success",
-      "first_seconds": 2.12,
-      "reinstall_seconds": 1.55,
-      "artifact_id": 10724052652,
-      "artifact_sha256": "a46aaa29d273fefe06017f2f6383d1c33e1c02797f78856b3359f5e4515ad193"
+      "first_seconds": 2.19,
+      "reinstall_seconds": 1.41,
+      "artifact_id": 10727024882,
+      "artifact_sha256": "7b1dc26b80098af1687897ad0e2adc964b956b1f6b85e2acef84082003ef78c1"
     },
     "local_environment": {
       "python": "3.13.5",
-      "passed": 264,
+      "passed": 285,
       "skipped": 5,
       "failed": 0,
       "scope": "local combined suite; SDK packages unavailable, not the accepted CI result"
@@ -118,10 +118,10 @@
     "independent_review": "PENDING",
     "live_book_feed": "NOT_CONNECTED",
     "android": "NOT_RUN",
-    "root_ui_tests": "NOT_RERUN_THIS_BATCH",
+    "root_ui_tests": "PASS_SEPARATE_EXACT_UI_COMMIT_B688943",
     "paid_provider_calls": 0,
-    "artifact_id": "mygpt-reader-selection-v1-20260923",
-    "checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md",
+    "artifact_id": "mygpt-host-ui-v1-20260923",
+    "checkpoint": "docs/HOST_UI_CHECKPOINT_20260923.md",
     "historical_checkpoints": [
       {
         "pr": 5,
@@ -142,11 +142,32 @@
         "paid_provider_calls": 0,
         "artifact_id": "mygpt-brain-context-v0.1-20260922",
         "checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md"
+      },
+      {
+        "implementation_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
+        "test_result": {
+          "passed": 269,
+          "skipped": 0,
+          "failed": 0,
+          "scope": "combined Brain suite including legacy audit and r6 mapper; two clean environments, real TestModel and in-memory MCP SDKs"
+        },
+        "remote_ci": {
+          "run_id": 35797671670,
+          "job_id": 106980616735,
+          "source_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
+          "conclusion": "success",
+          "first_seconds": 2.12,
+          "reinstall_seconds": 1.55,
+          "artifact_id": 10724052652,
+          "artifact_sha256": "a46aaa29d273fefe06017f2f6383d1c33e1c02797f78856b3359f5e4515ad193"
+        },
+        "artifact_id": "mygpt-reader-selection-v1-20260923",
+        "checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md"
       }
     ]
   },
-  "decision_checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md",
-  "evaluation_checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md",
+  "decision_checkpoint": "docs/HOST_UI_CHECKPOINT_20260923.md",
+  "evaluation_checkpoint": "docs/HOST_UI_CHECKPOINT_20260923.md",
   "book_bridge_candidate": {
     "status": "R6_EXPLICIT_SELECTION_OFFLINE_ACCEPTED",
     "target": "r6 Reader /api/reader, not the legacy Web ModeResponse/SourceResponse",
@@ -174,5 +195,60 @@
     "head_at_reconciliation": "632b843c4e071a32b841caa7de8bdb0bbfebc059",
     "modified_this_batch": false,
     "note": "This candidate does not merge or overwrite PR #5. Its executable SDK baseline is inherited via 95fd284; both review branches remain unmerged."
-  }
+  },
+  "host_ui_candidate": {
+    "status": "SYNTHETIC_REPLAY_UI_ACCEPTED",
+    "pr": 6,
+    "implementation_commit": "b688943fe710537ff0e7807361a303bd7b7aa04e",
+    "entry": "host/reader.html",
+    "usage": "host/README.md",
+    "runtime": "static modules with an explicit prewritten replay adapter",
+    "python_fixture_generation": "real Reader mapper and Brain at build/test time; no browser-to-Python live call",
+    "selected_entries": 5,
+    "supported_modes": [
+      "preview",
+      "learn",
+      "review",
+      "practice"
+    ],
+    "node_tests_passed": 49,
+    "jonah_browser_checks_passed": 49,
+    "host_browser_checks_passed": 39,
+    "runtime_errors": 0,
+    "external_requests_in_browser_test": 0,
+    "remote_ci": {
+      "run_id": 35807425272,
+      "job_id": 107011254871,
+      "conclusion": "success",
+      "artifact_id": 10727898973,
+      "artifact_sha256": "20f6591c22b802d1fd956f58cca6719503c1dbf13bcf673e0467a5df8657df5f",
+      "playwright": "1.62.0",
+      "chromium": "151.0.7922.34",
+      "node": "v22.23.2"
+    },
+    "historical_failure": {
+      "run_id": 35806749602,
+      "job_id": 107009208035,
+      "artifact_id": 10728255659,
+      "artifact_sha256": "9a71b9197810a675d5caf0de98b18e9879ff5db6f4670c023be6159c90f16cb5",
+      "cause": "test checked reduced-motion state before media event callback; original assertion preserved and awaited"
+    },
+    "visual_inspection": "final mobile and desktop screenshots reviewed; default dock no longer overlaps reading scrollport",
+    "live_book_connected": false,
+    "live_python_transport": false,
+    "paid_model_calls": 0,
+    "android": "NOT_RUN",
+    "independent_review": "PENDING",
+    "artifact_id": "mygpt-host-ui-v1-20260923",
+    "checkpoint": "docs/HOST_UI_CHECKPOINT_20260923.md"
+  },
+  "integration_conflicts": [
+    {
+      "pr": 6,
+      "base_pr": 5,
+      "status": "MERGEABLE_FALSE_REQUIRES_SEPARATE_THREE_WAY_RECONCILIATION",
+      "scope": "integration only; not an unsaved artifact",
+      "automatically_resolved": false
+    }
+  ]
 }
