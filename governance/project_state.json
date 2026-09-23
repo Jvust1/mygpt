@@ -4,8 +4,8 @@
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
   "active_branch": "feat/book-contract-audit-v1",
-  "phase": "SYNTHETIC_READER_HOST_UI_ACCEPTED",
-  "status": "HOST_39_BROWSER_AND_BRAIN_290_PASS_REAL_TRANSPORT_NEXT_REVIEW_PENDING",
+  "phase": "SYNTHETIC_LOOPBACK_BRAIN_ACCEPTED",
+  "status": "LOCAL_PYTHON_BRAIN_332_DUAL_ENV_HOST_23_BROWSER_PASS_BOOK_EXPORTER_NEXT_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -29,7 +29,8 @@
     "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
   },
   "blocking_items": [
-    "Live Book integration is not enabled: a real host exporter, authenticated revocable transport and target-device validation remain unimplemented."
+    "Real Book integration remains disabled: Book r6 does not yet emit an authenticated, revocable current-selection snapshot to mygpt.",
+    "Android physical-device validation and production multi-user transport remain unimplemented."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -49,7 +50,7 @@
     "historical_validation_only": false,
     "not_rerun_this_batch": false
   },
-  "next_step": "Design and validate the minimal host-to-real-Python-Brain request contract using synthetic data and TestModel only. Before adding a loopback transport, specify Origin/Host checks, temporary authorization, bounded endpoints, selection/source identity, expiry, cancellation and revocation in preflight. No real Book writes/feed, paid model calls, main writes or automatic merges.",
+  "next_step": "In the Book repository, after its own current safety/governance preflight, create a non-default-branch read-only explicit-selection exporter candidate for r6. Export only bounded current record/layer/version/session/epoch/freshness identity; do not export notes/answers by default, write StudyRecord, call a paid model, write main, or auto-merge.",
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
@@ -77,36 +78,37 @@
   },
   "brain_candidate": {
     "pr": 6,
-    "implementation_commit": "d24802d9906c559f2099d44eedbb7d58b9148d3f",
-    "base_commit": "070747683ebce299531c2d95d7aa9deb79b266cb",
+    "implementation_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
+    "base_commit": "b4634e482b5b72b92f4c3961a1a68d1e198ec6ee",
     "evidence_kind": "SIMULATED_ONLY",
     "context_protocols": [
       "mygpt.study-context.v1",
       "mygpt.reader-context.v2"
     ],
     "test_result": {
-      "passed": 290,
+      "passed": 332,
       "skipped": 0,
       "failed": 0,
-      "scope": "combined Python suite including deterministic generated host fixtures; two clean environments, real TestModel and in-memory MCP SDKs"
+      "scope": "combined Python suite with actual Pydantic AI TestModel/MCP/local loopback service; two clean locked environments"
     },
-    "sdk_integration": "PASS_SYNTHETIC_READER_LAYERS_AND_V1_COMPATIBILITY",
+    "sdk_integration": "PASS_TESTMODEL_MCP_AND_LOOPBACK_LOCAL_ENGINE",
     "remote_ci": {
-      "run_id": 35806749551,
-      "job_id": 107009207839,
-      "source_commit": "d24802d9906c559f2099d44eedbb7d58b9148d3f",
+      "run_id": 35816679199,
+      "job_id": 107039579688,
+      "source_commit": "ef31c36986ca0134c9c62bcdcdf2ebcdf155c431",
       "conclusion": "success",
-      "first_seconds": 2.19,
-      "reinstall_seconds": 1.41,
-      "artifact_id": 10727024882,
-      "artifact_sha256": "7b1dc26b80098af1687897ad0e2adc964b956b1f6b85e2acef84082003ef78c1"
+      "artifact_id": 10732155955,
+      "artifact_sha256": "3973492a40347cbf029463ec589f5a74e9d97b07c297b7509456e19aaf3b7e2a",
+      "tests_per_environment": 332,
+      "skipped": 0,
+      "local_http_smoke_checks": 17
     },
     "local_environment": {
       "python": "3.13.5",
-      "passed": 285,
-      "skipped": 5,
+      "passed": 326,
+      "skipped": 6,
       "failed": 0,
-      "scope": "local combined suite; SDK packages unavailable, not the accepted CI result"
+      "scope": "local suite; pydantic_ai/mcp unavailable so six integration cases skip and are not acceptance"
     },
     "dependency_lock": {
       "path": "brain/requirements-linux-py313.lock",
@@ -118,10 +120,10 @@
     "independent_review": "PENDING",
     "live_book_feed": "NOT_CONNECTED",
     "android": "NOT_RUN",
-    "root_ui_tests": "PASS_SEPARATE_EXACT_UI_COMMIT_B688943",
+    "root_ui_tests": "PASS_EXACT_HEAD_2C23FA5",
     "paid_provider_calls": 0,
-    "artifact_id": "mygpt-host-ui-v1-20260923",
-    "checkpoint": "docs/HOST_UI_CHECKPOINT_20260923.md",
+    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
+    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
     "historical_checkpoints": [
       {
         "pr": 5,
@@ -164,10 +166,11 @@
         "artifact_id": "mygpt-reader-selection-v1-20260923",
         "checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md"
       }
-    ]
+    ],
+    "accepted_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1"
   },
-  "decision_checkpoint": "docs/HOST_UI_CHECKPOINT_20260923.md",
-  "evaluation_checkpoint": "docs/HOST_UI_CHECKPOINT_20260923.md",
+  "decision_checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
+  "evaluation_checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
   "book_bridge_candidate": {
     "status": "R6_EXPLICIT_SELECTION_OFFLINE_ACCEPTED",
     "target": "r6 Reader /api/reader, not the legacy Web ModeResponse/SourceResponse",
@@ -197,13 +200,13 @@
     "note": "This candidate does not merge or overwrite PR #5. Its executable SDK baseline is inherited via 95fd284; both review branches remain unmerged."
   },
   "host_ui_candidate": {
-    "status": "SYNTHETIC_REPLAY_UI_ACCEPTED",
+    "status": "SYNTHETIC_LOOPBACK_PYTHON_BRAIN_ACCEPTED",
     "pr": 6,
-    "implementation_commit": "b688943fe710537ff0e7807361a303bd7b7aa04e",
-    "entry": "host/reader.html",
+    "implementation_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
+    "entry": "host/brain.html",
     "usage": "host/README.md",
-    "runtime": "static modules with an explicit prewritten replay adapter",
-    "python_fixture_generation": "real Reader mapper and Brain at build/test time; no browser-to-Python live call",
+    "runtime": "same-origin 127.0.0.1 Python Brain/TestModel for brain.html; legacy reader.html replay remains available",
+    "python_fixture_generation": "real Reader mapper and Brain; browser-to-Python live loopback is enabled only for fixed synthetic catalogue",
     "selected_entries": 5,
     "supported_modes": [
       "preview",
@@ -211,17 +214,18 @@
       "review",
       "practice"
     ],
-    "node_tests_passed": 49,
+    "node_tests_passed": 54,
     "jonah_browser_checks_passed": 49,
     "host_browser_checks_passed": 39,
     "runtime_errors": 0,
     "external_requests_in_browser_test": 0,
     "remote_ci": {
-      "run_id": 35807425272,
-      "job_id": 107011254871,
+      "run_id": 35817053593,
+      "job_id": 107040710718,
+      "source_commit": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
       "conclusion": "success",
-      "artifact_id": 10727898973,
-      "artifact_sha256": "20f6591c22b802d1fd956f58cca6719503c1dbf13bcf673e0467a5df8657df5f",
+      "artifact_id": 10731589161,
+      "artifact_sha256": "1fee99805b6e2c70d22f55a06f617e10c1fc03b3df25ef5ba6ba4598ef672ba2",
       "playwright": "1.62.0",
       "chromium": "151.0.7922.34",
       "node": "v22.23.2"
@@ -235,12 +239,16 @@
     },
     "visual_inspection": "final mobile and desktop screenshots reviewed; default dock no longer overlaps reading scrollport",
     "live_book_connected": false,
-    "live_python_transport": false,
+    "live_python_transport": true,
     "paid_model_calls": 0,
     "android": "NOT_RUN",
     "independent_review": "PENDING",
-    "artifact_id": "mygpt-host-ui-v1-20260923",
-    "checkpoint": "docs/HOST_UI_CHECKPOINT_20260923.md"
+    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
+    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
+    "accepted_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
+    "replay_host_browser_checks_passed": 39,
+    "local_brain_browser_checks_passed": 23,
+    "test_model_only": true
   },
   "integration_conflicts": [
     {
@@ -250,5 +258,37 @@
       "scope": "integration only; not an unsaved artifact",
       "automatically_resolved": false
     }
-  ]
+  ],
+  "local_brain_transport_candidate": {
+    "status": "ACCEPTED_SYNTHETIC_LOOPBACK_ONLY",
+    "bind": "127.0.0.1 only; ephemeral port supported",
+    "authorization": "ephemeral in-memory HttpOnly SameSite=Strict cookie; exact Host/origin/fetch-site/client guards",
+    "endpoints": [
+      "GET /api/v1/status",
+      "POST /api/v1/explain",
+      "POST /api/v1/cancel",
+      "POST /api/v1/revoke"
+    ],
+    "request_body_max_bytes": 8192,
+    "receipt_capacity": 128,
+    "authorization_seconds_range": [
+      60,
+      3600
+    ],
+    "selection_seconds_max": 300,
+    "runtime_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
+    "sdk_test_commit": "ef31c36986ca0134c9c62bcdcdf2ebcdf155c431",
+    "latest_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
+    "sdk_run": 35816679199,
+    "host_run": 35817053593,
+    "sdk_tests_per_environment": 332,
+    "loopback_browser_checks": 23,
+    "local_http_smoke_checks": 17,
+    "live_book_connected": false,
+    "paid_model_calls": 0,
+    "persistent_source_text": false,
+    "production_multi_user_security": "NOT_CLAIMED",
+    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
+    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md"
+  }
 }
