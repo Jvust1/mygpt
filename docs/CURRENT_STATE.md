@@ -12,6 +12,10 @@
 - 实际 HTTP：56 项通过，5 种实际选段路径通过 TestModel，付费模型调用 0。
 - 两仓发布代码已从 CI 源归档回读一致；两个新 Drive 增量包均已完成整包及内部 manifest 校验。
 
+## 配套 Book 明确内容层选择回归
+
+Book PR #37 已前进到运行提交 `114be2a40f9e3ef364aca2e02492361ebf46e4b6`：当同一 record 同时存在原文/补录/AI 校正等多个候选层时，不再默认选最后一层；必须用户自己选择并核对预览，之后分享按钮才启用。预览本身仍不会产生 `/select` 授权。run 35834149129 的 68 Python、18 projection Node、1 DOM state regression 通过；这不是实际浏览器 E2E。Book 新增量归档 Drive `1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz` 已完成整包哈希/CRC/内部 manifest 回读验证。
+
 ## 未完成与下一步
 
 托管浏览器以 `ERR_BLOCKED_BY_ADMINISTRATOR` 阻止 localhost 导航，未更改或绕过策略，因此 UI 端到端验收仍未完成。Android APK 身份、IPC/overlay、真机软键盘、真实教学模型、生产多用户安全和独立审阅未验收。旧 mygpt PR #5/#6 整合冲突未处理。

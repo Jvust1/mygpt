@@ -5,7 +5,7 @@
   "default_branch": "main",
   "active_branch": "feat/book-live-selection-v1-20260923",
   "phase": "SCOPED_R6_READONLY_BOOK_BRIDGE",
-  "status": "ARCHIVE_BOOK_HTTP_TESTMODEL_ACCEPTED_BROWSER_AND_REVIEW_PENDING",
+  "status": "ARCHIVE_BOOK_HTTP_TESTMODEL_ACCEPTED_UI_LAYER_STATE_REGRESSION_PASS_BROWSER_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "scope_note": "Current state of this isolated review branch only. Legacy product workstreams, frozen invariants and independent human gates are preserved and not superseded or activated by this bridge.",
   "drive": {
@@ -44,7 +44,7 @@
     "Independent code review and Android identity/IPC/physical-device validation pending.",
     "Existing mygpt PR #5/#6 integration conflict remains unresolved."
   ],
-  "next_step": "Run exact Book PR #37 plus mygpt PR #7 in an authorized browser runtime with localhost access; verify explicit selection, layer/raw-display switching, navigation/visibility/expiry invalidation, cancellation/revocation races, mobile layout, and zero external requests/StudyRecord writes; then obtain independent review. No Android/paid provider activation or automatic PR merge.",
+  "next_step": "Run exact Book PR #37 (including explicit multi-layer source choice at 114be2a) plus mygpt PR #7 in an authorized browser runtime with localhost access; verify explicit layer choice, two-stage share, navigation/visibility/expiry invalidation, cancellation/revocation races, mobile layout, and zero external requests/StudyRecord writes; then obtain independent review. No Android/paid provider activation or automatic PR merge.",
   "boundaries": {
     "main_write": false,
     "auto_merge": false,
@@ -89,5 +89,16 @@
     "decision_ledger": "docs/DECISION_LEDGER.md",
     "evaluation_ledger": "docs/EVALUATION_LEDGER.md",
     "active_decision_and_evaluation_checkpoint": "docs/BOOK_SELECTION_BRIDGE_CHECKPOINT_20260923.md"
+  },
+  "book_ui_state_regression": {
+    "Book_runtime_commit": "114be2a40f9e3ef364aca2e02492361ebf46e4b6",
+    "Book_governance_head": "67db4beaea031cd8ea2b6867cbd047bb41602c0b",
+    "ci_run": 35834149129,
+    "ci_artifact": 10738114864,
+    "ci_artifact_sha256": "26e7027f0697acccf8e8d50724ad1ec7bc9a9b3e3923eb8f57885f20d1c63b8e",
+    "node_dom_state_passed": 1,
+    "browser_e2e": "NOT_ACCEPTED",
+    "book_drive_delta_id": "1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz",
+    "book_drive_delta_sha256": "506ba0a1f259431fed59358bcfb7ccb44c3ddee31c681c890a492b6e1054079a"
   }
 }

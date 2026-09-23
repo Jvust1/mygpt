@@ -25,3 +25,12 @@ Book artifact 10736546209 的 SHA-256 为 `4214e74934bf6aaf63fc0e9e862c35ea750bc
 两份新增量 ZIP 分别归入 Book 与 mygpt 既有 Generated 目录。完整 SHA、Drive ID、内部成员数与整包回读校验记录在 `governance/book_selection_bridge_artifact_manifest_20260923.json`；旧 manifest 通过 includes 保留，旧 artifact 不重复上传。包内 CHECKPOINT.md 保存更详细的验证、错误及重现说明。
 
 状态同步将 pre-bridge 三份入口按完全相同的 Git blob 保存在 history，新入口只描述当前评审分支；不会覆盖历史证据或取消任何旧门禁。后续修改必须沿普通分支/审阅流程进行，不直接写 main，不自动合并。
+
+
+## BRIDGE-E002 — Book 多来源层显式选择
+
+配套 Book 提交 `114be2a40f9e3ef364aca2e02492361ebf46e4b6` 修复 UI 默认选层：多层 record 必须先明确选择原文/补录/AI 校正等具体层，再生成对应 preview/hash；未选层前分享禁用，预览阶段零 `/select`。单层 record 可直接预选。
+
+Book run 35834149129：68 Python + 18 projection Node + 1 DOM state regression 全过；artifact 10738114864 SHA-256 `26e7027f0697acccf8e8d50724ad1ec7bc9a9b3e3923eb8f57885f20d1c63b8e`。Book v1.1 增量归档 Drive `1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz`，103,218 bytes，SHA-256 `506ba0a1f259431fed59358bcfb7ccb44c3ddee31c681c890a492b6e1054079a`；旧 v1 不覆盖。
+
+mygpt `book_bridge.py` 未变；旧 receiver 验收仍有效。真实浏览器 localhost E2E、Android 和独立审阅继续 PENDING。
