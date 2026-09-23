@@ -19,7 +19,7 @@ function serverAddress(child) {
 (async()=>{
   const out=process.env.MYGPT_TEST_OUTPUT||path.join(__dirname,'..','brain-host-test-output');
   fs.mkdirSync(out,{recursive:true});
-  const report={result:'RUNNING',checks:[],errors:[],externalRequests:[],apiRequests:[],notVerified:[
+  const report={result:'RUNNING',checks:[],errors:[],expectedHttpErrors:[],externalRequests:[],apiRequests:[],notVerified:[
     'real Book export','paid/live model quality','Android device','production multi-user transport','independent review']};
   const check=(name,value)=>{assert(value,name);report.checks.push(name);};
   const python=process.env.MYGPT_PYTHON||'python';
@@ -42,7 +42,13 @@ function serverAddress(child) {
     });
     page=await context.newPage();page.setDefaultTimeout(10000);
     page.on('pageerror',e=>report.errors.push(e.message));
-    page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
+    page.on('console',m=>{
+      if(m.type()!=='error')return;
+      const text=m.text();
+      const match=text.match(/Failed to load resource: the server responded with a status of (403|409)/);
+      if(match) report.expectedHttpErrors.push(Number(match[1]));
+      else report.errors.push(text);
+    });
     const state=()=>page.locator('body').getAttribute('data-host-state');
     const wait=s=>page.waitForFunction(x=>document.body.dataset.hostState===x,s);
     const choose=id=>page.locator(`#select-record-${id.startsWith('b-')?'2':'1'}`).selectOption(id);
@@ -86,6 +92,8 @@ function serverAddress(child) {
     check('no external browser requests',report.externalRequests.length===0);
     check('API surface used only allowlisted paths',report.apiRequests.every(x=>['/api/v1/status','/api/v1/explain','/api/v1/cancel','/api/v1/revoke'].includes(x.path)));
     check('model-call counter stays zero',await page.locator('#model-calls').innerText()==='0');
+    check('only the two intentional negative HTTP fetches reached console error status',
+      report.expectedHttpErrors.length===2&&report.expectedHttpErrors.includes(409)&&report.expectedHttpErrors.includes(403));
     check('no runtime/CSP errors',report.errors.length===0);
     report.result='PASS';
   } catch(error) {
