@@ -4,6 +4,7 @@ on:
   push:
     branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1]
     paths:
+      - 'host/fixtures.js'
       - 'brain/mygpt_brain/**'
       - 'brain/tests/**'
       - 'brain/scripts/**'

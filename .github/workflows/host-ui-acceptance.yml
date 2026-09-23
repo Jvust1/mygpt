@@ -1,0 +1,62 @@
+name: Host UI acceptance (synthetic replay only)
+on:
+  push:
+    branches: [feat/book-contract-audit-v1]
+    paths:
+      - 'host/**'
+      - 'companion/**'
+      - 'tests/host-*.mjs'
+      - 'tests/host-browser.cjs'
+      - 'tests/browser.cjs'
+      - 'tests/atlas.test.mjs'
+      - 'scripts/serve.mjs'
+      - '.github/workflows/host-ui-acceptance.yml'
+permissions:
+  contents: read
+concurrency:
+  group: mygpt-host-ui-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  browser:
+    if: github.repository == 'Jvust2/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Record environment and install isolated pinned browser test tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/host-evidence"
+          node -e "if(Number(process.versions.node.split('.')[0])<20)process.exit(1)"
+          node --version > "$RUNNER_TEMP/host-evidence/node-version.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/host-evidence/source-commit.txt"
+          npm install --prefix "$RUNNER_TEMP/host-tools" --ignore-scripts --no-audit --no-fund --save-exact playwright@1.62.0
+          cp "$RUNNER_TEMP/host-tools/package-lock.json" "$RUNNER_TEMP/host-evidence/npm-package-lock.json"
+          node "$RUNNER_TEMP/host-tools/node_modules/playwright/cli.js" install --with-deps chromium
+          # Chinese labels must be visually inspectable; font files are not archived.
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Run Node unit and existing atlas tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/atlas.test.mjs tests/host-controller.test.mjs | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
+      - name: Run existing Jonah and new host browser checks serially
+        shell: bash
+        run: |
+          set -euo pipefail
+          export NODE_PATH="$RUNNER_TEMP/host-tools/node_modules"
+          MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/jonah" node tests/browser.cjs | tee "$RUNNER_TEMP/host-evidence/jonah-run.txt"
+          MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/host" node tests/host-browser.cjs | tee "$RUNNER_TEMP/host-evidence/host-run.txt"
+      - name: Preserve bounded source-linked evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: host-ui-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/host-evidence/
+          if-no-files-found: warn
+          retention-days: 3
