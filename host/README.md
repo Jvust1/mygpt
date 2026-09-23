@@ -1,3 +1,45 @@
+# mygpt 学习工作台 · 当前入口
+
+当前优先入口是 **`/host/brain.html`**：浏览器实际通过 127.0.0.1 调用 Python Brain，再走 Pydantic AI TestModel 的固定合成回复。真实 Book 与真实模型仍未连接。
+
+## 运行本机 Brain 模式
+
+需要先安装 `brain/pyproject.toml` 固定的 Python 依赖。Linux CPython 3.13 x86_64 可使用现有 hash lock；其他平台不要直接套用该平台锁。
+
+```sh
+cd brain
+python -m mygpt_brain.local_service --port 0
+```
+
+终端会打印类似：
+
+```text
+mygpt local brain: http://127.0.0.1:<随机端口>
+scope=SYNTHETIC_LOCAL_PYTHON_BRAIN live_book_connected=false paid_model_calls=0
+```
+
+在同一浏览器打开打印地址的 `/host/brain.html`。服务只绑定 127.0.0.1，使用每次启动生成的内存授权 cookie；当前有限接口仅为 status / explain / cancel / revoke。它是开发期同机协议，不是生产多用户服务器或 Android IPC。
+
+页面只发送有界的选择身份、来源引用/哈希、mode、revision 与选择有效期；Python 从固定合成目录重建正文，浏览器不会上传任意教材正文。只有明确点击“解释这段”才进入 Brain；取消、切段、暂停、过期或 revoke 都会使旧请求失效。
+
+## 当前验收
+
+- Python 固定 SDK：两个干净环境各 **332 passed / 0 failed / 0 skipped**。
+- 最新宿主测试 head：**Node 54 pass**。
+- 原 Jonah 浏览器回归：**49 checks pass**。
+- 旧合成回放 host：**39 checks pass**。
+- 新本机 Python host：**23 checks pass**。
+- 真实/付费模型调用：**0**。
+- 真实 Book feed：**未连接**。
+
+完整安全边界、原始失败历史、CI run/artifact 身份见 [LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md](../docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md)。
+
+## 旧回放入口
+
+`/host/reader.html` 仍保留，用来验证不依赖 Python 运行时的合成回放 UI。下面的旧说明作为历史/回放模式文档保留；其中“浏览器不会实时运行 Python Brain”只适用于 `reader.html`，不适用于当前 `brain.html`。
+
+---
+
 # mygpt 学习工作台 · 合成回放原型
 
 这是可操作的 **Reader 选段 × Jonah** 界面，不是完整聊天产品、真实 Book 连接或 APK。页面始终显示模拟标识；示例和回复均为人工编写，不使用真实教材、私人聊天或付费模型。

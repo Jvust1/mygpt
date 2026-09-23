@@ -1,3 +1,34 @@
+## 当前能力 · 本机 Loopback Brain / TestModel
+
+最新已验收链路把浏览器请求真正送入 Python：`LocalBrainEngine` 会按来源身份重建 `ReaderStudyContext v2`，执行 `SESSION_STARTED` 和 `HELP_REQUESTED`，只有 Brain 决策为 `explain` 且来源引用一致时才继续到 Pydantic AI `TestModel`。
+
+```sh
+cd brain
+# 本地合成 UI→Python Brain 服务；0 代表随机 loopback 端口
+python -m mygpt_brain.local_service --port 0
+
+# 独立 loopback HTTP smoke；不会调用付费模型
+python scripts/smoke_local_service.py
+
+# 已安装固定 SDK 时，严格验收必须零 skip；输出目录必须不存在
+python scripts/verify_integrations.py --output ./acceptance-new
+```
+
+安全/可靠性要点：
+- 只绑定 `127.0.0.1`；随机端口可用。
+- 内存 HttpOnly / SameSite=Strict 授权 cookie；不回显 token、不落盘。
+- 固定 Host、同源 Origin/Referer/Fetch Metadata 与客户端头校验。
+- 固定静态 allowlist；JSON ≤ 8192 bytes；收据容量 128。
+- explain / cancel / revoke 有界；同 request_id 同内容去重，不同内容返回冲突。
+- 浏览器不发送任意正文；Python 仅从固定合成 catalogue 取文本并再次核验 ref/hash。
+- 当前 Pydantic AI 只允许程序式 TestModel；真实 provider / 付费调用为 0。
+
+远端固定依赖验收：两套全新 Python 环境各 **332 passed / 0 skipped / 0 failed**。最新宿主 head 的浏览器链路也已通过 23 项 loopback 检查。详细证据见 [本机 Brain 链路检查点](../docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md)。
+
+**仍未完成：真实 Book 导出、Android 实机、生产多用户网络安全、真实模型教学质量和独立代码审阅。**
+
+---
+
 ## 当前能力 · r6 Reader 选段 v1 / Brain context v2
 
 实际通过代码 `86734b51024a4f0ae7c254835c9fe0178151bee3`，GitHub run `35797671670`：两个干净环境分别 **269 passed / 0 skipped / 0 failed**。本地缺 SDK 时仍是 264 passed / 5 skipped；不混用两类结果。
