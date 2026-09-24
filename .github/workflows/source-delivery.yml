@@ -4,6 +4,7 @@ on:
     branches: [feat/book-contract-audit-v1]
     paths:
       - 'scripts/source_bundle.py'
+      - 'scripts/launcher_smoke.py'
       - 'run_mygpt.py'
       - 'START_HERE.md'
       - 'tests/test_source_bundle.py'
@@ -67,6 +68,7 @@ jobs:
           "$PY" -m pip install --only-binary=:all: --require-hashes -r "$SRC/brain/requirements-linux-py313.lock"
           "$PY" -m pip check | tee "$OUT/pip-check.txt"
           "$PY" "$SRC/run_mygpt.py" doctor | tee "$OUT/doctor.json"
+          "$PY" "$SRC/scripts/launcher_smoke.py" --output "$OUT/launcher-http.json"
           cd "$SRC/brain"
           "$PY" scripts/verify_integrations.py --output "$OUT/recovered-brain"
           PYTHONPATH=. "$PY" scripts/smoke_selection_intake.py --output "$OUT/recovered-http.json"
