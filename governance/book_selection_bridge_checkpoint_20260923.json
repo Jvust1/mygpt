@@ -1,0 +1,85 @@
+{
+  "updated_date": "2026-09-23",
+  "status": "BROWSER_SHIM_UI_ACCEPTED_DIRECT_LOCALHOST_BLOCKED_REVIEW_PENDING",
+  "checkpoint": "docs/BOOK_SELECTION_BRIDGE_CHECKPOINT_20260923.md",
+  "next_step": "Obtain independent review of exact Book PR #37 and mygpt PR #7 while preserving the current browser-shim evidence. When an authorized browser runtime with direct localhost access is available, rerun the same flow without the transport/storage/WebCrypto test doubles. Do not start Android/paid-provider activation or merge any PR automatically.",
+  "evidence": {
+    "book_python_passed": 68,
+    "book_node_projection_passed": 18,
+    "real_r6_sections": 95,
+    "real_projection_vectors": 19174,
+    "projection_mismatches": 0,
+    "accepted_body_projections": 17330,
+    "expected_empty_body_rejections": 1844,
+    "real_http_checks": 56,
+    "http_actual_testmodel_calls": 5,
+    "mygpt_tests_per_clean_environment": 352,
+    "mygpt_clean_environments": 2,
+    "failed": 0,
+    "skipped": 0,
+    "browser": "BLOCKED_ENVIRONMENT_NOT_ACCEPTED",
+    "browser_error": "net::ERR_BLOCKED_BY_ADMINISTRATOR",
+    "android": "NOT_RUN",
+    "independent_review": "PENDING",
+    "paid_provider_calls": 0,
+    "teaching_quality_validated": false,
+    "book_ui_state_node_passed": 1,
+    "chromium_shim_main_passed": 21,
+    "chromium_shim_timing_passed": 5,
+    "chromium_shim_page_errors": 0,
+    "chromium_shim_console_errors": 0,
+    "chromium_shim_native_network_requests": 0,
+    "direct_localhost_127": "ERR_BLOCKED_BY_ADMINISTRATOR",
+    "direct_localhost_name": "ERR_BLOCKED_BY_ADMINISTRATOR",
+    "browser_shim_scope": "REAL_CHROMIUM_UI_EXACT_JS_REAL_R6_REAL_BOOK_HTTP_REAL_MYGPT_TESTMODEL_VIA_EXPLICIT_TRANSPORT_SHIM",
+    "browser_storage_history": "EXPLICIT_TEST_DOUBLES",
+    "browser_webcrypto_randomuuid": "EXPLICIT_TEST_DOUBLES"
+  },
+  "source": {
+    "book_r6_checkpoint": "7283f2eef7610d67c6b92b2ef7c513e1225ad957",
+    "drive_file_id": "1UiVow02Huh3r8qKBH8v4bL3D9OfkQ8_R",
+    "archive_sha256": "19315e8aeebe2db5cf2f4b55e0a38f550967966af106491dfef67212b430adc1",
+    "archive_size_bytes": 70090018,
+    "manifest_sha256": "15d9a1838023e8cf1d05835ddff80da28dde8cc2feaf01e1dbd3f718dff8c388",
+    "installed_apk_verified": false
+  },
+  "implementations": {
+    "Book": {
+      "repository": "Jvust2/Book",
+      "branch": "feat/reader-grant-bridge-20260923",
+      "commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
+      "pr": 37,
+      "ci_run": 35828253594,
+      "ci_artifact": 10736546209,
+      "ci_artifact_sha256": "4214e74934bf6aaf63fc0e9e862c35ea750bca2d8b1bf657885076c910197755",
+      "readback_matching_files": 16,
+      "latest_ui_commit": "114be2a40f9e3ef364aca2e02492361ebf46e4b6",
+      "governance_head": "060d5bda49f6fbc964c4f5ef5987bf1b049aa210",
+      "latest_ci_run": 35834149129,
+      "latest_ci_artifact": 10738114864,
+      "latest_ci_artifact_sha256": "26e7027f0697acccf8e8d50724ad1ec7bc9a9b3e3923eb8f57885f20d1c63b8e",
+      "latest_drive_delta": {
+        "id": "1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz",
+        "sha256": "506ba0a1f259431fed59358bcfb7ccb44c3ddee31c681c890a492b6e1054079a",
+        "size_bytes": 103218
+      },
+      "browser_shim_artifact": {
+        "drive_id": "1l1XxGbVqS5__4RhSYevhTnNT5JT3ijs9",
+        "sha256": "71b10b3127eb60a61681d96a9712c17758ddf7eb3f00bf09a6bdb3f75d6834ba",
+        "size_bytes": 1673673,
+        "zip_members": 18,
+        "indexed_members": 17
+      }
+    },
+    "mygpt": {
+      "repository": "Jvust2/mygpt",
+      "branch": "feat/book-live-selection-v1-20260923",
+      "commit": "fa9f17a0eb4fb015d76b419865f1b49a2d325f0e",
+      "pr": 7,
+      "ci_run": 35826642389,
+      "ci_artifact": 10735138372,
+      "ci_artifact_sha256": "f0ee3d7da7df19a4dca2abc7e61860e1fa1e4178ef468efae48841a699b349d2",
+      "readback_matching_files": 4
+    }
+  }
+}

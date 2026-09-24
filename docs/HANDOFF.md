@@ -1,102 +1,19 @@
-## 当前入口 · 浏览器已接通本机 Python Brain · 2026-09-23
+# mygpt Handoff · Book 只读选段桥
 
-当前分支 `feat/book-contract-audit-v1` / PR #6。运行代码从 `56b39522bb81aa71699548d2d93b060eb87dad6d` 开始；SDK 验收修正到 `ef31c36986ca0134c9c62bcdcdf2ebcdf155c431`，最新 UI 合同测试 head 为 `2c23fa5dec2fac17ce4d06aa083374007225d2f1`。
+先动态恢复 Drive 全局入口与全部当前根目录基线，再读目标分支 `AGENTS.md`、`SECURITY_POLICY.md`、project_state、North Star、Architecture Invariants、Current State、原 Ledger、本次独立决策/验收 checkpoint、pending_sync 和 Pre-flight。GitHub 高于聊天记忆；切换项目或分支重新检查安全门。
 
-现在 `host/brain.html` 已不再只是浏览器预写回放：浏览器通过 **127.0.0.1 同源服务**实际进入 Python，Python 重建 ReaderContext v2、执行 Brain `SESSION_STARTED / HELP_REQUESTED`，再通过 Pydantic AI TestModel 返回固定合成样本。**真实 Book 仍未连接，真实/付费模型调用仍为 0。**
+当前：`feat/book-live-selection-v1-20260923` / PR #7。实现身份、CI、原 r6 ZIP、Drive 增量包及哈希见 `governance/book_selection_bridge_checkpoint_20260923.json` 和 `governance/book_selection_bridge_artifact_manifest_20260923.json`。后者 includes 的旧总 artifact 清单继续有效，不能漏掉旧成果。
 
-远端固定依赖验收：两个干净 Python 环境各 **332 passed / 0 skipped / 0 failed**（run 35816679199）；最新 host run 35817053593：**Node 54 pass、Jonah 49 checks、回放 host 39 checks、本机 Python host 23 checks**，运行/CSP errors 0、外部请求 0。首次 SDK/host 失败证据均保留，没有通过删除断言制造绿灯。
+Book 运行目录必须来自固定 SHA 的 r6 归档；旧 Book `app/` 不是 r6，不能用它替代，也不能把归档整树覆盖进仓库。配套使用 Book PR #37 与 mygpt PR #7，原 r6 文件、数据库和教材不改。完整运行/验收命令在 Book `integrations/mygpt_selection/README.md`；mygpt 的新接收端是 `brain/mygpt_brain/book_bridge.py`。固定 SDK 输出不是模型教学。
 
-最新合同、安全边界、失败历史和恢复说明见 [本机 Brain 链路检查点](LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md)。Drive 恢复包 `mygpt-local-brain-transport-v1-20260923.zip`：ID `1bMzAIh4vRpOxo4y_5WKZQWqt3_vm-CIo`，3,389,070 bytes，SHA-256 `5d5a2ba2e9ff7789c25384505e6274cc470b55b29daea48cfea5576f7aef2b58`，已完整下载回读和 CRC 校验。
+下一步只做受信任浏览器环境的精确候选验收和独立审阅。重点覆盖两阶段明确选段、来源层级、raw/display、导航/隐藏/过期失效、授权和撤销竞态、取消和迟到结果、移动布局/字号/LaTeX。当前浏览器受到管理策略限制，不能通过修改策略或换路径来绕过。任何成功结论必须有实际浏览器证据；Node/HTTP 通过不能替代浏览器。
 
-**下一步：** 转到 Book r6 自己的非默认分支，先做“明确选中 record/layer → 只读短期快照”的最小导出器候选；重新执行 Book 的独立 preflight。默认不导出笔记/作答、不写 StudyRecord、不调用模型。Android、生产多用户网络、真实教学质量和独立审阅仍待完成；PR #5/#6 冲突不自动处理。
+保持 main 不动、PR 不自动合并、原 PR #5/#6 冲突不自动解决。禁止付费 provider、ChatContextVault 读取、笔记/作答导出、StudyRecord 写入/迁移、生产多用户传输、未授权 Android/overlay 扩展。Book 原 H3b/B4b/B5、Lecture、multi-book consumer migration、持久化答案和每个 PR merge 的独立门禁仍有效；mygpt 继续安静陪伴默认、优先结构化感知、截图仅显式授权、Shadow 默认关闭。
 
----
+原 project_state / Current State / Handoff 的精确 blobs 已另存 `governance/history/`、`docs/history/`；处理任何旧工作流时必须读取这些历史入口并重新核验其 live 分支，不能把本桥接检查点当成旧发布全量重验。原 `governance/pending_sync.json` 未被清空；本桥接成果同步无新增阻塞，既有 non-blocking 债务仍待独立证据。
 
-## 当前入口 · Reader × Jonah 宿主界面验收 · 2026-09-23
 
-当前分支 `feat/book-contract-audit-v1` / PR #6。宿主运行代码 `b688943fe710537ff0e7807361a303bd7b7aa04e`：远端 Node **49 项通过**，原 Jonah 浏览器 **49 项通过**，新宿主浏览器 **39 项通过**。Python/样本源码 `d24802d9906c559f2099d44eedbb7d58b9148d3f` 在两个干净环境分别 **290 passed / 0 skipped**；后续 UI 修正未改 Python 代码或样本。
+配套 Book PR #37 最新运行提交 `114be2a40f9e3ef364aca2e02492361ebf46e4b6`，治理 head `67db4beaea031cd8ea2b6867cbd047bb41602c0b`。多来源层必须显式选择后才能分享；run 35834149129 的 DOM 状态回归通过，但真实浏览器仍未验收。Book v1.1 增量包 Drive `1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz`；mygpt 接收端源码本轮未变。
 
-打开 `host/reader.html` 可操作选段、查看原文/校正/推导层、回放预写回复、取消、暂停和检验过期状态；Jonah 只显示实际界面请求状态。**仍是合成回放，不是浏览器已连接 Python Brain、真实 Book 或模型。**
 
-最新验收、第一次失败及修正、D019/E007 和恢复边界见 [宿主 UI 检查点](HOST_UI_CHECKPOINT_20260923.md)；运行命令见 [host/README.md](../host/README.md)。原始失败/成功 artifacts 进入 `mygpt-host-ui-v1-20260923` 恢复包，精确 Drive 身份以 artifact_manifest 为准。
-
-下一步：在 mygpt 内设计宿主到真正 Python Brain 的最小同机请求合同，继续使用合成资料/TestModel；网络实现前先明确 loopback、Origin/Host、临时授权、来源身份、取消及撤销边界。当前不改 Book、不增加付费调用、不写 main、不自动合并；PR #6 与 #5 的整合冲突及独立审阅继续待处理。
-
----
-
-以下原始内容保留为历史。旧 next_step 和“未重跑 UI”以本节替代，未验收的真实网络/Book/Android 限制仍有效。
-
-## 当前入口 · r6 明确选段已通过组合验收 · 2026-09-23
-
-当前分支 `feat/book-contract-audit-v1` / PR #6；精确通过代码 `86734b51024a4f0ae7c254835c9fe0178151bee3`。
-GitHub run `35797671670`：两个干净环境分别 **269 passed / 0 skipped / 0 failed**；包含三种选段内容层经过 TestModel/MCP 的验证。
-
-最新说明、D018/E006、限制和恢复命令见 [Reader 选段检查点](READER_SELECTION_CHECKPOINT_20260923.md)。当前目标是 r6 `/api/reader/...`，旧 Web DTO 校验器仅作参考，不与 r6 混用。
-
-下一步：在 mygpt 自己的宿主演示接入明确选择与“解释这段”，显示版本/层级/失效状态并与 Jonah 用户事件联动，先用合成事件验证。尚未连接真实 Book、调用真实模型或验收 Android；独立审阅 PENDING，PR 不合并。
-归档身份以 `governance/artifact_manifest.json` 的 `mygpt-reader-selection-v1-20260923` 为准。以下旧正文逐字保留为历史，其 SDK 阻塞、旧目标分支和旧 next_step 不作为当前状态。
-
----
-
-## 最新检查点 · 2026-09-22 · PR #5
-
-当前开发分支：`feat/book-context-brain-20260922`，基于 PR #3 的 `a8595c3ccaddcff5a6a95f8a37a963707f48c084`。
-实现提交：`68c351b85511ccdd625036a6917b4303646b6704`。新增可运行的 `brain/`，不是正式 Book/模型/Android 集成。
-本地两次最终源码回归均为 **95 passed, 2 skipped**；2 项跳过是 Pydantic AI / MCP SDK 未安装，不是通过。真实模型调用为 0，独立审阅待完成。
-源码/原始测试证据包已在 Drive 归档并下载回读验证：`13YcH0j9VXd20LLWspZzDquRm-pe02OSJ`。
-最新验收、设计决定和边界见 [Brain checkpoint](BOOK_CONTEXT_BRAIN_CHECKPOINT.md)；运行见 [brain/README.md](../brain/README.md)。
-下一步：先补齐无付费调用的 SDK 集成验证，再核对 Book 实际字段/版本并设计真实事件适配器。不要直接改 main 或自动合并。
-
----
-
-以下正文保留此前阶段的原始快照。旧的“未发布/尚未开始后端”表述不再代表本分支最新原型状态；以本节和 project_state 为准。
-
-# mygpt Handoff
-
-## Start here
-
-1. Read Drive root `全项目` and all current `全项目_*` baselines.
-2. Read exact-target-branch `SECURITY_POLICY.md` and `AGENTS.md`.
-3. Read `governance/project_state.json`.
-4. Read North Star, Architecture Invariants, Current State, Decision Ledger, Evaluation Ledger, artifact manifest, pending sync, and Pre-flight Checklist.
-5. Restore Book / StudyMate / ChatContextVault state from their own repositories only when needed.
-
-Repository evidence outranks chat recollection.
-
-## Current recovery point
-
-The project foundation remains in PR #1 on `chore/security-bootstrap-and-project-foundation-20260921`.
-
-The stacked feature branch `feat/jonah-companion-20260922` adds the first executable UI candidate: a local-only Jonah Web Component and mobile/desktop preview. It must not be described as a production mygpt app or Android APK.
-
-The central architectural decision is:
-
-`Book First → OS Sensor Second → User Context Third → Screen Vision Last`
-
-The first engineering milestone is a small Book-to-mygpt semantic event contract, not full-device screen surveillance.
-
-For the Jonah candidate, start with `docs/JONAH_COMPANION.md`. Its atlas hash, API, test evidence, Android boundary, external references, and integration steps are recorded there. The renderer exposes explicit state inputs and a chat-request event; the future host owns task truth and conversation behavior.
-
-## Current product concept
-
-mygpt should feel like a person who is present:
-- usually quiet when the user is studying well;
-- able to teach using current Book context;
-- able to notice meaningful departures or likely distraction;
-- able to ask whether the user is stuck rather than making brittle assumptions;
-- able to switch naturally between learning, encouragement, ordinary conversation, and emotional support.
-
-Shadow mode is optional and explicitly simulated.
-
-## Next step
-
-After review of the foundation and companion PRs, select the production host and produce the v0.1 interface/spec for:
-- Book StudyContext snapshot;
-- Book StudyEvent stream;
-- Companion intervention state;
-- local session state and privacy gates;
-- minimal communication path between Book and mygpt.
-
-Do not implement continuous screen capture before proving that Book semantic context plus low-cost device signals are insufficient.
-
-If mobile delivery is selected, use Android Studio for the app/WebView host and physical-device validation. Treat an Android cross-app overlay as an optional separate milestone; do not confuse it with the current in-app fixed-position component.
+浏览器 shim 最新证据：Book Drive `1l1XxGbVqS5__4RhSYevhTnNT5JT3ijs9`，SHA-256 `71b10b3127eb60a61681d96a9712c17758ddf7eb3f00bf09a6bdb3f75d6834ba`。21 个主 UI + 5 个时序检查通过，使用精确 Reader/Bridge、真实 r6、Book localhost 服务和真实 mygpt/TestModel；direct 127.0.0.1/localhost 仍被管理策略阻止，storage/history/WebCrypto/randomUUID 为 null-origin 测试替身。mygpt runtime 没改。当前优先做独立审阅。

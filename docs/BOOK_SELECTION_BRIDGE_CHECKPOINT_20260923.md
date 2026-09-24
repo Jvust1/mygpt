@@ -1,0 +1,45 @@
+# BRIDGE-D001 / BRIDGE-E001 — Book 只读选段桥 · 2026-09-23
+
+## 决策
+
+保留两个项目的权威边界：Book 提供真实版本绑定的选段和短期授权，mygpt 只接收受信任同机能力接口，正文不长期复制。HMAC 身份不等于可撤销授权，因此消费、缓存和最终完成都回到 Book 核验；递增序号防止迟到选择复活。新 `mygpt.book-lease-context.v1` 不改变旧 v1/v2 的 SIMULATED 限制。
+
+来源层级不混合：原始转录、补录、AI 校正、AI 思路提示与参考推导明确选择；raw/display 身份各自计算。保留实际公式编号撇号与合法跨小节引用；不修改源教材来适应代码。图片、笔记、答案和任意 provider/prompt 均不进入该接口。
+
+## BRIDGE-E001 实际验证
+
+精确提交：Book `bf7aa490639bc2b2fcf382623b915d54f6cecf07`，mygpt `fa9f17a0eb4fb015d76b419865f1b49a2d325f0e`。Book CI run 35828253594：68 Python、18 Node pass；有一条 pytest 缓存权限 warning，原日志保留。mygpt run 35826642389：相同 39-wheel lock 的两个新环境各 352 pass / 0 skipped / 0 failed，新 20 receiver cases 必须实际出现。
+
+Book artifact 10736546209 的 SHA-256 为 `4214e74934bf6aaf63fc0e9e862c35ea750bca2d8b1bf657885076c910197755`；16 个代码/测试/说明/工作流文件与本地逐字节相同。mygpt artifact 10735138372 的 SHA-256 为 `f0ee3d7da7df19a4dca2abc7e61860e1fa1e4178ef468efae48841a699b349d2`；4 个实现/测试/工作流文件回读一致。
+
+固定 r6 归档的 95 小节经独立 JS/Python 投影得到 19,174 个向量、0 mismatch，其中 17,330 个有效正文、1,844 个预期 EMPTY_BODY 拒绝。实际 Book HTTP 验收 56 项通过：5 类选段经实际 TestModel，重复请求不多调用，错误身份/私密字段/旧序号/撤销均拒绝，unexpected server errors=0、paid calls=0、不导入 StudyRecord。以上是身份/传输/策略验收，不是内容正确性或教学质量验收。
+
+原始失败包括缺模块 TDD、Pydantic alias 再验证、HTTP 测试定位与错误码假设；全部保留，未抹除为 unseen。JS 末尾换行标识符新增回归后通过；最终 19,174 向量已重跑。
+
+## UI 边界与下一步
+
+可选 Reader 控件已实现，原密集正文没有持久化改写。浏览器因托管导航策略返回 ERR_BLOCKED_BY_ADMINISTRATOR，未绕过策略，无浏览器验收或截图。下一步为允许 localhost 的受信任环境中完整 UI 验收和独立审阅；不能用 HTTP/Node 的通过替代。Android 真机/APK 身份/IPC/overlay、真实教学 provider、生产多用户安全、独立审阅与旧 PR #5/#6 整合仍待完成。
+
+## 保存与恢复
+
+两份新增量 ZIP 分别归入 Book 与 mygpt 既有 Generated 目录。完整 SHA、Drive ID、内部成员数与整包回读校验记录在 `governance/book_selection_bridge_artifact_manifest_20260923.json`；旧 manifest 通过 includes 保留，旧 artifact 不重复上传。包内 CHECKPOINT.md 保存更详细的验证、错误及重现说明。
+
+状态同步将 pre-bridge 三份入口按完全相同的 Git blob 保存在 history，新入口只描述当前评审分支；不会覆盖历史证据或取消任何旧门禁。后续修改必须沿普通分支/审阅流程进行，不直接写 main，不自动合并。
+
+
+## BRIDGE-E002 — Book 多来源层显式选择
+
+配套 Book 提交 `114be2a40f9e3ef364aca2e02492361ebf46e4b6` 修复 UI 默认选层：多层 record 必须先明确选择原文/补录/AI 校正等具体层，再生成对应 preview/hash；未选层前分享禁用，预览阶段零 `/select`。单层 record 可直接预选。
+
+Book run 35834149129：68 Python + 18 projection Node + 1 DOM state regression 全过；artifact 10738114864 SHA-256 `26e7027f0697acccf8e8d50724ad1ec7bc9a9b3e3923eb8f57885f20d1c63b8e`。Book v1.1 增量归档 Drive `1T_PGQxLQJgaq5BkYzlO_tAC1SXr1_arz`，103,218 bytes，SHA-256 `506ba0a1f259431fed59358bcfb7ccb44c3ddee31c681c890a492b6e1054079a`；旧 v1 不覆盖。
+
+mygpt `book_bridge.py` 未变；旧 receiver 验收仍有效。真实浏览器 localhost E2E、Android 和独立审阅继续 PENDING。
+
+
+## BRIDGE-E003 — Chromium UI + 真实 Book/mygpt 后端 shim
+
+冻结 r6 与 mygpt 精确源码重新恢复后，68 Python、18 projection Node、1 DOM state、19,174 conformance 和 56 HTTP / 5 TestModel / 0 paid 的既有结果全部重现。系统 Chromium 直接访问 `127.0.0.1` 和 `localhost` 均为 `ERR_BLOCKED_BY_ADMINISTRATOR`，策略未修改或绕过。
+
+显式 Playwright binding shim 中，真实 Chromium 执行精确 Reader/Bridge JS；应用 fetch 由 harness 转发至真实 Book 127.0.0.1 服务，Book Authority/r6/mygpt BookReceiver/TestModel 均不替换。由于测试页 null origin，localStorage/history、randomUUID/WebCrypto 为明确测试替身。
+
+主 UI 21/21、额外时序 5/5 通过，覆盖真实 raw/display、多层明确选层、预览零 grant、share、真实 TestModel reply、0 paid、MathJax、navigation/mode/group/visibility/expiry invalidation、cancel late reply、revoke、mobile/desktop layout、0 page/console errors。证据包仅归档在 Book：Drive `1l1XxGbVqS5__4RhSYevhTnNT5JT3ijs9`，SHA-256 `71b10b3127eb60a61681d96a9712c17758ddf7eb3f00bf09a6bdb3f75d6834ba`。该结果提升浏览器 UI/时序可信度，但 **direct browser -> localhost 仍 NOT ACCEPTED**。
