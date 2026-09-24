@@ -1,0 +1,80 @@
+name: Source delivery and clean recovery
+on:
+  push:
+    branches: [feat/book-contract-audit-v1]
+    paths:
+      - 'scripts/source_bundle.py'
+      - 'run_mygpt.py'
+      - 'START_HERE.md'
+      - 'tests/test_source_bundle.py'
+      - 'tests/test_launcher.py'
+      - '.github/workflows/source-delivery.yml'
+permissions:
+  contents: read
+concurrency:
+  group: mygpt-source-delivery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  source-recovery:
+    if: github.repository == 'Jvust2/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      OTEL_SDK_DISABLED: 'true'
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      PIP_NO_INPUT: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Test, build twice and verify exact committed source
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/source-evidence"
+          mkdir -p "$OUT"
+          python -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$OUT/delivery-tests.txt"
+          python scripts/source_bundle.py build --commit "$GITHUB_SHA" --output "$OUT/mygpt-source.zip" | tee "$OUT/build.json"
+          python scripts/source_bundle.py build --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/source-repeat.zip" > "$OUT/repeat.json"
+          cmp "$OUT/mygpt-source.zip" "$RUNNER_TEMP/source-repeat.zip"
+          sha256sum "$OUT/mygpt-source.zip" > "$OUT/source.sha256"
+          git rev-parse HEAD > "$OUT/source-commit.txt"
+      - name: Recover into a new directory and test using locked dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/source-evidence"
+          python - <<'PY'
+          import json, os, pathlib, zipfile
+          from scripts.source_bundle import verify
+          out = pathlib.Path(os.environ['RUNNER_TEMP']) / 'source-evidence'
+          report = json.loads((out / 'build.json').read_text())
+          verify(out / 'mygpt-source.zip', report['sha256'])
+          dest = pathlib.Path(os.environ['RUNNER_TEMP']) / 'recovered-source'
+          dest.mkdir(exist_ok=False)
+          # All member names, modes, sizes and hashes passed strict verification.
+          with zipfile.ZipFile(out / 'mygpt-source.zip') as archive:
+              archive.extractall(dest)
+          PY
+          python -m venv "$RUNNER_TEMP/recovery-env"
+          PY="$RUNNER_TEMP/recovery-env/bin/python"
+          SRC="$RUNNER_TEMP/recovered-source"
+          "$PY" -m pip install --only-binary=:all: --require-hashes -r "$SRC/brain/requirements-linux-py313.lock"
+          "$PY" -m pip check | tee "$OUT/pip-check.txt"
+          "$PY" "$SRC/run_mygpt.py" doctor | tee "$OUT/doctor.json"
+          cd "$SRC/brain"
+          "$PY" scripts/verify_integrations.py --output "$OUT/recovered-brain"
+          PYTHONPATH=. "$PY" scripts/smoke_selection_intake.py --output "$OUT/recovered-http.json"
+      - name: Preserve complete source and bounded recovery evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: source-delivery-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/source-evidence/
+          retention-days: 3
+          if-no-files-found: warn
