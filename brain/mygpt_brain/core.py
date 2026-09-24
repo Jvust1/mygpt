@@ -95,6 +95,17 @@ class ReaderStudyContext(StudyContext):
         return (*super().identity, self.schema_version)
 
 
+class ImportedReaderContext(ReaderStudyContext):
+    """A local user-selected source, NOT authenticated Book activity or truth."""
+    schema_version: Literal["mygpt.imported-reader-context.v1"] = "mygpt.imported-reader-context.v1"
+    evidence_kind: Literal["USER_SUPPLIED_UNVERIFIED"] = "USER_SUPPLIED_UNVERIFIED"
+    source_serialization: Literal["selected-source-json-v1"] = "selected-source-json-v1"
+
+    @property
+    def reference(self) -> str:
+        return "unverified-import:v1:" + super().reference
+
+
 def _legacy_context_tag(value):
     # Backward compatibility for original callers that omitted v1's default tag.
     # Explicit unknown tags never fall back to v1.
@@ -104,7 +115,7 @@ def _legacy_context_tag(value):
 
 
 ContextValue = Annotated[
-    StudyContext | ReaderStudyContext,
+    StudyContext | ReaderStudyContext | ImportedReaderContext,
     Field(discriminator="schema_version"), BeforeValidator(_legacy_context_tag),
 ]
 _CONTEXT = TypeAdapter(ContextValue)
@@ -117,7 +128,7 @@ def parse_context(value: dict | StudyContext | str) -> StudyContext | ReaderStud
 class StudyEvent(Contract):
     schema_version: Literal["mygpt.study-event.v1"] = "mygpt.study-event.v1"
     event_id: Identifier
-    producer_id: Literal["book-demo"] = "book-demo"
+    producer_id: Literal["book-demo", "local-selection"] = "book-demo"
     session_id: Identifier
     sequence: Sequence
     occurred_at: AwareDatetime
@@ -134,6 +145,9 @@ class StudyEvent(Contract):
         if (self.kind in CONTEXT_EVENTS) != (self.context is not None):
             raise ValueError("context is required only for start/change/resume")
         if self.context:
+            expected = "local-selection" if isinstance(self.context, ImportedReaderContext) else "book-demo"
+            if self.producer_id != expected:
+                raise ValueError("context_producer_mismatch")
             if self.context.session_id != self.session_id:
                 raise ValueError("context/session mismatch")
             if self.context.captured_at > self.occurred_at:
@@ -355,7 +369,9 @@ class Brain:
                 status = "context_unavailable"
             if status != "active":
                 context = None
-            return {"evidence_kind": "SIMULATED", "status": status, "session_id": row["id"],
+            evidence_kind = ("USER_SUPPLIED_UNVERIFIED"
+                if "mygpt.imported-reader-context.v1" in json.loads(row["identity_json"]) else "SIMULATED")
+            return {"evidence_kind": evidence_kind, "status": status, "session_id": row["id"],
                     "last_sequence": row["last_sequence"], "quiet": bool(row["quiet"]),
                     "context": context.model_dump(mode="json") if context else None,
                     "host_state": "blocked" if status in ("disconnected", "context_expired", "context_unavailable") else "idle",

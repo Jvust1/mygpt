@@ -5,10 +5,12 @@ on:
     branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1]
     paths:
       - 'host/fixtures.js'
+      - 'host/examples/selection-demo.json'
       - 'host/brain*.js'
       - 'host/brain.html'
       - 'brain/mygpt_brain/**'
       - 'brain/tests/**'
+      - 'brain/schemas/**'
       - 'brain/scripts/**'
       - 'brain/pyproject.toml'
       - 'brain/requirements-linux-py313.lock'
@@ -75,6 +77,8 @@ jobs:
           PYTHONPATH=. "$PY" -m mygpt_brain > "$RUNNER_TEMP/brain-evidence/demo.jsonl"
           PYTHONPATH=. "$PY" -m mygpt_brain.reader_demo > "$RUNNER_TEMP/brain-evidence/reader-demo.json"
           PYTHONPATH=. "$PY" -m mygpt_brain.host_fixtures --check ../host/fixtures.js | tee "$RUNNER_TEMP/brain-evidence/fixture-check.txt"
+          PYTHONPATH=. "$PY" scripts/smoke_selection_intake.py --output "$RUNNER_TEMP/brain-evidence/selection-http-smoke.json" | tee "$RUNNER_TEMP/brain-evidence/selection-http-smoke.txt"
+          "$PY" -m mygpt_brain.selection_packet validate ../host/examples/selection-demo.json > "$RUNNER_TEMP/brain-evidence/selection-packet-check.json"
           "$PY" -m compileall -q mygpt_brain scripts tests
           git rev-parse HEAD > "$RUNNER_TEMP/brain-evidence/source-commit.txt"
           sha256sum "$RUNNER_TEMP/brain-evidence/requirements-linux-py313.lock" > "$RUNNER_TEMP/brain-evidence/lock.sha256"

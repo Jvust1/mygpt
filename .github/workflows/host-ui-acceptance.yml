@@ -6,6 +6,12 @@ on:
       - 'host/**'
       - 'companion/**'
       - 'brain/mygpt_brain/local_service.py'
+      - 'brain/mygpt_brain/local_engine.py'
+      - 'brain/mygpt_brain/selection*.py'
+      - 'brain/mygpt_brain/json_boundary.py'
+      - 'brain/mygpt_brain/core.py'
+      - 'tests/selection-*.mjs'
+      - 'tests/selection-browser.cjs'
       - 'brain/mygpt_brain/adapters.py'
       - 'brain/mygpt_brain/host_fixtures.py'
       - 'brain/requirements-linux-py313.lock'
@@ -61,7 +67,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node --test tests/atlas.test.mjs tests/host-controller.test.mjs tests/brain-adapter.test.mjs | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
+          node --test tests/atlas.test.mjs tests/host-controller.test.mjs tests/brain-adapter.test.mjs tests/selection-controller.test.mjs | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
       - name: Run existing Jonah, replay host, and real loopback Python host checks serially
         shell: bash
         run: |
@@ -70,6 +76,7 @@ jobs:
           MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/jonah" node tests/browser.cjs | tee "$RUNNER_TEMP/host-evidence/jonah-run.txt"
           MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/replay-host" node tests/host-browser.cjs | tee "$RUNNER_TEMP/host-evidence/replay-host-run.txt"
           MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/python-host" MYGPT_PYTHON="$RUNNER_TEMP/brain-browser/bin/python" node tests/brain-host-browser.cjs | tee "$RUNNER_TEMP/host-evidence/python-host-run.txt"
+          MYGPT_TEST_OUTPUT="$RUNNER_TEMP/host-evidence/selection-host" MYGPT_PYTHON="$RUNNER_TEMP/brain-browser/bin/python" node tests/selection-browser.cjs | tee "$RUNNER_TEMP/host-evidence/selection-host-run.txt"
       - name: Preserve bounded source-linked evidence
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f

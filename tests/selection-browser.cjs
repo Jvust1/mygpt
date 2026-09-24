@@ -1,0 +1,110 @@
+// Actual file preview -> opt-in loopback intake -> Python Brain/TestModel.
+// Every file in this suite is synthetic. No real Book, clipboard data or provider.
+const {chromium}=require('playwright');
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {createHash}=require('node:crypto'),{spawn}=require('node:child_process');
+const root=path.join(__dirname,'..');
+function address(child){return new Promise((resolve,reject)=>{
+  let text='';const stop=()=>{clearTimeout(timer);child.stdout.off('data',data);child.off('exit',exit);child.off('error',fail);};
+  const fail=e=>{stop();reject(e);},exit=code=>fail(new Error(`server exited ${code}`));
+  const data=b=>{text+=b;const m=text.match(/mygpt local brain: (http:\/\/127\.0\.0\.1:\d+)\r?\n/);if(m){stop();resolve(m[1]);}};
+  const timer=setTimeout(()=>fail(new Error('startup timeout')),10000);
+  child.stdout.on('data',data);child.on('exit',exit);child.on('error',fail);
+});}
+const sorted=x=>Array.isArray(x)?x.map(sorted):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,sorted(x[k])])):x;
+(async()=>{
+  const out=process.env.MYGPT_TEST_OUTPUT||path.join(root,'selection-test-output');fs.mkdirSync(out,{recursive:true});
+  const report={result:'RUNNING',checks:[],errors:[],expectedHttpErrors:[],externalRequests:[],apiRequests:[]};
+  const check=(name,value)=>{assert(value,name);report.checks.push(name);};
+  const server=spawn(process.env.MYGPT_PYTHON||'python',['-m','mygpt_brain.local_service','--port','0',
+    '--enable-selection-intake','--demo-delay-ms','650'],{cwd:root,stdio:['ignore','pipe','pipe'],
+    env:{...process.env,PYTHONPATH:path.join(root,'brain'),PYTHONUNBUFFERED:'1',OTEL_SDK_DISABLED:'true'}});
+  let stderr='';server.stderr.on('data',b=>stderr+=b);let browser,page;
+  try{
+    const base=await address(server);browser=await chromium.launch({headless:true});
+    report.browser=browser.version();report.node=process.version;report.playwright=require('playwright/package.json').version;
+    const context=await browser.newContext({viewport:{width:393,height:852},isMobile:true,hasTouch:true});
+    await context.grantPermissions(['clipboard-read','clipboard-write'],{origin:base});
+    await context.route('**/*',route=>{const url=new URL(route.request().url());
+      if(url.origin!==base){report.externalRequests.push(url.origin);return route.abort();}
+      if(url.pathname.startsWith('/api/'))report.apiRequests.push(url.pathname);
+      return route.continue();
+    });
+    page=await context.newPage();page.setDefaultTimeout(10000);
+    page.on('pageerror',e=>report.errors.push(e.message));
+    page.on('console',m=>{if(m.type()!=='error')return;
+      const match=m.text().match(/Failed to load resource: the server responded with a status of (400|403)/);
+      if(match)report.expectedHttpErrors.push(Number(match[1]));else report.errors.push(m.text());
+    });
+    const wait=s=>page.waitForFunction(state=>document.body.dataset.hostState===state,s);
+    const count=path=>report.apiRequests.filter(p=>p===path).length;
+    const sample=JSON.parse(fs.readFileSync(path.join(root,'host/examples/selection-demo.json'),'utf8'));
+    const choose=raw=>page.locator('#packet-file').setInputFiles({name:'synthetic-selection.json',mimeType:'application/json',buffer:Buffer.from(raw)});
+    const submit=async()=>{await page.locator('#consent').check();await page.locator('#import').click();await wait('selected');};
+    await page.goto(base+'/host/selection.html');await page.waitForFunction(()=>!document.querySelector('#packet-file').disabled);
+    check('opt-in status visible',await page.locator('#connection').innerText().then(t=>t.includes('选段接收已开启')&&t.includes('来源未核验')));
+    check('cookie inaccessible to script',await page.evaluate(()=>document.cookie)==='');
+    check('no initial explain or import',count('/api/v1/explain')===0&&count('/api/v1/selection')===0);
+    await choose(JSON.stringify(sample));await page.waitForFunction(()=>document.querySelector('#file-preview').textContent.length>0);
+    check('file selection stays in browser',count('/api/v1/selection')===0);
+    check('consent required before local send',await page.locator('#import').isDisabled());
+    await submit();check('import itself does not explain',count('/api/v1/explain')===0);
+    check('provenance never upgraded',await page.locator('#source-trust').innerText().then(t=>t.includes('USER_SUPPLIED_UNVERIFIED')));
+    check('version and hash displayed',await page.locator('#selected-version').innerText().then(t=>t.includes('@'))&&await page.locator('#source-hash').innerText()===sample.source_sha256);
+    await page.locator('#explain').click();await wait('working');await page.waitForTimeout(150);
+    await page.locator('#cancel').click();await wait('selected');await page.waitForTimeout(800);
+    check('cancel suppresses late reply',await page.locator('#reply-box').isHidden());
+    check('cancel uses bounded server endpoint',count('/api/v1/cancel')>=1);
+    await page.locator('#explain').click();await wait('ready');
+    check('real Brain returns explicitly fixed TestModel receipt',await page.locator('#reply').innerText().then(t=>t.startsWith('[SIMULATED]')&&t.includes('没有进行真实模型推理')));
+    check('no horizontal overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await page.screenshot({path:path.join(out,'selection-mobile-ready.png')});
+    await page.locator('#copy-prompt').click();
+    await page.waitForFunction(()=>document.querySelector('#copy-status').textContent.includes('已复制'));
+    const clip=await page.evaluate(()=>navigator.clipboard.readText());
+    check('copy contains selected text and byte identity',clip.includes(sample.source_sha256)&&clip.includes('USER_SUPPLIED_UNVERIFIED')&&clip.includes('两个相同'));
+    const before=count('/api/v1/explain');await page.locator('#clear').click();
+    check('clear removes source display and disables sending',await page.locator('#source-parts').innerText()===''&&await page.locator('#explain').isDisabled());
+    check('clear does not send a model request',count('/api/v1/explain')===before);
+    const unsafe=structuredClone(sample);unsafe.source.parts[0].text='<img src="https://example.invalid/never" onerror="globalThis.bad=1">';
+    unsafe.source_sha256=createHash('sha256').update(JSON.stringify(sorted(unsafe.source))).digest('hex');
+    await choose(JSON.stringify(unsafe));await submit();
+    check('source HTML is displayed as text',await page.locator('#source-parts img').count()===0&&await page.locator('#source-parts').innerText().then(t=>t.includes('<img')));
+    check('source cannot execute script',await page.evaluate(()=>globalThis.bad===undefined));
+    await page.locator('#clear').click();
+    await page.locator('.scope').filter({has:page.locator('#manual-text')}).locator('summary').click();
+    await page.locator('#manual-title').fill('合成手动段落');await page.locator('#manual-text').fill('MANUAL_SYNTHETIC：原样保留 e\u0301 与 x+x。');
+    const importCount=count('/api/v1/selection');await page.locator('#prepare-manual').click();
+    await page.waitForFunction(()=>document.querySelector('#file-preview').textContent.includes('MANUAL_SYNTHETIC'));
+    check('manual preparation is local only',count('/api/v1/selection')===importCount);
+    await submit();await page.locator('#explain').click();await wait('ready');
+    check('manual text reaches Brain without fake Book version',await page.locator('#selected-version').innerText().then(t=>t.includes('manual-unversioned'))&&await page.locator('#source-parts').innerText().then(t=>t.includes('MANUAL_SYNTHETIC')));
+    await page.locator('#clear').click();let imports=count('/api/v1/selection');
+    await choose(Buffer.from([0xff]));await page.waitForFunction(()=>document.querySelector('#import-message').textContent.includes('读取失败'));
+    check('invalid UTF8 never sent',count('/api/v1/selection')===imports&&await page.locator('#import').isDisabled());
+    await choose(Buffer.alloc(65537,32));await page.waitForFunction(()=>document.querySelector('#import-message').textContent.includes('文件过大'));
+    check('oversize file never sent',count('/api/v1/selection')===imports);
+    const bad={...sample,source_sha256:'b'.repeat(64)};await choose(JSON.stringify(bad));await page.locator('#consent').check();await page.locator('#import').click();
+    await page.waitForFunction(()=>document.querySelector('#import-message').textContent.includes('接收失败'));
+    check('hash mismatch fails closed',await page.locator('#explain').isDisabled()&&await page.locator('#source-parts').innerText()==='');
+    await choose(JSON.stringify(sample));await submit();imports=count('/api/v1/explain');
+    await page.evaluate(()=>{const original=Date.now;Date.now=()=>original()+121000;});await page.locator('#explain').click();await wait('expired');
+    check('expired UI selection does not dispatch',count('/api/v1/explain')===imports);
+    await page.reload();await page.waitForFunction(()=>!document.querySelector('#packet-file').disabled);
+    check('reload does not restore source from storage',await page.locator('#source-parts').innerText()===''&&await page.locator('#file-preview').innerText()==='');
+    await choose(JSON.stringify(sample));await submit();await page.setViewportSize({width:1280,height:900});
+    await page.screenshot({path:path.join(out,'selection-desktop.png')});
+    await page.locator('.scope').filter({has:page.locator('#revoke')}).locator('summary').click();await page.locator('#revoke').click();
+    await page.waitForFunction(()=>document.querySelector('#connection').textContent.includes('授权已撤销'));
+    check('revoke disables controls',await page.locator('#packet-file').isDisabled()&&await page.locator('#explain').isDisabled());
+    await page.reload();await page.waitForFunction(()=>document.querySelector('#connection').textContent.includes('不可用'));
+    check('refresh cannot restore revoked authorization',await page.locator('#packet-file').isDisabled());
+    check('only expected negative HTTP errors',report.expectedHttpErrors.length===2&&report.expectedHttpErrors.includes(400)&&report.expectedHttpErrors.includes(403));
+    check('no runtime or CSP errors',report.errors.length===0);check('no external requests',report.externalRequests.length===0);
+    check('no arbitrary API paths',report.apiRequests.every(p=>['/api/v1/status','/api/v1/selection','/api/v1/explain','/api/v1/cancel','/api/v1/revoke'].includes(p)));
+    report.result='PASS';
+  }catch(error){report.result='FAIL';report.failure=String(error);report.serverStderr=stderr.slice(-2000);
+    if(page)await page.screenshot({path:path.join(out,'failure.png')}).catch(()=>{});throw error;
+  }finally{fs.writeFileSync(path.join(out,'selection-browser-report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
+    try{await browser?.close();}finally{server.kill('SIGTERM');setTimeout(()=>server.kill('SIGKILL'),1500).unref();}}
+})().catch(error=>{console.error(error);process.exitCode=1;});

@@ -17,7 +17,11 @@ function freeze(value) {
 export function createHostController({catalogue, adapter, now = () => Date.now(),
   monotonic = () => performance.now(), setTimer = setTimeout, clearTimer = clearTimeout,
   ttlMs = 120000, timeoutMs = 8000} = {}) {
-  if (catalogue?.schema !== 'mygpt.host-replay.v1' || catalogue.scope !== 'SYNTHETIC_FIXED_REPLAY'
+  const imported = catalogue?.schema === 'mygpt.host-selection.v1'
+    && catalogue.scope === 'LOCAL_UNVERIFIED_SELECTION';
+  const replay = catalogue?.schema === 'mygpt.host-replay.v1'
+    && catalogue.scope === 'SYNTHETIC_FIXED_REPLAY';
+  if ((!imported && !replay)
       || catalogue.live_book_connected !== false || catalogue.model_calls !== 0
       || !Array.isArray(catalogue.entries) || !catalogue.entries.length || catalogue.entries.length > 32
       || typeof adapter !== 'function') throw new TypeError('invalid replay configuration');
@@ -28,9 +32,9 @@ export function createHostController({catalogue, adapter, now = () => Date.now()
   for (const item of catalogue.entries) {
     const entry = freeze(structuredClone(item));
     if (typeof entry.id !== 'string' || entries.has(entry.id)
-        || entry.context?.schema_version !== 'mygpt.reader-context.v2'
-        || entry.context.evidence_kind !== 'SIMULATED'
-        || typeof entry.source_ref !== 'string' || !entry.source_ref.startsWith('reader:v2:')
+        || entry.context?.schema_version !== (imported?'mygpt.imported-reader-context.v1':'mygpt.reader-context.v2')
+        || entry.context.evidence_kind !== (imported?'USER_SUPPLIED_UNVERIFIED':'SIMULATED')
+        || typeof entry.source_ref !== 'string' || !entry.source_ref.startsWith(imported?'unverified-import:v1:reader:v2:':'reader:v2:')
         || !/^[a-f0-9]{64}$/.test(entry.context.source_sha256))
       throw new TypeError('invalid replay entry');
     entries.set(entry.id, entry);
@@ -83,7 +87,11 @@ export function createHostController({catalogue, adapter, now = () => Date.now()
     if (!Number.isFinite(wall) || !Number.isFinite(mono)) {
       invalidate('expired','invalid_clock'); return false;
     }
-    lease = {wallEnd:wall+ttlMs,monoEnd:mono+ttlMs,lastWall:wall,lastMono:mono};
+    const remaining = imported ? Math.min(ttlMs, Date.parse(entry.context.expires_at)-wall) : ttlMs;
+    if (!Number.isFinite(remaining) || remaining <= 0) {
+      invalidate('expired','selection_expired'); return false;
+    }
+    lease = {wallEnd:wall+remaining,monoEnd:mono+remaining,lastWall:wall,lastMono:mono};
     state = {...state,status:'selected',entry,reply:null,reason:'explicit_selection',
       revision:state.revision+1,expiresAt:lease.wallEnd};
     armExpiry(); notify(); return true;
@@ -101,7 +109,7 @@ export function createHostController({catalogue, adapter, now = () => Date.now()
     const request = freeze({request_id:`ui-${instanceKey}-${state.requests+1}`,
       revision,entry_id:entry.id,mode,source_ref:entry.source_ref,
       source_sha256:entry.context.source_sha256,selection_expires_at_ms:lease.wallEnd,
-      scope:'SYNTHETIC_FIXED_REPLAY'});
+      scope:catalogue.scope});
     const abort = new AbortController();
     let resolve;
     const promise = new Promise(done => {resolve = done;});
@@ -124,6 +132,7 @@ export function createHostController({catalogue, adapter, now = () => Date.now()
           || reply.entry_id !== entry.id || reply.revision !== revision || reply.mode !== mode
           || reply.source_ref !== entry.source_ref || reply.source_sha256 !== request.source_sha256
           || typeof reply.text !== 'string' || !reply.text.trim() || reply.text.length > 4000
+          || (imported && reply.source_trust !== 'USER_SUPPLIED_UNVERIFIED')
           || reply.model_called !== false) { fail('response_identity_mismatch'); return; }
       pending = null; clearTimer(token.timer);
       state = {...state,status:'ready',reply:reply.text,reason:'fixture_ready'};
