@@ -9,13 +9,54 @@ concurrency:
   group: desktop-delivery-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  core:
+    # The existing offline guard requires AF_UNIX asyncio wakeups. Do not relax it
+    # for Windows socketpair TCP wakeups, nor weaken the existing POSIX git-mode tests.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MYGPT_STRICT_SDK_TESTS: '1'
+      OTEL_SDK_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact SDK versions
+        run: |
+          python -m pip install -e './brain[integrations,test]'
+          python -m pip check
+      - name: Full unchanged offline and new desktop tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p core-evidence
+          python -m pytest tests brain/tests -ra --junitxml=core-evidence/pytest.xml 2>&1 | tee core-evidence/pytest.txt
+          python -c "import xml.etree.ElementTree as E; t=E.parse('core-evidence/pytest.xml'); assert not any(int(s.get(k,0)) for s in t.iter('testsuite') for k in ('failures','errors','skipped'))"
+          node --test tests/*.test.mjs 2>&1 | tee core-evidence/node-tests.txt
+          node --check desktop_ui/app.js
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mygpt-core-${{ github.sha }}
+          path: core-evidence/
+          retention-days: 14
+          if-no-files-found: error
   windows:
+    needs: core
     runs-on: windows-latest
     timeout-minutes: 30
     env:
       DESKTOP_APP: mygpt
       PYTHONUTF8: '1'
       PYTHONIOENCODING: utf-8
+      OTEL_SDK_DISABLED: 'true'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,6 +75,10 @@ jobs:
           git archive --format=zip HEAD -o delivery/mygpt-Source-and-Tests.zip
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           git rev-parse HEAD | Set-Content -Encoding utf8 delivery/SOURCE_COMMIT.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: mygpt-core-${{ github.sha }}
+          path: delivery/evidence/linux-core/
       - name: Install pinned integration and build dependencies
         shell: pwsh
         run: |
@@ -46,10 +91,10 @@ jobs:
           python -m playwright install chromium
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m pip freeze | Set-Content -Encoding utf8 delivery/evidence/dependencies.txt
-      - name: Full integration and persistence regression
+      - name: Windows desktop HTTP and persistence tests
         shell: pwsh
         run: |
-          python -m pytest tests brain/tests -ra --junitxml=delivery/evidence/pytest.xml 2>&1 | Tee-Object delivery/evidence/pytest.txt
+          python -m pytest tests/test_desktop_state.py tests/test_desktop_workspace.py -ra --junitxml=delivery/evidence/pytest.xml 2>&1 | Tee-Object delivery/evidence/pytest.txt
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node --test tests/*.test.mjs 2>&1 | Tee-Object delivery/evidence/node-tests.txt
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
