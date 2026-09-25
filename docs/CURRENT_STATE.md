@@ -1,3 +1,15 @@
+## 当前入口 · PR #8 组合链路已全绿 · 2026-09-25
+
+新的整合 review branch `feat/integrate-pr6-book-bridge-20260925` 以最新 PR #6 为基线，只移植 PR #7 的 Book lease receiver 运行/测试能力，**没有复制 PR #7 旧的 project_state/CURRENT_STATE/HANDOFF 替换内容**。当前 Draft PR #8 的实际运行 head `e9e5fb0` 已完成四套 exact-head CI：Brain SDK 双环境各 **446/0/0**，Book receiver 20 cases，Node **66 pass**，Jonah 49、replay 39、Python host 23、selection host 30，clean recovery 后 Brain **446/0/0**，launcher **12/12**，selection HTTP **32/32**。
+
+长期 Drive 归档 `mygpt-integrated-book-bridge-v1-20260925.zip`（ID `1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK`）已上传并下载回读：5,625,678 bytes，SHA-256 `eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09`，ZIP CRC PASS。详细见 [INTEGRATION_CHECKPOINT_20260925.md](INTEGRATION_CHECKPOINT_20260925.md)。
+
+**边界不变：**真实/付费模型为 0；未改 Book 仓库；未验证用户手机 Book APK、Windows/Android 真机、生产网络或独立审阅；没有自动 merge。
+
+**下一步：** 对 PR #8 与配套 Book authority 做独立审阅；通过后再做真实 Book 选段 → mygpt 的授权 localhost/Android Studio 端到端 TestModel 验收。
+
+---
+
 ## 当前入口 · 本地选段 + 可恢复完整源码已验收 · 2026-09-25
 
 当前 PR #6 运行能力已经从固定合成样本推进到**显式本地选段**：只有用户预览并同意后才把一条本地内容送入 127.0.0.1 Python Brain；来源始终标记为 `USER_SUPPLIED_UNVERIFIED`，不会冒充 Book。精确 intake head `318c3ef` 的固定 SDK 两个干净环境各 **426 passed / 0 skipped**；浏览器 selection host **30 checks**、Node **66 pass**。完整结果见 [SOURCE_DELIVERY_CHECKPOINT_20260925.md](SOURCE_DELIVERY_CHECKPOINT_20260925.md)。

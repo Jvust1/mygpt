@@ -50,3 +50,6 @@ Local files/manual text can be useful before a production Book/Android bridge is
 
 ## D017 — recovery is an explicit product requirement
 A runnable candidate is not considered recoverable only because GitHub contains files. Checkpoints should provide a deterministic source-only bundle from an immutable commit, an externally recorded SHA-256, a read-only environment doctor, an explicit launcher, and clean-directory recovery evidence. Launchers must not auto-install dependencies, inherit provider credentials, or silently enable intake/provider capabilities.
+
+## D018 — integrate stale review lines by capability, not by state-file overwrite
+When an older review branch contains useful additive runtime capability but also replaces newer project-state documents, create a fresh non-default integration branch from the newer accepted baseline and transplant only the bounded runtime/test capability. Preserve the old branch as provenance; do not resolve review-stack conflicts by overwriting current state or rewriting history.

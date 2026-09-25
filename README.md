@@ -1,5 +1,17 @@
 # mygpt
 
+## 当前检查点 · PR #8 组合链路全绿（2026-09-25）
+
+`feat/integrate-pr6-book-bridge-20260925` / Draft PR #8 把当前 PR #6 的显式本地选段/完整源码恢复与 PR #7 的 **Book lease receiver 运行能力**放到同一棵树中，并刻意保留新的治理状态而不是覆盖回旧版。
+
+Exact head `e9e5fb0`：Brain SDK 双环境各 **446/0/0**；Book receiver **20 cases**；Node **66 pass**；浏览器 Jonah 49 / replay 39 / Python host 23 / selection host 30；clean recovery 后 Brain **446/0/0**、launcher **12/12**、HTTP **32/32**。
+
+Drive 集成证据：`1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK`，SHA-256 `eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09`。详见 [integration checkpoint](docs/INTEGRATION_CHECKPOINT_20260925.md)。
+
+真实模型、Android/Windows 真机、用户实际 Book APK 和独立审阅仍未完成；PR #8 不自动合并。
+
+---
+
 ## 当前检查点 · 本地选段与完整源码恢复（2026-09-25）
 
 PR #6 已支持显式本地单条内容输入，来源固定为 `USER_SUPPLIED_UNVERIFIED`；`318c3ef` 的固定 SDK 双环境各 **426/0/0**，selection 浏览器 **30 checks**。随后 `65c8d6b` 增加完整源码恢复与显式启动器：delivery run `36019467569` 完成 97 个 tracked source files 的确定性源码包、fresh restore、Brain **426/0/0**、HTTP **32/32**、launcher **12/12**。
