@@ -1,3 +1,15 @@
+## 2026-09-25 Windows 学习陪伴交付更新
+
+- 新增 Windows 本机学习工作台：约拿陪伴、学习目标/计时、本地笔记、修订冲突保护、备份合并、本机 Ollama 明示调用入口。
+- 发布源码固定为 `0fc965263b42b8a12e0cb7b006f4b1bdcd137596`；不修改 Book / StudyMate / ChatContextVault，不改 main。
+- Windows delivery run `36149636550` 成功。
+- 同源码 Linux 全套 490 pytest PASS；Windows 桌面专项 18 pytest PASS；JavaScript 66 项在两端通过（平台套件有重叠，不相加）。
+- 原生 EXE 自检 5 项；Microsoft Edge 界面/退出/重启检查 13 项；包内 1,644 个文件逐项清单验证通过。
+- 便携包：`mygpt-Windows-Portable.zip`，34,199,210 bytes，SHA-256 `37ebfa7158af866a19de48d9680054816b4fcbea006e73050ab2eab99211cd79`。
+- Drive 完整交付归档：`mygpt-Windows-完整交付-20260925.zip`，文件 ID `15aYdyKH15Oakj1iuYblGxYScFQf8xx2A`。
+- Draft PR #9 已创建，未合并。
+- 边界保持：约拿仍是应用内陪伴而非系统级透明悬浮；不自动抓屏、不自动云同步；Book 实时桥和真实模型教学质量仍待用户设备验收。
+
 ## 当前入口 · PR #8 组合链路已全绿 · 2026-09-25
 
 新的整合 review branch `feat/integrate-pr6-book-bridge-20260925` 以最新 PR #6 为基线，只移植 PR #7 的 Book lease receiver 运行/测试能力，**没有复制 PR #7 旧的 project_state/CURRENT_STATE/HANDOFF 替换内容**。当前 Draft PR #8 的实际运行 head `e9e5fb0` 已完成四套 exact-head CI：Brain SDK 双环境各 **446/0/0**，Book receiver 20 cases，Node **66 pass**，Jonah 49、replay 39、Python host 23、selection host 30，clean recovery 后 Brain **446/0/0**，launcher **12/12**，selection HTTP **32/32**。
