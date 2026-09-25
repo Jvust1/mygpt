@@ -1,0 +1,16 @@
+{
+  "schema": "mygpt_desktop_delivery_v1",
+  "version": "2026.09.25-rc1",
+  "branch": "feat/desktop-delivery-20260925",
+  "base_commit": "fa09ad5ed93e3159edd585843a4f082d09f680b2",
+  "status": "IMPLEMENTED_PENDING_NATIVE_WINDOWS_ACCEPTANCE",
+  "source_systems_unchanged": ["Book", "StudyMate", "ChatContextVault"],
+  "features": ["companion", "explicit_focus_sessions", "local_notes", "revision_conflict_rejection", "idempotent_backup_merge", "opt_in_local_ollama_request", "preserved_volatile_selection_intake"],
+  "limits": ["no_native_system_overlay", "no_automatic_cloud_sync", "no_automatic_screen_capture", "live_model_quality_unverified", "real_book_bridge_device_acceptance_pending"],
+  "native_windows_tests": "PENDING",
+  "local_persistence_tests": {"passed": 8, "failed": 0},
+  "local_full_sdk_tests": "DEPENDENCIES_UNAVAILABLE_USE_PINNED_CI_ENVIRONMENT",
+  "main_modified": false,
+  "pr_merged": false,
+  "provider_calls_during_implementation": 0
+}

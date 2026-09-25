@@ -1,0 +1,74 @@
+name: Verified Windows desktop delivery
+on:
+  push:
+    branches: [feat/desktop-delivery-20260925]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: desktop-delivery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      DESKTOP_APP: mygpt
+      PYTHONUTF8: '1'
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preserve exact source
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force delivery/evidence | Out-Null
+          git archive --format=zip HEAD -o delivery/mygpt-Source-and-Tests.zip
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git rev-parse HEAD | Set-Content -Encoding utf8 delivery/SOURCE_COMMIT.txt
+      - name: Install pinned integration and build dependencies
+        shell: pwsh
+        run: |
+          python -m pip install -e "./brain[integrations,test]"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install pyinstaller==6.22.3 playwright==1.63.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m playwright install chromium
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip freeze | Set-Content -Encoding utf8 delivery/evidence/dependencies.txt
+      - name: Full integration and persistence regression
+        shell: pwsh
+        run: |
+          python -m pytest tests brain/tests -ra --junitxml=delivery/evidence/pytest.xml 2>&1 | Tee-Object delivery/evidence/pytest.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --test tests/*.test.mjs 2>&1 | Tee-Object delivery/evidence/node-tests.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --check desktop_ui/app.js
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build and test native executable, browser and restart
+        shell: pwsh
+        run: |
+          python tools/build_windows_delivery.py 2>&1 | Tee-Object delivery/evidence/build.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve boot diagnostics
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path "$env:LOCALAPPDATA/mygptDesktop/boot.log") { Copy-Item "$env:LOCALAPPDATA/mygptDesktop/boot.log" delivery/evidence/boot.log }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mygpt-windows-${{ github.sha }}
+          path: delivery/
+          retention-days: 14
+          if-no-files-found: error
