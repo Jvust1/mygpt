@@ -2,7 +2,6 @@
 from __future__ import annotations
 import hashlib
 import json
-import os
 from pathlib import Path
 import re
 import shutil
@@ -20,9 +19,10 @@ def run(args,**kwargs):
     subprocess.run(args,check=True,cwd=ROOT,**kwargs)
 
 args=[sys.executable,'-m','PyInstaller','--noconfirm','--clean','--onedir','--windowed',
-      '--name',NAME,'--exclude-module','playwright','--exclude-module','pytest',
+      '--name',NAME,'--exclude-module','playwright','--exclude-module','pytest','--exclude-module','mcp.cli',
       '--paths','brain','--collect-submodules','mygpt_brain','--collect-all','pydantic_ai',
-      '--collect-all','mcp','--recursive-copy-metadata','pydantic-ai-slim','--recursive-copy-metadata','mcp',
+      '--collect-submodules','mcp.client','--collect-submodules','mcp.server','--collect-data','mcp',
+      '--recursive-copy-metadata','pydantic-ai-slim','--recursive-copy-metadata','mcp',
       '--add-data','desktop_ui:desktop_ui','--add-data','host:host','--add-data','companion:companion',
       '--add-data','brain/pyproject.toml:brain','desktop.py']
 run(args)
