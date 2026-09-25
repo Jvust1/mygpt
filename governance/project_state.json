@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-22",
+  "updated_date": "2026-09-23",
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/jonah-companion-20260922",
-  "phase": "COMPANION_UI_PROTOTYPE",
-  "status": "JONAH_COMPANION_IMPLEMENTED_TESTS_PASS_REVIEW_PENDING",
+  "active_branch": "feat/book-context-brain-20260922",
+  "phase": "BOOK_READER_BRIDGE_DESIGN",
+  "status": "SDK_ACCEPTANCE_PASS_BOOK_MAPPING_RECORDED_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -28,7 +28,9 @@
     "StudyMate": "study-session and low-cost device/activity signals",
     "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
   },
-  "blocking_items": [],
+  "blocking_items": [
+    "Production Book bridge remains blocked: r6 opaque version compatibility, explicit selection, host events and authentication are not implemented."
+  ],
   "pending_sync": {
     "blocking_count": 0,
     "source": "governance/pending_sync.json"
@@ -45,7 +47,7 @@
       "independent human review"
     ]
   },
-  "next_step": "Review the foundation and stacked Jonah companion PRs, select the production host, then integrate explicit Book/mygpt task state and validate on Xiaomi 14 through Android Studio; do not start continuous screen capture before validating the semantic-context path.",
+  "next_step": "Implement and test a strict r6 ReaderSnapshot offline mapper on this mygpt branch: preserve opaque book_version_id including @, require explicit selected record and source/correction/derived identity, and validate actual text serialization. Use synthetic fixtures only; no Book writes, live endpoint, paid provider, direct main write or automatic merge.",
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
@@ -63,6 +65,91 @@
       "missing_browser_cleanup": "PASS"
     },
     "evidence": "docs/EVALUATION_LEDGER.md#e003--input-recovery-and-isolated-browser-validation",
-    "remote_write_performed": false
+    "remote_write_performed": false,
+    "historical_snapshot": true,
+    "actual_publication": {
+      "pr": 3,
+      "head": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+      "status": "OPEN_DRAFT_UNMERGED"
+    }
+  },
+  "brain_candidate": {
+    "pr": 5,
+    "implementation_commit": "95fd2846f5ec535b1241b4bb565fbca92eda626e",
+    "base_commit": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+    "evidence_kind": "SIMULATED_ONLY",
+    "test_result": {
+      "passed": 113,
+      "skipped": 0,
+      "failed": 0,
+      "scope": "real SDKs with synthetic data; exact-code CI first clean environment and second clean hash-locked reinstall"
+    },
+    "sdk_integration": "PASS_TESTMODEL_AND_IN_MEMORY_MCP",
+    "remote_ci": {
+      "run_id": 35762870487,
+      "job_id": 106865005363,
+      "source_commit": "95fd2846f5ec535b1241b4bb565fbca92eda626e",
+      "conclusion": "success",
+      "first_seconds": 2.17,
+      "reinstall_seconds": 1.36,
+      "artifact_id": 10711455709,
+      "artifact_sha256": "b7cae531acefa9d648c85f83be83417914a161bac18876e2e9f457f846d04cd1"
+    },
+    "independent_review": "PENDING",
+    "live_book_feed": "NOT_CONNECTED",
+    "android": "NOT_RUN",
+    "paid_provider_calls": 0,
+    "artifact_id": "mygpt-brain-sdk-acceptance-20260923",
+    "checkpoint": "docs/SDK_ACCEPTANCE_CHECKPOINT_20260923.md",
+    "initial_implementation_commit": "68c351b85511ccdd625036a6917b4303646b6704",
+    "local_environment": {
+      "python": "3.13.5",
+      "passed": 111,
+      "skipped": 2,
+      "sdk_packages": "NOT_INSTALLED_DNS_BLOCKED",
+      "note": "Local skips are not the accepted CI SDK results."
+    },
+    "dependency_lock": {
+      "path": "brain/requirements-linux-py313.lock",
+      "sha256": "78a05ef99a580964c73cc2944ec9a1df4252e0b16d352f99ae30ce02faeae8c2",
+      "distribution_count": 39,
+      "platform": "Ubuntu 24.04 / CPython 3.13.15 x86_64",
+      "universal_lock": false
+    },
+    "historical_checkpoints": [
+      {
+        "pr": 5,
+        "implementation_commit": "68c351b85511ccdd625036a6917b4303646b6704",
+        "base_commit": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+        "evidence_kind": "SIMULATED_ONLY",
+        "test_result": {
+          "passed": 95,
+          "skipped": 2,
+          "failed": 0,
+          "scope": "local core/source/CLI; optional SDK tests skipped"
+        },
+        "sdk_integration": "BLOCKED_DEPENDENCY_DOWNLOAD_DNS",
+        "remote_ci": "NOT_RUN",
+        "independent_review": "PENDING",
+        "live_book_feed": "NOT_CONNECTED",
+        "android": "NOT_RUN",
+        "paid_provider_calls": 0,
+        "artifact_id": "mygpt-brain-context-v0.1-20260922",
+        "checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md"
+      }
+    ]
+  },
+  "decision_checkpoint": "docs/SDK_ACCEPTANCE_CHECKPOINT_20260923.md",
+  "evaluation_checkpoint": "docs/SDK_ACCEPTANCE_CHECKPOINT_20260923.md",
+  "book_bridge_candidate": {
+    "status": "SOURCE_INSPECTED_CONTRACT_DESIGN_ONLY",
+    "mapping_document": "docs/BOOK_READER_BRIDGE_MAPPING_20260923.md",
+    "source_checkpoint_commit": "7283f2eef7610d67c6b92b2ef7c513e1225ad957",
+    "source_archive_drive_id": "1UiVow02Huh3r8qKBH8v4bL3D9OfkQ8_R",
+    "source_archive_sha256": "19315e8aeebe2db5cf2f4b55e0a38f550967966af106491dfef67212b430adc1",
+    "selected_members_verified": 7,
+    "live_connected": false,
+    "book_mutations": 0,
+    "raw_book_source_copied_to_mygpt": false
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": "mygpt_artifact_manifest_v1",
-  "updated_date": "2026-09-22",
+  "updated_date": "2026-09-23",
   "project": {
     "repository": "Jvust2/mygpt",
     "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
@@ -21,10 +21,46 @@
       "related_branch": "feat/jonah-companion-20260922",
       "purpose": "Recoverable Jonah companion source package with mobile/desktop screenshots and browser validation report. The archive intentionally excludes this manifest to avoid recursive artifact identity.",
       "status": "review_candidate"
+    },
+    {
+      "artifact_id": "mygpt-brain-context-v0.1-20260922",
+      "file_name": "mygpt-brain-context-v0.1-20260922.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "13YcH0j9VXd20LLWspZzDquRm-pe02OSJ",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "bf74c74dd2dd70cb6a8d99e62a76db3bbdd1a06d147dc42daeef99d1a3eddadb",
+      "size_bytes": 33433,
+      "version": "0.1.0",
+      "created_at": "2026-09-22T16:16:25.052Z",
+      "source": "assistant_generated",
+      "related_branch": "feat/book-context-brain-20260922",
+      "related_commit": "68c351b85511ccdd625036a6917b4303646b6704",
+      "purpose": "Standalone brain/ delta source, raw pytest outputs, deterministic demo, derived schemas and identity manifest; not the full mygpt repository and not a production integration. Excludes this archive registry to avoid recursive identity.",
+      "status": "archived_review_candidate",
+      "verification": "Drive metadata and downloaded bytes checked; SHA-256 matches local archive."
+    },
+    {
+      "artifact_id": "mygpt-brain-sdk-acceptance-20260923",
+      "file_name": "mygpt-brain-sdk-acceptance-20260923.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "1kENqb7SLkEV6B4YK8BZ1rq9ceSiMR5Fs",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "faf62347879a790f53826d43cb61f19a49a718a5faddf9987b36cf35ec3a98ba",
+      "size_bytes": 350075,
+      "version": "0.1.0-sdk-accepted",
+      "created_at": "2026-09-22T17:58:26.614Z",
+      "source": "assistant_generated_and_github_actions",
+      "related_branch": "feat/book-context-brain-20260922",
+      "related_commit": "95fd2846f5ec535b1241b4bb565fbca92eda626e",
+      "purpose": "Brain delta source, scoped CI, raw two failures and final 113-case dual-environment SDK pass, wheel hash lock, Book r6 interface metadata and mapping. No Book raw source/text, no Jonah duplicate, no credentials.",
+      "status": "archived_review_candidate",
+      "verification": "Drive metadata and full downloaded ZIP SHA-256 match local bundle; ZIP CRC and 34/34 member hashes pass; 35 members total."
     }
   ],
   "notes": [
     "The first generated artifact is the review-candidate Jonah companion source/evidence package.",
-    "Book, StudyMate, and ChatContextVault artifacts remain in their own authoritative stores and are referenced rather than copied by default."
+    "Book, StudyMate, and ChatContextVault artifacts remain in their own authoritative stores and are referenced rather than copied by default.",
+    "Brain archive does not contain or replace the existing Jonah package. SDK skips remain validation blockers, not missing synchronization artifacts.",
+    "2026-09-23: historical SDK skip note above is superseded by exact-code CI 35762870487: 113 passed, 0 skipped in each of two clean environments. The original archives and their provenance remain unchanged."
   ]
 }
