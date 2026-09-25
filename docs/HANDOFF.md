@@ -1,3 +1,10 @@
+## 2026-09-25 最新交付接手点
+
+- Windows 发布源码：`0fc965263b42b8a12e0cb7b006f4b1bdcd137596`。
+- Drive 完整交付文件 ID：`15aYdyKH15Oakj1iuYblGxYScFQf8xx2A`。
+- Draft PR：#9；未合并、不得自动合并。
+- 用户本人 Windows 设备验收仍未完成；发布包的自动验收环境为 GitHub hosted Windows / Microsoft Edge。
+
 ## 当前入口 · PR #8 组合链路已全绿 · 2026-09-25
 
 新的整合 review branch `feat/integrate-pr6-book-bridge-20260925` 以最新 PR #6 为基线，只移植 PR #7 的 Book lease receiver 运行/测试能力，**没有复制 PR #7 旧的 project_state/CURRENT_STATE/HANDOFF 替换内容**。当前 Draft PR #8 的实际运行 head `e9e5fb0` 已完成四套 exact-head CI：Brain SDK 双环境各 **446/0/0**，Book receiver 20 cases，Node **66 pass**，Jonah 49、replay 39、Python host 23、selection host 30，clean recovery 后 Brain **446/0/0**，launcher **12/12**，selection HTTP **32/32**。
