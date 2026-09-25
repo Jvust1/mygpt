@@ -37,3 +37,8 @@ Preferred perception order:
 Define and validate the Book-to-mygpt semantic StudyContext / StudyEvent contract before adding broad continuous screen capture.
 
 No application implementation is yet claimed.
+
+
+## 长期成长计划
+
+[长期成长路线图（2026-09-22）](docs/LONG_TERM_ROADMAP.md)：当前起点、能力与规模的成长路径、进入下一层级的条件、优先任务及跨项目边界。规划目标与已完成功能分别标注。
