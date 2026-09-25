@@ -1,3 +1,15 @@
+## 当前入口 · 本地选段 + 可恢复完整源码已验收 · 2026-09-25
+
+当前 PR #6 运行能力已经从固定合成样本推进到**显式本地选段**：只有用户预览并同意后才把一条本地内容送入 127.0.0.1 Python Brain；来源始终标记为 `USER_SUPPLIED_UNVERIFIED`，不会冒充 Book。精确 intake head `318c3ef` 的固定 SDK 两个干净环境各 **426 passed / 0 skipped**；浏览器 selection host **30 checks**、Node **66 pass**。完整结果见 [SOURCE_DELIVERY_CHECKPOINT_20260925.md](SOURCE_DELIVERY_CHECKPOINT_20260925.md)。
+
+当前完整源码恢复 head `65c8d6b` 的 run `36019467569` 已通过：26 个 delivery tests、97 个 tracked source files 的确定性 ZIP、fresh restore、doctor READY、实际 launcher **12/12**、恢复后 Brain **426/0/0**、selection HTTP **32/32**。Drive 长期包 `mygpt-source-delivery-v1-20260925.zip`（ID `1b-YQbKedJSfRwQ5ZMHmWTaXjiQE2yo5m`）已下载回读，SHA-256 `c70ba62ac0cc42dcbd9981f5fe025d6f242e2de19e6b8c64e208957648a68dbd`。
+
+并行 PR #7 的真实 Book 选段接收线继续独立保留，不在本分支自动合并；PR #5/#6/#7 需要三方冲突图与独立审阅。真实/付费模型、Windows/Android 实机、生产网络安全和独立代码审阅仍未验收。
+
+**下一步：** 先做 PR #5/#6/#7 的只读三方冲突/依赖审查；然后在不覆盖历史的前提下决定新的整合 review branch。任何 merge 仍需具体 PR 的明确授权。
+
+---
+
 ## 当前入口 · 浏览器已接通本机 Python Brain · 2026-09-23
 
 当前分支 `feat/book-contract-audit-v1` / PR #6。运行代码从 `56b39522bb81aa71699548d2d93b060eb87dad6d` 开始；SDK 验收修正到 `ef31c36986ca0134c9c62bcdcdf2ebcdf155c431`，最新 UI 合同测试 head 为 `2c23fa5dec2fac17ce4d06aa083374007225d2f1`。

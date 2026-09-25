@@ -44,3 +44,9 @@ Use the already validated Jonah sprite as mygpt's initial visual companion. Keep
 
 ## D015 — mobile app surface before system overlay
 First validate Jonah inside the mygpt mobile surface with touch, safe-area, reduced-motion, and hide/restore behavior. Treat an Android cross-application floating window as a separate Android Studio milestone with explicit OS permission and physical-device acceptance evidence.
+
+## D016 — imported local content remains explicitly unverified
+Local files/manual text can be useful before a production Book/Android bridge is available, but user-supplied bytes must never be silently promoted to authenticated Book facts. Intake is default-off, one-record/bounded, preview-and-consent driven, and uses a separate `USER_SUPPLIED_UNVERIFIED` context/reference namespace.
+
+## D017 — recovery is an explicit product requirement
+A runnable candidate is not considered recoverable only because GitHub contains files. Checkpoints should provide a deterministic source-only bundle from an immutable commit, an externally recorded SHA-256, a read-only environment doctor, an explicit launcher, and clean-directory recovery evidence. Launchers must not auto-install dependencies, inherit provider credentials, or silently enable intake/provider capabilities.

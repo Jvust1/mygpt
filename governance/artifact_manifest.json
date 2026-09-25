@@ -1,6 +1,6 @@
 {
   "schema_version": "mygpt_artifact_manifest_v1",
-  "updated_date": "2026-09-23",
+  "updated_date": "2026-09-25",
   "project": {
     "repository": "Jvust2/mygpt",
     "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
@@ -125,6 +125,57 @@
       "purpose": "Delta source and evidence for browser -> 127.0.0.1 Python Brain -> Pydantic AI TestModel synthetic path, including two preserved initial failure artifacts, final SDK/host success artifacts and local evidence. No real Book data, paid model, Jonah atlas duplicate, fonts, credentials, venv or cache.",
       "status": "archived_review_candidate",
       "verification": "Drive metadata and full downloaded ZIP match SHA-256; ZIP CRC passed; 31 members with 30/30 self-excluded manifest entries verified."
+    },
+    {
+      "artifact_id": "mygpt-selection-intake-v1-20260924",
+      "file_name": "mygpt-selection-intake-v1-20260924.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "1BT34bsIPxgzorSftSeGht-GTsNtXsVDG",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "774c1aa7e6f304838d07e30fc32b59092c985feffd0063033fc5f9bdc8dff09e",
+      "size_bytes": 1952992,
+      "version": "1-explicit-local-selection-intake",
+      "created_at": "2026-09-24T14:44:53.085Z",
+      "source": "assistant_generated_and_github_actions",
+      "related_branch": "feat/book-contract-audit-v1",
+      "related_commit": "318c3ef0874b6903320d7ccfa0ce63d33f862bd0",
+      "purpose": "Explicit default-off one-record local selection/manual-text intake, lifecycle hardening, exact SDK/UI evidence and recovery notes. USER_SUPPLIED_UNVERIFIED only; no real Book/provider activation.",
+      "status": "archived_review_candidate",
+      "verification": "Drive object downloaded at 1,952,992 bytes; SHA-256 matches 774c1aa7...; ZIP manifest indexes exact SDK/UI artifacts."
+    },
+    {
+      "artifact_id": "mygpt-book-live-selection-v1-20260923",
+      "file_name": "mygpt-book-live-selection-v1-20260923.zip",
+      "type": "generated",
+      "drive_file_id_or_path": "1JLrTiZnRWLlN9WlZPO3tczop49ipyTjP",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "656a93710cd48b7414c9742208ab3872abcda7cc0607cf497663329b38b2d58c",
+      "size_bytes": 43805,
+      "version": "1-parallel-book-lease-receiver",
+      "created_at": "2026-09-23T06:50:01.338Z",
+      "source": "assistant_generated_and_github_actions",
+      "related_branch": "feat/book-live-selection-v1-20260923",
+      "related_commit": "fa9f17a0eb4fb015d76b419865f1b49a2d325f0e",
+      "purpose": "Parallel PR #7 Book selection lease receiver evidence. Indexed for recovery only; not merged/adopted into PR #6 and not proof of the installed Android Book APK.",
+      "status": "parallel_review_candidate",
+      "verification": "Drive object downloaded at 43,805 bytes; SHA-256 and ZIP contents rechecked during 2026-09-25 all-results sync."
+    },
+    {
+      "artifact_id": "mygpt-source-delivery-v1-20260925",
+      "file_name": "mygpt-source-delivery-v1-20260925.zip",
+      "type": "snapshot",
+      "drive_file_id_or_path": "1b-YQbKedJSfRwQ5ZMHmWTaXjiQE2yo5m",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "c70ba62ac0cc42dcbd9981f5fe025d6f242e2de19e6b8c64e208957648a68dbd",
+      "size_bytes": 1843538,
+      "version": "1-complete-source-clean-recovery",
+      "created_at": "2026-09-25T02:49:35.750Z",
+      "source": "assistant_generated_and_github_actions",
+      "related_branch": "feat/book-contract-audit-v1",
+      "related_commit": "65c8d6b0493432c16d83174aeff22b415583a703",
+      "purpose": "Complete deterministic tracked-source ZIP plus clean-directory recovery, doctor, launcher, strict Brain and selection HTTP evidence. Source ZIP inside: 2,246,013 bytes, SHA-256 eb9404fb..., 97 tracked source files.",
+      "status": "archived_review_candidate",
+      "verification": "Drive full-byte download matches c70ba62a...; ZIP CRC PASS; build.json records exact source SHA/commit and launcher-http.json records 12/12."
     }
   ],
   "notes": [
@@ -135,6 +186,9 @@
     "The existing SDK and legacy-audit archives were indexed, not rewritten; old artifact IDs and original provenance are preserved.",
     "The latest bundle excludes this outer artifact registry and project_state to avoid circular identities; GitHub remains the authoritative current-state registry.",
     "Host UI checkpoint: existing five artifacts retained byte identities; one new delta archive. UI and Python exact-code evidence are separately identified. Browser fixture replay is not a live Python/Book transport.",
-    "Local Brain transport checkpoint: browser now reaches real Python Brain/TestModel over bounded loopback for synthetic fixed catalogue; live Book and paid provider remain disabled."
+    "Local Brain transport checkpoint: browser now reaches real Python Brain/TestModel over bounded loopback for synthetic fixed catalogue; live Book and paid provider remain disabled.",
+    "Selection-intake artifact from exact 318c3ef SDK/UI acceptance was indexed without reupload.",
+    "Parallel PR #7 Book bridge artifact is indexed for provenance only and is not silently integrated into PR #6.",
+    "Source-delivery checkpoint archives one exact complete source bundle and clean recovery evidence; internal manifest is not a substitute for the externally recorded SHA-256."
   ]
 }

@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-23",
+  "updated_date": "2026-09-25",
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
   "active_branch": "feat/book-contract-audit-v1",
-  "phase": "SYNTHETIC_LOOPBACK_BRAIN_ACCEPTED",
-  "status": "LOCAL_PYTHON_BRAIN_332_DUAL_ENV_HOST_23_BROWSER_PASS_BOOK_EXPORTER_NEXT_REVIEW_PENDING",
+  "phase": "LOCAL_UNVERIFIED_SELECTION_AND_SOURCE_RECOVERY_ACCEPTED",
+  "status": "INTAKE_426_DUAL_ENV_SELECTION_UI_30_SOURCE_RECOVERY_426_LAUNCHER_12_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -29,8 +29,9 @@
     "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
   },
   "blocking_items": [
-    "Real Book integration remains disabled: Book r6 does not yet emit an authenticated, revocable current-selection snapshot to mygpt.",
-    "Android physical-device validation and production multi-user transport remain unimplemented."
+    "Independent review and non-destructive three-way conflict mapping are required before combining PR #5/#6/#7.",
+    "Windows launcher/device validation and Android Studio/APK/physical-device validation remain unimplemented.",
+    "Real provider teaching quality and production multi-user transport remain disabled/unverified."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -50,7 +51,7 @@
     "historical_validation_only": false,
     "not_rerun_this_batch": false
   },
-  "next_step": "In the Book repository, after its own current safety/governance preflight, create a non-default-branch read-only explicit-selection exporter candidate for r6. Export only bounded current record/layer/version/session/epoch/freshness identity; do not export notes/answers by default, write StudyRecord, call a paid model, write main, or auto-merge.",
+  "next_step": "Perform a read-only three-way dependency/conflict review across PR #5, PR #6 and parallel Book-bridge PR #7; preserve all historical artifacts and do not auto-resolve/merge. Then choose a new non-default integration review branch. Real provider activation and Android/Windows acceptance remain separate gates.",
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
@@ -169,8 +170,8 @@
     ],
     "accepted_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1"
   },
-  "decision_checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
-  "evaluation_checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
+  "decision_checkpoint": "docs/SOURCE_DELIVERY_CHECKPOINT_20260925.md",
+  "evaluation_checkpoint": "docs/SOURCE_DELIVERY_CHECKPOINT_20260925.md",
   "book_bridge_candidate": {
     "status": "R6_EXPLICIT_SELECTION_OFFLINE_ACCEPTED",
     "target": "r6 Reader /api/reader, not the legacy Web ModeResponse/SourceResponse",
@@ -290,5 +291,53 @@
     "production_multi_user_security": "NOT_CLAIMED",
     "artifact_id": "mygpt-local-brain-transport-v1-20260923",
     "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md"
+  },
+  "selection_intake_candidate": {
+    "status": "ACCEPTED_USER_SUPPLIED_UNVERIFIED_LOCAL_ONLY",
+    "implementation_commit": "318c3ef0874b6903320d7ccfa0ce63d33f862bd0",
+    "evidence_kind": "USER_SUPPLIED_UNVERIFIED",
+    "default_enabled": false,
+    "max_records_per_import": 1,
+    "sdk_run": 36013336912,
+    "sdk_tests_per_environment": 426,
+    "sdk_skipped": 0,
+    "http_smoke_checks": 32,
+    "ui_run": 36013337122,
+    "node_tests_passed": 66,
+    "selection_browser_checks_passed": 30,
+    "paid_model_calls": 0,
+    "live_book_connected": false,
+    "artifact_id": "mygpt-selection-intake-v1-20260924",
+    "drive_id": "1BT34bsIPxgzorSftSeGht-GTsNtXsVDG",
+    "sha256": "774c1aa7e6f304838d07e30fc32b59092c985feffd0063033fc5f9bdc8dff09e"
+  },
+  "source_delivery_candidate": {
+    "status": "ACCEPTED_LINUX_CLEAN_RECOVERY",
+    "exact_head": "65c8d6b0493432c16d83174aeff22b415583a703",
+    "workflow_run": 36019467569,
+    "workflow_job": 107700373613,
+    "workflow_artifact": 10816450623,
+    "workflow_artifact_sha256": "c70ba62ac0cc42dcbd9981f5fe025d6f242e2de19e6b8c64e208957648a68dbd",
+    "source_zip_bytes": 2246013,
+    "source_zip_sha256": "eb9404fbfd9a4d9fc22db57c0518ecb65510a192b7500277885f2747219bb6df",
+    "tracked_source_files": 97,
+    "delivery_unit_tests": 26,
+    "launcher_checks": 12,
+    "recovered_brain_tests": 426,
+    "recovered_brain_skipped": 0,
+    "recovered_http_checks": 32,
+    "drive_id": "1b-YQbKedJSfRwQ5ZMHmWTaXjiQE2yo5m",
+    "artifact_id": "mygpt-source-delivery-v1-20260925",
+    "windows_device_acceptance": false,
+    "android_acceptance": false
+  },
+  "parallel_book_bridge": {
+    "pr": 7,
+    "branch": "feat/book-live-selection-v1-20260923",
+    "observed_head": "4e118054d9f3037a857d03c925f6d1641dd56979",
+    "status": "OPEN_DRAFT_UNMERGED_PARALLEL_REVIEW_LINE",
+    "drive_id": "1JLrTiZnRWLlN9WlZPO3tczop49ipyTjP",
+    "sha256": "656a93710cd48b7414c9742208ab3872abcda7cc0607cf497663329b38b2d58c",
+    "adopted_into_pr6": false
   }
 }

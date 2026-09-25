@@ -82,3 +82,32 @@ Proposed branch: `fix/companion-input-and-test-isolation-20260922`
 ### Scope and limits
 
 This is a locally validated review candidate, not a published or merged change. No GitHub or Drive mutation was performed by this audit. The remote publication preflight must verify the base head again, use the proposed new branch, and preserve existing PRs. Physical Android hardware, native overlay, soft keyboard, production Book/chat integration, and independent human review remain unverified.
+
+
+## E004 — explicit local selection intake
+Date: 2026-09-24
+Status: ACCEPTED_SYNTHETIC_LOCAL_INPUT / REVIEW_PENDING
+
+### Question
+Can a user explicitly bring one local text selection into the existing loopback Brain without pretending it is Book data or creating an implicit provider call?
+
+### Result
+Yes for the bounded local-input contract. Exact head `318c3ef0874b6903320d7ccfa0ce63d33f862bd0` passed two clean locked Python environments at 426/0/0 each, 32 loopback HTTP checks, 66 Node tests, and browser suites including 30 explicit-selection checks. The UI requires preview/consent; import alone does not explain; provenance remains `USER_SUPPLIED_UNVERIFIED`; reload/revoke/cancel/expiry paths fail closed.
+
+### Limits
+This does not authenticate Book, validate mathematical truth, activate a real model, support arbitrary documents, or prove Windows/Android behavior. Independent review remains pending.
+
+## E005 — deterministic source delivery and clean recovery
+Date: 2026-09-25
+Status: ACCEPTED_LINUX_CLEAN_RECOVERY / WINDOWS_ANDROID_PENDING
+
+### Question
+Can a fresh environment recover one exact PR #6 source state without relying on a dirty workspace, old incremental ZIP order, or hidden credentials?
+
+### Result
+Yes on the accepted Linux CI environment. Exact head `65c8d6b0493432c16d83174aeff22b415583a703`, run `36019467569`, passed 26 delivery unit tests; produced byte-identical source bundles from the immutable commit; verified 97 tracked source files; restored into a fresh directory; installed the existing hash lock; reported doctor READY; passed actual launcher start/status/Ctrl+C shutdown 12/12; and reran Brain 426/0/0 plus selection HTTP 32/32.
+
+The exact source ZIP is 2,246,013 bytes with SHA-256 `eb9404fbfd9a4d9fc22db57c0518ecb65510a192b7500277885f2747219bb6df`. The long-term Drive evidence/archive is indexed in the artifact manifest.
+
+### Limits
+The internal source manifest is not a signature; authenticity depends on the separately recorded outer SHA-256 and trusted Git/Drive provenance. Windows launcher, Android packaging/device behavior and independent review are not accepted by this evaluation.

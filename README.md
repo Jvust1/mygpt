@@ -1,5 +1,15 @@
 # mygpt
 
+## 当前检查点 · 本地选段与完整源码恢复（2026-09-25）
+
+PR #6 已支持显式本地单条内容输入，来源固定为 `USER_SUPPLIED_UNVERIFIED`；`318c3ef` 的固定 SDK 双环境各 **426/0/0**，selection 浏览器 **30 checks**。随后 `65c8d6b` 增加完整源码恢复与显式启动器：delivery run `36019467569` 完成 97 个 tracked source files 的确定性源码包、fresh restore、Brain **426/0/0**、HTTP **32/32**、launcher **12/12**。
+
+当前长期恢复包：`mygpt-source-delivery-v1-20260925.zip`，Drive ID `1b-YQbKedJSfRwQ5ZMHmWTaXjiQE2yo5m`，SHA-256 `c70ba62ac0cc42dcbd9981f5fe025d6f242e2de19e6b8c64e208957648a68dbd`。完整使用入口见 [START_HERE.md](START_HERE.md)，验收边界见 [source delivery checkpoint](docs/SOURCE_DELIVERY_CHECKPOINT_20260925.md)。
+
+真实 Book 接收能力仍在并行 PR #7；没有在 PR #6 内自动解决 PR #5/#6/#7 冲突。真实/付费模型、Android/Windows 实机与独立审阅仍未完成。
+
+---
+
 ## 当前检查点 · 浏览器 → 本机 Python Brain 已接通（2026-09-23）
 
 当前开发候选：`feat/book-contract-audit-v1` / PR #6，仍为 Draft、未合并。最新治理/归档 head 为 `6937d1c3b8d186e9b7b53a4c5e416793be7d4477`；实际运行链从 `56b39522` 开始，最新已验收测试 head 为 `2c23fa5d`。
