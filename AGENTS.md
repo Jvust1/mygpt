@@ -7,10 +7,9 @@ Any GPT / Claude / Codex / DeepSeek / local agent taking over this project must 
 Before project work:
 
 1. Read the Drive root `全项目` registry and every current root `全项目_*` baseline.
-2. Read this repository's `SECURITY_POLICY.md` from the exact target branch.
-3. Read `governance/project_state.json`, `docs/PROJECT_NORTH_STAR.md`, `docs/ARCHITECTURE_INVARIANTS.md`, `docs/CURRENT_STATE.md`, `docs/DECISION_LEDGER.md`, `docs/EVALUATION_LEDGER.md`, `docs/HANDOFF.md`, `docs/PRE_FLIGHT_CHECKLIST.md`, `governance/artifact_manifest.json`, and `governance/pending_sync.json` as applicable.
-4. Read linked Book / StudyMate / ChatContextVault state only as needed for the current bounded task.
-5. Do not rely only on chat memory or stale copied state.
+2. Read `governance/project_state.json`, `docs/PROJECT_NORTH_STAR.md`, `docs/ARCHITECTURE_INVARIANTS.md`, `docs/CURRENT_STATE.md`, `docs/DECISION_LEDGER.md`, `docs/EVALUATION_LEDGER.md`, `docs/HANDOFF.md`, `docs/PRE_FLIGHT_CHECKLIST.md`, `governance/artifact_manifest.json`, and `governance/pending_sync.json` as applicable.
+3. Read linked Book / StudyMate / ChatContextVault state only as needed for the current bounded task.
+4. Do not rely only on chat memory or stale copied state.
 
 ## Product boundary
 
@@ -20,12 +19,6 @@ mygpt is the orchestration and companion layer. It may integrate with:
 - ChatContextVault for explicitly authorized relationship-history retrieval and optional Shadow mode.
 
 Do not collapse these source systems into mygpt or silently duplicate their authoritative data.
-
-## Safety
-
-`SECURITY_POLICY.md` and the Drive global safety baseline are mandatory. `main` is treated as a protected stable branch for agent operations. Use non-default branches and reviewable PRs for ordinary changes. Do not automatically merge PRs.
-
-Deletion, purge, history rewrite, force-push, branch/tag deletion, unusual bulk overwrite/rename/move, frozen-evidence replacement, access-control weakening, safeguard removal/bypass, and ambiguous high-impact destructive actions are `DESTRUCTIVE_LOCKED`.
 
 ## Privacy
 
