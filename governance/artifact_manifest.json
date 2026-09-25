@@ -1,0 +1,14 @@
+{
+  "schema_version": "mygpt_artifact_manifest_v1",
+  "updated_date": "2026-09-21",
+  "project": {
+    "repository": "Jvust2/mygpt",
+    "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
+    "drive_root_name": "mygpt"
+  },
+  "artifacts": [],
+  "notes": [
+    "No binary or generated project artifact has been archived yet.",
+    "Book, StudyMate, and ChatContextVault artifacts remain in their own authoritative stores and are referenced rather than copied by default."
+  ]
+}
