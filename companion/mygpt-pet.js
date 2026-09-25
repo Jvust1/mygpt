@@ -71,9 +71,9 @@ export class MyGPTPet extends HTMLElement {
     window.visualViewport?.addEventListener('scroll', () => this._fit(), options);
     this._avatar.addEventListener('pointerdown', e => this._pointerDown(e), options);
     this._avatar.addEventListener('pointermove', e => this._pointerMove(e), options);
-    this._avatar.addEventListener('pointerup', () => this._pointerEnd(), options);
-    this._avatar.addEventListener('pointercancel', () => this._pointerEnd(true), options);
-    this._avatar.addEventListener('lostpointercapture', () => this._pointerEnd(true), options);
+    this._avatar.addEventListener('pointerup', e => this._pointerEnd(e), options);
+    this._avatar.addEventListener('pointercancel', e => this._pointerEnd(e, true), options);
+    this._avatar.addEventListener('lostpointercapture', e => this._pointerEnd(e, true), options);
     this._avatar.addEventListener('keydown', e => this._key(e), options);
     this.shadowRoot.addEventListener('click', e => this._click(e), options);
     this.shadowRoot.addEventListener('keydown', e => {
@@ -185,15 +185,22 @@ export class MyGPTPet extends HTMLElement {
     if (this._canAnimate()) this._timer = setTimeout(next, animation.durations[0]);
   }
   _togglePanel(open = this._panel.hidden) {
+    const focusWasInPanel = this._panel.contains(this.shadowRoot.activeElement);
     this._panel.hidden = !open;
     this._avatar.setAttribute('aria-expanded', String(open));
     this._label.setAttribute('aria-expanded', String(open));
     this._fit();
+    if (open) this._panel.querySelector('button').focus({ preventScroll: true });
+    else if (focusWasInPanel) this._avatar.focus({ preventScroll: true });
   }
   _click(event) {
     const button = event.target.closest('button');
     if (!button) return;
-    if (button === this._avatar && this._suppressClick) { this._suppressClick = false; return; }
+    if (button === this._avatar && this._suppressClick) {
+      this._suppressClick = false;
+      // Cancelled pointers may never click; do not swallow a later keyboard activation.
+      if (event.detail !== 0) return;
+    }
     switch (button.dataset.action) {
       case 'hide': this.hide(); break;
       case 'reset': this._togglePanel(false); this.resetPosition(); break;
@@ -203,7 +210,7 @@ export class MyGPTPet extends HTMLElement {
     }
   }
   _pointerDown(event) {
-    if (!event.isPrimary || event.button !== 0) return;
+    if (this._drag || !event.isPrimary || event.button !== 0) return;
     const rect = this.getBoundingClientRect();
     this._suppressClick = false;
     this._drag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: rect.left, top: rect.top, moved: false };
@@ -218,8 +225,8 @@ export class MyGPTPet extends HTMLElement {
     this._position = { x: drag.left + dx, y: drag.top + dy };
     this._fit();
   }
-  _pointerEnd(cancelled = false) {
-    if (!this._drag) return;
+  _pointerEnd(event, cancelled = false) {
+    if (!this._drag || event.pointerId !== this._drag.id) return;
     this._suppressClick = this._drag.moved || cancelled;
     this._drag = null; this._save();
   }

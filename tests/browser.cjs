@@ -5,35 +5,51 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
-async function waitForServer(url, timeout=5000) {
-  const started=Date.now();
-  while(Date.now()-started<timeout) {
-    try { const response=await fetch(url); if(response.ok) return; } catch {}
-    await new Promise(resolve=>setTimeout(resolve,50));
-  }
-  throw new Error(`Preview server did not start within ${timeout}ms`);
+function waitForServer(server, timeout=5000) {
+  return new Promise((resolve,reject) => {
+    let output='';
+    const cleanup=()=>{
+      clearTimeout(timer);
+      server.stdout.off('data',onData);
+      server.off('error',onError);
+      server.off('exit',onExit);
+    };
+    const onError=error=>{cleanup();reject(error);};
+    const onExit=code=>onError(new Error(`Preview server exited before listening (code ${code})`));
+    const onData=chunk=>{
+      output+=chunk.toString();
+      const match=output.match(/mygpt companion preview: (http:\/\/127\.0\.0\.1:\d+)\r?\n/);
+      if(match){cleanup();resolve(`${match[1]}/`);}
+    };
+    const timer=setTimeout(()=>onError(new Error(`Preview server did not start within ${timeout}ms`)),timeout);
+    server.stdout.on('data',onData);
+    server.on('error',onError);
+    server.on('exit',onExit);
+  });
 }
 
 (async () => {
-  const server=spawn(process.execPath,[path.join(__dirname,'..','scripts','serve.mjs')],{stdio:'ignore'});
-  await waitForServer('http://127.0.0.1:4173/');
-  const browser = await chromium.launch({ headless: true, ...(process.env.MYGPT_CHROMIUM_PATH ? { executablePath:process.env.MYGPT_CHROMIUM_PATH, args:['--no-sandbox','--disable-dev-shm-usage'] } : {}) });
-  const context = await browser.newContext({ viewport: { width: 393, height: 852 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
-  const page = await context.newPage();
-  const errors = [], external = [], checks = [];
-  page.on('pageerror', error => errors.push(error.message));
-  page.on('console', message => { if (message.type()==='error') errors.push(message.text()); });
-  page.on('response', response => { if (!response.ok()) errors.push(`${response.status()} ${response.url()}`); });
-  page.on('request', request => { if (!request.url().startsWith('http://127.0.0.1:4173/')) external.push(request.url()); });
-  const verify = (name, ok) => { assert(ok, name); checks.push(name); };
-  const state = () => page.$eval('#pet', p => ({ row:p._row, column:p._column, timer:p._timer, hidden:p.hidden, status:p.status, error:p.hasAttribute('asset-error') }));
-  const bounds = () => page.$eval('#pet', p => { const r=p.getBoundingClientRect(); return { x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height }; });
-  const inside = async (name) => {
-    const r=await bounds(), v=page.viewportSize();
-    assert(r.x>=0&&r.y>=0&&r.right<=v.width+1&&r.bottom<=v.height+1, `${name}: ${JSON.stringify({r,v})}`); checks.push(name);
-  };
+  // Each run owns its server, so an existing preview or parallel run cannot be mistaken for this build.
+  const server=spawn(process.execPath,[path.join(__dirname,'..','scripts','serve.mjs')],{stdio:['ignore','pipe','inherit'],env:{...process.env,PORT:'0'}});
+  let browser;
   try {
-    await page.goto('http://127.0.0.1:4173/');
+    const baseURL=await waitForServer(server);
+    browser = await chromium.launch({ headless: true, ...(process.env.MYGPT_CHROMIUM_PATH ? { executablePath:process.env.MYGPT_CHROMIUM_PATH, args:['--no-sandbox','--disable-dev-shm-usage'] } : {}) });
+    const context = await browser.newContext({ viewport: { width: 393, height: 852 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+    const page = await context.newPage();
+    const errors = [], external = [], checks = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => { if (message.type()==='error') errors.push(message.text()); });
+    page.on('response', response => { if (!response.ok()) errors.push(`${response.status()} ${response.url()}`); });
+    page.on('request', request => { if (!request.url().startsWith(baseURL)) external.push(request.url()); });
+    const verify = (name, ok) => { assert(ok, name); checks.push(name); };
+    const state = () => page.$eval('#pet', p => ({ row:p._row, column:p._column, timer:p._timer, hidden:p.hidden, status:p.status, error:p.hasAttribute('asset-error') }));
+    const bounds = () => page.$eval('#pet', p => { const r=p.getBoundingClientRect(); return { x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height }; });
+    const inside = async (name) => {
+      const r=await bounds(), v=page.viewportSize();
+      assert(r.x>=0&&r.y>=0&&r.right<=v.width+1&&r.bottom<=v.height+1, `${name}: ${JSON.stringify({r,v})}`); checks.push(name);
+    };
+    await page.goto(baseURL);
     await page.waitForFunction(() => customElements.get('mygpt-pet') && document.querySelector('#pet')._image?.complete, null, { timeout:10000 }).catch(async error => {
       throw new Error(`${error.message}; browser errors: ${errors.join(' | ') || 'none'}; debug: ${JSON.stringify(await page.evaluate(() => ({ defined:!!customElements.get('mygpt-pet'), image:document.querySelector('#pet')?._image?.src || null, ready:document.readyState })))}`);
     });
@@ -47,6 +63,11 @@ async function waitForServer(url, timeout=5000) {
       await page.locator(`[data-status="${status}"]`).click();
       verify(`host status ${status} maps to expected atlas row`, (await state()).row===row);
     }
+    await page.locator('mygpt-pet .avatar').focus();
+    await page.keyboard.press('Enter');
+    verify('keyboard opening focuses first control', await page.$eval('#pet',p=>p.shadowRoot.activeElement?.dataset.action==='chat'));
+    await page.keyboard.press('Escape');
+    verify('escape closes panel and restores avatar focus', await page.$eval('#pet',p=>p._panel.hidden&&p.shadowRoot.activeElement===p._avatar));
     await page.locator('mygpt-pet .avatar').tap();
     verify('touch tap opens controls', await page.locator('mygpt-pet .panel').isVisible());
     await page.locator('mygpt-pet [data-action="chat"]').tap();
@@ -59,6 +80,13 @@ async function waitForServer(url, timeout=5000) {
     const session=await context.newCDPSession(page);
     const x=avatar.x+avatar.width/2,y=avatar.y+avatar.height/2;
     await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+    await page.$eval('#pet',p=>{
+      const otherPointer=p._drag.id+1000;
+      for(const type of ['pointerup','pointercancel','lostpointercapture']) {
+        p._avatar.dispatchEvent(new PointerEvent(type,{pointerId:otherPointer,isPrimary:false,bubbles:true}));
+      }
+    });
+    verify('unrelated pointer events do not end active drag', await page.$eval('#pet',p=>p._drag!==null));
     await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:90,y:260}]});
     await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     verify('touch drag changes location', (await bounds()).x<160);
@@ -73,6 +101,15 @@ async function waitForServer(url, timeout=5000) {
     verify('hidden choice survives reload', (await state()).hidden);
     await page.locator('#visibility').click();
     verify('host control restores pet', !(await state()).hidden);
+    const cancelledAvatar=await page.locator('mygpt-pet .avatar').boundingBox();
+    const cx=cancelledAvatar.x+cancelledAvatar.width/2,cy=cancelledAvatar.y+cancelledAvatar.height/2;
+    await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:cx,y:cy}]});
+    await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:cx+20,y:cy+20}]});
+    await session.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+    await page.locator('mygpt-pet .avatar').focus();
+    await page.keyboard.press('Enter');
+    verify('keyboard activation works after touch cancellation', await page.locator('mygpt-pet .panel').isVisible());
+    await page.keyboard.press('Escape');
     await page.emulateMedia({ reducedMotion:'reduce' });
     await page.waitForFunction(() => document.querySelector('#pet')._timer===null);
     verify('reduced motion stops timers', (await state()).timer===null);
@@ -117,5 +154,7 @@ async function waitForServer(url, timeout=5000) {
     const report={result:'PASS',checks,errors,externalRequests:external,notVerified:['Android physical device','native Android overlay','production chat or Book bridge','independent human review']};
     fs.writeFileSync(path.join(out,'browser-report.json'),JSON.stringify(report,null,2)+'\n');
     console.log(JSON.stringify(report,null,2));
-  } finally { await browser.close(); server.kill('SIGTERM'); }
+  } finally {
+    try { await browser?.close(); } finally { server.kill('SIGTERM'); }
+  }
 })().catch(error=>{console.error(error);process.exitCode=1;});

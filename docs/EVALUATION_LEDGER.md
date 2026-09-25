@@ -52,3 +52,33 @@ Yes, at the reusable UI-component level. The candidate uses one local sprite atl
 
 ### Next evaluation
 Select the production host, integrate the component with explicit mygpt/Book state, then test on Xiaomi 14 through the Android Studio workflow. Evaluate a system overlay only as a separate optional feature.
+
+## E003 — Input recovery and isolated browser validation
+
+Date: 2026-09-22
+Status: LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION
+Base: `feat/jonah-companion-20260922` at `64e73b257a79ec09787e2a96a43816b5864f9a1c`
+Proposed branch: `fix/companion-input-and-test-isolation-20260922`
+
+### Reproduced defects
+
+1. Opening the panel with Enter left focus on the avatar even though the panel precedes it in tab order. The first action was not the next keyboard target.
+2. An unrelated `pointerup`, `pointercancel`, or `lostpointercapture` event ended the active drag because the end handler did not check pointer identity.
+3. A cancelled touch did not emit a click, leaving drag-click suppression armed. A later Enter activation was swallowed.
+4. The browser suite used a fixed port and could connect to another preview. Chromium launch occurred before the cleanup block, so launch failure could leave the child server running.
+
+### Change and evidence
+
+- Move focus into an opened action panel and restore avatar focus on close; keep normal host chat event handling.
+- End only the matching active pointer; ignore additional pointer-down attempts during a drag; preserve keyboard clicks after cancellation.
+- Start one test-owned server with `PORT=0`, read its actual listening address, and clean up startup/launch failures.
+- Baseline recovery verified all 26 Git blob identities against the exact upstream tree, including the unchanged sprite PNG.
+- Before the component changes, an independent Chromium reproduction returned false for all three input checks; after the changes, all three returned true.
+- `npm test`: 3/3 pass. `npm run test:browser`: 49/49 pass, including the original 45 checks plus keyboard focus, Escape recovery, pointer identity, and cancelled-touch keyboard recovery.
+- With an unrelated HTTP 500 server deliberately occupying port 4173, the updated browser suite still passed all 49 checks on its own port.
+- With an invalid Chromium executable path, the suite exited with code 1 in under one second instead of hanging on a leftover server.
+- Runtime errors: 0. External browser requests: 0. Runtime dependencies and sprite bytes unchanged.
+
+### Scope and limits
+
+This is a locally validated review candidate, not a published or merged change. No GitHub or Drive mutation was performed by this audit. The remote publication preflight must verify the base head again, use the proposed new branch, and preserve existing PRs. Physical Android hardware, native overlay, soft keyboard, production Book/chat integration, and independent human review remain unverified.
