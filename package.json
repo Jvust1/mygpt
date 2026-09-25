@@ -1,0 +1,12 @@
+{
+  "name": "mygpt-companion",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/atlas.test.mjs",
+    "test:browser": "node tests/browser.cjs"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": "mygpt_project_state_v1",
+  "updated_date": "2026-09-22",
+  "repository": "Jvust2/mygpt",
+  "default_branch": "main",
+  "active_branch": "feat/jonah-companion-20260922",
+  "phase": "COMPANION_UI_PROTOTYPE",
+  "status": "JONAH_COMPANION_IMPLEMENTED_TESTS_PASS_REVIEW_PENDING",
+  "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
+  "drive": {
+    "folder_name": "mygpt",
+    "folder_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK"
+  },
+  "product": {
+    "role": "long-term companion and learning orchestrator",
+    "perception_priority": [
+      "BOOK_SEMANTIC_CONTEXT",
+      "OS_APP_SIGNALS",
+      "USER_DECLARED_CONTEXT",
+      "OPT_IN_SCREEN_VISION"
+    ],
+    "default_companion_mode": "SILENT_PRESENCE",
+    "shadow_default": false,
+    "autonomous_ui_control_v0_1": false
+  },
+  "dependencies": {
+    "Book": "authoritative structured learning/content context",
+    "StudyMate": "study-session and low-cost device/activity signals",
+    "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
+  },
+  "blocking_items": [],
+  "pending_sync": {
+    "blocking_count": 0,
+    "source": "governance/pending_sync.json"
+  },
+  "ui_candidate": {
+    "name": "Jonah companion",
+    "surface": "framework-neutral Web Component and preview",
+    "sprite_sha256": "828b0fb468382f37aaf0d62a3e86cb33e5fcad5dbde8aeb091d6778b32a77790",
+    "validation": "3 deterministic checks and 45 headless Chromium interaction checks pass",
+    "unverified": [
+      "Android physical device and soft keyboard",
+      "native Android overlay",
+      "production chat and Book bridge",
+      "independent human review"
+    ]
+  },
+  "next_step": "Review the foundation and stacked Jonah companion PRs, select the production host, then integrate explicit Book/mygpt task state and validate on Xiaomi 14 through Android Studio; do not start continuous screen capture before validating the semantic-context path."
+}
