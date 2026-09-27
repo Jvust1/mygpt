@@ -2,7 +2,7 @@ name: Book bridge acceptance (TestModel only)
 
 on:
   push:
-    branches: [feat/book-live-selection-v1-20260923, feat/integrate-pr6-book-bridge-20260925]
+    branches: [feat/book-live-selection-v1-20260923, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925]
     paths:
       - 'brain/**'
       - 'host/**'
