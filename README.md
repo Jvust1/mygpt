@@ -88,7 +88,6 @@ Preferred perception order:
 - [Decision Ledger](docs/DECISION_LEDGER.md)
 - [Evaluation Ledger](docs/EVALUATION_LEDGER.md)
 - [Handoff](docs/HANDOFF.md)
-- [Pre-Flight Checklist](docs/PRE_FLIGHT_CHECKLIST.md)
 - [Machine-readable project state](governance/project_state.json)
 
 ## Current milestone
