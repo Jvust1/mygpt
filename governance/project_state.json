@@ -51,7 +51,16 @@
     "historical_validation_only": false,
     "not_rerun_this_batch": false
   },
-  "next_step": "Complete user Windows/device acceptance, then run a real Book selection -> mygpt localhost/Android Studio TestModel end-to-end on an authorized environment. Do not activate a live provider or merge automatically.",
+  "next_step": "Complete user Windows/device acceptance and Android/Book APK validation. The authorized same-process Book selection -> mygpt TestModel bridge has passed; do not activate a live provider or merge automatically.",
+  "authorized_e2e": {
+    "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
+    "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
+    "mygpt_commit": "c1b4ce7f8611d9ab57f321105fdb375cbc48df9e",
+    "repeat_receipt_identical": true,
+    "revoked_replay": "UNAUTHORIZED",
+    "paid_provider_calls": 0,
+    "user_device_acceptance": false
+  },
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
