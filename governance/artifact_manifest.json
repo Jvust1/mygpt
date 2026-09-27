@@ -1,6 +1,6 @@
 {
   "schema_version": "mygpt_artifact_manifest_v1",
-  "updated_date": "2026-09-25",
+  "updated_date": "2026-09-27",
   "project": {
     "repository": "Jvust2/mygpt",
     "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
@@ -204,6 +204,40 @@
       "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
       "purpose": "Verified Windows mygpt learning companion app with exact source/tests and evidence.",
       "status": "archived_verified_windows_ci_user_device_pending"
+    },
+    {
+      "artifact_id": "mygpt-progress-snapshot-20260927",
+      "file_name": "mygpt-progress-snapshot-20260927.zip",
+      "type": "snapshot",
+      "drive_file_id_or_path": "1XXiIyupbLnyP9S_9JgW6WarbaD5W-T0S",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "9f7823608e85d123c1d5c489954cf42589cebe145a0926fdbbb8196fc506700a",
+      "size_bytes": 1936413,
+      "version": "1-current-review-branch",
+      "created_at": "2026-09-27T09:19:50Z",
+      "source": "assistant_generated",
+      "related_branch": "codex/progress-mygpt-20260927",
+      "related_commit": "150832f75565ccbcc5978602c072f8ed2d0bb15e",
+      "purpose": "Current tracked source snapshot after desktop delivery review, Windows loopback test guard fix, and handoff update.",
+      "status": "current_review_candidate",
+      "verification": "Drive listing read-back confirms file ID, title, MIME type and 1,936,413-byte size. SHA-256 verified locally before upload."
+    },
+    {
+      "artifact_id": "mygpt-verification-20260927",
+      "file_name": "mygpt-verification-20260927.zip",
+      "type": "verification",
+      "drive_file_id_or_path": "1D_MGOhKNVx64Rfp2nHp67sF9stHa2y6B",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "358c976fba0403aed26aaec8ebd01a909e2a67f75bfee0dbc7b9a22ab868246b",
+      "size_bytes": 28219,
+      "version": "1-current-validation-evidence",
+      "created_at": "2026-09-27T09:19:53Z",
+      "source": "assistant_generated",
+      "related_branch": "codex/progress-mygpt-20260927",
+      "related_commit": "150832f75565ccbcc5978602c072f8ed2d0bb15e",
+      "purpose": "Review, governance, doctor, local smoke and Windows Brain test evidence for the current branch; paid/live provider calls remain zero.",
+      "status": "current_review_evidence",
+      "verification": "Drive listing read-back confirms file ID, title, MIME type and 28,219-byte size. SHA-256 verified locally before upload."
     }
   ],
   "notes": [
@@ -218,7 +252,8 @@
     "Selection-intake artifact from exact 318c3ef SDK/UI acceptance was indexed without reupload.",
     "Parallel PR #7 Book bridge artifact is indexed for provenance only and is not silently integrated into PR #6.",
     "Source-delivery checkpoint archives one exact complete source bundle and clean recovery evidence; internal manifest is not a substitute for the externally recorded SHA-256.",
-    "PR #8 integration artifact proves combined CI compatibility without importing PR #7 stale state-file replacements; merge and independent review remain separate gates."
+    "PR #8 integration artifact proves combined CI compatibility without importing PR #7 stale state-file replacements; merge and independent review remain separate gates.",
+    "2026-09-27: current review branch and validation bundle uploaded after GitHub push; historical artifacts were preserved and not duplicated."
   ],
-  "last_updated": "2026-09-25"
+  "last_updated": "2026-09-27"
 }
