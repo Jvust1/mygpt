@@ -176,6 +176,23 @@
       "purpose": "Complete deterministic tracked-source ZIP plus clean-directory recovery, doctor, launcher, strict Brain and selection HTTP evidence. Source ZIP inside: 2,246,013 bytes, SHA-256 eb9404fb..., 97 tracked source files.",
       "status": "archived_review_candidate",
       "verification": "Drive full-byte download matches c70ba62a...; ZIP CRC PASS; build.json records exact source SHA/commit and launcher-http.json records 12/12."
+    },
+    {
+      "artifact_id": "mygpt-integrated-book-bridge-v1-20260925",
+      "file_name": "mygpt-integrated-book-bridge-v1-20260925.zip",
+      "type": "snapshot",
+      "drive_file_id_or_path": "1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09",
+      "size_bytes": 5625678,
+      "version": "1-combined-local-intake-book-lease",
+      "created_at": "2026-09-25T03:00:05.909Z",
+      "source": "assistant_generated_and_github_actions",
+      "related_branch": "feat/integrate-pr6-book-bridge-20260925",
+      "related_commit": "e9e5fb0932c1830fa11e886beb2802191eea09c8",
+      "purpose": "Four exact combined CI artifacts plus checkpoint/manifest for PR #8: local explicit intake, Book lease receiver, UI regressions and complete-source recovery. Contains exact 103-file source-delivery artifact; no real provider or Book raw corpus.",
+      "status": "archived_review_candidate",
+      "verification": "Drive full-byte readback matches eec9e326...; ZIP CRC PASS; embedded manifest records exact run/artifact IDs and source ZIP identity."
     }
   ],
   "notes": [
@@ -189,6 +206,7 @@
     "Local Brain transport checkpoint: browser now reaches real Python Brain/TestModel over bounded loopback for synthetic fixed catalogue; live Book and paid provider remain disabled.",
     "Selection-intake artifact from exact 318c3ef SDK/UI acceptance was indexed without reupload.",
     "Parallel PR #7 Book bridge artifact is indexed for provenance only and is not silently integrated into PR #6.",
-    "Source-delivery checkpoint archives one exact complete source bundle and clean recovery evidence; internal manifest is not a substitute for the externally recorded SHA-256."
+    "Source-delivery checkpoint archives one exact complete source bundle and clean recovery evidence; internal manifest is not a substitute for the externally recorded SHA-256.",
+    "PR #8 integration artifact proves combined CI compatibility without importing PR #7 stale state-file replacements; merge and independent review remain separate gates."
   ]
 }

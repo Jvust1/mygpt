@@ -111,3 +111,19 @@ The exact source ZIP is 2,246,013 bytes with SHA-256 `eb9404fbfd9a4d9fc22db57c05
 
 ### Limits
 The internal source manifest is not a signature; authenticity depends on the separately recorded outer SHA-256 and trusted Git/Drive provenance. Windows launcher, Android packaging/device behavior and independent review are not accepted by this evaluation.
+
+
+## E006 — combined local-intake + Book lease receiver compatibility
+Date: 2026-09-25
+Status: ACCEPTED_COMBINED_CI / INDEPENDENT_REVIEW_PENDING
+
+### Question
+Can the current PR #6 local-selection/lifecycle/source-delivery code coexist with the additive PR #7 Book lease receiver without restoring stale project-state files?
+
+### Result
+Yes on the exact integration head `e9e5fb0932c1830fa11e886beb2802191eea09c8`. Four workflows all passed: Brain SDK two clean environments at 446/0/0 each; Book receiver 20/20 cases with the same 446/0/0 suite; UI regressions at Node 66 plus Jonah 49/replay 39/Python host 23/selection host 30; and complete-source recovery with 103 tracked files, recovered Brain 446/0/0, launcher 12/12 and selection HTTP 32/32.
+
+The integration was capability-selective: PR #7's replacement-style project_state/CURRENT_STATE/HANDOFF changes were not copied.
+
+### Limits
+This validates code compatibility and recovery on the tested Linux/browser environments. It does not authenticate the user's installed Book APK, prove the Book-side authority transport on a physical device, validate live model teaching quality, or satisfy independent review/merge gates.

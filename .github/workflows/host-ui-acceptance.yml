@@ -1,7 +1,7 @@
 name: Host UI acceptance (synthetic local Brain only)
 on:
   push:
-    branches: [feat/book-contract-audit-v1]
+    branches: [feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925]
     paths:
       - 'host/**'
       - 'companion/**'
@@ -30,7 +30,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   browser:
-    if: github.repository == 'Jvust2/mygpt'
+    if: github.repository == 'Jvust/mygpt'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:

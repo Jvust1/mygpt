@@ -3,9 +3,9 @@
   "updated_date": "2026-09-25",
   "repository": "Jvust2/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/book-contract-audit-v1",
-  "phase": "LOCAL_UNVERIFIED_SELECTION_AND_SOURCE_RECOVERY_ACCEPTED",
-  "status": "INTAKE_426_DUAL_ENV_SELECTION_UI_30_SOURCE_RECOVERY_426_LAUNCHER_12_REVIEW_PENDING",
+  "active_branch": "feat/integrate-pr6-book-bridge-20260925",
+  "phase": "COMBINED_LOCAL_INTAKE_AND_BOOK_LEASE_RECEIVER_ACCEPTED",
+  "status": "PR8_446_DUAL_ENV_BOOK20_UI_REGRESSIONS_SOURCE_RECOVERY_PASS_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -29,9 +29,10 @@
     "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
   },
   "blocking_items": [
-    "Independent review and non-destructive three-way conflict mapping are required before combining PR #5/#6/#7.",
-    "Windows launcher/device validation and Android Studio/APK/physical-device validation remain unimplemented.",
-    "Real provider teaching quality and production multi-user transport remain disabled/unverified."
+    "Independent review of exact PR #8 and the corresponding Book-side authority implementation is pending.",
+    "User-installed Book APK identity and real browser/Android end-to-end transport remain unverified.",
+    "Windows launcher/device validation, Android Studio APK/physical-device validation and production multi-user transport remain unimplemented.",
+    "Real provider teaching quality remains disabled/unverified."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -51,7 +52,7 @@
     "historical_validation_only": false,
     "not_rerun_this_batch": false
   },
-  "next_step": "Perform a read-only three-way dependency/conflict review across PR #5, PR #6 and parallel Book-bridge PR #7; preserve all historical artifacts and do not auto-resolve/merge. Then choose a new non-default integration review branch. Real provider activation and Android/Windows acceptance remain separate gates.",
+  "next_step": "Independently review PR #8 exact diff and the Book-side authority counterpart. If accepted, run a real Book selection -> mygpt localhost/Android Studio TestModel end-to-end on an authorized environment. Do not activate a live provider or merge automatically.",
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
@@ -170,8 +171,8 @@
     ],
     "accepted_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1"
   },
-  "decision_checkpoint": "docs/SOURCE_DELIVERY_CHECKPOINT_20260925.md",
-  "evaluation_checkpoint": "docs/SOURCE_DELIVERY_CHECKPOINT_20260925.md",
+  "decision_checkpoint": "docs/INTEGRATION_CHECKPOINT_20260925.md",
+  "evaluation_checkpoint": "docs/INTEGRATION_CHECKPOINT_20260925.md",
   "book_bridge_candidate": {
     "status": "R6_EXPLICIT_SELECTION_OFFLINE_ACCEPTED",
     "target": "r6 Reader /api/reader, not the legacy Web ModeResponse/SourceResponse",
@@ -339,5 +340,68 @@
     "drive_id": "1JLrTiZnRWLlN9WlZPO3tczop49ipyTjP",
     "sha256": "656a93710cd48b7414c9742208ab3872abcda7cc0607cf497663329b38b2d58c",
     "adopted_into_pr6": false
+  },
+  "current_pr": {
+    "number": 8,
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "base_branch": "feat/book-contract-audit-v1"
+  },
+  "integration_candidate": {
+    "status": "ACCEPTED_COMBINED_CI_REVIEW_PENDING",
+    "branch": "feat/integrate-pr6-book-bridge-20260925",
+    "pr": 8,
+    "implementation_commit": "e9e5fb0932c1830fa11e886beb2802191eea09c8",
+    "base_commit": "8cce4bdaaaacf260e6e36f0462104d94afb1c326",
+    "source_from_parallel_pr7": [
+      "brain/mygpt_brain/book_bridge.py",
+      "brain/tests/test_book_bridge.py",
+      "brain/scripts/assert_book_bridge_acceptance.py",
+      ".github/workflows/book-bridge-acceptance.yml"
+    ],
+    "stale_state_files_transplanted": false,
+    "brain_sdk": {
+      "run": 36088319906,
+      "tests_per_environment": 446,
+      "skipped": 0,
+      "artifact_id": 10844484067,
+      "sha256": "b18681b1d8390e20a64d91fb70afdb361089d4f56de7013097c40dffd7482acc"
+    },
+    "host_ui": {
+      "run": 36088319915,
+      "node_tests": 66,
+      "jonah_checks": 49,
+      "replay_host_checks": 39,
+      "python_host_checks": 23,
+      "selection_host_checks": 30,
+      "artifact_id": 10844723415,
+      "sha256": "28377ebba304a25d9751b6b2f8417cb34ba4ec4aee40c900ccafae8aec2d992e"
+    },
+    "source_delivery": {
+      "run": 36088319923,
+      "tracked_source_files": 103,
+      "source_zip_bytes": 2298335,
+      "source_zip_sha256": "4e3ef0e9f0e87c2decb3ee9c6b02a5684e78550c2a3fc9e8d47937314bda3466",
+      "recovered_brain_tests": 446,
+      "launcher_checks": 12,
+      "http_checks": 32,
+      "artifact_id": 10844851422,
+      "sha256": "bd6b36f3f0598249479afe34a0fb267d3359fadbe1a2edc72e95a3084d077b2e"
+    },
+    "book_bridge": {
+      "run": 36088319928,
+      "receiver_cases": 20,
+      "tests_per_environment": 446,
+      "skipped": 0,
+      "artifact_id": 10844841409,
+      "sha256": "f7c6ddf254dc9cab8afa956ef15d1ec4bff1d0effe72bdc54f01b9f995af6529"
+    },
+    "paid_provider_calls": 0,
+    "book_repository_mutations": 0,
+    "independent_review": "PENDING",
+    "artifact_id": "mygpt-integrated-book-bridge-v1-20260925",
+    "drive_id": "1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK",
+    "drive_sha256": "eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09"
   }
 }
