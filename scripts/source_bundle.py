@@ -14,8 +14,11 @@ import subprocess
 import zipfile
 
 ROOT_FILES = {'.gitignore', '.gitattributes', 'AGENTS.md', 'SECURITY_POLICY.md', 'README.md',
-              'package.json', 'package-lock.json', 'run_mygpt.py', 'START_HERE.md'}
-DIRECTORIES = {'brain', 'host', 'companion', 'demo', 'docs', 'governance', 'scripts', 'tests', '.github'}
+              'package.json', 'package-lock.json', 'run_mygpt.py', 'START_HERE.md',
+              'desktop.py', 'desktop_adapter.py', 'desktop_runtime.py', 'desktop_state.py',
+              'desktop_workspace.py'}
+DIRECTORIES = {'brain', 'host', 'companion', 'demo', 'docs', 'governance', 'scripts', 'tests', '.github',
+               'desktop_ui', 'tools'}
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'node_modules', '__pycache__', '.pytest_cache',
                    '.env', 'credentials', 'secrets', 'models', 'weights', 'cache'}
 FORBIDDEN_EXTENSIONS = {'.ttf', '.otf', '.woff', '.woff2', '.pem', '.key', '.db', '.sqlite',
