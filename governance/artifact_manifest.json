@@ -234,7 +234,7 @@
       "created_at": "2026-09-27T09:19:53Z",
       "source": "assistant_generated",
       "related_branch": "codex/progress-mygpt-20260927",
-      "related_commit": "150832f75565ccbcc5978602c072f8ed2d0bb15e",
+      "related_commit": "b188c81d8cef1fc4fb3f14a21b91767138645fcc",
       "purpose": "Review, governance, doctor, local smoke and Windows Brain test evidence for the current branch; paid/live provider calls remain zero.",
       "status": "current_review_evidence",
       "verification": "Drive update read-back confirms the same file ID, title, MIME type and 29,284-byte size. SHA-256 verified locally before in-place replacement."
