@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-25",
-  "repository": "Jvust2/mygpt",
+  "updated_date": "2026-09-27",
+  "repository": "Jvust/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/integrate-pr6-book-bridge-20260925",
-  "phase": "COMBINED_LOCAL_INTAKE_AND_BOOK_LEASE_RECEIVER_ACCEPTED",
-  "status": "PR8_446_DUAL_ENV_BOOK20_UI_REGRESSIONS_SOURCE_RECOVERY_PASS_REVIEW_PENDING",
+  "active_branch": "feat/desktop-delivery-20260925",
+  "phase": "NATIVE_WINDOWS_DELIVERY_VERIFIED_ARCHIVED_USER_DEVICE_PENDING",
+  "status": "PR9_WINDOWS_DELIVERY_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -29,9 +29,9 @@
     "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
   },
   "blocking_items": [
-    "Independent review of exact PR #8 and the corresponding Book-side authority implementation is pending.",
+    "Independent review of the exact PR #9 desktop diff together with the PR #8 and Book authority boundary is pending.",
     "User-installed Book APK identity and real browser/Android end-to-end transport remain unverified.",
-    "Windows launcher/device validation, Android Studio APK/physical-device validation and production multi-user transport remain unimplemented.",
+    "User Windows device acceptance, Android Studio APK/physical-device validation and production multi-user transport remain unimplemented.",
     "Real provider teaching quality remains disabled/unverified."
   ],
   "pending_sync": {
@@ -52,7 +52,7 @@
     "historical_validation_only": false,
     "not_rerun_this_batch": false
   },
-  "next_step": "Independently review PR #8 exact diff and the Book-side authority counterpart. If accepted, run a real Book selection -> mygpt localhost/Android Studio TestModel end-to-end on an authorized environment. Do not activate a live provider or merge automatically.",
+  "next_step": "Independently review PR #9 desktop delivery together with the PR #8 and Book authority boundary. If accepted, complete user Windows/device acceptance and then run a real Book selection -> mygpt localhost/Android Studio TestModel end-to-end on an authorized environment. Do not activate a live provider or merge automatically.",
   "optimization_candidate": {
     "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
     "base_branch": "feat/jonah-companion-20260922",
@@ -342,11 +342,11 @@
     "adopted_into_pr6": false
   },
   "current_pr": {
-    "number": 8,
+    "number": 9,
     "state": "OPEN",
     "draft": true,
     "merged": false,
-    "base_branch": "feat/book-contract-audit-v1"
+    "base_branch": "feat/integrate-pr6-book-bridge-20260925"
   },
   "integration_candidate": {
     "status": "ACCEPTED_COMBINED_CI_REVIEW_PENDING",
@@ -403,5 +403,22 @@
     "artifact_id": "mygpt-integrated-book-bridge-v1-20260925",
     "drive_id": "1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK",
     "drive_sha256": "eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09"
+  },
+  "as_of": "2026-09-25",
+  "desktop_delivery": {
+    "state": "NATIVE_WINDOWS_DELIVERY_VERIFIED_ARCHIVED_USER_DEVICE_PENDING",
+    "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
+    "release_workflow_run": 36149636550,
+    "linux_full_pytest_passed": 490,
+    "windows_desktop_pytest_passed": 18,
+    "javascript_unit_tests_passed_each_platform": 66,
+    "portable_file": "mygpt-Windows-Portable.zip",
+    "portable_bytes": 34199210,
+    "portable_sha256": "37ebfa7158af866a19de48d9680054816b4fcbea006e73050ab2eab99211cd79",
+    "drive_file_id": "15aYdyKH15Oakj1iuYblGxYScFQf8xx2A",
+    "review_pr": 9,
+    "main_modified": false,
+    "automatic_merge": false,
+    "user_device_acceptance": false
   }
 }

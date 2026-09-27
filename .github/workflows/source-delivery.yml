@@ -1,7 +1,7 @@
 name: Source delivery and clean recovery
 on:
   push:
-    branches: [feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925]
+    branches: [feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925]
     paths:
       - 'scripts/source_bundle.py'
       - 'scripts/launcher_smoke.py'
@@ -10,6 +10,11 @@ on:
       - 'tests/test_source_bundle.py'
       - 'tests/test_launcher.py'
       - '.github/workflows/source-delivery.yml'
+      - 'desktop*.py'
+      - 'desktop_ui/**'
+      - 'tests/test_desktop_*.py'
+      - 'tools/build_windows_delivery.py'
+      - 'tools/desktop_browser_test.py'
 permissions:
   contents: read
 concurrency:
@@ -39,9 +44,12 @@ jobs:
           set -euo pipefail
           OUT="$RUNNER_TEMP/source-evidence"
           mkdir -p "$OUT"
-          python -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$OUT/delivery-tests.txt"
-          python scripts/source_bundle.py build --commit "$GITHUB_SHA" --output "$OUT/mygpt-source.zip" | tee "$OUT/build.json"
-          python scripts/source_bundle.py build --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/source-repeat.zip" > "$OUT/repeat.json"
+          python -m venv "$RUNNER_TEMP/source-test-env"
+          PY="$RUNNER_TEMP/source-test-env/bin/python"
+          "$PY" -m pip install --only-binary=:all: --require-hashes -r brain/requirements-linux-py313.lock
+          "$PY" -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$OUT/delivery-tests.txt"
+          "$PY" scripts/source_bundle.py build --commit "$GITHUB_SHA" --output "$OUT/mygpt-source.zip" | tee "$OUT/build.json"
+          "$PY" scripts/source_bundle.py build --commit "$GITHUB_SHA" --output "$RUNNER_TEMP/source-repeat.zip" > "$OUT/repeat.json"
           cmp "$OUT/mygpt-source.zip" "$RUNNER_TEMP/source-repeat.zip"
           sha256sum "$OUT/mygpt-source.zip" > "$OUT/source.sha256"
           git rev-parse HEAD > "$OUT/source-commit.txt"

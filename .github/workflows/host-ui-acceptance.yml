@@ -1,7 +1,7 @@
 name: Host UI acceptance (synthetic local Brain only)
 on:
   push:
-    branches: [feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925]
+    branches: [feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925]
     paths:
       - 'host/**'
       - 'companion/**'

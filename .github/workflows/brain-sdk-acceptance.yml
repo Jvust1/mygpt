@@ -2,7 +2,7 @@ name: Brain SDK acceptance (no live model)
 
 on:
   push:
-    branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925]
+    branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925]
     paths:
       - 'host/fixtures.js'
       - 'host/examples/selection-demo.json'

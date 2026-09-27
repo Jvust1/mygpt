@@ -193,6 +193,17 @@
       "purpose": "Four exact combined CI artifacts plus checkpoint/manifest for PR #8: local explicit intake, Book lease receiver, UI regressions and complete-source recovery. Contains exact 103-file source-delivery artifact; no real provider or Book raw corpus.",
       "status": "archived_review_candidate",
       "verification": "Drive full-byte readback matches eec9e326...; ZIP CRC PASS; embedded manifest records exact run/artifact IDs and source ZIP identity."
+    },
+    {
+      "artifact_id": "mygpt-windows-delivery-20260925",
+      "file_name": "mygpt-Windows-完整交付-20260925.zip",
+      "type": "generated_release",
+      "drive_file_id_or_path": "15aYdyKH15Oakj1iuYblGxYScFQf8xx2A",
+      "drive_parent_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
+      "size_bytes": 36004941,
+      "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
+      "purpose": "Verified Windows mygpt learning companion app with exact source/tests and evidence.",
+      "status": "archived_verified_windows_ci_user_device_pending"
     }
   ],
   "notes": [
@@ -208,5 +219,6 @@
     "Parallel PR #7 Book bridge artifact is indexed for provenance only and is not silently integrated into PR #6.",
     "Source-delivery checkpoint archives one exact complete source bundle and clean recovery evidence; internal manifest is not a substitute for the externally recorded SHA-256.",
     "PR #8 integration artifact proves combined CI compatibility without importing PR #7 stale state-file replacements; merge and independent review remain separate gates."
-  ]
+  ],
+  "last_updated": "2026-09-25"
 }
