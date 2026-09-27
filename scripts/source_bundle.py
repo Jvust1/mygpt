@@ -13,7 +13,7 @@ import stat
 import subprocess
 import zipfile
 
-ROOT_FILES = {'.gitignore', 'AGENTS.md', 'SECURITY_POLICY.md', 'README.md',
+ROOT_FILES = {'.gitignore', '.gitattributes', 'AGENTS.md', 'SECURITY_POLICY.md', 'README.md',
               'package.json', 'package-lock.json', 'run_mygpt.py', 'START_HERE.md'}
 DIRECTORIES = {'brain', 'host', 'companion', 'demo', 'docs', 'governance', 'scripts', 'tests', '.github'}
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'node_modules', '__pycache__', '.pytest_cache',
