@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   offline-sdk:
-    if: github.repository == 'Jvust2/mygpt'
+    if: github.repository == 'Jvust/mygpt'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
