@@ -47,3 +47,9 @@ Book authority：`bf7aa490639bc2b2fcf382623b915d54f6cecf07`
 
 **Review status：ACCEPTED_FOR_USER_DEVICE_VALIDATION**  
 后续步骤是用户设备验收，以及在允许 localhost 的受信任环境中完成真实 Book 选段 → mygpt TestModel 端到端；不自动合并、不启用真实 provider。
+
+## 2026-09-27 follow-up validation
+
+- `brain/tests/conftest.py` now permits only loopback targets for the offline test guard, which allows Windows asyncio self-pipes while continuing to reject non-loopback network access.
+- With the fix, `tests/test_book_bridge.py` passes 20/20 and the TestModel integration case passes on Windows Python 3.14.
+- The full Windows suite reaches 445 passed; two parameterized JSON-boundary cases still hit Windows' 32K environment-variable limit while pytest restores the oversized case name. Formal SDK acceptance remains the Linux CPython 3.13 CI result recorded above.
