@@ -1,3 +1,10 @@
+## 2026-09-27 继续推进接手点
+
+- 当前本地推进分支为 `codex/progress-mygpt-20260927`，最新提交 `9b05a4b`。
+- PR #9 桌面交付与 PR #8 / Book authority 独立审查已完成，状态为 `ACCEPTED_FOR_USER_DEVICE_VALIDATION`。
+- 本地桌面回归为 18 个 pytest 用例、6 个子测试和 Node 66 个用例通过；`doctor` 在隔离环境已为 READY。
+- 下一步是用户 Windows 设备验收，以及受信任环境中的真实 Book 选段 → mygpt localhost/Android Studio TestModel 联调；真实 provider 仍保持关闭。
+
 ## 2026-09-25 最新交付接手点
 
 - Windows 发布源码：`0fc965263b42b8a12e0cb7b006f4b1bdcd137596`。
