@@ -53,3 +53,13 @@ A runnable candidate is not considered recoverable only because GitHub contains 
 
 ## D018 — integrate stale review lines by capability, not by state-file overwrite
 When an older review branch contains useful additive runtime capability but also replaces newer project-state documents, create a fresh non-default integration branch from the newer accepted baseline and transplant only the bounded runtime/test capability. Preserve the old branch as provenance; do not resolve review-stack conflicts by overwriting current state or rewriting history.
+
+## D019 — final mobile product pairs mygpt with Book Android
+The final product target is an Android companion that works alongside the Book Android app. Book remains the learning surface and authoritative structured study-context source; mygpt consumes bounded Book context/events to understand the current learning situation.
+
+## D020 — Live is the authoritative character-skin source
+The final visible companion should use character skins and presentation assets from the separate Live project. The current Jonah component is retained as a validated interaction prototype, not as the final character-content authority. mygpt must not silently fork or duplicate Live's authoritative skin collection.
+
+## D021 — mygpt owns conversation and supervision behavior
+mygpt is responsible for conversation, teaching assistance, encouragement, supervision and intervention policy. Character appearance comes from Live and learning truth comes from Book. Supervision should be evidence-driven and graduated from silent presence to reminders or active supervision; ambiguous states should be resolved conversationally rather than by asserting that the user is distracted.
+
