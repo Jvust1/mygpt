@@ -21,12 +21,30 @@
     ],
     "default_companion_mode": "SILENT_PRESENCE",
     "shadow_default": false,
-    "autonomous_ui_control_v0_1": false
+    "autonomous_ui_control_v0_1": false,
+    "final_form": {
+      "platform": "Android",
+      "companion_with": "Book Android",
+      "character_source": "Jvust/Live",
+      "capabilities": [
+        "persistent character companionship",
+        "conversation",
+        "learning assistance",
+        "study supervision",
+        "graduated interventions"
+      ],
+      "responsibility_split": {
+        "Book": "learning UI and authoritative structured study context",
+        "Live": "authoritative character skins and visual presentation assets",
+        "mygpt": "companion reasoning, conversation, teaching assistance, supervision and intervention orchestration"
+      }
+    }
   },
   "dependencies": {
     "Book": "authoritative structured learning/content context",
     "StudyMate": "study-session and low-cost device/activity signals",
-    "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding"
+    "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding",
+    "Live": "authoritative companion character skins and visual presentation assets"
   },
   "blocking_items": [
     "User-installed Book APK identity and real browser/Android end-to-end transport remain unverified.",
@@ -49,9 +67,11 @@
       "independent human review"
     ],
     "historical_validation_only": false,
-    "not_rerun_this_batch": false
+    "not_rerun_this_batch": false,
+    "final_target": "Live-backed character/skin runtime integrated with Book Android",
+    "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Complete user Windows/device acceptance and Android/Book APK validation. The authorized same-process Book selection -> mygpt TestModel bridge has passed; do not activate a live provider or merge automatically.",
+  "next_step": "Prioritize Android product integration: verify the user's Book APK and define the Book Android -> mygpt context/event bridge plus Live skin runtime contract, then validate conversation and graduated supervision on-device. Keep paid/live provider activation and merges explicit.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
