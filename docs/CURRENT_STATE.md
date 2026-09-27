@@ -194,3 +194,9 @@ A first acceptance target:
 > During a 30-minute Book study session, mygpt can know the current learning location and mode, detect meaningful study transitions, stay quiet by default, answer context-dependent questions, and selectively prompt for clarification or recall without continuous screen capture.
 
 No production backend, Book event bridge, or Android application has been started in this repository yet. The Jonah companion is the first executable UI candidate and remains unmerged.
+## 2026-09-27 独立审查更新
+
+- PR #9 桌面交付与 PR #8 / Book authority 边界已完成独立审查，未发现需要阻止继续推进的 Critical/Major 问题。
+- 实际 Book `Authority` → mygpt `BookReceiver` TestModel 联调通过；重复收据、内容摘要和撤销语义通过。
+- `tools/desktop_browser_test.py` 新增 Windows `/host/brain.html` loopback TestModel 回归；用户本人 Windows 设备、Android/真实 Book APK 和真实模型质量仍未验收。
+- 详细审查记录见 [INDEPENDENT_REVIEW_20260927.md](INDEPENDENT_REVIEW_20260927.md)。
