@@ -7,7 +7,7 @@ Any GPT / Claude / Codex / DeepSeek / local agent taking over this project must 
 Before project work:
 
 1. Read the Drive root `全项目` registry and every current root `全项目_*` baseline.
-2. Read `governance/project_state.json`, `docs/PROJECT_NORTH_STAR.md`, `docs/ARCHITECTURE_INVARIANTS.md`, `docs/CURRENT_STATE.md`, `docs/DECISION_LEDGER.md`, `docs/EVALUATION_LEDGER.md`, `docs/HANDOFF.md`, `docs/PRE_FLIGHT_CHECKLIST.md`, `governance/artifact_manifest.json`, and `governance/pending_sync.json` as applicable.
+2. Read `governance/project_state.json`, `docs/PROJECT_NORTH_STAR.md`, `docs/ARCHITECTURE_INVARIANTS.md`, `docs/CURRENT_STATE.md`, `docs/DECISION_LEDGER.md`, `docs/EVALUATION_LEDGER.md`, `docs/HANDOFF.md`, `governance/artifact_manifest.json`, and `governance/pending_sync.json` as applicable.
 3. Read linked Book / StudyMate / ChatContextVault state only as needed for the current bounded task.
 4. Do not rely only on chat memory or stale copied state.
 
