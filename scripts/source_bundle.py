@@ -96,7 +96,7 @@ def build(root: Path, commit: str, output: Path) -> dict:
         files[name] = data
         entries.append({'path': name, 'mode': mode, 'bytes': size, 'git_blob': oid,
                         'sha256': hashlib.sha256(data).hexdigest()})
-    manifest = {'schema': 'mygpt.source-bundle.v1', 'repository': 'Jvust2/mygpt',
+    manifest = {'schema': 'mygpt.source-bundle.v1', 'repository': 'Jvust/mygpt',
                 'source_commit': commit, 'scope': 'TRACKED_PROJECT_SOURCE_ONLY',
                 'includes_dependencies': False, 'files': sorted(entries, key=lambda x: x['path'])}
     raw = (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + '\n').encode()
