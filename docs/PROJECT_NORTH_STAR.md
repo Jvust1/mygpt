@@ -14,6 +14,20 @@ mygpt is a new, independent companion identity. It is not a replacement for any 
 
 It may optionally provide a clearly labeled Shadow mode grounded in ChatContextVault history, but Shadow output must remain explicitly simulated and must never be represented as the real person speaking.
 
+## Final product form
+
+The intended final product is an Android companion that works alongside the Book Android app.
+
+The responsibility split is:
+
+- **Book Android** — the learning surface and authoritative source of structured study context: what the user is reading, learning, reviewing, practicing, where they are in the material, and relevant study-state events.
+- **Live** — the authoritative source of companion character skins and visual presentation assets. mygpt should be able to use Live characters/skins as the visible companion rather than treating the current Jonah prototype as the final character system.
+- **mygpt** — the companion brain and orchestration layer: conversation, teaching assistance, encouragement, supervision, intervention timing, state interpretation, and the decision about when the character should stay quiet, talk, remind, or actively supervise.
+
+The visible character should feel continuously present while the user studies in Book, be available for ordinary conversation, and supervise study without turning the product into punitive surveillance. Supervision should primarily use Book semantic context and explicit/local device signals, escalate gradually, and ask the user when evidence is ambiguous.
+
+The current Jonah surface remains useful as an implementation and interaction prototype, but it is not the final character-content source. The final character system should consume Live-provided skins through a clear interface so character appearance can evolve independently from mygpt reasoning and Book learning data.
+
 ## Learning goal
 
 The learning loop is:
