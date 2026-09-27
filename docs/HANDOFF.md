@@ -82,7 +82,7 @@ GitHub run `35797671670`：两个干净环境分别 **269 passed / 0 skipped / 0
 1. Read Drive root `全项目` and all current `全项目_*` baselines.
 2. Read exact-target-branch `SECURITY_POLICY.md` and `AGENTS.md`.
 3. Read `governance/project_state.json`.
-4. Read North Star, Architecture Invariants, Current State, Decision Ledger, Evaluation Ledger, artifact manifest, pending sync, and Pre-flight Checklist.
+4. Read North Star, Architecture Invariants, Current State, Decision Ledger, Evaluation Ledger, artifact manifest, and pending sync.
 5. Restore Book / StudyMate / ChatContextVault state from their own repositories only when needed.
 
 Repository evidence outranks chat recollection.
