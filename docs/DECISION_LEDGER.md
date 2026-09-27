@@ -63,3 +63,6 @@ The final visible companion should use character skins and presentation assets f
 ## D021 — mygpt owns conversation and supervision behavior
 mygpt is responsible for conversation, teaching assistance, encouragement, supervision and intervention policy. Character appearance comes from Live and learning truth comes from Book. Supervision should be evidence-driven and graduated from silent presence to reminders or active supervision; ambiguous states should be resolved conversationally rather than by asserting that the user is distracted.
 
+## D022 — upstream adoption is broad in research and narrow in shipping dependencies
+mygpt maintains a broad upstream registry across Android, local AI, voice, supervision, memory and character runtimes so mature open-source work is continuously reused. “Adopt” does not mean bulk-vendoring every repository. Production dependencies must remain small, replaceable and explicitly version/license/security checked; restricted/copyleft projects remain reference-only until a separate decision permits their integration. The canonical registry is `governance/open_source_sources.json` and the adoption plan is `docs/OPEN_SOURCE_ADOPTION.md`.
+
