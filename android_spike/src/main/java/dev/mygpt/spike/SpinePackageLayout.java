@@ -9,7 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -20,6 +21,9 @@ import java.util.zip.ZipInputStream;
 /** Validates and installs the decrypted Live 3714430278 package without any LPK decryption step. */
 public final class SpinePackageLayout {
     public static final String SKIN_ID = "3714430278";
+    public static final String EXPECTED_ARCHIVE_SHA256 =
+            "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f";
+    private static final long MAX_ARCHIVE_BYTES = 16L * 1024L * 1024L;
     private static final long MAX_ENTRY_BYTES = 8L * 1024L * 1024L;
     private static final long MAX_TOTAL_EXTRACTED_BYTES = 20L * 1024L * 1024L;
     private static final Pattern SPINE_VERSION = Pattern.compile("4\\.1\\.[0-9]+");
@@ -38,26 +42,45 @@ public final class SpinePackageLayout {
     public static final class InstalledSkin {
         public final File directory;
         public final String spineVersion;
-        InstalledSkin(File directory, String spineVersion) {
+        public final String archiveSha256;
+        InstalledSkin(File directory, String spineVersion, String archiveSha256) {
             this.directory = directory;
             this.spineVersion = spineVersion;
+            this.archiveSha256 = archiveSha256;
         }
     }
 
     public static InstalledSkin install(InputStream source, File targetDirectory) throws IOException {
+        return install(source, targetDirectory, EXPECTED_ARCHIVE_SHA256);
+    }
+
+    static InstalledSkin install(InputStream source, File targetDirectory, String expectedSha256)
+            throws IOException {
         if (source == null) throw new IllegalArgumentException("source cannot be null");
         if (targetDirectory == null) throw new IllegalArgumentException("targetDirectory cannot be null");
         File parent = targetDirectory.getParentFile();
         if (parent == null) throw new IOException("target directory must have a parent");
         if (!parent.exists() && !parent.mkdirs()) throw new IOException("cannot create skin parent");
 
+        File archive = new File(parent, targetDirectory.getName() + ".incoming.zip");
         File staging = new File(parent, targetDirectory.getName() + ".staging");
+        deleteRecursively(archive);
         deleteRecursively(staging);
-        if (!staging.mkdirs()) throw new IOException("cannot create staging directory");
+
+        String archiveSha = copyAndDigest(source, archive);
+        if (expectedSha256 != null && !expectedSha256.equalsIgnoreCase(archiveSha)) {
+            deleteRecursively(archive);
+            throw new IOException("archive SHA-256 mismatch");
+        }
+
+        if (!staging.mkdirs()) {
+            deleteRecursively(archive);
+            throw new IOException("cannot create staging directory");
+        }
 
         Set<String> found = new HashSet<String>();
         long total = 0L;
-        try (ZipInputStream zip = new ZipInputStream(new BufferedInputStream(source))) {
+        try (ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(archive)))) {
             ZipEntry entry;
             byte[] buffer = new byte[32 * 1024];
             while ((entry = zip.getNextEntry()) != null) {
@@ -82,8 +105,11 @@ public final class SpinePackageLayout {
             }
         } catch (IOException error) {
             deleteRecursively(staging);
+            deleteRecursively(archive);
             throw error;
         }
+
+        deleteRecursively(archive);
 
         if (!found.containsAll(REQUIRED)) {
             Set<String> missing = new HashSet<String>(REQUIRED);
@@ -99,6 +125,12 @@ public final class SpinePackageLayout {
             throw new IOException("package is not Live skin " + SKIN_ID);
         }
 
+        String model = readUtf8(new File(staging, "model.json"));
+        if (!model.contains("\"type\":9") && !model.contains("\"type\": 9")) {
+            deleteRecursively(staging);
+            throw new IOException("skin model is not the expected Spine type");
+        }
+
         String version = detectSpineVersion(new File(staging, "skeleton.bin"));
         if (version == null || !version.startsWith("4.1.")) {
             deleteRecursively(staging);
@@ -110,7 +142,32 @@ public final class SpinePackageLayout {
             deleteRecursively(staging);
             throw new IOException("cannot promote installed skin");
         }
-        return new InstalledSkin(targetDirectory, version);
+        return new InstalledSkin(targetDirectory, version, archiveSha);
+    }
+
+    private static String copyAndDigest(InputStream source, File archive) throws IOException {
+        final MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException impossible) {
+            throw new IOException("SHA-256 unavailable", impossible);
+        }
+        byte[] buffer = new byte[32 * 1024];
+        long total = 0L;
+        try (BufferedInputStream in = new BufferedInputStream(source);
+             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(archive))) {
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                total += read;
+                if (total > MAX_ARCHIVE_BYTES) throw new IOException("archive size limit exceeded");
+                digest.update(buffer, 0, read);
+                out.write(buffer, 0, read);
+            }
+        } catch (IOException error) {
+            deleteRecursively(archive);
+            throw error;
+        }
+        return hex(digest.digest());
     }
 
     private static String readUtf8(File file) throws IOException {
@@ -155,5 +212,16 @@ public final class SpinePackageLayout {
             }
         }
         if (!file.delete()) throw new IOException("cannot delete " + file);
+    }
+
+    private static String hex(byte[] bytes) {
+        char[] out = new char[bytes.length * 2];
+        final char[] digits = "0123456789abcdef".toCharArray();
+        for (int i = 0; i < bytes.length; i++) {
+            int value = bytes[i] & 0xff;
+            out[i * 2] = digits[value >>> 4];
+            out[i * 2 + 1] = digits[value & 0x0f];
+        }
+        return new String(out);
     }
 }
