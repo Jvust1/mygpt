@@ -1,3 +1,9 @@
+## 2026-09-28 Android 宿主生命周期修复（CI 通过，真机待验）
+
+`feat/android-companion-boundary-20260928@eef4d8e`、Draft PR #10：离开前台或锁屏即清除合成会话，到期后无需后续事件也收起提示；撤销、结束或新会话均需重新开启本次提醒。push run [`36369308484`](https://github.com/Jvust/mygpt/actions/runs/36369308484) 与 PR run [`36369310978`](https://github.com/Jvust/mygpt/actions/runs/36369310978) 的 Java 8 smoke、Android debug 构建成功。当前 APK 14,913 bytes，SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`，Drive 文件 ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`；上一版保留为历史候选。仍未在真机上安装操作，Book 真实学习事件与 Live 角色均未接入。
+
+---
+
 ## 2026-09-28 Android 合成测试宿主 APK（CI 通过，真机待验）
 
 `feat/android-companion-boundary-20260928@332e9a2`、Draft PR #10：独立 Android debug 宿主的按钮产生明确标注的合成 Book 事件，驱动 Java 状态机和文字 cue；撤销立即清除会话。push run [`36368235878`](https://github.com/Jvust/mygpt/actions/runs/36368235878) 的 Java 8 smoke 与 `assembleDebug` 均成功。APK 14,033 bytes，SHA-256 `2a80adbb5bab0187f2b42eba22a044f79552eb13336468cef9b176b9b2bced78`，Drive 文件 ID `1HXRW8XBmHyG0lJtfP6FX3KvZ-SOCM8rY`。首次 run `36368130257` 因 setup-android 请求已移除的 SDK tools 包失败，改用 runner 预装 SDK 后通过。Manifest 不请求网络、麦克风或悬浮窗权限。Book 真实学习事件、Live 角色渲染、模型、语音和用户真机验收仍未完成。

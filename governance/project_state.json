@@ -5,7 +5,7 @@
   "default_branch": "main",
   "active_branch": "feat/android-companion-boundary-20260928",
   "phase": "ANDROID_COMPANION_BOUNDARY_SPIKE_CANDIDATE",
-  "status": "ANDROID_SYNTHETIC_DEBUG_APK_CI_PASS_DEVICE_PENDING",
+  "status": "ANDROID_SYNTHETIC_LIFECYCLE_CI_PASS_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "On a device, validate lifecycle and revocation of the isolated synthetic host. Obtain a genuine trusted Book Android study-event producer (the current selection lease is a different authority), then bind a Live-owned renderer with rights cleared; evaluate local chat and optional voice separately.",
+  "next_step": "Validate the synthetic host on a physical device (background/lock/reopen, expiry and revocation). Then negotiate a genuine trusted Book Android study-event producer and bind a Live-owned renderer with rights cleared; evaluate local chat and optional voice separately.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -519,21 +519,24 @@
       "book_authentication": "TEST_DOUBLE",
       "live_renderer": "TEXT_PLACEHOLDER",
       "permissions": [],
-      "implementation_commit": "332e9a29578428b56048ac3851ee29cb74dc3492",
+      "implementation_commit": "eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b",
       "ci": {
         "first_failed_run": 36368130257,
         "first_failure": "setup-android requested removed SDK tools package",
         "successful_push_run": 36368235878,
-        "java8_job": 108758839963,
-        "android_job": 108758840189,
-        "conclusion": "success"
+        "java8_job": 108762033636,
+        "android_job": 108762033792,
+        "conclusion": "success",
+        "lifecycle_push_run": 36369308484,
+        "lifecycle_pr_run": 36369310978
       },
       "artifact": {
-        "id": "mygpt-android-synthetic-spike-debug-20260928",
-        "drive_file_id": "1HXRW8XBmHyG0lJtfP6FX3KvZ-SOCM8rY",
-        "sha256": "2a80adbb5bab0187f2b42eba22a044f79552eb13336468cef9b176b9b2bced78",
-        "size_bytes": 14033
-      }
+        "id": "mygpt-android-synthetic-spike-lifecycle-20260928",
+        "drive_file_id": "1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG",
+        "sha256": "78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed",
+        "size_bytes": 14913
+      },
+      "lifecycle": "BACKGROUND_REVOKES_SESSION; EXPIRY_CLEARS_CUE; SUPERVISION_RECONSENT_PER_SESSION; CI_PASS_DEVICE_PENDING"
     }
   }
 }
