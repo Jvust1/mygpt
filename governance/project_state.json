@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Verify Java 8 CI, then bind the coordinator to an authenticated Book Android study-event producer and a Live-owned CharacterRuntime in a device test host. Do not claim an APK, real event transport, model quality, or production renderer.",
+  "next_step": "Bind the verified coordinator to an authenticated Book Android study-event producer and a Live-owned CharacterRuntime in a device test host. Then benchmark local chat engines, add consent-gated voice, and introduce graduated supervision signals. Do not claim an APK, production transport, or real model quality before device and authority acceptance.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
