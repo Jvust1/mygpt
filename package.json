@@ -8,7 +8,5 @@
     "test": "node --test",
     "test:browser": "node tests/browser.cjs"
   },
-  "engines": {
-    "node": ">=20"
-  }
+  "engines": { "node": ">=20" }
 }
