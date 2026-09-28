@@ -71,6 +71,22 @@ jobs:
         run: |
           set -euo pipefail
           gradle -p android_spike :app:assembleDebug --no-daemon
+      - name: Verify Spine host APK native payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import zipfile
+          apk = "android_spike/app/build/outputs/apk/debug/app-debug.apk"
+          with zipfile.ZipFile(apk) as z:
+              names = set(z.namelist())
+              required = "lib/arm64-v8a/libgdx.so"
+              if required not in names:
+                  raise SystemExit(f"missing {required}")
+              if "classes.dex" not in names:
+                  raise SystemExit("missing classes.dex")
+              print("APK native payload PASS:", required)
+          PY
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: mygpt-spine-3714430278-android-spike
