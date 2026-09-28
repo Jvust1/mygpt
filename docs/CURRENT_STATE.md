@@ -1,3 +1,9 @@
+## 2026-09-28 Android 集成边界原型（CI 待验）
+
+在 `feat/android-companion-boundary-20260928` 增加 `android_spike/`：Book 语义事件状态机、静默默认/监督显式同意、过期与撤销门、序号与 epoch 拒绝、Live 中立角色 cue 接口及 Java 8 验收脚本。该分支基于 `codex/progress-mygpt-20260927@5a2473d`。当前是纯 JVM 候选；未接上 Book Android 的实际事件生产者、Live 角色运行时，也不是 APK。本地缺少 javac，精确 CI 结果随后记录。使用和边界见 [android_spike/README.md](../android_spike/README.md)。
+
+---
+
 ## 2026-09-25 Windows 学习陪伴交付更新
 
 - 新增 Windows 本机学习工作台：约拿陪伴、学习目标/计时、本地笔记、修订冲突保护、备份合并、本机 Ollama 明示调用入口。

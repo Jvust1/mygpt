@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-27",
+  "updated_date": "2026-09-28",
   "repository": "Jvust/mygpt",
   "default_branch": "main",
-  "active_branch": "codex/progress-mygpt-20260927",
-  "phase": "NATIVE_WINDOWS_DELIVERY_VERIFIED_ARCHIVED_USER_DEVICE_PENDING",
-  "status": "PR9_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
+  "active_branch": "feat/android-companion-boundary-20260928",
+  "phase": "ANDROID_COMPANION_BOUNDARY_SPIKE_CANDIDATE",
+  "status": "ANDROID_SPIKE_CI_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Build the Android integration spike around Book semantic events + mygpt companion state machine + a renderer-neutral Live CharacterRuntime adapter. Benchmark llama.cpp/ExecuTorch/MLC/ONNX for local chat and whisper.cpp/sherpa-onnx/Silero VAD for voice; keep restricted/copyleft upstreams reference-only until license review.",
+  "next_step": "Verify Java 8 CI, then bind the coordinator to an authenticated Book Android study-event producer and a Live-owned CharacterRuntime in a device test host. Do not claim an APK, real event transport, model quality, or production renderer.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -496,5 +496,14 @@
       ]
     },
     "license_gate": "Verify exact license/version before direct import; restricted/copyleft projects remain reference-only until explicit decision."
+  },
+  "android_integration_spike": {
+    "branch": "feat/android-companion-boundary-20260928",
+    "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
+    "scope": "Pure Java 8 Book event coordinator and renderer-neutral Live cue port",
+    "verification": "CI_PENDING_LOCAL_JAVAC_UNAVAILABLE",
+    "book_live_transport": "NOT_CONNECTED",
+    "apk": "NOT_BUILT",
+    "provider_calls": 0
   }
 }

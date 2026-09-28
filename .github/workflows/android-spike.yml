@@ -1,0 +1,26 @@
+name: Android companion boundary spike
+on:
+  push:
+    paths:
+      - 'android_spike/**'
+      - '.github/workflows/android-spike.yml'
+  pull_request:
+    paths:
+      - 'android_spike/**'
+      - '.github/workflows/android-spike.yml'
+jobs:
+  java8-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile for Java 8 and run boundary smoke
+        run: |
+          mkdir -p android_spike/build/classes
+          javac --release 8 -d android_spike/build/classes \
+            android_spike/src/main/java/dev/mygpt/spike/CompanionCoordinator.java \
+            android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java
+          java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
