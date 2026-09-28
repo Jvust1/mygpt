@@ -34,7 +34,7 @@ The debug APK appears at `android_spike/app/build/outputs/apk/debug/app-debug.ap
 
 ## 3714430278 Spine renderer implementation
 
-The decrypted runtime package `3714430278.zip` has been inspected directly. It contains 13 flat entries and is a **Spine 4.1.20** skeletal package, not a Cubism/Live2D model.
+The decrypted runtime package `3714430278.zip` has been inspected directly. Its pinned SHA-256 is `eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`; the Android importer verifies this exact identity before extraction. It contains 13 flat entries and is a **Spine 4.1.20** skeletal package, not a Cubism/Live2D model.
 
 Primary runtime files:
 - `model.json` — Live package controller/motion map.
