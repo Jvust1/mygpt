@@ -1,6 +1,6 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-28",
+  "updated_date": "2026-09-29",
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/spine-3714430278-runtime-final-20260928",
@@ -38,6 +38,14 @@
         "Live": "authoritative character skins and visual presentation assets",
         "mygpt": "companion reasoning, conversation, teaching assistance, supervision and intervention orchestration"
       }
+    },
+    "skin_strategy": {
+      "authority": "Jvust/Live",
+      "primary_dynamic_skin": "3714430278",
+      "backup_static_skins": [
+        "backup_skin_image_01"
+      ],
+      "candidate_registry": "android_spike/skin_candidates.json"
     }
   },
   "dependencies": {
@@ -71,7 +79,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Install the CI-verified debug APK on Xiaomi 14, select the exact SHA-256 verified Live 3714430278.zip, and validate first frame, idle, NEEDS_INPUT/action cues, pause/resume, background/reopen and wrong-package rejection. After device acceptance, connect the genuine trusted Book Android study-event producer.",
+  "next_step": "First complete Xiaomi 14 device acceptance for primary dynamic skin 3714430278. Keep backup_skin_image_01 available as a static portrait/fallback and future dynamic conversion source; then connect the genuine trusted Book Android study-event producer.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -632,6 +640,26 @@
         "GENTLE_CHECK_IN": "action -> idle fallback"
       }
     },
-    "renderer_branch": "feat/spine-3714430278-runtime-final-20260928"
+    "renderer_branch": "feat/spine-3714430278-runtime-final-20260928",
+    "backup_skin": {
+      "id": "backup_skin_image_01",
+      "role": "backup_static_character_skin_reference",
+      "source": "user_upload",
+      "file_name": "mygpt_backup_skin_01_679CB8C0A379FE2655C951F73CA47FC3.png",
+      "drive_file_id": "1adRumPFELRvB_4d7ORfnvUZRPhUTOLDW",
+      "drive_parent_id": "1F1deaHZp4zYN03GyDHiMSzdHRSB081pj",
+      "sha256": "9d03cf43b5d60a8ae486c17979e72bd294e479fc58732971aaa205df7e3f5cff",
+      "size_bytes": 3056688,
+      "mime_type": "image/png",
+      "runtime_kind": "STATIC_IMAGE",
+      "direct_dynamic_runtime": false,
+      "intended_uses": [
+        "backup companion visual reference",
+        "static portrait fallback",
+        "future dynamic-skin visual source"
+      ],
+      "status": "ARCHIVED_IN_LIVE_DRIVE_REFERENCE_READY",
+      "authority": "Jvust/Live + Live Drive skin library"
+    }
   }
 }
