@@ -32,13 +32,28 @@ gradle -p android_spike :app:assembleDebug --no-daemon
 
 The debug APK appears at `android_spike/app/build/outputs/apk/debug/app-debug.apk`. CI builds and uploads it as a short-lived test artifact. Do not use this package to assess actual Book transport, Live WPK animation, model teaching quality, or cross-app overlays.
 
-## Selected Live skin
+## 3714430278 Spine renderer implementation
 
-The first Android companion skin is **Live skin `3714430278`**. The canonical asset remains in the Live project/Drive; mygpt stores only a reference in `android_spike/live_skin_ref.json` and does not duplicate the LPK bytes.
+The decrypted runtime package `3714430278.zip` has been inspected directly. It contains 13 flat entries and is a **Spine 4.1.20** skeletal package, not a Cubism/Live2D model.
 
-Current source assets:
-- `3714430278.lpk` — Live authoritative package
-- `config.json` — Live skin configuration
-- `20260426152945.png` — preview
+Primary runtime files:
+- `model.json` — Live package controller/motion map.
+- `skeleton.bin` — Spine binary skeleton exported with version `4.1.20`.
+- `c610_00.atlas` — texture atlas with premultiplied alpha.
+- `c610_00.png` — atlas texture.
+- `lpk_files.json` — package identity and decrypted-name mapping.
 
-The Android spike still uses a text placeholder until an LPK-capable `CharacterRuntime` is bound and validated on-device. Selecting this skin does not claim that rendering is already implemented.
+The first implemented Android renderer uses `spine-libgdx:4.1.0` and libGDX 1.11.x-compatible APIs. The Activity uses Android's Storage Access Framework to let the user select the already-decrypted ZIP. The app stores only a persisted URI grant plus a verified local extraction in app-private storage; no broad storage permission is requested.
+
+Before rendering, `SpinePackageLayout` rejects path traversal/nested entries, duplicate required files, oversized decompression, wrong skin ID, missing required resources, and non-4.1 skeleton versions. The renderer then loads `skeleton.bin` + `c610_00.atlas` and displays the skeleton on a GPU-backed libGDX surface.
+
+Current cue mapping:
+- `QUIET` → `idle`
+- `PAUSED` → freeze current animation
+- `NEEDS_INPUT` → `smile` (fallback `idle`)
+- `GENTLE_CHECK_IN` → `action` (fallback `idle`)
+
+The decrypted package also advertises tap motions including `etc`, `no`, `pain`, `sad`, `special`, and `surprise`; these remain available for later conversation/emotion mapping.
+
+**Verification boundary:** implementation is now in PR #10, but this renderer is not called CI-verified or device-verified until the new exact-head workflow and a physical Android device both pass. Book events are still synthetic. Production redistribution is separately gated by the Spine Runtimes license.
+
