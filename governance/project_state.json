@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Validate the synthetic host on a physical device (background/lock/reopen, expiry and revocation). Then negotiate a genuine trusted Book Android study-event producer and bind a Live-owned renderer with rights cleared; evaluate local chat and optional voice separately.",
+  "next_step": "Bind a Live-owned LPK-capable CharacterRuntime for selected skin 3714430278 and validate it on a physical Android device; then connect the genuine trusted Book Android study-event producer. Keep the Live asset authoritative in Live rather than copying it into mygpt.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -517,7 +517,7 @@
       "kind": "SYNTHETIC_ANDROID_DEBUG_ONLY",
       "build": "CI_PASS",
       "book_authentication": "TEST_DOUBLE",
-      "live_renderer": "TEXT_PLACEHOLDER",
+      "live_renderer": "TEXT_PLACEHOLDER_WITH_SELECTED_SKIN_3714430278_REFERENCE",
       "permissions": [],
       "implementation_commit": "eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b",
       "ci": {
@@ -553,6 +553,16 @@
         "tracked_files": 131,
         "verification": "file paths exactly match current branch tree"
       }
+    },
+    "selected_live_skin": {
+      "skin_id": "3714430278",
+      "source": "Jvust/Live",
+      "drive_folder_id": "1StRk6RJ2N8l5-Q0ogpPHFcb1uviOJYCh",
+      "lpk_drive_file_id": "1g0UAayGcezBHKywrSNIdYh9GyCaWZ7G2",
+      "config_drive_file_id": "1O87dhnMOs2faZvFMWepm2DM-1Lqa51RW",
+      "preview_drive_file_id": "1DwSlVnuGPp6EAOAnECSkNfm0mZeExTZx",
+      "mygpt_asset_copy": false,
+      "status": "SELECTED_REFERENCE_ONLY_RENDERER_PENDING"
     }
   }
 }
