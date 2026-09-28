@@ -38,8 +38,11 @@ jobs:
           mkdir -p android_spike/build/classes
           javac --release 8 -d android_spike/build/classes \
             android_spike/src/main/java/dev/mygpt/spike/CompanionCoordinator.java \
-            android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java
+            android_spike/src/main/java/dev/mygpt/spike/SpinePackageLayout.java \
+            android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java \
+            android_spike/src/test/java/dev/mygpt/spike/SpinePackageLayoutSmoke.java
           java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
+          java -cp android_spike/build/classes dev.mygpt.spike.SpinePackageLayoutSmoke
   android-debug-host:
     if: github.repository == 'Jvust/mygpt'
     runs-on: ubuntu-24.04
@@ -70,7 +73,7 @@ jobs:
           gradle -p android_spike :app:assembleDebug --no-daemon
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: mygpt-synthetic-android-spike
+          name: mygpt-spine-3714430278-android-spike
           path: android_spike/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 3
