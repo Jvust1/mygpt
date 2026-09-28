@@ -24,6 +24,30 @@ on:
       - 'package.json'
       - 'scripts/serve.mjs'
       - '.github/workflows/host-ui-acceptance.yml'
+  pull_request:
+    branches: [codex/progress-mygpt-20260927, feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925]
+    paths:
+      - 'host/**'
+      - 'companion/**'
+      - 'brain/mygpt_brain/local_service.py'
+      - 'brain/mygpt_brain/local_engine.py'
+      - 'brain/mygpt_brain/selection*.py'
+      - 'brain/mygpt_brain/json_boundary.py'
+      - 'brain/mygpt_brain/core.py'
+      - 'tests/selection-*.mjs'
+      - 'tests/selection-browser.cjs'
+      - 'brain/mygpt_brain/adapters.py'
+      - 'brain/mygpt_brain/host_fixtures.py'
+      - 'brain/requirements-linux-py313.lock'
+      - 'tests/host-*.mjs'
+      - 'tests/host-browser.cjs'
+      - 'tests/brain-*.mjs'
+      - 'tests/brain-host-browser.cjs'
+      - 'tests/browser.cjs'
+      - 'tests/atlas.test.mjs'
+      - 'package.json'
+      - 'scripts/serve.mjs'
+      - '.github/workflows/host-ui-acceptance.yml'
 permissions:
   contents: read
 concurrency:
