@@ -1,6 +1,6 @@
 # Android integration spike: Book → coordinator → Live cue
 
-This contains a dependency-free Java 8 core and a small Android device test host. The host builds a **synthetic debug APK** to exercise the coordinator. It is not an authenticated Book integration, a Live renderer, or a model/voice implementation. It contains no imported upstream code or assets.
+This contains a dependency-free Java 8 core and a small Android device test host. The host builds a **synthetic debug APK** to exercise the coordinator and a private evaluation renderer for selected Live skin 3714430278. It is not an authenticated Book integration or a model/voice implementation. The skin bytes remain external and are selected through Android SAF; the APK includes the Spine runtime dependency only for this license-gated private evaluation path.
 
 The host must implement `VerifiedBookPort` using Book's actual local authority and short-lived lease checks before forwarding a projected event. The current Book lease receiver (`brain/mygpt_brain/book_bridge.py`) authenticates explicit selected content for a TestModel reply; it does **not** yet emit this study-event stream. This spike does not infer an event from a screenshot or accept arbitrary HTTP JSON as Book authority. Only opaque `book-lease://` references enter the coordinator; text, notes and answers stay in Book.
 
@@ -22,7 +22,7 @@ Next implementation gate: in a Book Android and mygpt Android test host, prove t
 
 ## Android test host
 
-`android_spike/app` is a separate package (`dev.mygpt.spike`) with no permissions, no internet access and no automatic model calls. Every button says it simulates Book activity; its authority callback is an in-memory test double that can be revoked. The visible character area is text, not a Live skin. Leaving the Activity foreground or locking the device clears the session and this-session supervision opt-in. A 30-second synthetic event deadline also clears a visible cue without waiting for another button press.
+`android_spike/app` is a separate package (`dev.mygpt.spike`) with no permissions, no internet access and no automatic model calls. Every button says it simulates Book activity; its authority callback is an in-memory test double that can be revoked. The host now includes a GPU-backed Spine rendering surface; the separate text label remains only as a readable cue fallback. Leaving the Activity foreground or locking the device clears the session and this-session supervision opt-in. A 30-second synthetic event deadline also clears a visible cue without waiting for another button press.
 
 With Android SDK 35, JDK 17 and Gradle 8.13 installed:
 
@@ -43,7 +43,7 @@ Primary runtime files:
 - `c610_00.png` — atlas texture.
 - `lpk_files.json` — package identity and decrypted-name mapping.
 
-The first implemented Android renderer uses `spine-libgdx:4.1.0` and libGDX 1.11.x-compatible APIs. The Activity uses Android's Storage Access Framework to let the user select the already-decrypted ZIP. The app stores only a persisted URI grant plus a verified local extraction in app-private storage; no broad storage permission is requested.
+The first implemented Android renderer uses `spine-libgdx:4.1.0` and libGDX 1.10.0. The Activity uses Android's Storage Access Framework to let the user select the already-decrypted ZIP. The app stores only a persisted URI grant plus a verified local extraction in app-private storage; no broad storage permission is requested.
 
 Before rendering, `SpinePackageLayout` rejects path traversal/nested entries, duplicate required files, oversized decompression, wrong skin ID, missing required resources, and non-4.1 skeleton versions. The renderer then loads `skeleton.bin` + `c610_00.atlas` and displays the skeleton on a GPU-backed libGDX surface.
 
@@ -57,3 +57,15 @@ The decrypted package also advertises tap motions including `etc`, `no`, `pain`,
 
 **Verification boundary:** implementation is now in PR #10, but this renderer is not called CI-verified or device-verified until the new exact-head workflow and a physical Android device both pass. Book events are still synthetic. Production redistribution is separately gated by the Spine Runtimes license.
 
+
+### Exact selected package identity
+
+- ZIP SHA-256: `eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+- ZIP bytes: 12,342,220
+- Uncompressed bytes: 12,340,902
+- Entries: 13
+- ZIP CRC: PASS
+- Spine binary: 4.1.20
+- First Android ABI: arm64-v8a
+
+The importer rejects any archive whose SHA-256 does not match the selected Live package before extraction.
