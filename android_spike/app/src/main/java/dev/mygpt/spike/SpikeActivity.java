@@ -136,16 +136,16 @@ public final class SpikeActivity extends AndroidApplication {
             try (InputStream input = getContentResolver().openInputStream(uri)) {
                 if (input == null) throw new IllegalStateException("无法打开所选文件");
                 File skinRoot = new File(getFilesDir(), "skins");
-                File packageFile = new File(skinRoot, SpinePackageLayout.SKIN_ID + ".zip");
-                SpinePackageLayout.cacheVerifiedPackage(input, packageFile);
                 File target = new File(skinRoot, SpinePackageLayout.SKIN_ID);
-                SpinePackageLayout.InstalledSkin installed = SpinePackageLayout.install(packageFile, target);
+                SpinePackageLayout.InstalledSkin installed = SpinePackageLayout.install(input, target);
                 if (remember) {
                     getSharedPreferences(PREFS, MODE_PRIVATE).edit()
                             .putString(PREF_SKIN_URI, uri.toString()).apply();
                 }
                 runOnUiThread(() -> {
-                    status.setText("校验通过 · Spine " + installed.spineVersion + " · 正在进入渲染器");
+                    status.setText("校验通过 · Spine " + installed.spineVersion
+                            + " · SHA " + installed.archiveSha256.substring(0, 12)
+                            + "… · 正在进入渲染器");
                     characterRuntime.load(installed.directory);
                 });
             } catch (Throwable error) {
