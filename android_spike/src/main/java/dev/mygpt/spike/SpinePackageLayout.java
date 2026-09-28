@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -47,6 +49,61 @@ public final class SpinePackageLayout {
             this.directory = directory;
             this.spineVersion = spineVersion;
             this.archiveSha256 = archiveSha256;
+        }
+    }
+
+    /** Copies the selected package into app-private storage and verifies the exact Live asset identity. */
+    public static File cacheVerifiedPackage(InputStream source, File destination) throws IOException {
+        if (source == null) throw new IllegalArgumentException("source cannot be null");
+        if (destination == null) throw new IllegalArgumentException("destination cannot be null");
+        File parent = destination.getParentFile();
+        if (parent == null) throw new IOException("package destination must have a parent");
+        if (!parent.exists() && !parent.mkdirs()) throw new IOException("cannot create package parent");
+
+        File partial = new File(parent, destination.getName() + ".partial");
+        if (partial.exists() && !partial.delete()) throw new IOException("cannot replace partial package");
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException impossible) {
+            throw new IOException("SHA-256 unavailable", impossible);
+        }
+
+        long total = 0L;
+        byte[] buffer = new byte[32 * 1024];
+        try (BufferedInputStream in = new BufferedInputStream(source);
+             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(partial))) {
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                total += read;
+                if (total > MAX_PACKAGE_BYTES) throw new IOException("package exceeds size limit");
+                digest.update(buffer, 0, read);
+                out.write(buffer, 0, read);
+            }
+        } catch (IOException error) {
+            partial.delete();
+            throw error;
+        }
+
+        String actual = hex(digest.digest());
+        if (!EXPECTED_ZIP_SHA256.equals(actual)) {
+            partial.delete();
+            throw new IOException("package SHA-256 mismatch: " + actual);
+        }
+        if (destination.exists() && !destination.delete()) {
+            partial.delete();
+            throw new IOException("cannot replace cached package");
+        }
+        if (!partial.renameTo(destination)) {
+            partial.delete();
+            throw new IOException("cannot promote cached package");
+        }
+        return destination;
+    }
+
+    public static InstalledSkin install(File packageFile, File targetDirectory) throws IOException {
+        try (FileInputStream input = new FileInputStream(packageFile)) {
+            return install(input, targetDirectory);
         }
     }
 
@@ -168,6 +225,12 @@ public final class SpinePackageLayout {
             throw error;
         }
         return hex(digest.digest());
+    }
+
+    private static String hex(byte[] value) {
+        StringBuilder out = new StringBuilder(value.length * 2);
+        for (byte b : value) out.append(String.format("%02x", b & 0xff));
+        return out.toString();
     }
 
     private static String readUtf8(File file) throws IOException {
