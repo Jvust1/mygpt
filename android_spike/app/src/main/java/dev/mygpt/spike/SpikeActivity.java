@@ -1,7 +1,8 @@
 package dev.mygpt.spike;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,12 +14,24 @@ import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-/** Installable device harness. Every Book event here is explicitly synthetic. */
-public final class SpikeActivity extends Activity {
+import com.badlogic.gdx.backends.android.AndroidApplication;
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+
+import java.io.File;
+import java.io.InputStream;
+
+/** Installable device harness. Book events remain synthetic; Live skin 3714430278 can now be imported and rendered. */
+public final class SpikeActivity extends AndroidApplication {
+    private static final int OPEN_SKIN_REQUEST = 3714;
+    private static final String PREFS = "mygpt_spike";
+    private static final String PREF_SKIN_URI = "skin_3714430278_uri";
+
     private CompanionCoordinator coordinator;
     private TextView character;
     private TextView status;
     private Switch optIn;
+    private SpineSkinApplication spineApp;
+    private SpineCharacterRuntime characterRuntime;
     private final Handler expiryHandler = new Handler(Looper.getMainLooper());
     private Runnable pendingExpiry;
     private long epoch;
@@ -28,6 +41,7 @@ public final class SpikeActivity extends Activity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+
         LinearLayout column = new LinearLayout(this);
         column.setOrientation(LinearLayout.VERTICAL);
         column.setPadding(24, 32, 24, 32);
@@ -36,21 +50,33 @@ public final class SpikeActivity extends Activity {
         scroll.addView(column);
         setContentView(scroll);
 
-        TextView title = label("MyGPT · Android 集成测试", 25, Color.rgb(43, 54, 43));
+        TextView title = label("MyGPT · 3714430278 Android 渲染测试", 24, Color.rgb(43, 54, 43));
         column.addView(title);
-        TextView notice = label("仅合成事件演示。未接入 Book Android、Live 角色、模型或语音。", 15,
-                Color.rgb(120, 63, 41));
+        TextView notice = label("Book 事件仍为合成测试；人物包使用已解密 3714430278.zip。"
+                + " Spine Runtime 当前仅用于私有调试评估。", 14, Color.rgb(120, 63, 41));
         column.addView(notice);
-        character = label("静默陪伴", 27, Color.rgb(52, 91, 70));
+
+        character = label("3714430278 · 静默陪伴", 18, Color.rgb(52, 91, 70));
         character.setGravity(Gravity.CENTER);
-        character.setPadding(16, 40, 16, 40);
-        character.setBackgroundColor(Color.rgb(229, 237, 225));
-        column.addView(character, new LinearLayout.LayoutParams(-1, 170));
-        status = label("等待模拟会话", 15, Color.DKGRAY);
+        character.setPadding(16, 16, 16, 16);
+        column.addView(character, new LinearLayout.LayoutParams(-1, 80));
+
+        status = label("请选择 3714430278.zip；选择一次后会记住该文件授权。", 14, Color.DKGRAY);
         column.addView(status);
 
-        coordinator = new CompanionCoordinator((event, nowMs) -> !revoked,
-                cue -> character.setText(cueText(cue)));
+        spineApp = new SpineSkinApplication(message -> runOnUiThread(() -> status.setText(message)));
+        AndroidApplicationConfiguration graphics = new AndroidApplicationConfiguration();
+        graphics.useAccelerometer = false;
+        graphics.useCompass = false;
+        graphics.useGyroscope = false;
+        View spineView = initializeForView(spineApp, graphics);
+        column.addView(spineView, new LinearLayout.LayoutParams(-1, 760));
+
+        characterRuntime = new SpineCharacterRuntime(spineApp, character);
+        coordinator = new CompanionCoordinator((event, nowMs) -> !revoked, characterRuntime);
+
+        addButton(column, "选择 / 更换 3714430278.zip", this::openSkinPackage);
+
         optIn = new Switch(this);
         optIn.setText("允许轻量学习提醒（仅本次演示）");
         optIn.setOnCheckedChangeListener((button, checked) -> coordinator.setSupervisionOptIn(checked));
@@ -74,6 +100,57 @@ public final class SpikeActivity extends Activity {
         addButton(column, "撤销模拟授权", () ->
                 clearDemoSession("模拟授权已撤销；会话与提醒许可已清除"));
         addButton(column, "结束会话", () -> send(CompanionCoordinator.Kind.SESSION_ENDED, null));
+
+        String persisted = getSharedPreferences(PREFS, MODE_PRIVATE).getString(PREF_SKIN_URI, null);
+        if (persisted != null) loadSkin(Uri.parse(persisted), false);
+    }
+
+    private void openSkinPackage() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                new String[]{"application/zip", "application/x-zip", "application/octet-stream"});
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        startActivityForResult(intent, OPEN_SKIN_REQUEST);
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != OPEN_SKIN_REQUEST || resultCode != RESULT_OK || data == null
+                || data.getData() == null) return;
+        Uri uri = data.getData();
+        try {
+            int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            getContentResolver().takePersistableUriPermission(uri, flags);
+        } catch (SecurityException ignored) {
+            // Some providers do not offer persistable grants; current-session loading can still proceed.
+        }
+        loadSkin(uri, true);
+    }
+
+    private void loadSkin(Uri uri, boolean remember) {
+        status.setText("正在校验并安装 3714430278.zip…");
+        new Thread(() -> {
+            try (InputStream input = getContentResolver().openInputStream(uri)) {
+                if (input == null) throw new IllegalStateException("无法打开所选文件");
+                File target = new File(new File(getFilesDir(), "skins"), SpinePackageLayout.SKIN_ID);
+                SpinePackageLayout.InstalledSkin installed = SpinePackageLayout.install(input, target);
+                if (remember) {
+                    getSharedPreferences(PREFS, MODE_PRIVATE).edit()
+                            .putString(PREF_SKIN_URI, uri.toString()).apply();
+                }
+                runOnUiThread(() -> {
+                    status.setText("校验通过 · Spine " + installed.spineVersion + " · 正在进入渲染器");
+                    characterRuntime.load(installed.directory);
+                });
+            } catch (Throwable error) {
+                if (!remember) getSharedPreferences(PREFS, MODE_PRIVATE).edit().remove(PREF_SKIN_URI).apply();
+                runOnUiThread(() -> status.setText("3714430278 导入失败："
+                        + error.getClass().getSimpleName() + " · " + safeMessage(error)));
+            }
+        }, "mygpt-skin-import").start();
     }
 
     @Override protected void onStop() {
@@ -150,12 +227,8 @@ public final class SpikeActivity extends Activity {
         parent.addView(button, new LinearLayout.LayoutParams(-1, -2));
     }
 
-    private String cueText(CompanionCoordinator.Cue cue) {
-        switch (cue) {
-            case PAUSED: return "学习暂停中";
-            case NEEDS_INPUT: return "我在这里 · 等待提问";
-            case GENTLE_CHECK_IN: return "要一起看看哪里卡住了吗？";
-            default: return "静默陪伴";
-        }
+    private static String safeMessage(Throwable error) {
+        String message = error.getMessage();
+        return message == null ? "无详细信息" : message;
     }
 }
