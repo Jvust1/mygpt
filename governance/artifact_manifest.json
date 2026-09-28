@@ -308,6 +308,24 @@
       "purpose": "Isolated synthetic Android host with session and supervision clearing on background, revoke, end and expiry; not Book/Live integration or device acceptance.",
       "status": "current_review_candidate",
       "verification": "Push and PR CI Java 8 smoke and Android assembleDebug passed. Artifact ZIP SHA-256 464ba406dc5704042473bc11e4932a984eeed09554b2dd1655aa2b80a588c5ea; ZIP and APK CRC checked. Extracted APK SHA-256 and Drive metadata name/size/parent checked."
+    },
+    {
+      "artifact_id": "mygpt-android-lifecycle-review-bundle-20260928",
+      "file_name": "mygpt-android-lifecycle-review-bundle-eef4d8e.zip",
+      "type": "source_delta_review_bundle",
+      "drive_file_id_or_path": "16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a",
+      "size_bytes": 21323,
+      "version": "android-lifecycle-review-bundle-eef4d8e",
+      "created_at": "2026-09-28",
+      "source": "assistant_generated_review_bundle",
+      "related_branch": "feat/android-companion-boundary-20260928",
+      "related_commit": "986b7b39cf0eda54e74e096f701d4b132c5bbdd9",
+      "workflow_run": "https://github.com/Jvust/mygpt/actions/runs/36369310978",
+      "purpose": "Review bundle of Android spike source/config, CI workflow and synthetic APK. It is a changed-files package, not a full repository source snapshot.",
+      "status": "current_review_candidate",
+      "verification": "ZIP CRC passed; SHA-256 verified locally. Includes APK matching artifact manifest entry mygpt-android-synthetic-spike-lifecycle-20260928."
     }
   ],
   "notes": [

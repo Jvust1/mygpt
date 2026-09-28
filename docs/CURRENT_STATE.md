@@ -1,3 +1,17 @@
+## Android 生命周期成果归档补充
+
+当前 GitHub 分支头：`986b7b39cf0eda54e74e096f701d4b132c5bbdd9`，Draft PR #10 保持未合并。
+
+- 最新合成 Android debug APK：Drive 文件 ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`，14,913 bytes，SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`。
+- 变更文件评审包：Drive 文件 ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`，21,323 bytes，SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`。它包含 Android 测试宿主变更和 APK，不是完整仓库快照；完整源码以 GitHub 分支为准。
+- Java 8 smoke 与 Android `:app:assembleDebug` 已通过 push run `36369308484` 和 PR run `36369310978`。
+- 离开前台、撤销、结束或到期时清除合成会话；本次提醒授权须重新开启。
+- 真机生命周期验收、Book 真实学习事件和 Live 角色渲染仍待完成。
+
+此补充更新本收据上一次同步时“没有 APK 或测试产物”的状态描述；上文作为当时同步记录保留。
+
+---
+
 ## 2026-09-28 Android 宿主生命周期修复（CI 通过，真机待验）
 
 `feat/android-companion-boundary-20260928@eef4d8e`、Draft PR #10：离开前台或锁屏即清除合成会话，到期后无需后续事件也收起提示；撤销、结束或新会话均需重新开启本次提醒。push run [`36369308484`](https://github.com/Jvust/mygpt/actions/runs/36369308484) 与 PR run [`36369310978`](https://github.com/Jvust/mygpt/actions/runs/36369310978) 的 Java 8 smoke、Android debug 构建成功。当前 APK 14,913 bytes，SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`，Drive 文件 ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`；上一版保留为历史候选。仍未在真机上安装操作，Book 真实学习事件与 Live 角色均未接入。

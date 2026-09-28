@@ -536,7 +536,14 @@
         "sha256": "78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed",
         "size_bytes": 14913
       },
-      "lifecycle": "BACKGROUND_REVOKES_SESSION; EXPIRY_CLEARS_CUE; SUPERVISION_RECONSENT_PER_SESSION; CI_PASS_DEVICE_PENDING"
+      "lifecycle": "BACKGROUND_REVOKES_SESSION; EXPIRY_CLEARS_CUE; SUPERVISION_RECONSENT_PER_SESSION; CI_PASS_DEVICE_PENDING",
+      "review_bundle": {
+        "drive_file_id": "16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq",
+        "file_name": "mygpt-android-lifecycle-review-bundle-eef4d8e.zip",
+        "sha256": "c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a",
+        "size_bytes": 21323,
+        "type": "changed_files_review_package_not_full_source_snapshot"
+      }
     }
   }
 }
