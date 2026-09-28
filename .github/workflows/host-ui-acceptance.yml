@@ -21,6 +21,31 @@ on:
       - 'tests/brain-host-browser.cjs'
       - 'tests/browser.cjs'
       - 'tests/atlas.test.mjs'
+      - 'package.json'
+      - 'scripts/serve.mjs'
+      - '.github/workflows/host-ui-acceptance.yml'
+  pull_request:
+    branches: [codex/progress-mygpt-20260927, feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925]
+    paths:
+      - 'host/**'
+      - 'companion/**'
+      - 'brain/mygpt_brain/local_service.py'
+      - 'brain/mygpt_brain/local_engine.py'
+      - 'brain/mygpt_brain/selection*.py'
+      - 'brain/mygpt_brain/json_boundary.py'
+      - 'brain/mygpt_brain/core.py'
+      - 'tests/selection-*.mjs'
+      - 'tests/selection-browser.cjs'
+      - 'brain/mygpt_brain/adapters.py'
+      - 'brain/mygpt_brain/host_fixtures.py'
+      - 'brain/requirements-linux-py313.lock'
+      - 'tests/host-*.mjs'
+      - 'tests/host-browser.cjs'
+      - 'tests/brain-*.mjs'
+      - 'tests/brain-host-browser.cjs'
+      - 'tests/browser.cjs'
+      - 'tests/atlas.test.mjs'
+      - 'package.json'
       - 'scripts/serve.mjs'
       - '.github/workflows/host-ui-acceptance.yml'
 permissions:
@@ -63,11 +88,11 @@ jobs:
           cp "$RUNNER_TEMP/host-tools/package-lock.json" "$RUNNER_TEMP/host-evidence/npm-package-lock.json"
           node "$RUNNER_TEMP/host-tools/node_modules/playwright/cli.js" install --with-deps chromium
           sudo apt-get install -y fonts-noto-cjk
-      - name: Run Node contract/controller/atlas tests
+      - name: Run all Node unit tests
         shell: bash
         run: |
           set -euo pipefail
-          node --test tests/atlas.test.mjs tests/host-controller.test.mjs tests/brain-adapter.test.mjs tests/selection-controller.test.mjs | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
+          npm test | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
       - name: Run existing Jonah, replay host, and real loopback Python host checks serially
         shell: bash
         run: |
