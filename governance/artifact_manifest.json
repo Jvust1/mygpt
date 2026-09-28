@@ -270,6 +270,25 @@
       "purpose": "Current sync receipt for the Book Android + mygpt + Live end-state decision and 51-project upstream adoption registry. Historical ZIP artifacts preserved; no false full-source snapshot generated because this batch changed governance/docs rather than runtime code.",
       "status": "current_sync_receipt",
       "verification": "Google Docs content and Drive parent are read back after creation; GitHub manifest records the stable Drive file ID."
+    },
+    {
+      "artifact_id": "mygpt-android-synthetic-spike-debug-20260928",
+      "file_name": "mygpt-android-spike-debug-332e9a2.apk",
+      "type": "android_debug_apk",
+      "drive_file_id_or_path": "1HXRW8XBmHyG0lJtfP6FX3KvZ-SOCM8rY",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "2a80adbb5bab0187f2b42eba22a044f79552eb13336468cef9b176b9b2bced78",
+      "size_bytes": 14033,
+      "version": "synthetic-debug-332e9a2",
+      "created_at": "2026-09-28",
+      "source": "github_actions_artifact",
+      "related_branch": "feat/android-companion-boundary-20260928",
+      "related_commit": "332e9a29578428b56048ac3851ee29cb74dc3492",
+      "workflow_run": "https://github.com/Jvust/mygpt/actions/runs/36368235878",
+      "workflow_artifact_id": 10947829161,
+      "purpose": "Installable isolated Android test host with explicit synthetic Book event buttons, Java boundary coordinator and text cue placeholder; no actual Book or Live integration, model, voice or network.",
+      "status": "review_candidate",
+      "verification": "Push CI Java 8 smoke and Android assembleDebug passed; GitHub artifact ZIP digest 6e6f490df0ce0b6e166123446b95a9dafb954c74f80f258cb00a2cce95bff98f and CRC checked. Extracted APK SHA-256 and Drive identity/size checked; physical-device acceptance pending."
     }
   ],
   "notes": [
