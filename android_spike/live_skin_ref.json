@@ -30,7 +30,11 @@
       "size_bytes": 12342220,
       "format_role": "decrypted_lpk_runtime_package",
       "direct_use": true,
-      "preferred": true
+      "preferred": true,
+      "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+      "entries": 13,
+      "uncompressed_bytes": 12340902,
+      "zip_crc": "PASS"
     }
   },
   "policy": {
@@ -40,7 +44,11 @@
     "renderer_status": "SPINE_4_1_IMPLEMENTED_CI_AND_DEVICE_PENDING",
     "preferred_runtime_input": "3714430278.zip",
     "requires_decryption_before_use": false,
-    "distribution_status": "LICENSE_REVIEW_REQUIRED_BEFORE_REDISTRIBUTION"
+    "distribution_status": "LICENSE_REVIEW_REQUIRED_BEFORE_REDISTRIBUTION",
+    "android_first_abi": "arm64-v8a",
+    "runtime_dependency": "com.esotericsoftware.spine:spine-libgdx:4.1.0",
+    "gdx_version": "1.10.0",
+    "runtime_license": "Spine Runtimes License Agreement; distribution remains license-gated"
   },
   "format": {
     "family": "Spine",
@@ -78,5 +86,18 @@
       "NEEDS_INPUT": "smile",
       "GENTLE_CHECK_IN": "action"
     }
+  },
+  "detected_format": {
+    "engine": "Spine",
+    "skeleton_binary_version": "4.1.20",
+    "runtime_line": "4.1",
+    "main_skeleton": "skeleton.bin",
+    "main_atlas": "c610_00.atlas",
+    "main_texture": "c610_00.png",
+    "main_idle_animation": "idle",
+    "alternate_sets": [
+      "aim",
+      "cover"
+    ]
   }
 }
