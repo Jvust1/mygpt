@@ -31,3 +31,14 @@ gradle -p android_spike :app:assembleDebug --no-daemon
 ```
 
 The debug APK appears at `android_spike/app/build/outputs/apk/debug/app-debug.apk`. CI builds and uploads it as a short-lived test artifact. Do not use this package to assess actual Book transport, Live WPK animation, model teaching quality, or cross-app overlays.
+
+## Selected Live skin
+
+The first Android companion skin is **Live skin `3714430278`**. The canonical asset remains in the Live project/Drive; mygpt stores only a reference in `android_spike/live_skin_ref.json` and does not duplicate the LPK bytes.
+
+Current source assets:
+- `3714430278.lpk` — Live authoritative package
+- `config.json` — Live skin configuration
+- `20260426152945.png` — preview
+
+The Android spike still uses a text placeholder until an LPK-capable `CharacterRuntime` is bound and validated on-device. Selecting this skin does not claim that rendering is already implemented.
