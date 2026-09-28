@@ -1,15 +1,6 @@
-## Android 生命周期成果归档补充
+## 当前 Android 生命周期成果与源码快照
 
-GitHub 分支头：bf996e6e64c3f4d078102d337be31480dedf2f88；Draft PR #10 保持打开、未合并。
-
-- 完整源码快照：Drive 文件 ID 1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy；1,954,056 bytes；SHA-256 006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc。快照含 131 个受跟踪文件，与该分支路径清单一致。
-- 最新合成 Android debug APK：Drive 文件 ID 1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG；14,913 bytes；SHA-256 78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed。
-- 变更文件评审包：Drive 文件 ID 16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq；21,323 bytes；SHA-256 c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a。
-- Java 8 smoke 与 Android assembleDebug 已通过 push run 36369308484、PR run 36369310978。
-- 离开前台、撤销、结束或到期时清除合成会话；新会话需重新开启提醒授权。
-- 真机验证、Book 真实学习事件与 Live 角色渲染仍待完成。
-
-本补充更新上文原同步时“没有 APK 或测试产物”的状态；上文保留为当时记录。
+项目分支 `feat/android-companion-boundary-20260928` 持续保持 Draft PR #10。最新代码验证：push run `36369308484` 与 PR run `36369310978` 的 Java 8 smoke、Android debug 构建通过。当前 debug APK Drive ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`（SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`）；完整源码快照 Drive ID `1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy`（commit `bf996e6e64c3f4d078102d337be31480dedf2f88`，131 tracked files，SHA-256 `006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc`）；变更文件评审包 Drive ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`（SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`）。真机生命周期验证及真实 Book/Live 接入仍待完成。
 
 ---
 
