@@ -4,8 +4,8 @@
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/spine-3714430278-runtime-final-20260928",
-  "phase": "ANDROID_SPINE_3714430278_RUNTIME_REVIEW",
-  "status": "SPINE_3714430278_RUNTIME_EXACT_CI_PENDING_DEVICE_PENDING",
+  "phase": "ANDROID_SPINE_3714430278_RUNTIME_CI_VERIFIED",
+  "status": "SPINE_3714430278_RUNTIME_CI_PASS_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Run exact-head CI on the clean Spine 3714430278 review branch. If green, merge only this bounded renderer delta into PR #10, then install the debug APK on Xiaomi 14 and validate first frame, idle, cue transitions, background/reopen and exact-package rejection.",
+  "next_step": "Install the CI-verified debug APK on Xiaomi 14, select the exact SHA-256 verified Live 3714430278.zip, and validate first frame, idle, NEEDS_INPUT/action cues, pause/resume, background/reopen and wrong-package rejection. After device acceptance, connect the genuine trusted Book Android study-event producer.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -501,7 +501,7 @@
     "branch": "feat/android-companion-boundary-20260928",
     "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
     "scope": "Pure Java 8 Book event coordinator, renderer-neutral Live cue port, and isolated synthetic Android debug host",
-    "verification": "PR10_BASELINE_CI_PASS; CLEAN_SPINE_RUNTIME_DELTA_EXACT_HEAD_CI_PENDING",
+    "verification": "SPINE_3714430278_JAVA8_AND_ANDROID_CI_PASS_NATIVE_PAYLOAD_VERIFIED_DEVICE_PENDING",
     "book_live_transport": "NOT_CONNECTED",
     "apk": "DEBUG_APK_BUILT_SYNTHETIC_DEVICE_PENDING",
     "provider_calls": 0,
@@ -555,8 +555,29 @@
       },
       "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
       "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
-      "renderer_ci_run": null,
-      "renderer_ci_status": "PENDING_CLEAN_BRANCH_EXACT_HEAD"
+      "renderer_ci_run": 36449606217,
+      "renderer_ci_status": "SUCCESS",
+      "renderer_ci_source_commit": "631d573943a11d7f3946d162a7d7e952f482a559",
+      "renderer_ci_jobs": {
+        "java8_boundary": "SUCCESS",
+        "android_debug_host": "SUCCESS",
+        "native_payload_check": "SUCCESS"
+      },
+      "renderer_artifact": {
+        "github_artifact_id": 10981983241,
+        "github_artifact_name": "mygpt-spine-3714430278-android-spike",
+        "github_artifact_digest": "sha256:46000a6a99621d9a54ed05675344b305fd8f1c4678cd5f26b21cd166005ac957",
+        "github_artifact_size_bytes": 1257410,
+        "github_expires_at": "2026-10-01T16:16:34Z",
+        "drive_archive_id": "1keutv3dGtexS2mMYoV8ptF7sOpq5f-7H",
+        "drive_archive_name": "mygpt-spine-3714430278-android-spike-run36449606217.zip",
+        "apk_name": "app-debug.apk",
+        "apk_size_bytes": 1381959,
+        "apk_sha256": "44bb4863c944c05e0acb30a7be9df6b9751b3600fc144e05812f4ee74d68fae2",
+        "arm64_libgdx_present": true,
+        "spine_license_notice_present": true,
+        "classes_dex_present": true
+      }
     },
     "selected_live_skin": {
       "skin_id": "3714430278",
@@ -596,11 +617,13 @@
         "runtime": "spine-libgdx",
         "runtime_version": "4.1.0",
         "libgdx_line": "1.10.0",
-        "status": "IMPLEMENTED_CLEAN_BRANCH_CI_PENDING_DEVICE_PENDING",
+        "status": "CI_VERIFIED_DEVICE_PENDING",
         "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION",
         "abi": "arm64-v8a",
         "native_packaging": "lib/arm64-v8a/libgdx.so from gdx-platform:1.10.0:natives-arm64-v8a",
-        "license_notice_path": "android_spike/app/src/main/assets/SPINE_RUNTIME_LICENSE.txt"
+        "license_notice_path": "android_spike/app/src/main/assets/SPINE_RUNTIME_LICENSE.txt",
+        "ci_run": 36449606217,
+        "apk_sha256": "44bb4863c944c05e0acb30a7be9df6b9751b3600fc144e05812f4ee74d68fae2"
       },
       "motion_mapping": {
         "QUIET": "idle",
