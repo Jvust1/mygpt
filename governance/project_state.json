@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Finish exact-head CI for the Spine 4.1 renderer. If green, install the resulting debug APK on a physical Android device, select Live decrypted package 3714430278.zip, verify first frame/idle/cue transitions/background-reopen, then connect the genuine trusted Book Android study-event producer.",
+  "next_step": "Run exact-head CI for feat/spine-3714430278-runtime-20260928, verify the APK contains arm64 libgdx.so, then install on Xiaomi 14 and select the exact SHA-256 verified 3714430278.zip for first-frame/idle/cue validation.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -501,7 +501,7 @@
     "branch": "feat/android-companion-boundary-20260928",
     "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
     "scope": "Pure Java 8 Book event coordinator, renderer-neutral Live cue port, and isolated synthetic Android debug host",
-    "verification": "PREVIOUS_BOUNDARY_CI_PASS; NEW_SPINE_RENDERER_EXACT_HEAD_CI_PENDING",
+    "verification": "PREVIOUS_BOUNDARY_CI_PASS; SPINE_3714430278_RUNTIME_BRANCH_CI_PENDING",
     "book_live_transport": "NOT_CONNECTED",
     "apk": "DEBUG_APK_BUILT_SYNTHETIC_DEVICE_PENDING",
     "provider_calls": 0,
@@ -556,7 +556,7 @@
       "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
       "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
       "renderer_ci_run": 36448236193,
-      "renderer_ci_status": "QUEUED_AT_LAST_CHECK"
+      "renderer_ci_status": "PENDING_ON_SPINE_RUNTIME_BRANCH"
     },
     "selected_live_skin": {
       "skin_id": "3714430278",
@@ -573,7 +573,10 @@
         "size_bytes": 12342220,
         "status": "DECRYPTED_LPK_READY_FOR_DIRECT_USE",
         "preferred_runtime_input": true,
-        "requires_decryption": false
+        "requires_decryption": false,
+        "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+        "entries": 13,
+        "uncompressed_bytes": 12340902
       },
       "original_lpk_role": "source identity only; runtime should prefer decrypted zip",
       "format": "Spine",
@@ -590,9 +593,11 @@
       "renderer_candidate": {
         "runtime": "spine-libgdx",
         "runtime_version": "4.1.0",
-        "libgdx_line": "1.11.0",
-        "status": "IMPLEMENTED_PENDING_EXACT_HEAD_CI_AND_DEVICE",
-        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION"
+        "libgdx_line": "1.10.0",
+        "status": "IMPLEMENTED_EXACT_HEAD_CI_PENDING_DEVICE_PENDING",
+        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION",
+        "abi": "arm64-v8a",
+        "native_packaging": "libgdx.so bundled from gdx-platform natives-arm64-v8a"
       },
       "motion_mapping": {
         "QUIET": "idle",
