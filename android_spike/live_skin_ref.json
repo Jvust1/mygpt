@@ -1,0 +1,34 @@
+{
+  "schema_version": "mygpt_live_skin_ref_v1",
+  "selected": true,
+  "role": "default_first_android_companion_skin",
+  "skin_id": "3714430278",
+  "authority": {
+    "repository": "Jvust/Live",
+    "drive_folder_id": "1StRk6RJ2N8l5-Q0ogpPHFcb1uviOJYCh",
+    "asset_package": {
+      "name": "3714430278.lpk",
+      "drive_file_id": "1g0UAayGcezBHKywrSNIdYh9GyCaWZ7G2",
+      "size_bytes": 12557305
+    },
+    "config": {
+      "name": "config.json",
+      "drive_file_id": "1O87dhnMOs2faZvFMWepm2DM-1Lqa51RW"
+    },
+    "preview": {
+      "name": "20260426152945.png",
+      "drive_file_id": "1DwSlVnuGPp6EAOAnECSkNfm0mZeExTZx"
+    },
+    "archive": {
+      "name": "3714430278.zip",
+      "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+      "size_bytes": 12342220
+    }
+  },
+  "policy": {
+    "copy_assets_into_mygpt": false,
+    "live_remains_asset_authority": true,
+    "mygpt_stores_reference_only": true,
+    "renderer_status": "PENDING_LPK_RUNTIME_BINDING_AND_DEVICE_VALIDATION"
+  }
+}
