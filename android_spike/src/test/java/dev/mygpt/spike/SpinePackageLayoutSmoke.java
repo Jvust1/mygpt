@@ -48,7 +48,7 @@ public final class SpinePackageLayoutSmoke {
     private static byte[] validZip() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (ZipOutputStream zip = new ZipOutputStream(out)) {
-            put(zip, "model.json", "{\"type\":9}");
+            put(zip, "model.json", "{\"type\":9,\"motions\":{\"idle\":[{\"file\":\"idle\"}]}}");
             put(zip, "skeleton.bin", "hash-prefix\\u00074.1.20-data");
             put(zip, "c610_00.atlas", "c610_00.png\nsize:1,1\npma:true\n");
             putBytes(zip, "c610_00.png", new byte[]{1,2,3,4});
