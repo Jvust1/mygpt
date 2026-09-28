@@ -11,8 +11,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -25,6 +23,7 @@ public final class SpinePackageLayout {
     public static final String SKIN_ID = "3714430278";
     public static final String EXPECTED_ARCHIVE_SHA256 =
             "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f";
+
     private static final long MAX_ARCHIVE_BYTES = 16L * 1024L * 1024L;
     private static final long MAX_ENTRY_BYTES = 8L * 1024L * 1024L;
     private static final long MAX_TOTAL_EXTRACTED_BYTES = 20L * 1024L * 1024L;
@@ -45,6 +44,7 @@ public final class SpinePackageLayout {
         public final File directory;
         public final String spineVersion;
         public final String archiveSha256;
+
         InstalledSkin(File directory, String spineVersion, String archiveSha256) {
             this.directory = directory;
             this.spineVersion = spineVersion;
@@ -52,69 +52,17 @@ public final class SpinePackageLayout {
         }
     }
 
-    /** Copies the selected package into app-private storage and verifies the exact Live asset identity. */
-    public static File cacheVerifiedPackage(InputStream source, File destination) throws IOException {
-        if (source == null) throw new IllegalArgumentException("source cannot be null");
-        if (destination == null) throw new IllegalArgumentException("destination cannot be null");
-        File parent = destination.getParentFile();
-        if (parent == null) throw new IOException("package destination must have a parent");
-        if (!parent.exists() && !parent.mkdirs()) throw new IOException("cannot create package parent");
-
-        File partial = new File(parent, destination.getName() + ".partial");
-        if (partial.exists() && !partial.delete()) throw new IOException("cannot replace partial package");
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException impossible) {
-            throw new IOException("SHA-256 unavailable", impossible);
-        }
-
-        long total = 0L;
-        byte[] buffer = new byte[32 * 1024];
-        try (BufferedInputStream in = new BufferedInputStream(source);
-             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(partial))) {
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                total += read;
-                if (total > MAX_PACKAGE_BYTES) throw new IOException("package exceeds size limit");
-                digest.update(buffer, 0, read);
-                out.write(buffer, 0, read);
-            }
-        } catch (IOException error) {
-            partial.delete();
-            throw error;
-        }
-
-        String actual = hex(digest.digest());
-        if (!EXPECTED_ZIP_SHA256.equals(actual)) {
-            partial.delete();
-            throw new IOException("package SHA-256 mismatch: " + actual);
-        }
-        if (destination.exists() && !destination.delete()) {
-            partial.delete();
-            throw new IOException("cannot replace cached package");
-        }
-        if (!partial.renameTo(destination)) {
-            partial.delete();
-            throw new IOException("cannot promote cached package");
-        }
-        return destination;
-    }
-
-    public static InstalledSkin install(File packageFile, File targetDirectory) throws IOException {
-        try (FileInputStream input = new FileInputStream(packageFile)) {
-            return install(input, targetDirectory);
-        }
-    }
-
+    /** Production import path for the selected first skin: exact archive identity is mandatory. */
     public static InstalledSkin install(InputStream source, File targetDirectory) throws IOException {
         return install(source, targetDirectory, EXPECTED_ARCHIVE_SHA256);
     }
 
+    /** Package-private overload keeps deterministic tests independent of the private production ZIP. */
     static InstalledSkin install(InputStream source, File targetDirectory, String expectedSha256)
             throws IOException {
         if (source == null) throw new IllegalArgumentException("source cannot be null");
         if (targetDirectory == null) throw new IllegalArgumentException("targetDirectory cannot be null");
+
         File parent = targetDirectory.getParentFile();
         if (parent == null) throw new IOException("target directory must have a parent");
         if (!parent.exists() && !parent.mkdirs()) throw new IOException("cannot create skin parent");
@@ -127,7 +75,7 @@ public final class SpinePackageLayout {
         String archiveSha = copyAndDigest(source, archive);
         if (expectedSha256 != null && !expectedSha256.equalsIgnoreCase(archiveSha)) {
             deleteRecursively(archive);
-            throw new IOException("archive SHA-256 mismatch");
+            throw new IOException("archive SHA-256 mismatch: " + archiveSha);
         }
 
         if (!staging.mkdirs()) {
@@ -136,26 +84,31 @@ public final class SpinePackageLayout {
         }
 
         Set<String> found = new HashSet<String>();
-        long total = 0L;
-        try (ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(archive)))) {
+        long extractedTotal = 0L;
+        try (ZipInputStream zip = new ZipInputStream(
+                new BufferedInputStream(new FileInputStream(archive)))) {
             ZipEntry entry;
             byte[] buffer = new byte[32 * 1024];
             while ((entry = zip.getNextEntry()) != null) {
                 if (entry.isDirectory()) continue;
+
                 String name = normalizeFlatEntry(entry.getName());
                 if (!REQUIRED.contains(name)) continue;
                 if (!found.add(name)) throw new IOException("duplicate runtime entry: " + name);
                 if (entry.getSize() > MAX_ENTRY_BYTES) throw new IOException("entry too large: " + name);
 
                 File output = new File(staging, name);
-                long written = 0L;
-                try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
+                long entryBytes = 0L;
+                try (BufferedOutputStream out =
+                             new BufferedOutputStream(new FileOutputStream(output))) {
                     int read;
                     while ((read = zip.read(buffer)) != -1) {
-                        written += read;
-                        total += read;
-                        if (written > MAX_ENTRY_BYTES || total > MAX_TOTAL_EXTRACTED_BYTES)
+                        entryBytes += read;
+                        extractedTotal += read;
+                        if (entryBytes > MAX_ENTRY_BYTES
+                                || extractedTotal > MAX_TOTAL_EXTRACTED_BYTES) {
                             throw new IOException("decompressed size limit exceeded");
+                        }
                         out.write(buffer, 0, read);
                     }
                 }
@@ -164,9 +117,9 @@ public final class SpinePackageLayout {
             deleteRecursively(staging);
             deleteRecursively(archive);
             throw error;
+        } finally {
+            deleteRecursively(archive);
         }
-
-        deleteRecursively(archive);
 
         if (!found.containsAll(REQUIRED)) {
             Set<String> missing = new HashSet<String>(REQUIRED);
@@ -183,9 +136,17 @@ public final class SpinePackageLayout {
         }
 
         String model = readUtf8(new File(staging, "model.json"));
-        if (!model.contains("\"type\":9") && !model.contains("\"type\": 9")) {
+        if ((!model.contains("\"type\":9") && !model.contains("\"type\": 9"))
+                || !model.contains("\"idle\"")) {
             deleteRecursively(staging);
-            throw new IOException("skin model is not the expected Spine type");
+            throw new IOException("unexpected Spine model metadata");
+        }
+
+        String atlas = readUtf8(new File(staging, "c610_00.atlas"));
+        if (!atlas.startsWith("c610_00.png")
+                || (!atlas.contains("pma:true") && !atlas.contains("pma: true"))) {
+            deleteRecursively(staging);
+            throw new IOException("unexpected atlas identity or PMA setting");
         }
 
         String version = detectSpineVersion(new File(staging, "skeleton.bin"));
@@ -209,6 +170,7 @@ public final class SpinePackageLayout {
         } catch (NoSuchAlgorithmException impossible) {
             throw new IOException("SHA-256 unavailable", impossible);
         }
+
         byte[] buffer = new byte[32 * 1024];
         long total = 0L;
         try (BufferedInputStream in = new BufferedInputStream(source);
@@ -225,12 +187,6 @@ public final class SpinePackageLayout {
             throw error;
         }
         return hex(digest.digest());
-    }
-
-    private static String hex(byte[] value) {
-        StringBuilder out = new StringBuilder(value.length * 2);
-        for (byte b : value) out.append(String.format("%02x", b & 0xff));
-        return out.toString();
     }
 
     private static String readUtf8(File file) throws IOException {
