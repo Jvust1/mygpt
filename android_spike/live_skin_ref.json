@@ -37,8 +37,46 @@
     "copy_assets_into_mygpt": false,
     "live_remains_asset_authority": true,
     "mygpt_stores_reference_only": true,
-    "renderer_status": "READY_FOR_LPK_RUNTIME_BINDING_DEVICE_VALIDATION_PENDING",
+    "renderer_status": "SPINE_4_1_IMPLEMENTED_CI_AND_DEVICE_PENDING",
     "preferred_runtime_input": "3714430278.zip",
-    "requires_decryption_before_use": false
+    "requires_decryption_before_use": false,
+    "distribution_status": "LICENSE_REVIEW_REQUIRED_BEFORE_REDISTRIBUTION"
+  },
+  "format": {
+    "family": "Spine",
+    "export_version": "4.1.20",
+    "entry_count": 13,
+    "primary_runtime_files": [
+      "model.json",
+      "skeleton.bin",
+      "c610_00.atlas",
+      "c610_00.png",
+      "lpk_files.json"
+    ],
+    "atlas_premultiplied_alpha": true,
+    "renderer_candidate": "spine-libgdx:4.1.0",
+    "cubism": false
+  },
+  "motion_map": {
+    "idle": [
+      "idle"
+    ],
+    "tap": [
+      "action",
+      "etc",
+      "no",
+      "pain",
+      "sad",
+      "smile",
+      "special",
+      "surprise",
+      "idle"
+    ],
+    "current_cue_mapping": {
+      "QUIET": "idle",
+      "PAUSED": "freeze-current",
+      "NEEDS_INPUT": "smile",
+      "GENTLE_CHECK_IN": "action"
+    }
   }
 }
