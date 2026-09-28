@@ -1,3 +1,9 @@
+## E011 — Complete source snapshot delivery
+
+Created a complete tracked-source ZIP for branch `feat/android-companion-boundary-20260928` at `bf996e6e64c3f4d078102d337be31480dedf2f88`. It contains 131 files, exactly matching the recursive GitHub tree's blob paths. The source base was snapshot commit `150832f75565ccbcc5978602c072f8ed2d0bb15e`; GitHub compare to current branch showed 21 commits ahead, 0 behind, and 21 changed paths, all refreshed from the current branch. Drive file `1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy`, 1,954,056 bytes, SHA-256 `006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc`; ZIP CRC passed and Drive metadata confirms the file and folder. Existing prior snapshots are preserved. The current Android APK and changed-files review bundle remain separate artifacts. The embedded manifest is the manifest from source head bf996e and therefore does not recursively contain this snapshot's own identity; the live manifest on GitHub records it.
+
+---
+
 ## E010 — Drive and Library delivery sync
 
 The lifecycle source changes are in GitHub branch `feat/android-companion-boundary-20260928` at `986b7b39cf0eda54e74e096f701d4b132c5bbdd9`; Draft PR #10 remains open and unmerged. Current Android debug APK Drive ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`, 14,913 bytes, SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`. Changed-files review bundle Drive ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`, 21,323 bytes, SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`; it is not a complete source snapshot. Prior APKs and the September 27 source snapshot remain preserved as historical artifacts. The Google Drive sync receipt has an addendum that supersedes its earlier “no APK/test artifact” status. No main-branch change or PR merge was performed.

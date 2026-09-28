@@ -543,6 +543,15 @@
         "sha256": "c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a",
         "size_bytes": 21323,
         "type": "changed_files_review_package_not_full_source_snapshot"
+      },
+      "source_snapshot": {
+        "drive_file_id": "1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy",
+        "file_name": "mygpt-android-lifecycle-source-snapshot-20260928.zip",
+        "sha256": "006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc",
+        "size_bytes": 1954056,
+        "git_commit": "bf996e6e64c3f4d078102d337be31480dedf2f88",
+        "tracked_files": 131,
+        "verification": "file paths exactly match current branch tree"
       }
     }
   }
