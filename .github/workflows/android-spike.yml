@@ -24,3 +24,24 @@ jobs:
             android_spike/src/main/java/dev/mygpt/spike/CompanionCoordinator.java \
             android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java
           java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
+  android-debug-host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Install Android SDK 35
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build isolated synthetic Android test host
+        run: gradle -p android_spike :app:assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mygpt-synthetic-android-spike
+          path: android_spike/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

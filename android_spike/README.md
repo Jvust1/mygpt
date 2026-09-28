@@ -1,6 +1,6 @@
 # Android integration spike: Book → coordinator → Live cue
 
-This is a dependency-free Java 8 core intended for an Android host module. It is **not** an APK, an authenticated Book integration, a Live renderer, or a model/voice implementation. It contains no imported upstream code or assets.
+This contains a dependency-free Java 8 core and a small Android device test host. The host builds a **synthetic debug APK** to exercise the coordinator. It is not an authenticated Book integration, a Live renderer, or a model/voice implementation. It contains no imported upstream code or assets.
 
 The host must implement `VerifiedBookPort` using Book's actual local authority and short-lived lease checks before forwarding a projected event. The current Book lease receiver (`brain/mygpt_brain/book_bridge.py`) authenticates explicit selected content for a TestModel reply; it does **not** yet emit this study-event stream. This spike does not infer an event from a screenshot or accept arbitrary HTTP JSON as Book authority. Only opaque `book-lease://` references enter the coordinator; text, notes and answers stay in Book.
 
@@ -19,3 +19,15 @@ java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
 ```
 
 Next implementation gate: in a Book Android and mygpt Android test host, prove the exact Book producer identity and revocation path, then bind a Live `CharacterRuntime` implementation and test lifecycle/permission behavior on a device. Local chat and voice engines need separate benchmarks and user consent gates. Do not call this code production transport or a verified user-device build.
+
+## Android test host
+
+`android_spike/app` is a separate package (`dev.mygpt.spike`) with no permissions, no internet access and no automatic model calls. Every button says it simulates Book activity; its authority callback is an in-memory test double that can be revoked. The visible character area is text, not a Live skin. Closing the Activity loses the session.
+
+With Android SDK 35, JDK 17 and Gradle 8.13 installed:
+
+```sh
+gradle -p android_spike :app:assembleDebug --no-daemon
+```
+
+The debug APK appears at `android_spike/app/build/outputs/apk/debug/app-debug.apk`. CI builds and uploads it as a short-lived test artifact. Do not use this package to assess actual Book transport, Live WPK animation, model teaching quality, or cross-app overlays.

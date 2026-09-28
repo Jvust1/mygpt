@@ -1,3 +1,9 @@
+## 2026-09-28 Android 可安装测试宿主候选（构建待验）
+
+`android_spike/app` 新增独立 debug 应用：界面按钮明确产生合成 Book 事件，运行已验 Java 状态机并显示文字 cue；撤销会立刻清除会话。Manifest 无网络、麦克风、悬浮窗或其他权限。它没有真实 Book 事件、Live 角色、模型或语音。CI 将构建 APK，成功前不宣称 APK 已生成。
+
+---
+
 ## 2026-09-28 Android 集成边界原型（CI 通过）
 
 `feat/android-companion-boundary-20260928@8e8c93b`、Draft PR #10：Java 8 状态机与 Live 中立 cue 接口已提交。推送 run `36367251552` 和 PR run `36367267599` 均成功；后者 `java8-boundary` job `108756041802` 的编译与 smoke 步骤成功。本地环境无 javac，所以本地编译未执行。Book Android 事件生产者、Live 实际渲染、APK 与真机验收仍未实现。下一步是以 Book 的真实授权事件接入测试宿主并绑定 Live 运行时；不直接启用模型或权限敏感功能。

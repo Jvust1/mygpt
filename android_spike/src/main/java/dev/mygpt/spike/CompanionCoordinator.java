@@ -77,6 +77,13 @@ public final class CompanionCoordinator {
 
     public synchronized Cue currentCue() { return cue; }
 
+    /** The trusted host calls this immediately when Book revokes or disconnects. */
+    public synchronized void revokeSession() {
+        sessionId = null;
+        paused = false;
+        present(Cue.QUIET);
+    }
+
     public synchronized Result accept(BookEvent event, long nowMs) {
         Objects.requireNonNull(event, "event");
         if (nowMs < 0 || event.expiresAtMs <= nowMs || event.sequence < 1 || event.epoch < 1

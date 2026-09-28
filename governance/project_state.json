@@ -5,7 +5,7 @@
   "default_branch": "main",
   "active_branch": "feat/android-companion-boundary-20260928",
   "phase": "ANDROID_COMPANION_BOUNDARY_SPIKE_CANDIDATE",
-  "status": "ANDROID_SPIKE_JAVA8_CI_PASS_REVIEW_PENDING",
+  "status": "ANDROID_SYNTHETIC_HOST_BUILD_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Bind the verified coordinator to an authenticated Book Android study-event producer and a Live-owned CharacterRuntime in a device test host. Then benchmark local chat engines, add consent-gated voice, and introduce graduated supervision signals. Do not claim an APK, production transport, or real model quality before device and authority acceptance.",
+  "next_step": "Verify the isolated Android debug host build. Then connect a genuine Book Android event producer and a Live-owned CharacterRuntime in a device test, preserving the explicit selection lease boundary; evaluate local chat and voice separately.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -512,6 +512,13 @@
       "job_id": 108756041802,
       "conclusion": "success"
     },
-    "pr": 10
+    "pr": 10,
+    "host": {
+      "kind": "SYNTHETIC_ANDROID_DEBUG_ONLY",
+      "build": "CI_PENDING",
+      "book_authentication": "TEST_DOUBLE",
+      "live_renderer": "TEXT_PLACEHOLDER",
+      "permissions": []
+    }
   }
 }

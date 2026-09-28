@@ -53,6 +53,12 @@ public final class CompanionCoordinatorSmoke {
                 "new epoch can start");
         check(!c.accept(e(CompanionCoordinator.Kind.HELP_REQUESTED, 2, 2, t + 5000, "raw text"), t).accepted,
                 "source must be opaque Book reference");
+        check(c.accept(e(CompanionCoordinator.Kind.HELP_REQUESTED, 2, 2, t + 5000,
+                "book-lease://source"), t).cue == CompanionCoordinator.Cue.NEEDS_INPUT, "new session help");
+        c.revokeSession();
+        check(c.currentCue() == CompanionCoordinator.Cue.QUIET, "revocation immediately quiets cue");
+        check(!c.accept(e(CompanionCoordinator.Kind.HELP_REQUESTED, 3, 2, t + 5000,
+                "book-lease://source"), t).accepted, "revoked session cannot continue");
         check(shown.contains(CompanionCoordinator.Cue.GENTLE_CHECK_IN), "renderer called");
         System.out.println("PASS: Android companion boundary smoke");
     }
