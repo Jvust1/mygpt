@@ -30,7 +30,8 @@
       "size_bytes": 12342220,
       "format_role": "decrypted_lpk_runtime_package",
       "direct_use": true,
-      "preferred": true
+      "preferred": true,
+      "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f"
     }
   },
   "policy": {
@@ -40,7 +41,9 @@
     "renderer_status": "SPINE_4_1_IMPLEMENTED_CI_AND_DEVICE_PENDING",
     "preferred_runtime_input": "3714430278.zip",
     "requires_decryption_before_use": false,
-    "distribution_status": "LICENSE_REVIEW_REQUIRED_BEFORE_REDISTRIBUTION"
+    "distribution_status": "LICENSE_REVIEW_REQUIRED_BEFORE_REDISTRIBUTION",
+    "exact_runtime_package_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+    "package_identity_enforced_by_android_importer": true
   },
   "format": {
     "family": "Spine",
