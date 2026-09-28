@@ -58,6 +58,7 @@ public final class CompanionCoordinator {
     private String sessionId;
     private long epoch;
     private long lastSequence;
+    private long expiresAtMs = Long.MIN_VALUE;
     private long lastCheckInMs = Long.MIN_VALUE;
     private boolean paused;
     private boolean supervisionOptIn;
@@ -80,12 +81,22 @@ public final class CompanionCoordinator {
     /** The trusted host calls this immediately when Book revokes or disconnects. */
     public synchronized void revokeSession() {
         sessionId = null;
+        expiresAtMs = Long.MIN_VALUE;
         paused = false;
+        supervisionOptIn = false;
         present(Cue.QUIET);
+    }
+
+    /** Expiry also clears a visible cue when no further Book event arrives. */
+    public synchronized boolean expireIfNeeded(long nowMs) {
+        if (sessionId == null || nowMs < expiresAtMs) return false;
+        revokeSession();
+        return true;
     }
 
     public synchronized Result accept(BookEvent event, long nowMs) {
         Objects.requireNonNull(event, "event");
+        expireIfNeeded(nowMs);
         if (nowMs < 0 || event.expiresAtMs <= nowMs || event.sequence < 1 || event.epoch < 1
                 || event.sessionId.isEmpty()) return reject("INVALID_OR_EXPIRED");
         if (!book.isCurrent(event, nowMs)) return reject("BOOK_AUTHORITY_REJECTED");
@@ -96,8 +107,10 @@ public final class CompanionCoordinator {
             sessionId = event.sessionId;
             epoch = event.epoch;
             lastSequence = 1;
+            expiresAtMs = event.expiresAtMs;
             lastCheckInMs = Long.MIN_VALUE;
             paused = false;
+            supervisionOptIn = false;
             present(Cue.QUIET);
             return acceptResult();
         }
@@ -112,6 +125,7 @@ public final class CompanionCoordinator {
 
         // No source body, note, answer, screenshot, or provider input is stored here.
         lastSequence = event.sequence;
+        expiresAtMs = event.expiresAtMs;
         switch (event.kind) {
             case SESSION_PAUSED:
                 paused = true;
@@ -133,9 +147,7 @@ public final class CompanionCoordinator {
                 } else present(Cue.QUIET);
                 break;
             case SESSION_ENDED:
-                sessionId = null;
-                paused = false;
-                present(Cue.QUIET);
+                revokeSession();
                 break;
             default:
                 throw new IllegalStateException("Unhandled event: " + event.kind);

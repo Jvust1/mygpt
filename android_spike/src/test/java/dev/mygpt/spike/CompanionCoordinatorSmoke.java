@@ -55,10 +55,32 @@ public final class CompanionCoordinatorSmoke {
                 "source must be opaque Book reference");
         check(c.accept(e(CompanionCoordinator.Kind.HELP_REQUESTED, 2, 2, t + 5000,
                 "book-lease://source"), t).cue == CompanionCoordinator.Cue.NEEDS_INPUT, "new session help");
+        c.setSupervisionOptIn(true);
         c.revokeSession();
         check(c.currentCue() == CompanionCoordinator.Cue.QUIET, "revocation immediately quiets cue");
         check(!c.accept(e(CompanionCoordinator.Kind.HELP_REQUESTED, 3, 2, t + 5000,
                 "book-lease://source"), t).accepted, "revoked session cannot continue");
+        check(c.accept(e(CompanionCoordinator.Kind.SESSION_STARTED, 1, 3, t + 5000, null), t).accepted,
+                "new epoch after revocation");
+        check(c.accept(e(CompanionCoordinator.Kind.PRACTICE_REPEATED_ERROR, 2, 3,
+                t + 5000, "book-lease://source"), t).cue == CompanionCoordinator.Cue.QUIET,
+                "revocation clears supervision opt-in");
+        c.setSupervisionOptIn(true);
+        check(c.accept(e(CompanionCoordinator.Kind.PRACTICE_REPEATED_ERROR, 3, 3,
+                t + 5000, "book-lease://source"), t).cue == CompanionCoordinator.Cue.GENTLE_CHECK_IN,
+                "prompt after renewed opt-in");
+        check(!c.expireIfNeeded(t + 4999), "not expired before deadline");
+        check(c.currentCue() == CompanionCoordinator.Cue.GENTLE_CHECK_IN, "cue remains before expiry");
+        check(c.expireIfNeeded(t + 5000), "expires at deadline");
+        check(c.currentCue() == CompanionCoordinator.Cue.QUIET, "expiry immediately quiets cue");
+        check(!c.accept(e(CompanionCoordinator.Kind.HELP_REQUESTED, 4, 3,
+                t + 6000, "book-lease://source"), t + 5000).accepted,
+                "expired session cannot continue");
+        check(c.accept(e(CompanionCoordinator.Kind.SESSION_STARTED, 1, 4,
+                t + 11000, null), t + 5000).accepted, "fresh epoch after expiry");
+        check(c.accept(e(CompanionCoordinator.Kind.PRACTICE_REPEATED_ERROR, 2, 4,
+                t + 11000, "book-lease://source"), t + 5000).cue == CompanionCoordinator.Cue.QUIET,
+                "expiry clears supervision opt-in");
         check(shown.contains(CompanionCoordinator.Cue.GENTLE_CHECK_IN), "renderer called");
         System.out.println("PASS: Android companion boundary smoke");
     }

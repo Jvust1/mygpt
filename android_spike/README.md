@@ -22,7 +22,7 @@ Next implementation gate: in a Book Android and mygpt Android test host, prove t
 
 ## Android test host
 
-`android_spike/app` is a separate package (`dev.mygpt.spike`) with no permissions, no internet access and no automatic model calls. Every button says it simulates Book activity; its authority callback is an in-memory test double that can be revoked. The visible character area is text, not a Live skin. Closing the Activity loses the session.
+`android_spike/app` is a separate package (`dev.mygpt.spike`) with no permissions, no internet access and no automatic model calls. Every button says it simulates Book activity; its authority callback is an in-memory test double that can be revoked. The visible character area is text, not a Live skin. Leaving the Activity foreground or locking the device clears the session and this-session supervision opt-in. A 30-second synthetic event deadline also clears a visible cue without waiting for another button press.
 
 With Android SDK 35, JDK 17 and Gradle 8.13 installed:
 

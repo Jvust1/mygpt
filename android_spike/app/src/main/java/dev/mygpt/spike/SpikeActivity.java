@@ -3,6 +3,8 @@ package dev.mygpt.spike;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +18,9 @@ public final class SpikeActivity extends Activity {
     private CompanionCoordinator coordinator;
     private TextView character;
     private TextView status;
+    private Switch optIn;
+    private final Handler expiryHandler = new Handler(Looper.getMainLooper());
+    private Runnable pendingExpiry;
     private long epoch;
     private long sequence;
     private boolean active;
@@ -46,12 +51,14 @@ public final class SpikeActivity extends Activity {
 
         coordinator = new CompanionCoordinator((event, nowMs) -> !revoked,
                 cue -> character.setText(cueText(cue)));
-        Switch optIn = new Switch(this);
+        optIn = new Switch(this);
         optIn.setText("允许轻量学习提醒（仅本次演示）");
         optIn.setOnCheckedChangeListener((button, checked) -> coordinator.setSupervisionOptIn(checked));
         column.addView(optIn);
 
         addButton(column, "开始模拟 Book 会话", () -> {
+            cancelExpiry();
+            optIn.setChecked(false);
             revoked = false;
             active = true;
             epoch++;
@@ -64,16 +71,41 @@ public final class SpikeActivity extends Activity {
                 "book-lease://synthetic"));
         addButton(column, "暂停学习", () -> send(CompanionCoordinator.Kind.SESSION_PAUSED, null));
         addButton(column, "恢复学习", () -> send(CompanionCoordinator.Kind.SESSION_RESUMED, null));
-        addButton(column, "撤销模拟授权", () -> {
-            revoked = true;
-            active = false;
-            coordinator.revokeSession();
-            status.setText("模拟授权已撤销；会话已清除并返回静默状态");
-        });
-        addButton(column, "结束会话", () -> {
-            send(CompanionCoordinator.Kind.SESSION_ENDED, null);
-            active = false;
-        });
+        addButton(column, "撤销模拟授权", () ->
+                clearDemoSession("模拟授权已撤销；会话与提醒许可已清除"));
+        addButton(column, "结束会话", () -> send(CompanionCoordinator.Kind.SESSION_ENDED, null));
+    }
+
+    @Override protected void onStop() {
+        clearDemoSession("演示已离开前台；会话与提醒许可已清除");
+        super.onStop();
+    }
+
+    private void clearDemoSession(String message) {
+        cancelExpiry();
+        revoked = true;
+        active = false;
+        if (coordinator != null) coordinator.revokeSession();
+        if (optIn != null) optIn.setChecked(false);
+        if (status != null) status.setText(message);
+    }
+
+    private void cancelExpiry() {
+        if (pendingExpiry != null) expiryHandler.removeCallbacks(pendingExpiry);
+        pendingExpiry = null;
+    }
+
+    private void scheduleExpiry(long deadlineMs) {
+        cancelExpiry();
+        pendingExpiry = () -> {
+            if (coordinator.expireIfNeeded(System.currentTimeMillis())) {
+                clearDemoSession("模拟事件已到期；会话与提醒许可已清除");
+            } else if (active) {
+                scheduleExpiry(deadlineMs);
+            }
+        };
+        expiryHandler.postDelayed(pendingExpiry,
+                Math.max(1L, deadlineMs - System.currentTimeMillis()));
     }
 
     private void send(CompanionCoordinator.Kind kind, String sourceRef) {
@@ -82,7 +114,21 @@ public final class SpikeActivity extends Activity {
         CompanionCoordinator.BookEvent event = new CompanionCoordinator.BookEvent(
                 kind, "synthetic-session", sequence + 1, epoch, now + 30000, sourceRef);
         CompanionCoordinator.Result result = coordinator.accept(event, now);
-        if (result.accepted) sequence++;
+        if (result.accepted) {
+            sequence++;
+            if (kind == CompanionCoordinator.Kind.SESSION_ENDED) {
+                active = false;
+                cancelExpiry();
+                optIn.setChecked(false);
+            } else {
+                scheduleExpiry(event.expiresAtMs);
+            }
+        } else if ("SESSION_MISMATCH".equals(result.reason) && coordinator.currentCue()
+                == CompanionCoordinator.Cue.QUIET) {
+            active = false;
+            optIn.setChecked(false);
+            cancelExpiry();
+        }
         status.setText((result.accepted ? "已接收：" : "已拒绝：") + result.reason
                 + " · " + kind.name() + " · 序号 " + (sequence + (result.accepted ? 0 : 1)));
     }
