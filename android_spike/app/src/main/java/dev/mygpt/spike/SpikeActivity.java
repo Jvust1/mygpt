@@ -142,7 +142,7 @@ public final class SpikeActivity extends AndroidApplication {
                             .putString(PREF_SKIN_URI, uri.toString()).apply();
                 }
                 runOnUiThread(() -> {
-                    status.setText("校验通过 · Spine " + installed.spineVersion + " · 正在进入渲染器");
+                    status.setText("校验通过 · Spine " + installed.spineVersion + " · SHA " + installed.archiveSha256.substring(0, 12) + "… · 正在进入渲染器");
                     characterRuntime.load(installed.directory);
                 });
             } catch (Throwable error) {
