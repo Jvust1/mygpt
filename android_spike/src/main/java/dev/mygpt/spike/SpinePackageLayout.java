@@ -92,8 +92,7 @@ public final class SpinePackageLayout {
             throw new IOException("missing required runtime files: " + missing);
         }
 
-        String manifest = new String(Files.readAllBytes(new File(staging, "lpk_files.json").toPath()),
-                StandardCharsets.UTF_8);
+        String manifest = readUtf8(new File(staging, "lpk_files.json"));
         if (!manifest.contains("\"fileId\": \"" + SKIN_ID + "\"")
                 && !manifest.contains("\"fileId\":\"" + SKIN_ID + "\"")) {
             deleteRecursively(staging);
@@ -112,6 +111,19 @@ public final class SpinePackageLayout {
             throw new IOException("cannot promote installed skin");
         }
         return new InstalledSkin(targetDirectory, version);
+    }
+
+    private static String readUtf8(File file) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buffer = new byte[4096];
+        try (FileInputStream input = new FileInputStream(file)) {
+            int read;
+            while ((read = input.read(buffer)) != -1) {
+                if (out.size() + read > MAX_ENTRY_BYTES) throw new IOException("text file too large");
+                out.write(buffer, 0, read);
+            }
+        }
+        return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 
     private static String normalizeFlatEntry(String raw) throws IOException {
