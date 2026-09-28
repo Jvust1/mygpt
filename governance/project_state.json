@@ -3,9 +3,9 @@
   "updated_date": "2026-09-28",
   "repository": "Jvust/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/android-companion-boundary-20260928",
-  "phase": "ANDROID_SPINE_CHARACTER_RUNTIME_IMPLEMENTED",
-  "status": "SPINE_3714430278_RENDERER_CODED_CI_DEVICE_PENDING",
+  "active_branch": "feat/spine-3714430278-runtime-final-20260928",
+  "phase": "ANDROID_SPINE_3714430278_RUNTIME_REVIEW",
+  "status": "SPINE_3714430278_RUNTIME_EXACT_CI_PENDING_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Finish exact-head CI for the Spine 4.1 renderer. If green, install the resulting debug APK on a physical Android device, select Live decrypted package 3714430278.zip, verify first frame/idle/cue transitions/background-reopen, then connect the genuine trusted Book Android study-event producer.",
+  "next_step": "Run exact-head CI on the clean Spine 3714430278 review branch. If green, merge only this bounded renderer delta into PR #10, then install the debug APK on Xiaomi 14 and validate first frame, idle, cue transitions, background/reopen and exact-package rejection.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -501,7 +501,7 @@
     "branch": "feat/android-companion-boundary-20260928",
     "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
     "scope": "Pure Java 8 Book event coordinator, renderer-neutral Live cue port, and isolated synthetic Android debug host",
-    "verification": "PREVIOUS_BOUNDARY_CI_PASS; NEW_SPINE_RENDERER_EXACT_HEAD_CI_PENDING",
+    "verification": "PR10_BASELINE_CI_PASS; CLEAN_SPINE_RUNTIME_DELTA_EXACT_HEAD_CI_PENDING",
     "book_live_transport": "NOT_CONNECTED",
     "apk": "DEBUG_APK_BUILT_SYNTHETIC_DEVICE_PENDING",
     "provider_calls": 0,
@@ -517,7 +517,7 @@
       "kind": "SYNTHETIC_ANDROID_DEBUG_ONLY",
       "build": "CI_PASS",
       "book_authentication": "TEST_DOUBLE",
-      "live_renderer": "SPINE_LIBGDX_4_1_IMPLEMENTED_CI_AND_DEVICE_PENDING",
+      "live_renderer": "SPINE_LIBGDX_4_1_IMPLEMENTED_CLEAN_REVIEW_BRANCH",
       "permissions": [],
       "implementation_commit": "eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b",
       "ci": {
@@ -555,8 +555,8 @@
       },
       "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
       "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
-      "renderer_ci_run": 36448862550,
-      "renderer_ci_status": "PENDING_AT_LAST_CHECK"
+      "renderer_ci_run": null,
+      "renderer_ci_status": "PENDING_CLEAN_BRANCH_EXACT_HEAD"
     },
     "selected_live_skin": {
       "skin_id": "3714430278",
@@ -575,7 +575,10 @@
         "preferred_runtime_input": true,
         "requires_decryption": false,
         "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
-        "exact_identity_enforced": true
+        "exact_identity_enforced": true,
+        "entries": 13,
+        "uncompressed_bytes": 12340902,
+        "zip_crc": "PASS"
       },
       "original_lpk_role": "source identity only; runtime should prefer decrypted zip",
       "format": "Spine",
@@ -592,9 +595,12 @@
       "renderer_candidate": {
         "runtime": "spine-libgdx",
         "runtime_version": "4.1.0",
-        "libgdx_line": "1.11.0",
-        "status": "IMPLEMENTED_PENDING_EXACT_HEAD_CI_AND_DEVICE",
-        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION"
+        "libgdx_line": "1.10.0",
+        "status": "IMPLEMENTED_CLEAN_BRANCH_CI_PENDING_DEVICE_PENDING",
+        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION",
+        "abi": "arm64-v8a",
+        "native_packaging": "lib/arm64-v8a/libgdx.so from gdx-platform:1.10.0:natives-arm64-v8a",
+        "license_notice_path": "android_spike/app/src/main/assets/SPINE_RUNTIME_LICENSE.txt"
       },
       "motion_mapping": {
         "QUIET": "idle",
@@ -602,6 +608,7 @@
         "NEEDS_INPUT": "smile -> idle fallback",
         "GENTLE_CHECK_IN": "action -> idle fallback"
       }
-    }
+    },
+    "renderer_branch": "feat/spine-3714430278-runtime-final-20260928"
   }
 }
