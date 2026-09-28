@@ -5,7 +5,7 @@
   "default_branch": "main",
   "active_branch": "feat/android-companion-boundary-20260928",
   "phase": "ANDROID_COMPANION_BOUNDARY_SPIKE_CANDIDATE",
-  "status": "ANDROID_SPIKE_CI_PENDING",
+  "status": "ANDROID_SPIKE_JAVA8_CI_PASS_REVIEW_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -501,9 +501,17 @@
     "branch": "feat/android-companion-boundary-20260928",
     "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
     "scope": "Pure Java 8 Book event coordinator and renderer-neutral Live cue port",
-    "verification": "CI_PENDING_LOCAL_JAVAC_UNAVAILABLE",
+    "verification": "JAVA8_COMPILE_AND_BOUNDARY_SMOKE_PASS",
     "book_live_transport": "NOT_CONNECTED",
     "apk": "NOT_BUILT",
-    "provider_calls": 0
+    "provider_calls": 0,
+    "implementation_commit": "8e8c93b11cef54cefa133abfda7ffe4df0bd0685",
+    "ci": {
+      "push_run": 36367251552,
+      "pr_run": 36367267599,
+      "job_id": 108756041802,
+      "conclusion": "success"
+    },
+    "pr": 10
   }
 }

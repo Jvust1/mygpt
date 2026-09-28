@@ -1,6 +1,6 @@
-## 2026-09-28 Android 集成边界原型（CI 待验）
+## 2026-09-28 Android 集成边界原型（CI 通过）
 
-在 `feat/android-companion-boundary-20260928` 增加 `android_spike/`：Book 语义事件状态机、静默默认/监督显式同意、过期与撤销门、序号与 epoch 拒绝、Live 中立角色 cue 接口及 Java 8 验收脚本。该分支基于 `codex/progress-mygpt-20260927@5a2473d`。当前是纯 JVM 候选；未接上 Book Android 的实际事件生产者、Live 角色运行时，也不是 APK。本地缺少 javac，精确 CI 结果随后记录。使用和边界见 [android_spike/README.md](../android_spike/README.md)。
+`feat/android-companion-boundary-20260928@8e8c93b`、Draft PR #10：Java 8 状态机与 Live 中立 cue 接口已提交。推送 run `36367251552` 和 PR run `36367267599` 均成功；后者 `java8-boundary` job `108756041802` 的编译与 smoke 步骤成功。本地环境无 javac，所以本地编译未执行。Book Android 事件生产者、Live 实际渲染、APK 与真机验收仍未实现。下一步是以 Book 的真实授权事件接入测试宿主并绑定 Live 运行时；不直接启用模型或权限敏感功能。
 
 ---
 

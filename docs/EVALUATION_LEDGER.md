@@ -1,3 +1,9 @@
+## E007 — Android companion boundary spike (2026-09-28)
+
+Source: `feat/android-companion-boundary-20260928@8e8c93b11cef54cefa133abfda7ffe4df0bd0685`, Draft PR #10. GitHub push run 36367251552 and PR run 36367267599 succeeded. PR job 108756041802 compiled with `javac --release 8` and ran `CompanionCoordinatorSmoke` successfully. Local javac was unavailable. The checks cover quiet default, explicit supervision opt-in/out, prompt, replay/gap, expiry, rejected Book authority, pause/resume, epoch identity, opaque source reference and session end. This verifies a synthetic JVM boundary only, not an Android APK, Book producer, Live renderer, model teaching, permission flow or physical device. No upstream source/assets or paid provider were used.
+
+---
+
 # Evaluation Ledger
 
 ## E001 — Foundation architecture review
