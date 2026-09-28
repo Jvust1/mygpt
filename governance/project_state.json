@@ -4,8 +4,8 @@
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/android-companion-boundary-20260928",
-  "phase": "ANDROID_COMPANION_BOUNDARY_SPIKE_CANDIDATE",
-  "status": "ANDROID_SYNTHETIC_LIFECYCLE_CI_PASS_DEVICE_PENDING",
+  "phase": "ANDROID_SPINE_CHARACTER_RUNTIME_IMPLEMENTED",
+  "status": "SPINE_3714430278_RENDERER_CODED_CI_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Bind an LPK-capable CharacterRuntime directly to Live decrypted package 3714430278.zip, validate rendering on a physical Android device, then connect the genuine trusted Book Android study-event producer.",
+  "next_step": "Finish exact-head CI for the Spine 4.1 renderer. If green, install the resulting debug APK on a physical Android device, select Live decrypted package 3714430278.zip, verify first frame/idle/cue transitions/background-reopen, then connect the genuine trusted Book Android study-event producer.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -501,7 +501,7 @@
     "branch": "feat/android-companion-boundary-20260928",
     "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
     "scope": "Pure Java 8 Book event coordinator, renderer-neutral Live cue port, and isolated synthetic Android debug host",
-    "verification": "JAVA8_SMOKE_AND_ANDROID_DEBUG_ASSEMBLE_CI_PASS",
+    "verification": "PREVIOUS_BOUNDARY_CI_PASS; NEW_SPINE_RENDERER_EXACT_HEAD_CI_PENDING",
     "book_live_transport": "NOT_CONNECTED",
     "apk": "DEBUG_APK_BUILT_SYNTHETIC_DEVICE_PENDING",
     "provider_calls": 0,
@@ -517,7 +517,7 @@
       "kind": "SYNTHETIC_ANDROID_DEBUG_ONLY",
       "build": "CI_PASS",
       "book_authentication": "TEST_DOUBLE",
-      "live_renderer": "TEXT_PLACEHOLDER_WITH_SELECTED_SKIN_3714430278_REFERENCE",
+      "live_renderer": "SPINE_LIBGDX_4_1_IMPLEMENTED_CI_AND_DEVICE_PENDING",
       "permissions": [],
       "implementation_commit": "eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b",
       "ci": {
@@ -552,7 +552,11 @@
         "git_commit": "bf996e6e64c3f4d078102d337be31480dedf2f88",
         "tracked_files": 131,
         "verification": "file paths exactly match current branch tree"
-      }
+      },
+      "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
+      "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
+      "renderer_ci_run": 36448236193,
+      "renderer_ci_status": "QUEUED_AT_LAST_CHECK"
     },
     "selected_live_skin": {
       "skin_id": "3714430278",
@@ -571,7 +575,31 @@
         "preferred_runtime_input": true,
         "requires_decryption": false
       },
-      "original_lpk_role": "source identity only; runtime should prefer decrypted zip"
+      "original_lpk_role": "source identity only; runtime should prefer decrypted zip",
+      "format": "Spine",
+      "spine_export_version": "4.1.20",
+      "decrypted_entry_count": 13,
+      "primary_runtime_files": [
+        "model.json",
+        "skeleton.bin",
+        "c610_00.atlas",
+        "c610_00.png",
+        "lpk_files.json"
+      ],
+      "cubism_route": false,
+      "renderer_candidate": {
+        "runtime": "spine-libgdx",
+        "runtime_version": "4.1.0",
+        "libgdx_line": "1.11.0",
+        "status": "IMPLEMENTED_PENDING_EXACT_HEAD_CI_AND_DEVICE",
+        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION"
+      },
+      "motion_mapping": {
+        "QUIET": "idle",
+        "PAUSED": "freeze-current",
+        "NEEDS_INPUT": "smile -> idle fallback",
+        "GENTLE_CHECK_IN": "action -> idle fallback"
+      }
     }
   }
 }
