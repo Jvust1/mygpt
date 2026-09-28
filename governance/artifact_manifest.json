@@ -1,8 +1,8 @@
 {
   "schema_version": "mygpt_artifact_manifest_v1",
-  "updated_date": "2026-09-27",
+  "updated_date": "2026-09-28",
   "project": {
-    "repository": "Jvust2/mygpt",
+    "repository": "Jvust/mygpt",
     "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
     "drive_root_name": "mygpt"
   },
@@ -255,6 +255,21 @@
       "purpose": "Current tracked source snapshot after authorized Book bridge E2E evidence and verification provenance alignment.",
       "status": "current_review_candidate",
       "verification": "Drive listing read-back confirms file ID, title, MIME type and 1,938,253-byte size. SHA-256 verified locally before upload; prior snapshot retained as historical."
+    },
+    {
+      "artifact_id": "mygpt-sync-receipt-20260928",
+      "file_name": "mygpt_成果同步收据_20260928",
+      "type": "sync_receipt",
+      "drive_file_id_or_path": "1i8vs9_rZyhAxDa5hnAvU2CSrRAtL2KCxwtu_1vU_LFA",
+      "drive_parent_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
+      "version": "2026-09-28-current-governance-sync",
+      "created_at": "2026-09-28",
+      "source": "assistant_generated_google_doc",
+      "related_branch": "codex/progress-mygpt-20260927",
+      "related_commit": "9d4888e8654e658cfa6517e6619680229dd4189d",
+      "purpose": "Current sync receipt for the Book Android + mygpt + Live end-state decision and 51-project upstream adoption registry. Historical ZIP artifacts preserved; no false full-source snapshot generated because this batch changed governance/docs rather than runtime code.",
+      "status": "current_sync_receipt",
+      "verification": "Google Docs content and Drive parent are read back after creation; GitHub manifest records the stable Drive file ID."
     }
   ],
   "notes": [
@@ -271,7 +286,8 @@
     "Source-delivery checkpoint archives one exact complete source bundle and clean recovery evidence; internal manifest is not a substitute for the externally recorded SHA-256.",
     "PR #8 integration artifact proves combined CI compatibility without importing PR #7 stale state-file replacements; merge and independent review remain separate gates.",
     "2026-09-27: current review branch and validation bundle uploaded after GitHub push; historical artifacts were preserved and not duplicated.",
-    "2026-09-27: r2 current source snapshot uploaded after authorized Book bridge E2E and provenance alignment; prior snapshot retained as historical."
+    "2026-09-27: r2 current source snapshot uploaded after authorized Book bridge E2E and provenance alignment; prior snapshot retained as historical.",
+    "2026-09-28: synchronized final Book Android + mygpt + Live target and 51-project upstream registry; historical ZIP artifacts were preserved and a current Drive sync receipt was added without manufacturing a new full-source archive."
   ],
-  "last_updated": "2026-09-27"
+  "last_updated": "2026-09-28"
 }
