@@ -21,6 +21,7 @@ on:
       - 'tests/brain-host-browser.cjs'
       - 'tests/browser.cjs'
       - 'tests/atlas.test.mjs'
+      - 'package.json'
       - 'scripts/serve.mjs'
       - '.github/workflows/host-ui-acceptance.yml'
 permissions:
@@ -67,7 +68,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node --test tests/atlas.test.mjs tests/host-controller.test.mjs tests/brain-adapter.test.mjs tests/selection-controller.test.mjs | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
+          npm test | tee "$RUNNER_TEMP/host-evidence/node-tests.txt"
       - name: Run existing Jonah, replay host, and real loopback Python host checks serially
         shell: bash
         run: |
