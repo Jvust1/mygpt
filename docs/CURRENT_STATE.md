@@ -1,3 +1,12 @@
+
+## 2026-09-29 · Live 主/备皮肤同步
+
+- 主动态皮肤继续为 Live `3714430278`：Spine 4.1.20，Android CI 已通过，真机待验。
+- CI APK SHA-256：`44bb4863c944c05e0acb30a7be9df6b9751b3600fc144e05812f4ee74d68fae2`；长期 Drive artifact ID：`1keutv3dGtexS2mMYoV8ptF7sOpq5f-7H`。
+- 新增静态备选皮肤 `backup_skin_image_01`，Live Drive ID：`1adRumPFELRvB_4d7ORfnvUZRPhUTOLDW`，SHA-256：`9d03cf43b5d60a8ae486c17979e72bd294e479fc58732971aaa205df7e3f5cff`。
+- 备选图当前仅作为静态 fallback / 人物视觉参考，不宣称具有 Spine/Live2D 动态能力。
+- 新增 `android_spike/skin_candidates.json` 记录主/备关系；Live 继续是皮肤资产权威源。
+
 ## 当前 Android 生命周期成果与源码快照
 
 项目分支 `feat/android-companion-boundary-20260928` 持续保持 Draft PR #10。最新代码验证：push run `36369308484` 与 PR run `36369310978` 的 Java 8 smoke、Android debug 构建通过。当前 debug APK Drive ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`（SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`）；完整源码快照 Drive ID `1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy`（commit `bf996e6e64c3f4d078102d337be31480dedf2f88`，131 tracked files，SHA-256 `006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc`）；变更文件评审包 Drive ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`（SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`）。真机生命周期验证及真实 Book/Live 接入仍待完成。
