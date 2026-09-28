@@ -32,6 +32,6 @@ dependencies {
     // Spine binary is 4.1.20, so keep the runtime on the matching 4.1 line.
     // This debug spike is evaluation-only until Spine Runtime licensing is cleared for distribution.
     implementation("com.esotericsoftware.spine:spine-libgdx:4.1.0")
-    implementation("com.badlogicgames.gdx:gdx:1.14.2")
-    implementation("com.badlogicgames.gdx:gdx-backend-android:1.14.2")
+    implementation("com.badlogicgames.gdx:gdx:1.11.0")
+    implementation("com.badlogicgames.gdx:gdx-backend-android:1.11.0")
 }
