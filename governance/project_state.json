@@ -555,8 +555,8 @@
       },
       "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
       "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
-      "renderer_ci_run": 36448236193,
-      "renderer_ci_status": "QUEUED_AT_LAST_CHECK"
+      "renderer_ci_run": 36448862550,
+      "renderer_ci_status": "PENDING_AT_LAST_CHECK"
     },
     "selected_live_skin": {
       "skin_id": "3714430278",
@@ -573,7 +573,9 @@
         "size_bytes": 12342220,
         "status": "DECRYPTED_LPK_READY_FOR_DIRECT_USE",
         "preferred_runtime_input": true,
-        "requires_decryption": false
+        "requires_decryption": false,
+        "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+        "exact_identity_enforced": true
       },
       "original_lpk_role": "source identity only; runtime should prefer decrypted zip",
       "format": "Spine",
