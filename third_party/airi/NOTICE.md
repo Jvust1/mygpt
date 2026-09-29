@@ -14,12 +14,16 @@ structures from the following AIRI files:
 - `packages/core-agent/src/messages/compaction.ts`
   - bounded recent-turn history compaction;
 - `packages/stage-ui/src/database/repos/chat-sessions.repo.ts`
-  - local-first durable session/idempotency principles.
+  - local-first durable session/idempotency principles;
+- `packages/ccc/src/define/card.ts`
+  - character card field organization for persona, scenario, greetings, tags and
+    sample conversation behavior.
 
 Local derived/adapted files:
 
 - `brain/mygpt_brain/conversation.py`
 - `brain/mygpt_brain/session_store.py`
+- `brain/mygpt_brain/character_card.py`
 
 Material changes in MyGPT:
 
@@ -31,6 +35,9 @@ Material changes in MyGPT:
 - Request receipts and message IDs are persisted transactionally for local
   replay/idempotency.
 - Provider-specific continuation/media logic is not copied.
+- Character-card TypeScript types are reimplemented as a bounded Pydantic
+  contract. Imported cards remain descriptive data until a caller explicitly
+  approves conversion into trusted persona instructions.
 - Memory and Ollama provider modules are original MyGPT integration code built
   around these boundaries, not AIRI source copies.
 
