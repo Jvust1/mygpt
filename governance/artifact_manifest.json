@@ -430,6 +430,23 @@
       "purpose": "PR #13 refresh CI artifact aligned to PR #10 latest head; includes arm64 Spine/libGDX renderer, exact skin metadata and bundled Spine runtime license notice.",
       "status": "current_ci_verified_device_pending",
       "verification": "Java8 boundary PASS, Android assembleDebug PASS, native libgdx payload PASS. APK 1,381,959 bytes SHA-256 9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593; assets/SPINE_RUNTIME_LICENSE.txt present."
+    },
+    {
+      "artifact_id": "mygpt-3714430278-selfcontained-apk-20260929",
+      "file_name": "mygpt-3714430278-selfcontained-20260929.apk",
+      "type": "android_selfcontained_debug_apk",
+      "drive_file_id_or_path": "19TBASO7hsyRRA8RTyjCL7wVHEIxHZaT6",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "fe694d9b7ce24a6dae5018b0f5711082b632308343bdd0c27dea0d52aadf9c01",
+      "size_bytes": 13724357,
+      "version": "0.0.4-spine-3714430278-selfcontained-private-test",
+      "created_at": "2026-09-29",
+      "source": "assistant_built_from_ci_apk_plus_live_authoritative_skin",
+      "related_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+      "related_commit": "83b303d89ddc4691b7cbc979b9cd5ae9a6a55e82",
+      "purpose": "Private device-test APK that bundles Live skin 3714430278 and auto-loads it on first launch. File picker remains optional override only.",
+      "status": "current_device_validation_candidate",
+      "verification": "APK contains assets/3714430278.zip with SHA-256 eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f, assets/SPINE_RUNTIME_LICENSE.txt, classes.dex and arm64 libgdx.so. APK v2 signature cryptographic verification PASS, signed content digest matches, ZIP integrity PASS, libgdx.so data offset 1146880 is 16K aligned. Drive metadata read-back confirms file ID, name, size and project artifact parent."
     }
   ],
   "notes": [
@@ -450,7 +467,8 @@
     "2026-09-28: synchronized final Book Android + mygpt + Live target and 51-project upstream registry; historical ZIP artifacts were preserved and a current Drive sync receipt was added without manufacturing a new full-source archive.",
     "2026-09-29: recorded the exact-head Spine 4.1 renderer CI artifact for skin 3714430278; GitHub Actions evidence is short-lived/re-creatable, no Drive duplicate was created, physical-device validation remains pending.",
     "2026-09-29: backup static skin image 01 archived under Live/skin and registered as mygpt fallback; primary remains dynamic Spine skin 3714430278.",
-    "2026-09-29: PR #13 refresh aligned skin 3714430278 and backup registry to PR #10 latest head; CI run 36511143238 passed and exact artifact was archived to Drive."
+    "2026-09-29: PR #13 refresh aligned skin 3714430278 and backup registry to PR #10 latest head; CI run 36511143238 passed and exact artifact was archived to Drive.",
+    "2026-09-29: archived the self-contained 3714430278 Android device-test APK; it auto-loads the bundled Live skin and replaces the earlier manual-import-first test flow."
   ],
   "last_updated": "2026-09-29"
 }
