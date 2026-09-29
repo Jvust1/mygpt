@@ -24,6 +24,18 @@ from .core import Contract, ContextValue, Identifier
 from .memory_store import MemoryRecord, MemoryStore
 from .session_store import ChatSessionStore
 
+PresentationEmotion = Literal[
+    "happy",
+    "sad",
+    "angry",
+    "think",
+    "surprised",
+    "awkward",
+    "question",
+    "curious",
+    "neutral",
+]
+
 
 class CompanionPersona(Contract):
     schema_version: Literal["mygpt.companion-persona.v1"] = "mygpt.companion-persona.v1"
@@ -95,6 +107,12 @@ class CompanionChatRequest(Contract):
     book_context: CompanionBookContext | None = None
 
 
+class CompanionReply(Contract):
+    schema_version: Literal["mygpt.companion-reply.v1"] = "mygpt.companion-reply.v1"
+    text: Annotated[str, Field(min_length=1, max_length=8000)]
+    emotion: PresentationEmotion = "neutral"
+
+
 class CompanionChatResult(Contract):
     schema_version: Literal["mygpt.companion-chat-result.v1"] = "mygpt.companion-chat-result.v1"
     request_id: Identifier
@@ -104,6 +122,7 @@ class CompanionChatResult(Contract):
     recalled_memory_ids: list[Identifier]
     compacted_message_ids: list[Identifier]
     context_references: list[str] = Field(default_factory=list)
+    presentation_emotion: PresentationEmotion = "neutral"
     replayed: bool = False
 
 
@@ -132,7 +151,7 @@ class ChatPrompt:
         return messages
 
 
-ChatResponder = Callable[[ChatPrompt], Awaitable[str]]
+ChatResponder = Callable[[ChatPrompt], Awaitable[str | CompanionReply]]
 
 
 class CompanionChatRuntime:
@@ -249,16 +268,22 @@ class CompanionChatRuntime:
             prompt = ChatPrompt(self.persona, window, memories)
 
             try:
-                reply_text = await asyncio.wait_for(
+                raw_reply = await asyncio.wait_for(
                     self.responder(prompt),
                     timeout=self.request_timeout_seconds,
                 )
             except TimeoutError:
                 raise RuntimeError("chat responder timeout") from None
-            if not isinstance(reply_text, str) or not reply_text.strip():
+            if isinstance(raw_reply, str):
+                reply = CompanionReply(text=raw_reply)
+            else:
+                try:
+                    reply = CompanionReply.model_validate(raw_reply)
+                except Exception:
+                    raise RuntimeError("invalid structured chat reply") from None
+            reply_text = reply.text
+            if not reply_text.strip():
                 raise RuntimeError("chat responder returned empty reply")
-            if len(reply_text) > 8000:
-                raise RuntimeError("chat responder reply too long")
 
             assistant_id = "a-" + hashlib.sha256(
                 (request.session_id + "\x1f" + request.request_id + "\x1fassistant").encode("utf-8")
@@ -282,6 +307,7 @@ class CompanionChatRuntime:
                     [request.book_context.context.reference]
                     if request.book_context is not None else []
                 ),
+                presentation_emotion=reply.emotion,
             )
             if self.session_store is not None:
                 durable_messages = [user, assistant]

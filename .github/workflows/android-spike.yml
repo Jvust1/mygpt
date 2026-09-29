@@ -39,6 +39,7 @@ jobs:
           javac --release 8 -d android_spike/build/classes \
             android_spike/src/main/java/dev/mygpt/spike/CompanionCoordinator.java \
             android_spike/src/main/java/dev/mygpt/spike/SkinCapabilityCatalog.java \
+            android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java \
             android_spike/src/main/java/dev/mygpt/spike/SpinePackageLayout.java \
             android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java \
             android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java \

@@ -27,7 +27,7 @@
       "area": "Companion chat/session/character agent runtime",
       "priority": "P0",
       "mode": "CODE_ADAPTED",
-      "why": "Directly advances MyGPT final companion goal: authority-aware chat, durable local sessions, idempotent replay and companion runtime patterns.",
+      "why": "Direct companion runtime adoption: authority-aware chat, durable sessions, character cards, and renderer-neutral emotion protocol.",
       "url": "https://github.com/moeru-ai/airi",
       "license_status": "MIT_VERIFIED",
       "pinned_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
@@ -36,7 +36,9 @@
         "brain/mygpt_brain/conversation.py",
         "brain/mygpt_brain/session_store.py",
         "third_party/airi/LICENSE",
-        "third_party/airi/NOTICE.md"
+        "third_party/airi/NOTICE.md",
+        "brain/mygpt_brain/character_card.py",
+        "android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java"
       ]
     },
     {

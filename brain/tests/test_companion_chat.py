@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta, timezone
 import pytest
-from mygpt_brain.companion_chat import CompanionChatRuntime, CompanionPersona
+from mygpt_brain.companion_chat import (
+    CompanionChatRuntime,
+    CompanionPersona,
+    CompanionReply,
+)
 from mygpt_brain.memory_store import MemoryRecord, MemoryStore
 
 NOW=datetime(2026,9,29,14,0,tzinfo=timezone.utc)
@@ -127,3 +131,23 @@ async def test_expired_book_context_fails_before_provider_call():
             "text":"explain","book_context":context
         },now=NOW)
     assert calls==0
+
+
+@pytest.mark.asyncio
+async def test_structured_reply_carries_renderer_neutral_emotion():
+    async def responder(_prompt):
+        return CompanionReply(text="做得不错，继续。", emotion="happy")
+    persona=CompanionPersona(
+        persona_id="p1",display_name="P",visual_skin_id="3714430278",
+        instructions="Be helpful."
+    )
+    runtime=CompanionChatRuntime(persona=persona,responder=responder)
+    result=await runtime.send({
+        "request_id":"emotion-r1","session_id":"s1","persona_id":"p1","text":"我做完了"
+    },now=NOW)
+    assert result.presentation_emotion=="happy"
+    replay=await runtime.send({
+        "request_id":"emotion-r1","session_id":"s1","persona_id":"p1","text":"我做完了"
+    },now=NOW)
+    assert replay.presentation_emotion=="happy"
+    assert replay.replayed is True

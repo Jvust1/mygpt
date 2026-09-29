@@ -23,6 +23,25 @@ public final class SkinCapabilityCatalogSmoke {
         require(SkinCapabilityCatalog.authoredTransition(
                 SkinCapabilityCatalog.Form.DEFAULT, SkinCapabilityCatalog.Form.AIM) == null,
                 "default to aim is direct until authored transition is discovered");
+        require(PresentationEmotion.fromWire("happy") == PresentationEmotion.HAPPY,
+                "emotion wire mapping");
+        require(PresentationEmotion.fromWire("unknown") == PresentationEmotion.NEUTRAL,
+                "unknown emotion fail-safe");
+        require("smile".equals(SkinCapabilityCatalog.emotionAnimation(
+                SkinCapabilityCatalog.Form.DEFAULT, PresentationEmotion.HAPPY)),
+                "emotion happy");
+        require("sad".equals(SkinCapabilityCatalog.emotionAnimation(
+                SkinCapabilityCatalog.Form.DEFAULT, PresentationEmotion.SAD)),
+                "emotion sad");
+        require("surprise".equals(SkinCapabilityCatalog.emotionAnimation(
+                SkinCapabilityCatalog.Form.DEFAULT, PresentationEmotion.SURPRISED)),
+                "emotion surprise");
+        require("idle".equals(SkinCapabilityCatalog.emotionAnimation(
+                SkinCapabilityCatalog.Form.DEFAULT, PresentationEmotion.ANGRY)),
+                "unsupported emotion does not guess");
+        require("aim_idle".equals(SkinCapabilityCatalog.emotionAnimation(
+                SkinCapabilityCatalog.Form.AIM, PresentationEmotion.HAPPY)),
+                "non-default form does not guess");
         System.out.println("SkinCapabilityCatalogSmoke PASS");
     }
 

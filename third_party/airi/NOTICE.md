@@ -17,13 +17,16 @@ structures from the following AIRI files:
   - local-first durable session/idempotency principles;
 - `packages/ccc/src/define/card.ts`
   - character card field organization for persona, scenario, greetings, tags and
-    sample conversation behavior.
+    sample conversation behavior;
+- `packages/stage-ui-spine/src/constants/emotions.ts`
+  - renderer-neutral emotion vocabulary used across character renderers.
 
 Local derived/adapted files:
 
 - `brain/mygpt_brain/conversation.py`
 - `brain/mygpt_brain/session_store.py`
 - `brain/mygpt_brain/character_card.py`
+- `android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java`
 
 Material changes in MyGPT:
 
