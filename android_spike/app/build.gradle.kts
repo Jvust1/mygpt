@@ -14,8 +14,8 @@ android {
         applicationId = "dev.mygpt.spike"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.0.3-spine-3714430278"
+        versionCode = 4
+        versionName = "0.0.4-spine-3714430278-selfcontained"
         ndk {
             // First device target is Xiaomi 14 / Snapdragon 8 Gen 3.
             abiFilters += "arm64-v8a"
