@@ -1,3 +1,18 @@
+## E014 — Latest branch-head rerun after device checklist (2026-09-29)
+
+**Status:** ACCEPTED_EXACT_HEAD_CI / DEVICE_PENDING
+
+The Xiaomi 14 validation checklist was added at `b515e506baff573284fa6249bf82e75982bbe750`. The runtime implementation remains `a076be06e2e4c3eeecdab3f1860143771bfef0d3`; this latest head adds documentation and governance only.
+
+- Workflow run [36553738585](https://github.com/Jvust/mygpt/actions/runs/36553738585) completed with `success`.
+- Java 8 boundary job `109357805251` and Android host job `109357805448` both succeeded.
+- Artifact `11026122163` / `mygpt-spine-3714430278-android-spike`: 1,256,530 bytes; SHA-256 `7cbee4b7f4fe3530f5966420b8179ea1275ece6b0649f64bcb8a996783f21873`; expires 2026-10-02T10:10:58Z.
+- The APK ZIP was downloaded and its SHA-256 matched the GitHub artifact digest.
+
+This rerun preserves the prior renderer acceptance and confirms the current PR head remains CI-green. It still does not prove Xiaomi 14 rendering, SAF import, background-reopen behavior or a genuine Book Android producer.
+
+---
+
 ## E013 — Spine 4.1 renderer exact-head CI pass (2026-09-29)
 
 **Status:** ACCEPTED_EXACT_HEAD_CI / DEVICE_PENDING

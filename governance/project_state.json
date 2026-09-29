@@ -603,18 +603,19 @@
         "GENTLE_CHECK_IN": "action -> idle fallback"
       }
     },
-    "renderer_ci_run": 36449517394,
+    "renderer_ci_run": 36553738585,
     "renderer_ci_status": "success",
     "renderer_ci": {
-      "exact_head": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
-      "workflow_run": 36449517394,
-      "java8_job": 109020458878,
-      "android_job": 109020458429,
-      "artifact_id": 10983131261,
+      "implementation_head": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
+      "exact_head": "b515e506baff573284fa6249bf82e75982bbe750",
+      "workflow_run": 36553738585,
+      "java8_job": 109357805251,
+      "android_job": 109357805448,
+      "artifact_id": 11026122163,
       "artifact_name": "mygpt-spine-3714430278-android-spike",
-      "artifact_sha256": "1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411",
-      "artifact_size_bytes": 1256529,
-      "artifact_expires_at": "2026-10-01T16:16:10Z",
+      "artifact_sha256": "7cbee4b7f4fe3530f5966420b8179ea1275ece6b0649f64bcb8a996783f21873",
+      "artifact_size_bytes": 1256530,
+      "artifact_expires_at": "2026-10-02T10:10:58Z",
       "native_payload_check": "PASS"
     }
   }

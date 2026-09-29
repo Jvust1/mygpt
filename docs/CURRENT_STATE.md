@@ -1,10 +1,10 @@
-## 当前 Android Spine 渲染 exact-head CI 已通过（真机待验）
+## 当前 Android Spine 渲染 exact-head CI 已通过（最新分支头，真机待验）
 
-截至 2026-09-29，Draft PR #10 的精确头提交 `a076be06e2e4c3eeecdab3f1860143771bfef0d3` 已通过 Android companion boundary workflow run [36449517394](https://github.com/Jvust/mygpt/actions/runs/36449517394)。Java 8 package-layout smoke job `109020458878` 与 Android `assembleDebug`/Spine native payload job `109020458429` 均成功。GitHub Actions artifact `10983131261`（`mygpt-spine-3714430278-android-spike`，1,256,529 bytes，SHA-256 `1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411`，保留至 2026-10-01）是当前 CI 证据；它是短期可重建产物，不是 Drive 长期归档。
+截至 2026-09-29，Draft PR #10 最新分支头 `b515e506baff573284fa6249bf82e75982bbe750`（Spine renderer implementation head `a076be06`，之后仅增加验收清单与治理同步）已通过 Android companion boundary workflow run [36553738585](https://github.com/Jvust/mygpt/actions/runs/36553738585)。Java 8 package-layout smoke job `109357805251` 与 Android `assembleDebug`/Spine native payload job `109357805448` 均成功。最新 GitHub Actions artifact `11026122163`（`mygpt-spine-3714430278-android-spike`，1,256,530 bytes，SHA-256 `7cbee4b7f4fe3530f5966420b8179ea1275ece6b0649f64bcb8a996783f21873`，保留至 2026-10-02T10:10:58Z）是当前 CI 证据；它是短期可重建产物，不是 Drive 长期归档。
 
-这一步把状态从“renderer coded / CI pending”推进到“renderer exact-head CI pass / device pending”。已验证的是包布局校验、Spine 4.1.20 资源路径、Java 8 边界 smoke、Android 构建和 APK native payload；仍未验证小米 14 真机上的 SAF 导入、首帧、idle/cue 切换、后台恢复，以及真实 Book Android study-event producer。Spine Runtime 许可证仍是任何可分发构建的独立门槛；PR #10 保持 Draft，main 未修改。
+这一步确认最新分支头仍保持“renderer exact-head CI pass / device pending”。已验证的是包布局校验、Spine 4.1.20 资源路径、Java 8 边界 smoke、Android 构建和 APK native payload；仍未验证小米 14 真机上的 SAF 导入、首帧、idle/cue 切换、后台恢复，以及真实 Book Android study-event producer。Spine Runtime 许可证仍是任何可分发构建的独立门槛；PR #10 保持 Draft，main 未修改。
 
-下一步：在小米 14 安装该 exact-head debug APK，选择已解密 `3714430278.zip`，逐项记录首帧、`QUIET/PAUSED/NEEDS_INPUT/GENTLE_CHECK_IN`、后台重开和失败恢复，再接入真实且可撤销的 Book 事件源。
+下一步：按 `docs/ANDROID_SPINE_DEVICE_VALIDATION_CHECKLIST_20260929.md` 在小米 14 安装最新 exact-head APK，选择已解密 `3714430278.zip`，逐项记录首帧、`QUIET/PAUSED/NEEDS_INPUT/GENTLE_CHECK_IN`、后台重开和失败恢复，再接入真实且可撤销的 Book 事件源。
 
 ---
 

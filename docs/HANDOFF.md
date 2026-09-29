@@ -1,10 +1,10 @@
-## 当前接手点 · Spine exact-head CI 通过，进入小米 14 真机门
+## 当前接手点 · 最新 exact-head CI 通过，进入小米 14 真机门
 
-- 分支：`feat/android-companion-boundary-20260928`；Draft PR #10；精确 head `a076be06e2e4c3eeecdab3f1860143771bfef0d3`；未合并，main 未修改。
-- CI：run [36449517394](https://github.com/Jvust/mygpt/actions/runs/36449517394) 成功；Java 8 job `109020458878`、Android host job `109020458429` 成功。
-- 产物：GitHub artifact `10983131261` / `mygpt-spine-3714430278-android-spike`，1,256,529 bytes，SHA-256 `1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411`，2026-10-01 到期。该产物未复制到 Drive；manifest 只登记 GitHub artifact 身份。
+- 分支：`feat/android-companion-boundary-20260928`；Draft PR #10；最新 head `b515e506baff573284fa6249bf82e75982bbe750`；renderer implementation head `a076be06`；未合并，main 未修改。
+- CI：run [36553738585](https://github.com/Jvust/mygpt/actions/runs/36553738585) 成功；Java 8 job `109357805251`、Android host job `109357805448` 成功。
+- 产物：GitHub artifact `11026122163` / `mygpt-spine-3714430278-android-spike`，1,256,530 bytes，SHA-256 `7cbee4b7f4fe3530f5966420b8179ea1275ece6b0649f64bcb8a996783f21873`，2026-10-02T10:10:58Z 到期。该产物未复制到 Drive；manifest 只登记 GitHub artifact 身份。
 - 已验证：`3714430278.zip` 的 Spine 4.1.20 包布局与安全解压边界、Java 8 coordinator/package-layout smoke、Android debug 构建、`lib/arm64-v8a/libgdx.so` 与 `classes.dex`。
-- 尚待：小米 14 安装、SAF 选择已解密包、首帧与 idle/cue/background-reopen、真实 Book Android producer。Book 事件仍为 synthetic test double；Spine Runtime 仍限私有调试评估。
+- 尚待：按照 [真机清单](ANDROID_SPINE_DEVICE_VALIDATION_CHECKLIST_20260929.md) 完成小米 14 安装、SAF 选择已解密包、首帧与 idle/cue/background-reopen、真实 Book Android producer。Book 事件仍为 synthetic test double；Spine Runtime 仍限私有调试评估。
 
 接手后先保存真机日志和截图，再修改状态文件；不要把 CI 通过写成 device acceptance，也不要 merge PR #10。
 
