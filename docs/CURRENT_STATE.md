@@ -1,3 +1,22 @@
+## 2026-09-29 · MyGPT 0.0.5 页面美化版
+
+PR #13 已完成 Android 页面第一轮产品化美化，并通过最新 exact-head CI。
+
+- App 名称：`MyGPT`
+- 版本：`0.0.5-companion-ui-3714430278`
+- 页面结构：品牌区 → 人物卡片 → 当前状态 → 学习陪伴操作 → 角色设置 → 开发说明
+- 人物区域改为圆角卡片并与 Spine 背景统一。
+- 学习按钮按用途重新分组，不再是测试工具式纵向按钮堆叠。
+- 换皮入口降级为“角色设置”里的可选功能。
+- 皮肤音频保持完全关闭。
+- exact-head CI run `36523316210`：Java8 PASS、Android assembleDebug PASS、arm64 native payload PASS。
+- 新自包含 APK：`mygpt-3714430278-ui-v0.0.5-20260929.apk`
+- APK SHA-256：`d53c9c0e9bda17fcfaf5fe607690449154a1089c5289e2571f4702460765a34b`
+- Drive ID：`1qQ7BJNmN6qh900Qo8rRfAeft6gBH9eN5`
+- 内置皮肤 SHA-256：`eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+- 与上一版自包含 APK 使用相同签名证书，可作为覆盖升级候选。
+- 当前仍待小米 14 真机视觉/交互验收。
+
 ## 2026-09-29 · 自包含 3714430278 APK
 
 用户真机反馈上一版仍要求手动选择 ZIP，且所选文件 SHA-256 为 `578b...`，与 Live 权威包 `eb6edd...` 不一致。当前源码已具备“优先自动加载 APK 内置 `3714430278.zip`”逻辑；在此基础上已生成一份真正自包含的私有测试 APK：
