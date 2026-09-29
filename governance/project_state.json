@@ -707,8 +707,18 @@
       "zip_integrity": "PASS",
       "native_alignment": "lib/arm64-v8a/libgdx.so data offset 1146880; 16K aligned",
       "install_note": "Locally re-signed debug artifact uses a new debug key; uninstall a differently-signed prior dev.mygpt.spike build before installation if required.",
-      "drive_archive_id": null,
-      "distribution": "PRIVATE_DEVICE_TEST_ONLY"
+      "drive_archive_id": "19TBASO7hsyRRA8RTyjCL7wVHEIxHZaT6",
+      "distribution": "PRIVATE_DEVICE_TEST_ONLY",
+      "drive_archive_name": "mygpt-3714430278-selfcontained-20260929.apk",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "drive_archive_status": "ARCHIVED_AND_METADATA_READBACK_VERIFIED",
+      "final_verification": {
+        "bundled_skin_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+        "v2_signature_crypto": "PASS",
+        "content_digest_match": true,
+        "zip_integrity": "PASS",
+        "libgdx_16k_alignment": "PASS"
+      }
     }
   }
 }
