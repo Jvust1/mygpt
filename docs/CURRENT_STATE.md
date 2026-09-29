@@ -1,3 +1,26 @@
+## 2026-09-29 · AIRI-derived companion brain candidate · PR #15
+
+A new stacked draft branch `feat/airi-chat-memory-brain-20260929` now sits on top of the current PR #13 skin/Android line. This is the first bounded direct AIRI code adoption for MyGPT rather than a reference-only registry entry.
+
+Implemented:
+- chat message authority separation: system/developer vs application context;
+- AIRI-style durable/current merge and message dedupe;
+- bounded recent conversation compaction without silently converting old raw chat into semantic memory;
+- explicit SQLite long-term memory with Chinese tag/query support;
+- durable SQLite sessions and request receipts, including replay across process restarts;
+- loopback-only Ollama adapter at `127.0.0.1:11434/api/chat`;
+- runnable `brain/scripts/chat_local_ollama.py`, where long-term memory is created only through explicit `:remember`;
+- pinned AIRI MIT license and adaptation notice.
+
+Verification:
+- isolated local candidate suite: **18 passed / 0 failed**;
+- GitHub Actions run `36590899728` attempted twice but both ended before step 1 with `runner_id=0` and no steps, so remote code tests are **not executed**, not failed assertions;
+- no live Ollama model call has been accepted as evidence yet.
+
+Commits: `226c477d` (implementation) + `6438752d` (persistence hardening / CI branch enablement). Draft PR: #15. Main remains untouched. The existing Xiaomi 14 multi-form skin acceptance gate remains independently pending.
+
+---
+
 ## 2026-09-29 · 0.0.6 安装修复 + 三形态
 
 上一份 0.0.5 自包含 APK 在 Android 真机出现“解析软件包时出现问题”。复核确认 ZIP 本体和内置皮肤没有损坏；问题来自本地重签名步骤生成了结构错误的 APK v2 signer framing。0.0.5 设备包因此降级为不可用历史证据。

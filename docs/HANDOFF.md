@@ -1,3 +1,11 @@
+## Parallel candidate · PR #15 · AIRI chat/memory brain
+
+A stacked draft PR #15 (`feat/airi-chat-memory-brain-20260929` → `feat/spine-3714430278-runtime-refresh-20260929`) now contains the first bounded direct AIRI adoption: authority-aware chat contracts, durable local sessions/request receipts, explicit SQLite memory, and a loopback-only Ollama adapter. AIRI is pinned at `b40e3e87b149ea5fb75d4944440493829e601411` under MIT with in-repo attribution. Local isolated tests are 18/18; GitHub run `36590899728` failed twice before allocating a runner, so remote tests remain pending. Do not describe this as live-model or Android acceptance yet. Do not auto-merge.
+
+The Android/skin Xiaomi 14 gate below remains valid and independent; PR #15 must not overwrite that historical/device state.
+
+---
+
 ## 当前接手点 · Spine exact-head CI 通过，进入小米 14 真机门
 
 - 分支：`feat/android-companion-boundary-20260928`；Draft PR #10；精确 head `a076be06e2e4c3eeecdab3f1860143771bfef0d3`；未合并，main 未修改。

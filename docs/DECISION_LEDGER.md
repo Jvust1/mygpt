@@ -72,3 +72,6 @@ A skin is not considered fully integrated merely because one skeleton, atlas, te
 ## D024 — skin audio is out of scope
 Skin integration in mygpt/Live is visual and interaction focused. Voice, BGM and SFX packaged with skins are not loaded, played, mapped or counted toward skin utilization/completion. Full-utilization requirements cover visual forms, animations, expressions, transitions, effects, layout and interaction only.
 
+
+## D025 — companion chat authority and memory are explicit/local
+MyGPT directly adapts AIRI's MIT-licensed authority-separated conversation, merge/deduplication, bounded-history and local-first session persistence patterns from pinned upstream commit `b40e3e87b149ea5fb75d4944440493829e601411`. Trusted persona/developer instructions remain distinct from application context and recalled memory; context/memory is projected as data, not silently upgraded to system authority. Long-term memory is explicit/reviewed local state rather than automatic transcript ingestion. The first real provider adapter is deliberately loopback-only Ollama; arbitrary remote provider URLs are outside this candidate. Full attribution is retained in `third_party/airi/`.

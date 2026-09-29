@@ -1,3 +1,21 @@
+## Implemented bounded adoption — Project AIRI (2026-09-29)
+
+AIRI is no longer only a research reference. Draft PR #15 directly adapts a bounded MIT-licensed subset from pinned upstream commit `b40e3e87b149ea5fb75d4944440493829e601411`.
+
+Implemented in MyGPT:
+- authority-separated chat/context contracts;
+- stable stored/current message merge and deduplication;
+- bounded recent-turn compaction;
+- durable SQLite session persistence and idempotent request receipts;
+- explicit local memory (MyGPT-original integration layer; transcripts are not auto-promoted);
+- loopback-only Ollama provider adapter and local developer CLI.
+
+Attribution is mandatory and lives in `third_party/airi/LICENSE` + `third_party/airi/NOTICE.md`. This does **not** vendor the whole AIRI monorepo. Android Pocket/Tamagotchi and richer agent modules remain later candidates and must be adopted only when they directly advance the final MyGPT product.
+
+Verification at this checkpoint: local candidate tests 18/18 pass. GitHub Actions run 36590899728 failed twice before step 1 with runner_id=0, so remote code tests have not executed yet.
+
+---
+
 # mygpt Open-Source Adoption Plan
 
 Date: 2026-09-27

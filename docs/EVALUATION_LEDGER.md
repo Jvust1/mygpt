@@ -1,3 +1,20 @@
+## E014 — AIRI-derived local companion chat/memory candidate (2026-09-29)
+
+**Status:** LOCAL_TEST_PASS / REMOTE_RUNNER_INFRA_BLOCKED / LIVE_MODEL_NOT_RUN
+
+**Source:** draft PR #15 on `feat/airi-chat-memory-brain-20260929`; implementation commit `226c477ddb2ea07bd1646361896320007d28f2a2`, hardening/CI commit `6438752db7a2c67b14f632f871739e7a3266edca`.
+
+### Evidence
+- isolated candidate suite: **18 passed / 0 failed**;
+- tests cover explicit authority boundaries, AIRI-style merge/dedupe, bounded history, Chinese memory retrieval, persistence across process restart, idempotent request replay, multi-session system-ID isolation, persistence failure rollback behavior, and loopback-only Ollama request projection;
+- AIRI source pinned to `b40e3e87b149ea5fb75d4944440493829e601411`, MIT license reproduced in-repo;
+- GitHub Actions run `36590899728` attempts 1 and 2 both ended before step 1 with `runner_id=0`, so no remote test assertion executed.
+
+### Limits
+This does not prove a real Ollama model response, Android embedding, Book-to-chat context injection, voice, or Xiaomi 14 behavior. Long-term memories are explicit local records; no automatic transcript-to-memory policy is accepted here. Remote CI remains unverified until GitHub allocates a runner and executes the suite.
+
+---
+
 ## E013 — Spine 4.1 renderer exact-head CI pass (2026-09-29)
 
 **Status:** ACCEPTED_EXACT_HEAD_CI / DEVICE_PENDING

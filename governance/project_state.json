@@ -485,11 +485,11 @@
     "user_device_acceptance": false
   },
   "open_source_adoption": {
-    "status": "REGISTRY_ESTABLISHED_REFERENCE_FIRST",
+    "status": "REGISTRY_PLUS_BOUNDED_CODE_ADOPTION",
     "registry": "governance/open_source_sources.json",
     "plan": "docs/OPEN_SOURCE_ADOPTION.md",
-    "candidate_count": 51,
-    "code_copied_by_registry": false,
+    "candidate_count": 52,
+    "code_copied_by_registry": true,
     "immediate_tracks": [
       "Android host architecture and testing",
       "persistent floating companion surface",
@@ -523,6 +523,7 @@
         "letta-ai/letta"
       ],
       "character": [
+        "moeru-ai/airi",
         "Live2D/CubismJavaSamples",
         "Live2D/CubismJavaFramework",
         "Inochi2D/inochi2d",
@@ -796,5 +797,46 @@
       "corrected_in": "mygpt-3714430278-v0.0.6-multiform-fixed-20260929.apk",
       "correction": "Rebuilt APK Signature Scheme v2 block with correct nested length-prefix structure and verified RSA signature plus content digest."
     }
+  },
+  "companion_chat_candidate": {
+    "branch": "feat/airi-chat-memory-brain-20260929",
+    "draft_pr": 15,
+    "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+    "upstream": {
+      "repository": "moeru-ai/airi",
+      "pinned_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
+      "license": "MIT",
+      "notice": "third_party/airi/NOTICE.md"
+    },
+    "implementation_commits": [
+      "226c477ddb2ea07bd1646361896320007d28f2a2",
+      "6438752db7a2c67b14f632f871739e7a3266edca"
+    ],
+    "capabilities": [
+      "authority-separated chat messages",
+      "AIRI-style durable/current message dedupe",
+      "bounded recent conversation window",
+      "explicit SQLite companion memory with Chinese retrieval",
+      "SQLite chat session persistence",
+      "durable idempotent request receipts",
+      "loopback-only Ollama responder",
+      "developer CLI with explicit :remember"
+    ],
+    "local_test": {
+      "passed": 18,
+      "failed": 0,
+      "environment": "isolated Python candidate suite"
+    },
+    "github_ci": {
+      "run_id": 36590899728,
+      "attempts": 2,
+      "status": "RUNNER_PROVISIONING_FAILED_BEFORE_STEP_1",
+      "evidence": "runner_id=0 and empty step list on both attempts",
+      "code_test_result": "NOT_EXECUTED"
+    },
+    "live_ollama_call": "NOT_RUN",
+    "automatic_transcript_memory": false,
+    "provider_boundary": "127.0.0.1:11434 only",
+    "status": "DRAFT_CANDIDATE_LOCAL_TEST_PASS_REMOTE_CI_INFRA_BLOCKED"
   }
 }
