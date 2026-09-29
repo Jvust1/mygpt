@@ -18,7 +18,7 @@ For every new skin package, the integration process MUST:
 
 1. enumerate every file in the package;
 2. identify every renderable model / skeleton / atlas / texture set;
-3. identify every animation, expression, costume, alternate state, effect, audio reference, physics/config file and transition rule;
+3. identify every animation, expression, costume, alternate state, effect, physics/config file and transition rule;
 4. parse configuration files before choosing a "main" runtime path;
 5. build a **Skin Capability Manifest**;
 6. build a **Skin State Graph** describing legal transitions;
@@ -74,7 +74,6 @@ Before renderer implementation, produce a machine-readable inventory containing 
 - all atlas files;
 - all texture files;
 - all config/manifest files;
-- all audio files;
 - all effect/shader files;
 - all alternate model sets;
 - orphan/unreferenced files;
@@ -103,7 +102,6 @@ Each skin should eventually expose a normalized manifest similar to:
   "expressions": {},
   "transitions": {},
   "effects": {},
-  "audio": {},
   "fallbacks": {},
   "unsupported": []
 }
@@ -121,7 +119,6 @@ A capability can be one of:
 - **transition** — form-to-form or mode-to-mode animation;
 - **effect** — particle/shader/attachment behavior;
 - **interaction** — tap/drag/hover/reaction;
-- **audio** — voice/BGM/SFX reference;
 - **camera/layout** — authored bounds, scale or anchor rules;
 - **metadata** — names, groups, tags and semantic hints.
 
@@ -331,19 +328,9 @@ For every texture:
 - detect alternate atlases/resolutions;
 - do not discard opaque textures until the dependency graph proves they are unreachable.
 
-## 14. Audio/effects utilization
+## 14. Effects utilization
 
-If a skin package contains audio/effect resources, they should be inventoried even if mygpt does not enable them immediately.
-
-The manifest must separately mark:
-
-- present;
-- parsed;
-- supported by runtime;
-- enabled by product;
-- disabled intentionally.
-
-Presence does not automatically imply playback permission.
+Visual effects may be inventoried and used when they contribute to the character presentation. **Audio is explicitly out of scope for skin integration.** Voice, BGM and SFX are not loaded, not played, not required for coverage, and do not affect skin completion status.
 
 ## 15. Coverage metric
 
@@ -497,7 +484,8 @@ For `3714430278`:
 5. implement multi-form loading;
 6. implement `change_cos` / transition state machine;
 7. map mygpt cues to the richer animation set;
-8. test default / aim / cover on Xiaomi 14;
-9. record coverage and remaining unsupported capabilities;
-10. only then mark the skin fully integrated.
+8. keep all skin audio disabled and outside the runtime contract;
+9. test default / aim / cover on Xiaomi 14;
+10. record coverage and remaining unsupported capabilities;
+11. only then mark the skin fully integrated.
 
