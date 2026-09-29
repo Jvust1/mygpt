@@ -1,3 +1,24 @@
+## Latest parallel checkpoint · PR #15 companion runtime expansion
+
+Draft PR #15 is now at `741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5`, stacked on the current PR #13 skin branch. It contains direct, attributed code adoption from AIRI (MIT), Mem0 (Apache-2.0) and sherpa-onnx (Apache-2.0).
+
+The current added layers are:
+`Book ephemeral context -> authority-aware chat -> explicit/auditable memory -> local Ollama interface -> renderer-neutral emotion`, plus an Android PCM capture foundation for future offline ASR.
+
+Important limits:
+- Book/Live repositories were not modified;
+- no raw Book context is persisted by the chat candidate;
+- no chat transcript is auto-promoted to memory;
+- no real Ollama call accepted yet;
+- microphone permission is not automatically requested;
+- raw audio is not stored;
+- GitHub Actions is presently failing before runner allocation (`runner_id=0`, zero steps), so do not report remote CI as passed or as a code assertion failure;
+- Android physical-device acceptance remains pending.
+
+Use `third_party/*/NOTICE.md` and `governance/open_source_sources.json` before further direct code copying. Do not auto-merge PR #15.
+
+---
+
 ## Parallel candidate · PR #15 · AIRI chat/memory brain
 
 A stacked draft PR #15 (`feat/airi-chat-memory-brain-20260929` → `feat/spine-3714430278-runtime-refresh-20260929`) now contains the first bounded direct AIRI adoption: authority-aware chat contracts, durable local sessions/request receipts, explicit SQLite memory, and a loopback-only Ollama adapter. AIRI is pinned at `b40e3e87b149ea5fb75d4944440493829e601411` under MIT with in-repo attribution. Local isolated tests are 18/18; GitHub run `36590899728` failed twice before allocating a runner, so remote tests remain pending. Do not describe this as live-model or Android acceptance yet. Do not auto-merge.

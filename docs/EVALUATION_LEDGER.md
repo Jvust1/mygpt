@@ -1,3 +1,27 @@
+## E015 — PR #15 expanded companion runtime partial validation (2026-09-29)
+
+**Status:** PARTIAL_LOCAL_VALIDATION / GITHUB_RUNNER_INFRA_BLOCKED / DEVICE_AND_LIVE_MODEL_PENDING
+
+**Exact head:** `741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5`
+
+### Implemented since E014
+- ephemeral Book semantic chat context, lower-authority and non-persistent;
+- approved AIRI-derived Character Card contract + `3714430278` MyGPT persona;
+- Mem0-style memory update/delete/history audit lifecycle;
+- sherpa-derived Android PCM capture foundation;
+- AIRI emotion wire protocol and conservative 3714430278 mapping.
+
+### Evidence
+- earlier initial Python candidate remained 18/18 in its isolated local suite;
+- independent local Java-8 smoke compiled with `javac --release 8` and executed successfully for PCM normalization, emotion wire parsing and conservative skin mapping;
+- GitHub Brain run `36594289643`: job had `runner_id=0`, 0 steps;
+- GitHub Android run `36594581646`: both jobs had `runner_id=0`, 0 steps.
+
+### Interpretation
+Those GitHub failures occurred before a runner executed any repository code and are classified as infrastructure/provisioning failures, not code-test failures. The newer exact-head Python suite has not yet executed remotely. Live Ollama inference, Android microphone capture, chat-to-Spine device behavior and Xiaomi 14 acceptance are still pending.
+
+---
+
 ## E014 — AIRI-derived local companion chat/memory candidate (2026-09-29)
 
 **Status:** LOCAL_TEST_PASS / REMOTE_RUNNER_INFRA_BLOCKED / LIVE_MODEL_NOT_RUN

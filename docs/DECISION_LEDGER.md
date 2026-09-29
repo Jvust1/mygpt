@@ -75,3 +75,12 @@ Skin integration in mygpt/Live is visual and interaction focused. Voice, BGM and
 
 ## D025 — companion chat authority and memory are explicit/local
 MyGPT directly adapts AIRI's MIT-licensed authority-separated conversation, merge/deduplication, bounded-history and local-first session persistence patterns from pinned upstream commit `b40e3e87b149ea5fb75d4944440493829e601411`. Trusted persona/developer instructions remain distinct from application context and recalled memory; context/memory is projected as data, not silently upgraded to system authority. Long-term memory is explicit/reviewed local state rather than automatic transcript ingestion. The first real provider adapter is deliberately loopback-only Ollama; arbitrary remote provider URLs are outside this candidate. Full attribution is retained in `third_party/airi/`.
+
+## D026 — long-term memory must be correctable and auditable
+MyGPT memory is not append-only truth. Following Mem0-style lifecycle semantics, explicit memories support update, delete and history. Updates preserve memory identity fields and append an audit event; deletes remove the active memory while preserving the audit event. Raw conversation is not automatically promoted into long-term memory.
+
+## D027 — voice capture is explicit and engine-neutral
+The first Android voice layer is a 16 kHz mono PCM capture foundation adapted from sherpa-onnx. It does not request RECORD_AUDIO permission automatically, persist raw audio, or commit to one ASR engine. Permission must follow an explicit user action; sherpa-onnx, whisper.cpp or another local engine can be benchmarked behind the same frame interface.
+
+## D028 — brain-to-character emotion uses a renderer-neutral protocol
+MyGPT adopts AIRI's renderer-neutral emotion vocabulary so chat/voice logic does not depend on one skin. A specific skin may play only authored semantically matching animations. For 3714430278, happy/sad/surprised map to smile/sad/surprise; unsupported emotions fall back to idle rather than guessing with unrelated combat/action animations.

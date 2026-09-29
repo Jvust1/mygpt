@@ -1,3 +1,30 @@
+## 2026-09-29 · PR #15 expanded companion runtime checkpoint
+
+PR #15 has advanced from the initial AIRI chat/session candidate into a broader companion runtime stack.
+
+Direct bounded upstream adoption now includes:
+- **Project AIRI (MIT):** authority-aware conversation, stored/current message merge/dedupe, bounded history, Character Card fields, and renderer-neutral emotion vocabulary;
+- **Mem0 (Apache-2.0):** explicit memory update/delete/history lifecycle with auditable local change records;
+- **sherpa-onnx (Apache-2.0):** Android 16 kHz mono AudioRecord capture pattern and PCM16 normalization foundation.
+
+MyGPT-specific integration added:
+- ephemeral Book semantic context enters chat only as lower-authority application data and is not persisted in chat history or memory;
+- skin `3714430278` now has an approved MyGPT character card with persona/scenario/greeting/example-dialogue fields;
+- memory CLI supports `:remember`, `:update`, `:forget`, `:history`;
+- Android voice capture does not request microphone permission automatically and does not write raw audio to disk;
+- chat replies can carry AIRI-compatible `happy/sad/angry/think/surprised/awkward/question/curious/neutral` presentation emotions;
+- 3714430278 only maps exact authored matches (`smile/sad/surprise`); unsupported emotions fail safe to the current form's idle.
+
+Validation:
+- initial Python companion candidate: **18/18 local tests passed** before the later Book/card/memory-history/voice/emotion expansion;
+- independent local Java-8 smoke for PCM + emotion protocol: **PASS**;
+- GitHub Actions remains infrastructure-blocked: representative Brain run `36594289643` and Android run `36594581646` have `runner_id=0` and zero executed steps. These are not assertion/test failures;
+- exact-head full Python suite, live Ollama inference, microphone device capture and Xiaomi 14 chat/voice integration remain unaccepted.
+
+Current exact branch head at this checkpoint: `741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5`. Main remains untouched and PR #15 stays Draft.
+
+---
+
 ## 2026-09-29 · AIRI-derived companion brain candidate · PR #15
 
 A new stacked draft branch `feat/airi-chat-memory-brain-20260929` now sits on top of the current PR #13 skin/Android line. This is the first bounded direct AIRI code adoption for MyGPT rather than a reference-only registry entry.

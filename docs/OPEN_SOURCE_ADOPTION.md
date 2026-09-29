@@ -1,3 +1,13 @@
+## Additional direct adoption — Mem0 + sherpa-onnx + AIRI Character/Emotion (2026-09-29)
+
+- `mem0ai/mem0@94c3fe9f...` (Apache-2.0): adapted update/delete/history audit semantics into `brain/mygpt_brain/memory_store.py`. MyGPT keeps memory creation explicit and local; no transcript-wide auto-capture was enabled.
+- `k2-fsa/sherpa-onnx@040afe36...` (Apache-2.0): adapted the Android Java demo's 16 kHz mono AudioRecord/PCM normalization foundation. Recognizer/model weights are **not** bundled yet; microphone permission is not auto-requested.
+- `moeru-ai/airi@b40e3e87...` (MIT): added Character Card fields and the shared renderer-neutral emotion vocabulary. Imported cards cannot self-promote to system authority; explicit approval is required.
+
+Attribution and upstream licenses are stored under `third_party/airi`, `third_party/mem0`, and `third_party/sherpa-onnx`.
+
+---
+
 ## Implemented bounded adoption — Project AIRI (2026-09-29)
 
 AIRI is no longer only a research reference. Draft PR #15 directly adapts a bounded MIT-licensed subset from pinned upstream commit `b40e3e87b149ea5fb75d4944440493829e601411`.

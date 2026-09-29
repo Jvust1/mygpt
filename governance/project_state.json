@@ -802,41 +802,95 @@
     "branch": "feat/airi-chat-memory-brain-20260929",
     "draft_pr": 15,
     "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-    "upstream": {
-      "repository": "moeru-ai/airi",
-      "pinned_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
-      "license": "MIT",
-      "notice": "third_party/airi/NOTICE.md"
-    },
+    "latest_head": "741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5",
+    "upstreams": [
+      {
+        "repository": "moeru-ai/airi",
+        "pinned_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
+        "license": "MIT"
+      },
+      {
+        "repository": "mem0ai/mem0",
+        "pinned_commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+        "license": "Apache-2.0"
+      },
+      {
+        "repository": "k2-fsa/sherpa-onnx",
+        "pinned_commit": "040afe360a38e25daaa325ce8889abf93ea02609",
+        "license": "Apache-2.0"
+      }
+    ],
     "implementation_commits": [
       "226c477ddb2ea07bd1646361896320007d28f2a2",
-      "6438752db7a2c67b14f632f871739e7a3266edca"
+      "6438752db7a2c67b14f632f871739e7a3266edca",
+      "6b75e4cf94ee1afccc0b57715a788e448e6df625",
+      "52c23ccb203500bc8cbd53a027a51c46321ecf8c",
+      "cda2e5e38c43a56894e9909e70a8ddf722a75b11",
+      "f02944b1a74f2eb976d263f66f1874824b24ea04",
+      "7dadc28b937911b8a42336592a5497b8ebbcc096",
+      "741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5"
     ],
     "capabilities": [
       "authority-separated chat messages",
       "AIRI-style durable/current message dedupe",
       "bounded recent conversation window",
+      "ephemeral Book semantic context injected as lower-authority data",
+      "AIRI-derived approved character-card/persona contract bound to skin 3714430278",
       "explicit SQLite companion memory with Chinese retrieval",
+      "Mem0-style memory update/delete/history audit lifecycle",
       "SQLite chat session persistence",
       "durable idempotent request receipts",
       "loopback-only Ollama responder",
-      "developer CLI with explicit :remember"
+      "developer CLI with explicit remember/update/forget/history commands",
+      "sherpa-derived Android 16kHz mono PCM capture foundation without automatic permission request",
+      "AIRI renderer-neutral emotion protocol mapped conservatively to authored 3714430278 animations"
     ],
-    "local_test": {
-      "passed": 18,
-      "failed": 0,
-      "environment": "isolated Python candidate suite"
+    "validation": {
+      "initial_python_candidate": {
+        "passed": 18,
+        "failed": 0,
+        "scope": "initial AIRI chat/session/memory/Ollama candidate before later expansions"
+      },
+      "local_java8_smoke": {
+        "result": "PASS",
+        "scope": "VoicePcm normalization + PresentationEmotion wire mapping + conservative 3714430278 emotion mapping",
+        "command": "javac --release 8 + java smoke in independent execution environment"
+      },
+      "github_actions": {
+        "status": "RUNNER_PROVISIONING_FAILED_BEFORE_STEP_1",
+        "evidence": [
+          {
+            "run_id": 36594289643,
+            "job": "focused",
+            "runner_id": 0,
+            "steps": 0
+          },
+          {
+            "run_id": 36594581646,
+            "jobs": [
+              "android-debug-host",
+              "java8-boundary"
+            ],
+            "runner_id": 0,
+            "steps": 0
+          }
+        ],
+        "code_test_result": "NOT_EXECUTED"
+      },
+      "exact_head_full_python_suite": "NOT_EXECUTED",
+      "live_ollama_call": "NOT_RUN",
+      "android_microphone_device_test": "NOT_RUN"
     },
-    "github_ci": {
-      "run_id": 36590899728,
-      "attempts": 2,
-      "status": "RUNNER_PROVISIONING_FAILED_BEFORE_STEP_1",
-      "evidence": "runner_id=0 and empty step list on both attempts",
-      "code_test_result": "NOT_EXECUTED"
+    "boundaries": {
+      "automatic_transcript_memory": false,
+      "book_context_persisted": false,
+      "arbitrary_remote_provider": false,
+      "ollama_endpoint": "127.0.0.1:11434 only",
+      "microphone_permission_auto_request": false,
+      "raw_audio_persisted": false,
+      "book_repo_modified": false,
+      "live_repo_modified": false
     },
-    "live_ollama_call": "NOT_RUN",
-    "automatic_transcript_memory": false,
-    "provider_boundary": "127.0.0.1:11434 only",
-    "status": "DRAFT_CANDIDATE_LOCAL_TEST_PASS_REMOTE_CI_INFRA_BLOCKED"
+    "status": "DRAFT_EXPANDED_LOCAL_PARTIAL_VALIDATION_REMOTE_CI_INFRA_BLOCKED"
   }
 }
