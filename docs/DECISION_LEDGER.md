@@ -66,3 +66,9 @@ mygpt is responsible for conversation, teaching assistance, encouragement, super
 ## D022 — upstream adoption is broad in research and narrow in shipping dependencies
 mygpt maintains a broad upstream registry across Android, local AI, voice, supervision, memory and character runtimes so mature open-source work is continuously reused. “Adopt” does not mean bulk-vendoring every repository. Production dependencies must remain small, replaceable and explicitly version/license/security checked; restricted/copyleft projects remain reference-only until a separate decision permits their integration. The canonical registry is `governance/open_source_sources.json` and the adoption plan is `docs/OPEN_SOURCE_ADOPTION.md`.
 
+## D023 — skin integration must maximize authored package capabilities
+A skin is not considered fully integrated merely because one skeleton, atlas, texture or idle animation renders. Live must first inventory and classify the complete package, including alternate forms, skeletons, atlases, textures, animations, expressions, transitions, effects, audio references and configuration-driven state changes. mygpt consumes a normalized capability contract from Live and maps semantic companion states to those capabilities. Unknown or intentionally unsupported resources must be explicitly recorded. The canonical implementation plan is `docs/SKIN_FULL_UTILIZATION_PLAN.md`. For skin `3714430278`, default / aim / cover resources and their authored transitions must be treated as one multi-state skin rather than discarding opaque `misc_*` resources.
+
+## D024 — skin audio is out of scope
+Skin integration in mygpt/Live is visual and interaction focused. Voice, BGM and SFX packaged with skins are not loaded, played, mapped or counted toward skin utilization/completion. Full-utilization requirements cover visual forms, animations, expressions, transitions, effects, layout and interaction only.
+

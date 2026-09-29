@@ -3,9 +3,9 @@
   "updated_date": "2026-09-29",
   "repository": "Jvust/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/android-companion-boundary-20260928",
-  "phase": "ANDROID_SPINE_CHARACTER_RUNTIME_EXACT_HEAD_CI_PASS",
-  "status": "SPINE_3714430278_RENDERER_CI_PASS_DEVICE_PENDING",
+  "active_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+  "phase": "ANDROID_MULTIFORM_V006_INSTALL_FIXED_CI_PASS",
+  "status": "INSTALLABLE_V2_MULTIFORM_APK_READY_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -38,6 +38,40 @@
         "Live": "authoritative character skins and visual presentation assets",
         "mygpt": "companion reasoning, conversation, teaching assistance, supervision and intervention orchestration"
       }
+    },
+    "skin_strategy": {
+      "authority": "Jvust/Live",
+      "primary_dynamic_skin": "3714430278",
+      "backup_static_skins": [
+        "backup_skin_image_01"
+      ],
+      "candidate_registry": "android_spike/skin_candidates.json"
+    },
+    "skin_utilization_policy": {
+      "authority": "Jvust/Live",
+      "plan": "docs/SKIN_FULL_UTILIZATION_PLAN.md",
+      "rule": "mygpt consumes the full normalized capability set of a skin; first-frame or default-only rendering is not completion.",
+      "current_skin_3714430278": {
+        "maturity": "L2_PARTIAL",
+        "target": "L6_DEVICE_ACCEPTED_FULL_CAPABILITY",
+        "forms": [
+          "default",
+          "aim",
+          "cover"
+        ],
+        "required_next": [
+          "full inventory",
+          "capability manifest",
+          "state graph",
+          "multi-form renderer",
+          "transition mapping",
+          "Xiaomi 14 acceptance"
+        ]
+      }
+    },
+    "skin_audio_policy": {
+      "enabled": false,
+      "scope": "Skin voice/BGM/SFX are excluded from runtime, semantic mapping, acceptance, and completion metrics."
     }
   },
   "dependencies": {
@@ -71,7 +105,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Install the exact-head debug APK on a Xiaomi 14 physical device, select the already-decrypted Live package 3714430278.zip through SAF, verify first frame/idle/cue transitions/background-reopen, then connect the genuine trusted Book Android study-event producer.",
+  "next_step": "Install the v0.0.6 multi-form fixed APK on Xiaomi 14. Verify Android package installation first, then DEFAULT/AIM/COVER first frames, authored AIM↔COVER transitions, action cycling, background/reopen and automatic bundled-skin loading. After device acceptance, connect genuine Book Android events.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -501,7 +535,7 @@
     "branch": "feat/android-companion-boundary-20260928",
     "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
     "scope": "Pure Java 8 Book event coordinator, renderer-neutral Live cue port, and isolated synthetic Android debug host",
-    "verification": "PREVIOUS_BOUNDARY_CI_PASS; SPINE_RENDERER_EXACT_HEAD_CI_PASS_DEVICE_PENDING",
+    "verification": "REFRESH_BRANCH_JAVA8_AND_ANDROID_CI_PASS_NATIVE_AND_LICENSE_PAYLOAD_VERIFIED_DEVICE_PENDING",
     "book_live_transport": "NOT_CONNECTED",
     "apk": "DEBUG_APK_BUILT_SYNTHETIC_DEVICE_PENDING",
     "provider_calls": 0,
@@ -517,7 +551,7 @@
       "kind": "SYNTHETIC_ANDROID_DEBUG_ONLY",
       "build": "CI_PASS",
       "book_authentication": "TEST_DOUBLE",
-      "live_renderer": "SPINE_LIBGDX_4_1_EXACT_HEAD_CI_PASS_DEVICE_PENDING",
+      "live_renderer": "SPINE_LIBGDX_4_1_REFRESH_CI_PASS_DEVICE_PENDING",
       "permissions": [],
       "implementation_commit": "eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b",
       "ci": {
@@ -555,8 +589,44 @@
       },
       "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
       "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
-      "renderer_ci_run": 36448862550,
-      "renderer_ci_status": "PENDING_AT_LAST_CHECK"
+      "renderer_ci_run": 36511143238,
+      "renderer_ci_status": "SUCCESS",
+      "renderer_baseline_ci": {
+        "source_commit": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
+        "run_id": 36449517394,
+        "java8_boundary": "SUCCESS",
+        "android_debug_host": "SUCCESS",
+        "native_payload_check": "SUCCESS",
+        "github_artifact_id": 10983131261,
+        "github_artifact_digest": "sha256:1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411",
+        "github_artifact_size_bytes": 1256529,
+        "apk_sha256": "d7eea8e80e1d782e0ff0e8f350d6064b9f7b415f595af480c03e22667d7b56c9",
+        "apk_size_bytes": 1381049,
+        "arm64_libgdx_present": true,
+        "spine_license_notice_present": false,
+        "note": "PR #10 latest baseline before refresh; refresh branch adds the runtime license notice and skin governance without reverting PR #10."
+      },
+      "renderer_ci_source_commit": "b48268e66633f6b1d1230d392afa450ebb0c3ab4",
+      "renderer_ci_jobs": {
+        "java8_boundary": "SUCCESS",
+        "android_debug_host": "SUCCESS",
+        "native_payload_check": "SUCCESS"
+      },
+      "renderer_artifact": {
+        "github_artifact_id": 11008074830,
+        "github_artifact_name": "mygpt-spine-3714430278-android-spike",
+        "github_artifact_digest": "sha256:70546d140e5d2aee8442776866741d7f68f4c07b6d27bc86dddfd59ad5757420",
+        "github_artifact_size_bytes": 1257407,
+        "github_expires_at": "2026-10-02T02:09:35Z",
+        "drive_archive_id": "1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa",
+        "drive_archive_name": "mygpt-spine-3714430278-refresh-run36511143238.zip",
+        "apk_name": "app-debug.apk",
+        "apk_size_bytes": 1381959,
+        "apk_sha256": "9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593",
+        "arm64_libgdx_present": true,
+        "spine_license_notice_present": true,
+        "classes_dex_present": true
+      }
     },
     "selected_live_skin": {
       "skin_id": "3714430278",
@@ -566,7 +636,7 @@
       "config_drive_file_id": "1O87dhnMOs2faZvFMWepm2DM-1Lqa51RW",
       "preview_drive_file_id": "1DwSlVnuGPp6EAOAnECSkNfm0mZeExTZx",
       "mygpt_asset_copy": false,
-      "status": "SELECTED_DECRYPTED_RUNTIME_PACKAGE_READY_CI_PASS_DEVICE_PENDING",
+      "status": "MULTIFORM_IMPLEMENTED_CI_PASS_DEVICE_PENDING",
       "runtime_package": {
         "file_name": "3714430278.zip",
         "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
@@ -575,7 +645,10 @@
         "preferred_runtime_input": true,
         "requires_decryption": false,
         "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
-        "exact_identity_enforced": true
+        "exact_identity_enforced": true,
+        "entries": 13,
+        "uncompressed_bytes": 12340902,
+        "zip_crc": "PASS"
       },
       "original_lpk_role": "source identity only; runtime should prefer decrypted zip",
       "format": "Spine",
@@ -592,15 +665,55 @@
       "renderer_candidate": {
         "runtime": "spine-libgdx",
         "runtime_version": "4.1.0",
-        "libgdx_line": "1.11.0",
-        "status": "IMPLEMENTED_EXACT_HEAD_CI_PASS_DEVICE_PENDING",
-        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION"
+        "libgdx_line": "1.10.0",
+        "status": "REFRESH_CI_VERIFIED_DEVICE_PENDING",
+        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION",
+        "abi": "arm64-v8a",
+        "native_packaging": "lib/arm64-v8a/libgdx.so from gdx-platform:1.10.0:natives-arm64-v8a",
+        "license_notice_path": "android_spike/app/src/main/assets/SPINE_RUNTIME_LICENSE.txt",
+        "ci_run": 36511143238,
+        "apk_sha256": "9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593",
+        "baseline_ci_run": 36449517394,
+        "baseline_apk_sha256": "d7eea8e80e1d782e0ff0e8f350d6064b9f7b415f595af480c03e22667d7b56c9",
+        "drive_artifact_id": "1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa"
       },
       "motion_mapping": {
         "QUIET": "idle",
         "PAUSED": "freeze-current",
         "NEEDS_INPUT": "smile -> idle fallback",
         "GENTLE_CHECK_IN": "action -> idle fallback"
+      },
+      "full_utilization_target": {
+        "current_maturity": "L4_FULL_CAPABILITY_IMPLEMENTATION_CI_PASS",
+        "target_maturity": "L6_DEVICE_ACCEPTANCE",
+        "forms": [
+          "default",
+          "aim",
+          "cover"
+        ],
+        "package_files_extracted": "13/13",
+        "runtime_texture_aliases": [
+          "misc_04.png -> c610_aim_00.png",
+          "misc_05.png -> c610_cover_00.png"
+        ],
+        "authored_transitions": [
+          "aim -> cover via to_cover",
+          "cover -> aim via to_aim"
+        ],
+        "direct_switches": [
+          "default -> aim",
+          "default -> cover",
+          "aim -> default",
+          "cover -> default"
+        ],
+        "action_cycle": true,
+        "semantic_cue_mapping": true,
+        "audio": false,
+        "manifests": [
+          "android_spike/skin/3714430278/skin_inventory.json",
+          "android_spike/skin/3714430278/skin_capabilities.json",
+          "android_spike/skin/3714430278/skin_state_graph.json"
+        ]
       }
     },
     "renderer_ci_run": 36449517394,
@@ -616,6 +729,72 @@
       "artifact_size_bytes": 1256529,
       "artifact_expires_at": "2026-10-01T16:16:10Z",
       "native_payload_check": "PASS"
+    },
+    "renderer_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+    "backup_skin": {
+      "id": "backup_skin_image_01",
+      "role": "backup_static_character_skin_reference",
+      "source": "user_upload",
+      "file_name": "mygpt_backup_skin_01_679CB8C0A379FE2655C951F73CA47FC3.png",
+      "drive_file_id": "1adRumPFELRvB_4d7ORfnvUZRPhUTOLDW",
+      "drive_parent_id": "1F1deaHZp4zYN03GyDHiMSzdHRSB081pj",
+      "sha256": "9d03cf43b5d60a8ae486c17979e72bd294e479fc58732971aaa205df7e3f5cff",
+      "size_bytes": 3056688,
+      "mime_type": "image/png",
+      "runtime_kind": "STATIC_IMAGE",
+      "direct_dynamic_runtime": false,
+      "intended_uses": [
+        "backup companion visual reference",
+        "static portrait fallback",
+        "future dynamic-skin visual source"
+      ],
+      "status": "ARCHIVED_IN_LIVE_DRIVE_REFERENCE_READY",
+      "authority": "Jvust/Live + Live Drive skin library"
+    },
+    "selfcontained_device_build": {
+      "version_code": 6,
+      "version_name": "0.0.6-multiform-3714430278",
+      "source_head": "327638d084d46d565b5a833ac064810ef8d1b124",
+      "ci_run": 36525176168,
+      "ci_artifact_id": 11013719188,
+      "ci_java8": "SUCCESS",
+      "ci_android": "SUCCESS",
+      "full_package_smoke": "SUCCESS",
+      "bundled_asset": "assets/3714430278.zip",
+      "bundled_asset_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+      "apk_file_name": "mygpt-3714430278-v0.0.6-multiform-fixed-20260929.apk",
+      "apk_size_bytes": 13740669,
+      "apk_sha256": "638f48511dc00a52dcde78bdc13a9d17a3fd673c3c3636eb96ff031b56b66a71",
+      "drive_file_id": "1NoYIaXGgFdMtgxcOw9MCI84wxI07U4DR",
+      "signature_scheme": "APK Signature Scheme v2",
+      "signer_cert_sha256": "42221fbf403ebe655ce71ffe514f1f3424c50f7abfd39a650f49c82bb1c8dac6",
+      "v2_structure": "PASS",
+      "rsa_signature": "PASS",
+      "apk_content_digest": "PASS",
+      "zip_integrity": "PASS",
+      "libgdx_16k_alignment": "PASS",
+      "auto_load": true,
+      "audio": false,
+      "distribution": "PRIVATE_DEVICE_TEST_ONLY"
+    },
+    "ui_candidate_v005": {
+      "source_head": "da0642c84ce85d36b99fbd3309fb66db7abe259b",
+      "version_code": 5,
+      "version_name": "0.0.5-companion-ui-3714430278",
+      "app_label": "MyGPT",
+      "layout": "brand header + character card + status card + learning controls + character settings",
+      "audio": false,
+      "ci_run": 36523316210,
+      "ci_java8": "SUCCESS",
+      "ci_android": "SUCCESS",
+      "native_payload": "SUCCESS"
+    },
+    "package_parse_incident": {
+      "affected_artifact": "mygpt-3714430278-ui-v0.0.5-20260929.apk",
+      "symptom": "Android reported package parse/install failure",
+      "root_cause": "Locally generated APK v2 signing block had malformed signer framing; ZIP payload itself was intact.",
+      "corrected_in": "mygpt-3714430278-v0.0.6-multiform-fixed-20260929.apk",
+      "correction": "Rebuilt APK Signature Scheme v2 block with correct nested length-prefix structure and verified RSA signature plus content digest."
     }
   }
 }

@@ -1,3 +1,88 @@
+## 2026-09-29 · 0.0.6 安装修复 + 三形态
+
+上一份 0.0.5 自包含 APK 在 Android 真机出现“解析软件包时出现问题”。复核确认 ZIP 本体和内置皮肤没有损坏；问题来自本地重签名步骤生成了结构错误的 APK v2 signer framing。0.0.5 设备包因此降级为不可用历史证据。
+
+当前修正版：
+- `0.0.6-multiform-3714430278`
+- 源码 head：`327638d084d46d565b5a833ac064810ef8d1b124`
+- CI run：`36525176168`，Java8 full-package smoke / Android assembleDebug / native payload 全部 PASS
+- APK：`mygpt-3714430278-v0.0.6-multiform-fixed-20260929.apk`
+- APK SHA-256：`638f48511dc00a52dcde78bdc13a9d17a3fd673c3c3636eb96ff031b56b66a71`
+- Drive ID：`1NoYIaXGgFdMtgxcOw9MCI84wxI07U4DR`
+- 内置皮肤 SHA-256：`eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+- APK v2 signer 结构 / RSA 签名 / signed content digest：PASS
+- ZIP 完整性：PASS
+- arm64 `libgdx.so` 16K 对齐：PASS
+
+3714430278 已从 default-only 推进到 L4 代码实现：
+- 完整提取并校验 13/13 文件
+- DEFAULT：`skeleton.bin + c610_00.atlas + c610_00.png`
+- AIM：`misc_01.bin + misc_02.atlas + misc_04.png`
+- COVER：`misc_08.bin + misc_03.atlas + misc_05.png`
+- AIM → COVER：先播放 `to_cover`，完成后切换 COVER
+- COVER → AIM：先播放 `to_aim`，完成后切换 AIM
+- 其他无原生过渡的路径采用直接 form swap，并明确记录为 direct switch
+- 一次性动作结束自动回当前形态 idle
+- 页面新增 DEFAULT / AIM / COVER 和“待机 / 主要动作 / 反应动作 / 下一个动作”控制，可循环验收完整动作集合
+- 音频继续完全关闭
+- 已新增 `skin_inventory.json`、`skin_capabilities.json`、`skin_state_graph.json`
+
+下一门槛是 L6：小米 14 真机安装 + 三形态首帧/动作/切换/后台恢复验收。
+
+## 2026-09-29 · MyGPT 0.0.5 页面美化版
+
+PR #13 已完成 Android 页面第一轮产品化美化，并通过最新 exact-head CI。
+
+- App 名称：`MyGPT`
+- 版本：`0.0.5-companion-ui-3714430278`
+- 页面结构：品牌区 → 人物卡片 → 当前状态 → 学习陪伴操作 → 角色设置 → 开发说明
+- 人物区域改为圆角卡片并与 Spine 背景统一。
+- 学习按钮按用途重新分组，不再是测试工具式纵向按钮堆叠。
+- 换皮入口降级为“角色设置”里的可选功能。
+- 皮肤音频保持完全关闭。
+- exact-head CI run `36523316210`：Java8 PASS、Android assembleDebug PASS、arm64 native payload PASS。
+- 新自包含 APK：`mygpt-3714430278-ui-v0.0.5-20260929.apk`
+- APK SHA-256：`d53c9c0e9bda17fcfaf5fe607690449154a1089c5289e2571f4702460765a34b`
+- Drive ID：`1qQ7BJNmN6qh900Qo8rRfAeft6gBH9eN5`
+- 内置皮肤 SHA-256：`eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+- 与上一版自包含 APK 使用相同签名证书，可作为覆盖升级候选。
+- 当前仍待小米 14 真机视觉/交互验收。
+
+## 2026-09-29 · 自包含 3714430278 APK
+
+用户真机反馈上一版仍要求手动选择 ZIP，且所选文件 SHA-256 为 `578b...`，与 Live 权威包 `eb6edd...` 不一致。当前源码已具备“优先自动加载 APK 内置 `3714430278.zip`”逻辑；在此基础上已生成一份真正自包含的私有测试 APK：
+
+- 内置资产：`assets/3714430278.zip`
+- 资产 SHA-256：`eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+- APK：13,724,357 bytes
+- APK SHA-256：`fe694d9b7ce24a6dae5018b0f5711082b632308343bdd0c27dea0d52aadf9c01`
+- Drive 长期归档：`19TBASO7hsyRRA8RTyjCL7wVHEIxHZaT6`（`mygpt/02_Generated_Artifacts/mygpt-3714430278-selfcontained-20260929.apk`）
+- APK Signature Scheme v2：本地密码学结构验证 PASS
+- ZIP 完整性：PASS
+- `lib/arm64-v8a/libgdx.so`：16K 对齐保持 PASS
+- 启动行为：首次启动直接从 APK assets 自动安装并加载主皮肤；“更换皮肤包”只作为可选入口。
+- 因本次本地私有测试 APK 重新签名，若与已安装测试版签名不同，需要先卸载旧 `dev.mygpt.spike` 再安装。
+- 仍未宣称真机显示已通过；需要用户安装后确认首帧、idle、cue 与后台/恢复。
+
+## 2026-09-29 · PR #13 刷新验收
+
+- PR #13 从 PR #10 最新 head `3ad7d14a5446a3c0c6f23aa7e00703a3535f4e7e` 派生，保留 PR #10 当天新增的 CURRENT_STATE / EVALUATION_LEDGER / HANDOFF 状态。
+- refresh 测试 head：`b48268e66633f6b1d1230d392afa450ebb0c3ab4`。
+- workflow run `36511143238`：Java8 boundary PASS、Android assembleDebug PASS、`lib/arm64-v8a/libgdx.so` payload PASS。
+- APK：1,381,959 bytes，SHA-256 `9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593`；Spine runtime license notice 已包含。
+- 长期 Drive artifact：`1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa`。
+- PR #12 作为旧对账线被 PR #13 取代；主动态皮肤仍为 `3714430278`，静态备选仍为 `backup_skin_image_01`。
+- 下一门槛仍是小米 14 真机显示验收；真实 Book Android 学习事件尚未接入。
+
+## 2026-09-29 · Live 主/备皮肤同步
+
+- 主动态皮肤继续为 Live `3714430278`：Spine 4.1.20，Android CI 已通过，真机待验。
+- CI APK SHA-256：`44bb4863c944c05e0acb30a7be9df6b9751b3600fc144e05812f4ee74d68fae2`；长期 Drive artifact ID：`1keutv3dGtexS2mMYoV8ptF7sOpq5f-7H`。
+- 新增静态备选皮肤 `backup_skin_image_01`，Live Drive ID：`1adRumPFELRvB_4d7ORfnvUZRPhUTOLDW`，SHA-256：`9d03cf43b5d60a8ae486c17979e72bd294e479fc58732971aaa205df7e3f5cff`。
+- 备选图当前仅作为静态 fallback / 人物视觉参考，不宣称具有 Spine/Live2D 动态能力。
+- 新增 `android_spike/skin_candidates.json` 记录主/备关系；Live 继续是皮肤资产权威源。
+- 本节现已重放到 PR #10 最新 head；PR #10 在 2026-09-29 新增的状态/评估/交接内容全部保留。
+
 ## 当前 Android Spine 渲染 exact-head CI 已通过（真机待验）
 
 截至 2026-09-29，Draft PR #10 的精确头提交 `a076be06e2e4c3eeecdab3f1860143771bfef0d3` 已通过 Android companion boundary workflow run [36449517394](https://github.com/Jvust/mygpt/actions/runs/36449517394)。Java 8 package-layout smoke job `109020458878` 与 Android `assembleDebug`/Spine native payload job `109020458429` 均成功。GitHub Actions artifact `10983131261`（`mygpt-spine-3714430278-android-spike`，1,256,529 bytes，SHA-256 `1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411`，保留至 2026-10-01）是当前 CI 证据；它是短期可重建产物，不是 Drive 长期归档。
