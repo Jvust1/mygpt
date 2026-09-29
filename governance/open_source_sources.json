@@ -303,11 +303,18 @@
       "repo": "k2-fsa/sherpa-onnx",
       "area": "Speech stack",
       "priority": "P0",
-      "mode": "ENGINE_CANDIDATE",
-      "why": "Cross-platform offline ASR/TTS/VAD options suitable for Android evaluation.",
+      "mode": "CODE_ADAPTED",
+      "why": "Android 16 kHz mono microphone capture/PCM normalization base for future offline ASR; recognizer/model remains separately gated.",
       "url": "https://github.com/k2-fsa/sherpa-onnx",
-      "code_copied": false,
-      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "040afe360a38e25daaa325ce8889abf93ea02609",
+      "local_paths": [
+        "android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java",
+        "android_spike/app/src/main/java/dev/mygpt/spike/VoiceCaptureSession.java",
+        "third_party/sherpa-onnx/LICENSE",
+        "third_party/sherpa-onnx/NOTICE.md"
+      ]
     },
     {
       "repo": "pytorch/executorch",

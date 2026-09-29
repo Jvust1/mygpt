@@ -40,12 +40,15 @@ jobs:
             android_spike/src/main/java/dev/mygpt/spike/CompanionCoordinator.java \
             android_spike/src/main/java/dev/mygpt/spike/SkinCapabilityCatalog.java \
             android_spike/src/main/java/dev/mygpt/spike/SpinePackageLayout.java \
+            android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java \
             android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/SpinePackageLayoutSmoke.java \
-            android_spike/src/test/java/dev/mygpt/spike/SkinCapabilityCatalogSmoke.java
+            android_spike/src/test/java/dev/mygpt/spike/SkinCapabilityCatalogSmoke.java \
+            android_spike/src/test/java/dev/mygpt/spike/VoicePcmSmoke.java
           java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.SpinePackageLayoutSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.SkinCapabilityCatalogSmoke
+          java -cp android_spike/build/classes dev.mygpt.spike.VoicePcmSmoke
 
   android-debug-host:
     if: github.repository == 'Jvust/mygpt'
