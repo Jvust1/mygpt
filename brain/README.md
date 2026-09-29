@@ -1,3 +1,46 @@
+## 当前候选 · AIRI/Mem0/sherpa 伴侣 Brain + Native Loopback API
+
+Draft PR #15 已在既有 Brain 旁新增一条**独立候选链路**，不改变下方已验收的历史 TestModel/Reader 入口：
+
+```text
+Book 临时语义上下文
+        ↓（低权限 data，不持久化）
+CompanionChatRuntime
+        ├─ AIRI：会话权威/去重/Character Card/Emotion
+        ├─ Mem0：显式、可修改/删除/审计的长期记忆
+        └─ Ollama：固定 127.0.0.1 本地 provider
+        ↓
+text + presentation_emotion
+```
+
+启动真实本机 Ollama 候选服务：
+
+```sh
+cd brain
+python scripts/serve_companion_ollama.py --model <已安装的Ollama模型名>
+```
+
+默认角色卡为 `personas/3714430278.json`。服务只绑定 `127.0.0.1`，启动时生成随机 Bearer token，并写入 `.mygpt-local/companion.token`；token **不会打印到 stdout**。服务结束时只在文件内容仍与本次 token 一致时删除该文件。
+
+Native API 目前只有：
+- `GET /api/v1/status`
+- `POST /api/v1/chat`
+- `POST /api/v1/revoke`
+
+每次请求还必须携带 `X-MyGPT-Client: mygpt-companion-native-v1`。HTTP 层不能切换模型、provider URL、persona 或监听地址；不提供 CORS，也不支持 LAN/公网绑定。
+
+开发者命令行聊天仍可使用：
+
+```sh
+python scripts/chat_local_ollama.py --model <已安装的Ollama模型名>
+```
+
+其长期记忆命令为 `:remember / :update / :forget / :history / :memories`。聊天正文不会自动升级成长时记忆。
+
+当前验证边界：早期 AIRI 候选 Python 聚焦测试 18/18 通过，新增纯 Java PCM/Emotion 协议在独立 Java 8 smoke 中 PASS；GitHub hosted runner 当前在 step 1 前即失败（runner_id=0），因此最新 exact-head Python/Android 全套仍待真正执行。不要把本节描述成 Xiaomi 14、真实 Book、真实 Ollama 或语音实机已经验收。
+
+---
+
 ## 当前能力 · 本机 Loopback Brain / TestModel
 
 最新已验收链路把浏览器请求真正送入 Python：`LocalBrainEngine` 会按来源身份重建 `ReaderStudyContext v2`，执行 `SESSION_STARTED` 和 `HELP_REQUESTED`，只有 Brain 决策为 `explain` 且来源引用一致时才继续到 Pydantic AI `TestModel`。

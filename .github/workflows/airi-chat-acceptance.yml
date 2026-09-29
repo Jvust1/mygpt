@@ -19,6 +19,7 @@ on:
       - 'brain/tests/test_providers.py'
       - 'brain/tests/test_character_card.py'
       - 'brain/tests/test_companion_service.py'
+      - 'brain/scripts/serve_companion_ollama.py'
       - '.github/workflows/airi-chat-acceptance.yml'
 
 permissions:
@@ -50,4 +51,4 @@ jobs:
             tests/test_character_card.py
       - name: Compile new runtime modules
         working-directory: brain
-        run: python -m compileall -q mygpt_brain scripts/chat_local_ollama.py
+        run: python -m compileall -q mygpt_brain scripts/chat_local_ollama.py scripts/serve_companion_ollama.py
