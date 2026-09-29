@@ -1,0 +1,95 @@
+name: Android companion boundary spike
+on:
+  push:
+    paths:
+      - 'android_spike/**'
+      - '.github/workflows/android-spike.yml'
+  pull_request:
+    paths:
+      - 'android_spike/**'
+      - '.github/workflows/android-spike.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mygpt-android-spike-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  java8-boundary:
+    if: github.repository == 'Jvust/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile for Java 8 and run boundary smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p android_spike/build/classes
+          javac --release 8 -d android_spike/build/classes \
+            android_spike/src/main/java/dev/mygpt/spike/CompanionCoordinator.java \
+            android_spike/src/main/java/dev/mygpt/spike/SpinePackageLayout.java \
+            android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java \
+            android_spike/src/test/java/dev/mygpt/spike/SpinePackageLayoutSmoke.java
+          java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
+          java -cp android_spike/build/classes dev.mygpt.spike.SpinePackageLayoutSmoke
+  android-debug-host:
+    if: github.repository == 'Jvust/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4.4.3
+        with:
+          gradle-version: '8.13'
+      - name: Check hosted Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_HOME"
+          test -d "$ANDROID_HOME/platforms/android-35"
+      - name: Build isolated synthetic Android test host
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle -p android_spike :app:assembleDebug --no-daemon
+      - name: Verify Spine host APK native payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import zipfile
+          apk = "android_spike/app/build/outputs/apk/debug/app-debug.apk"
+          with zipfile.ZipFile(apk) as z:
+              names = set(z.namelist())
+              required = "lib/arm64-v8a/libgdx.so"
+              if required not in names:
+                  raise SystemExit(f"missing {required}")
+              if "classes.dex" not in names:
+                  raise SystemExit("missing classes.dex")
+              print("APK native payload PASS:", required)
+          PY
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: mygpt-spine-3714430278-android-spike
+          path: android_spike/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 3

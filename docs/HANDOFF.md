@@ -1,10 +1,52 @@
-## 2026-09-27 继续推进接手点
+## 当前接手点 · 最新 exact-head CI 通过，进入小米 14 真机门
 
-- 当前本地推进分支为 `codex/progress-mygpt-20260927`，最新提交 `9b05a4b`。
-- PR #9 桌面交付与 PR #8 / Book authority 独立审查已完成，状态为 `ACCEPTED_FOR_USER_DEVICE_VALIDATION`。
-- 本地桌面回归为 18 个 pytest 用例、6 个子测试和 Node 66 个用例通过；`doctor` 在隔离环境已为 READY。
-- 下一步是用户 Windows 设备验收，以及受信任环境中的真实 Book 选段 → mygpt localhost/Android Studio TestModel 联调；真实 provider 仍保持关闭。
-- 受信任同进程联调已完成：Book authority `bf7aa490...` → mygpt `c1b4ce7...`，lease、重复收据和撤销重放均通过；该结果仍不替代用户设备、Book APK 或 Android Studio 验收。
+- 分支：`feat/android-companion-boundary-20260928`；Draft PR #10；最新 head `b515e506baff573284fa6249bf82e75982bbe750`；renderer implementation head `a076be06`；未合并，main 未修改。
+- CI：run [36553738585](https://github.com/Jvust/mygpt/actions/runs/36553738585) 成功；Java 8 job `109357805251`、Android host job `109357805448` 成功。
+- 产物：GitHub artifact `11026122163` / `mygpt-spine-3714430278-android-spike`，1,256,530 bytes，SHA-256 `7cbee4b7f4fe3530f5966420b8179ea1275ece6b0649f64bcb8a996783f21873`，2026-10-02T10:10:58Z 到期。该产物未复制到 Drive；manifest 只登记 GitHub artifact 身份。
+- 已验证：`3714430278.zip` 的 Spine 4.1.20 包布局与安全解压边界、Java 8 coordinator/package-layout smoke、Android debug 构建、`lib/arm64-v8a/libgdx.so` 与 `classes.dex`。
+- 尚待：按照 [真机清单](ANDROID_SPINE_DEVICE_VALIDATION_CHECKLIST_20260929.md) 完成小米 14 安装、SAF 选择已解密包、首帧与 idle/cue/background-reopen、真实 Book Android producer。Book 事件仍为 synthetic test double；Spine Runtime 仍限私有调试评估。
+
+接手后先保存真机日志和截图，再修改状态文件；不要把 CI 通过写成 device acceptance，也不要 merge PR #10。
+
+---
+
+## 当前 Android 生命周期成果与源码快照
+
+项目分支 `feat/android-companion-boundary-20260928` 持续保持 Draft PR #10。最新代码验证：push run `36369308484` 与 PR run `36369310978` 的 Java 8 smoke、Android debug 构建通过。当前 debug APK Drive ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`（SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`）；完整源码快照 Drive ID `1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy`（commit `bf996e6e64c3f4d078102d337be31480dedf2f88`，131 tracked files，SHA-256 `006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc`）；变更文件评审包 Drive ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`（SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`）。真机生命周期验证及真实 Book/Live 接入仍待完成。
+
+---
+
+## Android 生命周期成果归档补充
+
+当前 GitHub 分支头：`986b7b39cf0eda54e74e096f701d4b132c5bbdd9`，Draft PR #10 保持未合并。
+
+- 最新合成 Android debug APK：Drive 文件 ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`，14,913 bytes，SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`。
+- 变更文件评审包：Drive 文件 ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`，21,323 bytes，SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`。它包含 Android 测试宿主变更和 APK，不是完整仓库快照；完整源码以 GitHub 分支为准。
+- Java 8 smoke 与 Android `:app:assembleDebug` 已通过 push run `36369308484` 和 PR run `36369310978`。
+- 离开前台、撤销、结束或到期时清除合成会话；本次提醒授权须重新开启。
+- 真机生命周期验收、Book 真实学习事件和 Live 角色渲染仍待完成。
+
+此补充更新本收据上一次同步时“没有 APK 或测试产物”的状态描述；上文作为当时同步记录保留。
+
+---
+
+## 2026-09-28 Android 宿主生命周期修复（CI 通过，真机待验）
+
+`feat/android-companion-boundary-20260928@eef4d8e`、Draft PR #10：离开前台或锁屏即清除合成会话，到期后无需后续事件也收起提示；撤销、结束或新会话均需重新开启本次提醒。push run [`36369308484`](https://github.com/Jvust/mygpt/actions/runs/36369308484) 与 PR run [`36369310978`](https://github.com/Jvust/mygpt/actions/runs/36369310978) 的 Java 8 smoke、Android debug 构建成功。当前 APK 14,913 bytes，SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`，Drive 文件 ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`；上一版保留为历史候选。仍未在真机上安装操作，Book 真实学习事件与 Live 角色均未接入。
+
+---
+
+## 2026-09-28 Android 合成测试宿主 APK（CI 通过，真机待验）
+
+`feat/android-companion-boundary-20260928@332e9a2`、Draft PR #10：独立 Android debug 宿主的按钮产生明确标注的合成 Book 事件，驱动 Java 状态机和文字 cue；撤销立即清除会话。push run [`36368235878`](https://github.com/Jvust/mygpt/actions/runs/36368235878) 的 Java 8 smoke 与 `assembleDebug` 均成功。APK 14,033 bytes，SHA-256 `2a80adbb5bab0187f2b42eba22a044f79552eb13336468cef9b176b9b2bced78`，Drive 文件 ID `1HXRW8XBmHyG0lJtfP6FX3KvZ-SOCM8rY`。首次 run `36368130257` 因 setup-android 请求已移除的 SDK tools 包失败，改用 runner 预装 SDK 后通过。Manifest 不请求网络、麦克风或悬浮窗权限。Book 真实学习事件、Live 角色渲染、模型、语音和用户真机验收仍未完成。
+
+---
+
+## 2026-09-28 Android 集成边界原型（CI 通过）
+
+`feat/android-companion-boundary-20260928@8e8c93b`、Draft PR #10：Java 8 状态机与 Live 中立 cue 接口已提交。推送 run `36367251552` 和 PR run `36367267599` 均成功；后者 `java8-boundary` job `108756041802` 的编译与 smoke 步骤成功。本地环境无 javac，所以本地编译未执行。Book Android 事件生产者、Live 实际渲染、APK 与真机验收仍未实现。下一步是以 Book 的真实授权事件接入测试宿主并绑定 Live 运行时；不直接启用模型或权限敏感功能。
+
+---
 
 ## 2026-09-25 最新交付接手点
 

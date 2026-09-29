@@ -1,3 +1,51 @@
+## 当前 Android Spine 渲染 exact-head CI 已通过（最新分支头，真机待验）
+
+截至 2026-09-29，Draft PR #10 最新分支头 `b515e506baff573284fa6249bf82e75982bbe750`（Spine renderer implementation head `a076be06`，之后仅增加验收清单与治理同步）已通过 Android companion boundary workflow run [36553738585](https://github.com/Jvust/mygpt/actions/runs/36553738585)。Java 8 package-layout smoke job `109357805251` 与 Android `assembleDebug`/Spine native payload job `109357805448` 均成功。最新 GitHub Actions artifact `11026122163`（`mygpt-spine-3714430278-android-spike`，1,256,530 bytes，SHA-256 `7cbee4b7f4fe3530f5966420b8179ea1275ece6b0649f64bcb8a996783f21873`，保留至 2026-10-02T10:10:58Z）是当前 CI 证据；它是短期可重建产物，不是 Drive 长期归档。
+
+这一步确认最新分支头仍保持“renderer exact-head CI pass / device pending”。已验证的是包布局校验、Spine 4.1.20 资源路径、Java 8 边界 smoke、Android 构建和 APK native payload；仍未验证小米 14 真机上的 SAF 导入、首帧、idle/cue 切换、后台恢复，以及真实 Book Android study-event producer。Spine Runtime 许可证仍是任何可分发构建的独立门槛；PR #10 保持 Draft，main 未修改。
+
+下一步：按 `docs/ANDROID_SPINE_DEVICE_VALIDATION_CHECKLIST_20260929.md` 在小米 14 安装最新 exact-head APK，选择已解密 `3714430278.zip`，逐项记录首帧、`QUIET/PAUSED/NEEDS_INPUT/GENTLE_CHECK_IN`、后台重开和失败恢复，再接入真实且可撤销的 Book 事件源。
+
+---
+
+## 当前 Android 生命周期成果与源码快照
+
+项目分支 `feat/android-companion-boundary-20260928` 持续保持 Draft PR #10。最新代码验证：push run `36369308484` 与 PR run `36369310978` 的 Java 8 smoke、Android debug 构建通过。当前 debug APK Drive ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`（SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`）；完整源码快照 Drive ID `1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy`（commit `bf996e6e64c3f4d078102d337be31480dedf2f88`，131 tracked files，SHA-256 `006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc`）；变更文件评审包 Drive ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`（SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`）。真机生命周期验证及真实 Book/Live 接入仍待完成。
+
+---
+
+## Android 生命周期成果归档补充
+
+当前 GitHub 分支头：`986b7b39cf0eda54e74e096f701d4b132c5bbdd9`，Draft PR #10 保持未合并。
+
+- 最新合成 Android debug APK：Drive 文件 ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`，14,913 bytes，SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`。
+- 变更文件评审包：Drive 文件 ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`，21,323 bytes，SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`。它包含 Android 测试宿主变更和 APK，不是完整仓库快照；完整源码以 GitHub 分支为准。
+- Java 8 smoke 与 Android `:app:assembleDebug` 已通过 push run `36369308484` 和 PR run `36369310978`。
+- 离开前台、撤销、结束或到期时清除合成会话；本次提醒授权须重新开启。
+- 真机生命周期验收、Book 真实学习事件和 Live 角色渲染仍待完成。
+
+此补充更新本收据上一次同步时“没有 APK 或测试产物”的状态描述；上文作为当时同步记录保留。
+
+---
+
+## 2026-09-28 Android 宿主生命周期修复（CI 通过，真机待验）
+
+`feat/android-companion-boundary-20260928@eef4d8e`、Draft PR #10：离开前台或锁屏即清除合成会话，到期后无需后续事件也收起提示；撤销、结束或新会话均需重新开启本次提醒。push run [`36369308484`](https://github.com/Jvust/mygpt/actions/runs/36369308484) 与 PR run [`36369310978`](https://github.com/Jvust/mygpt/actions/runs/36369310978) 的 Java 8 smoke、Android debug 构建成功。当前 APK 14,913 bytes，SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`，Drive 文件 ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`；上一版保留为历史候选。仍未在真机上安装操作，Book 真实学习事件与 Live 角色均未接入。
+
+---
+
+## 2026-09-28 Android 合成测试宿主 APK（CI 通过，真机待验）
+
+`feat/android-companion-boundary-20260928@332e9a2`、Draft PR #10：独立 Android debug 宿主的按钮产生明确标注的合成 Book 事件，驱动 Java 状态机和文字 cue；撤销立即清除会话。push run [`36368235878`](https://github.com/Jvust/mygpt/actions/runs/36368235878) 的 Java 8 smoke 与 `assembleDebug` 均成功。APK 14,033 bytes，SHA-256 `2a80adbb5bab0187f2b42eba22a044f79552eb13336468cef9b176b9b2bced78`，Drive 文件 ID `1HXRW8XBmHyG0lJtfP6FX3KvZ-SOCM8rY`。首次 run `36368130257` 因 setup-android 请求已移除的 SDK tools 包失败，改用 runner 预装 SDK 后通过。Manifest 不请求网络、麦克风或悬浮窗权限。Book 真实学习事件、Live 角色渲染、模型、语音和用户真机验收仍未完成。
+
+---
+
+## 2026-09-28 Android 集成边界原型（CI 通过）
+
+`feat/android-companion-boundary-20260928@8e8c93b`、Draft PR #10：Java 8 状态机与 Live 中立 cue 接口已提交。推送 run `36367251552` 和 PR run `36367267599` 均成功；后者 `java8-boundary` job `108756041802` 的编译与 smoke 步骤成功。本地环境无 javac，所以本地编译未执行。Book Android 事件生产者、Live 实际渲染、APK 与真机验收仍未实现。下一步是以 Book 的真实授权事件接入测试宿主并绑定 Live 运行时；不直接启用模型或权限敏感功能。
+
+---
+
 ## 2026-09-25 Windows 学习陪伴交付更新
 
 - 新增 Windows 本机学习工作台：约拿陪伴、学习目标/计时、本地笔记、修订冲突保护、备份合并、本机 Ollama 明示调用入口。

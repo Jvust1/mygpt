@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-27",
+  "updated_date": "2026-09-29",
   "repository": "Jvust/mygpt",
   "default_branch": "main",
-  "active_branch": "codex/progress-mygpt-20260927",
-  "phase": "NATIVE_WINDOWS_DELIVERY_VERIFIED_ARCHIVED_USER_DEVICE_PENDING",
-  "status": "PR9_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
+  "active_branch": "feat/android-companion-boundary-20260928",
+  "phase": "ANDROID_SPINE_CHARACTER_RUNTIME_EXACT_HEAD_CI_PASS",
+  "status": "SPINE_3714430278_RENDERER_CI_PASS_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -71,7 +71,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Build the Android integration spike around Book semantic events + mygpt companion state machine + a renderer-neutral Live CharacterRuntime adapter. Benchmark llama.cpp/ExecuTorch/MLC/ONNX for local chat and whisper.cpp/sherpa-onnx/Silero VAD for voice; keep restricted/copyleft upstreams reference-only until license review.",
+  "next_step": "Install the exact-head debug APK on a Xiaomi 14 physical device, select the already-decrypted Live package 3714430278.zip through SAF, verify first frame/idle/cue transitions/background-reopen, then connect the genuine trusted Book Android study-event producer.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -432,7 +432,7 @@
     "drive_id": "1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK",
     "drive_sha256": "eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09"
   },
-  "as_of": "2026-09-27",
+  "as_of": "2026-09-29",
   "desktop_delivery": {
     "state": "NATIVE_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
     "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
@@ -496,5 +496,127 @@
       ]
     },
     "license_gate": "Verify exact license/version before direct import; restricted/copyleft projects remain reference-only until explicit decision."
+  },
+  "android_integration_spike": {
+    "branch": "feat/android-companion-boundary-20260928",
+    "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
+    "scope": "Pure Java 8 Book event coordinator, renderer-neutral Live cue port, and isolated synthetic Android debug host",
+    "verification": "PREVIOUS_BOUNDARY_CI_PASS; SPINE_RENDERER_EXACT_HEAD_CI_PASS_DEVICE_PENDING",
+    "book_live_transport": "NOT_CONNECTED",
+    "apk": "DEBUG_APK_BUILT_SYNTHETIC_DEVICE_PENDING",
+    "provider_calls": 0,
+    "implementation_commit": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
+    "ci": {
+      "push_run": 36367251552,
+      "pr_run": 36367267599,
+      "job_id": 108756041802,
+      "conclusion": "success"
+    },
+    "pr": 10,
+    "host": {
+      "kind": "SYNTHETIC_ANDROID_DEBUG_ONLY",
+      "build": "CI_PASS",
+      "book_authentication": "TEST_DOUBLE",
+      "live_renderer": "SPINE_LIBGDX_4_1_EXACT_HEAD_CI_PASS_DEVICE_PENDING",
+      "permissions": [],
+      "implementation_commit": "eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b",
+      "ci": {
+        "first_failed_run": 36368130257,
+        "first_failure": "setup-android requested removed SDK tools package",
+        "successful_push_run": 36368235878,
+        "java8_job": 108762033636,
+        "android_job": 108762033792,
+        "conclusion": "success",
+        "lifecycle_push_run": 36369308484,
+        "lifecycle_pr_run": 36369310978
+      },
+      "artifact": {
+        "id": "mygpt-android-synthetic-spike-lifecycle-20260928",
+        "drive_file_id": "1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG",
+        "sha256": "78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed",
+        "size_bytes": 14913
+      },
+      "lifecycle": "BACKGROUND_REVOKES_SESSION; EXPIRY_CLEARS_CUE; SUPERVISION_RECONSENT_PER_SESSION; CI_PASS_DEVICE_PENDING",
+      "review_bundle": {
+        "drive_file_id": "16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq",
+        "file_name": "mygpt-android-lifecycle-review-bundle-eef4d8e.zip",
+        "sha256": "c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a",
+        "size_bytes": 21323,
+        "type": "changed_files_review_package_not_full_source_snapshot"
+      },
+      "source_snapshot": {
+        "drive_file_id": "1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy",
+        "file_name": "mygpt-android-lifecycle-source-snapshot-20260928.zip",
+        "sha256": "006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc",
+        "size_bytes": 1954056,
+        "git_commit": "bf996e6e64c3f4d078102d337be31480dedf2f88",
+        "tracked_files": 131,
+        "verification": "file paths exactly match current branch tree"
+      },
+      "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
+      "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
+      "renderer_ci_run": 36448862550,
+      "renderer_ci_status": "PENDING_AT_LAST_CHECK"
+    },
+    "selected_live_skin": {
+      "skin_id": "3714430278",
+      "source": "Jvust/Live",
+      "drive_folder_id": "1StRk6RJ2N8l5-Q0ogpPHFcb1uviOJYCh",
+      "lpk_drive_file_id": "1g0UAayGcezBHKywrSNIdYh9GyCaWZ7G2",
+      "config_drive_file_id": "1O87dhnMOs2faZvFMWepm2DM-1Lqa51RW",
+      "preview_drive_file_id": "1DwSlVnuGPp6EAOAnECSkNfm0mZeExTZx",
+      "mygpt_asset_copy": false,
+      "status": "SELECTED_DECRYPTED_RUNTIME_PACKAGE_READY_CI_PASS_DEVICE_PENDING",
+      "runtime_package": {
+        "file_name": "3714430278.zip",
+        "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+        "size_bytes": 12342220,
+        "status": "DECRYPTED_LPK_READY_FOR_DIRECT_USE",
+        "preferred_runtime_input": true,
+        "requires_decryption": false,
+        "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+        "exact_identity_enforced": true
+      },
+      "original_lpk_role": "source identity only; runtime should prefer decrypted zip",
+      "format": "Spine",
+      "spine_export_version": "4.1.20",
+      "decrypted_entry_count": 13,
+      "primary_runtime_files": [
+        "model.json",
+        "skeleton.bin",
+        "c610_00.atlas",
+        "c610_00.png",
+        "lpk_files.json"
+      ],
+      "cubism_route": false,
+      "renderer_candidate": {
+        "runtime": "spine-libgdx",
+        "runtime_version": "4.1.0",
+        "libgdx_line": "1.11.0",
+        "status": "IMPLEMENTED_EXACT_HEAD_CI_PASS_DEVICE_PENDING",
+        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION"
+      },
+      "motion_mapping": {
+        "QUIET": "idle",
+        "PAUSED": "freeze-current",
+        "NEEDS_INPUT": "smile -> idle fallback",
+        "GENTLE_CHECK_IN": "action -> idle fallback"
+      }
+    },
+    "renderer_ci_run": 36553738585,
+    "renderer_ci_status": "success",
+    "renderer_ci": {
+      "implementation_head": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
+      "exact_head": "b515e506baff573284fa6249bf82e75982bbe750",
+      "workflow_run": 36553738585,
+      "java8_job": 109357805251,
+      "android_job": 109357805448,
+      "artifact_id": 11026122163,
+      "artifact_name": "mygpt-spine-3714430278-android-spike",
+      "artifact_sha256": "7cbee4b7f4fe3530f5966420b8179ea1275ece6b0649f64bcb8a996783f21873",
+      "artifact_size_bytes": 1256530,
+      "artifact_expires_at": "2026-10-02T10:10:58Z",
+      "native_payload_check": "PASS"
+    }
   }
 }

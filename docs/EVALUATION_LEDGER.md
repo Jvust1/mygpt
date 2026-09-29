@@ -1,3 +1,72 @@
+## E014 — Latest branch-head rerun after device checklist (2026-09-29)
+
+**Status:** ACCEPTED_EXACT_HEAD_CI / DEVICE_PENDING
+
+The Xiaomi 14 validation checklist was added at `b515e506baff573284fa6249bf82e75982bbe750`. The runtime implementation remains `a076be06e2e4c3eeecdab3f1860143771bfef0d3`; this latest head adds documentation and governance only.
+
+- Workflow run [36553738585](https://github.com/Jvust/mygpt/actions/runs/36553738585) completed with `success`.
+- Java 8 boundary job `109357805251` and Android host job `109357805448` both succeeded.
+- Artifact `11026122163` / `mygpt-spine-3714430278-android-spike`: 1,256,530 bytes; SHA-256 `7cbee4b7f4fe3530f5966420b8179ea1275ece6b0649f64bcb8a996783f21873`; expires 2026-10-02T10:10:58Z.
+- The APK ZIP was downloaded and its SHA-256 matched the GitHub artifact digest.
+
+This rerun preserves the prior renderer acceptance and confirms the current PR head remains CI-green. It still does not prove Xiaomi 14 rendering, SAF import, background-reopen behavior or a genuine Book Android producer.
+
+---
+
+## E013 — Spine 4.1 renderer exact-head CI pass (2026-09-29)
+
+**Status:** ACCEPTED_EXACT_HEAD_CI / DEVICE_PENDING
+
+**Source:** Draft PR #10, `a076be06e2e4c3eeecdab3f1860143771bfef0d3` on `feat/android-companion-boundary-20260928`.
+
+### Evidence
+
+- Workflow run [36449517394](https://github.com/Jvust/mygpt/actions/runs/36449517394) completed with conclusion `success`.
+- `java8-boundary` job `109020458878`: Java 8 compile and `SpinePackageLayoutSmoke`/coordinator smoke passed.
+- `android-debug-host` job `109020458429`: hosted Android SDK check, `:app:assembleDebug`, and native payload check passed.
+- Artifact `10983131261`, `mygpt-spine-3714430278-android-spike`: 1,256,529 bytes; SHA-256 `1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411`; expires 2026-10-01.
+- The exact-head source path remains `3714430278.zip -> SAF URI grant -> bounded/validated extraction -> SpinePackageLayout -> SpineSkinApplication -> SpineCharacterRuntime -> CompanionCoordinator cue`.
+
+### Interpretation
+
+This is the first accepted exact-head CI evidence for the real Spine renderer implementation. It confirms the package-validation contract, Java 8 boundary, Android APK assembly and native payload presence. It does not prove a physical Android render or real Book producer.
+
+### Limits and next gate
+
+No Xiaomi 14 installation, SAF import, first-frame check, cue-transition check or background-reopen check has been performed. Book events remain synthetic; paid provider calls remain zero; the Spine Runtime license gate still blocks any production/public redistribution claim. Next gate is a user-device validation record, followed by the genuine trusted Book Android study-event producer.
+
+---
+
+## E012 — Current GitHub and Drive handoff alignment
+
+Synchronized the current state and handoff to include the CI-passing synthetic Android lifecycle host, APK, changed-files review bundle, complete 131-file source snapshot, latest Drive IDs and checksums. The source snapshot is explicitly tied to source commit `bf996e6e64c3f4d078102d337be31480dedf2f88`; GitHub branch head subsequently advances through documentation-only synchronization commits. The Drive sync receipt receives a top addendum superseding the earlier no-APK statement. Earlier APK and source archives remain historical; no PR merge or main update.
+
+---
+
+## E010 — Drive and Library delivery sync
+
+The lifecycle source changes are in GitHub branch `feat/android-companion-boundary-20260928` at `986b7b39cf0eda54e74e096f701d4b132c5bbdd9`; Draft PR #10 remains open and unmerged. Current Android debug APK Drive ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`, 14,913 bytes, SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`. Changed-files review bundle Drive ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`, 21,323 bytes, SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`; it is not a complete source snapshot. Prior APKs and the September 27 source snapshot remain preserved as historical artifacts. The Google Drive sync receipt has an addendum that supersedes its earlier “no APK/test artifact” status. No main-branch change or PR merge was performed.
+
+---
+
+## E009 — Synthetic host lifecycle and expiry (2026-09-28)
+
+Source: `feat/android-companion-boundary-20260928@eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b`, Draft PR #10. The pure Java coordinator now clears session-scoped supervision consent at revocation, end, expiry and a new session; a deadline check clears a visible cue without waiting for another event. The Android Activity clears its synthetic session on `onStop` and schedules expiry for the last accepted event. Push run [`36369308484`](https://github.com/Jvust/mygpt/actions/runs/36369308484) and PR run [`36369310978`](https://github.com/Jvust/mygpt/actions/runs/36369310978) succeeded; PR jobs `108762033636` (Java 8 smoke including revocation/expiry and consent reset) and `108762033792` (`:app:assembleDebug`) succeeded. Artifact `10948049229` ZIP digest SHA-256 `464ba406dc5704042473bc11e4932a984eeed09554b2dd1655aa2b80a588c5ea`, downloaded ZIP CRC passed. Extracted APK 14,913 bytes, SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`, APK ZIP CRC passed; Drive file `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG` metadata read-back matches name, size and folder. CI compiles Activity but does not exercise physical-device lifecycle, screen lock, timing, or UI behavior; those remain pending. No real Book Android producer, Live renderer, model or voice is connected.
+
+---
+
+## E008 — Synthetic Android debug host CI (2026-09-28)
+
+Source: `feat/android-companion-boundary-20260928@332e9a29578428b56048ac3851ee29cb74dc3492`, Draft PR #10. Initial push run `36368130257` failed before build in `android-actions/setup-android@v3` while requesting the removed SDK `tools` package; Java 8 smoke passed. The workflow changed to the hosted runner's preinstalled Android SDK. Push run [`36368235878`](https://github.com/Jvust/mygpt/actions/runs/36368235878) then passed both Java 8 boundary smoke (job `108758839963`) and Android `:app:assembleDebug` (job `108758840189`). GitHub artifact `10947829161` ZIP SHA-256 `6e6f490df0ce0b6e166123446b95a9dafb954c74f80f258cb00a2cce95bff98f`; downloaded ZIP CRC passed. Extracted APK 14,033 bytes, SHA-256 `2a80adbb5bab0187f2b42eba22a044f79552eb13336468cef9b176b9b2bced78`; Drive file `1HXRW8XBmHyG0lJtfP6FX3KvZ-SOCM8rY` metadata read-back confirms APK name, size and artifact parent. The host uses explicit synthetic Book event buttons, a test-double authority, and a text cue placeholder. This is build verification, not installation or lifecycle validation on a physical device; genuine Book Android events, Live-owned renderer, model, voice and production permissions are pending.
+
+---
+
+## E007 — Android companion boundary spike (2026-09-28)
+
+Source: `feat/android-companion-boundary-20260928@8e8c93b11cef54cefa133abfda7ffe4df0bd0685`, Draft PR #10. GitHub push run 36367251552 and PR run 36367267599 succeeded. PR job 108756041802 compiled with `javac --release 8` and ran `CompanionCoordinatorSmoke` successfully. Local javac was unavailable. The checks cover quiet default, explicit supervision opt-in/out, prompt, replay/gap, expiry, rejected Book authority, pause/resume, epoch identity, opaque source reference and session end. This verifies a synthetic JVM boundary only, not an Android APK, Book producer, Live renderer, model teaching, permission flow or physical device. No upstream source/assets or paid provider were used.
+
+---
+
 # Evaluation Ledger
 
 ## E001 — Foundation architecture review
