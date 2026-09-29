@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import pytest
 from mygpt_brain.companion_chat import CompanionChatRuntime, CompanionPersona
 from mygpt_brain.memory_store import MemoryRecord, MemoryStore
@@ -49,3 +49,81 @@ async def test_long_session_returns_compaction_ids_without_auto_memory():
     result=await runtime.send({"request_id":"r2","session_id":"s1","persona_id":"p1","text":"two"},now=NOW)
     assert result.compacted_message_ids
     assert runtime.memory_store.recent(namespace="p1")==[]
+
+
+@pytest.mark.asyncio
+async def test_book_context_is_ephemeral_lower_authority_data(tmp_path):
+    seen=[]
+    async def responder(prompt):
+        provider=prompt.provider_messages()
+        seen.extend(provider)
+        assert provider[0].role=="system"
+        assert any(
+            item.role=="user"
+            and "APPLICATION_CONTEXT_DATA" in item.content
+            and "泛函分析本节定义" in item.content
+            for item in provider
+        )
+        return "按当前教材上下文解释。"
+
+    persona=CompanionPersona(persona_id="p1",display_name="P",visual_skin_id="3714430278",
+        instructions="Trusted persona instruction.")
+    context={
+        "schema_version":"mygpt.companion-book-context.v1",
+        "context":{
+            "schema_version":"mygpt.study-context.v1",
+            "evidence_kind":"SIMULATED",
+            "session_id":"s1",
+            "course_id":"functional-analysis",
+            "book_id":"jiang-ze-jian",
+            "book_version":"v1",
+            "section_id":"ch1-s1",
+            "source_id":"source-1",
+            "source_sha256":"a"*64,
+            "mode":"learn",
+            "captured_at":NOW,
+            "expires_at":NOW+timedelta(seconds=300),
+        },
+        "text":"泛函分析本节定义：这是结构化教材语义上下文。",
+    }
+    from mygpt_brain.session_store import ChatSessionStore
+    with ChatSessionStore(tmp_path/"chat.sqlite3") as sessions:
+        runtime=CompanionChatRuntime(persona=persona,responder=responder,session_store=sessions)
+        result=await runtime.send({
+            "request_id":"book-r1","session_id":"s1","persona_id":"p1",
+            "text":"解释这一节","book_context":context
+        },now=NOW)
+        assert result.context_references==["book:jiang-ze-jian:v1:ch1-s1:source-1"]
+        durable=sessions.load_messages("s1")
+        assert [m.role for m in durable]==["system","user","assistant"]
+        assert all("BOOK_SEMANTIC_CONTEXT_V1" not in m.content for m in durable)
+
+
+@pytest.mark.asyncio
+async def test_expired_book_context_fails_before_provider_call():
+    calls=0
+    async def responder(_prompt):
+        nonlocal calls
+        calls+=1
+        return "should not run"
+    persona=CompanionPersona(persona_id="p1",display_name="P",visual_skin_id="3714430278",
+        instructions="Trusted.")
+    context={
+        "schema_version":"mygpt.companion-book-context.v1",
+        "context":{
+            "schema_version":"mygpt.study-context.v1",
+            "evidence_kind":"SIMULATED",
+            "session_id":"s1",
+            "course_id":"c","book_id":"b","book_version":"v1","section_id":"s","source_id":"src",
+            "source_sha256":"b"*64,"mode":"learn",
+            "captured_at":NOW-timedelta(seconds=300),"expires_at":NOW,
+        },
+        "text":"expired",
+    }
+    runtime=CompanionChatRuntime(persona=persona,responder=responder)
+    with pytest.raises(ValueError,match="expired"):
+        await runtime.send({
+            "request_id":"book-r2","session_id":"s1","persona_id":"p1",
+            "text":"explain","book_context":context
+        },now=NOW)
+    assert calls==0
