@@ -33,8 +33,11 @@ class CompanionPersona(Contract):
     instructions: Annotated[str, Field(min_length=1, max_length=4000)]
 
     def system_message(self, session_id: str, *, now: datetime) -> ChatMessage:
+        identity = hashlib.sha256(
+            (self.persona_id + "\x1f" + session_id).encode("utf-8")
+        ).hexdigest()[:24]
         return ChatMessage(
-            message_id="persona-" + self.persona_id,
+            message_id="persona-" + identity,
             session_id=session_id,
             role="system",
             authority="system",
@@ -74,6 +77,7 @@ class ChatPrompt:
             memory_text = "\n".join(
                 f"- [{item.kind}] {item.text}" for item in self.memories
             )
+            # Memories are application data, not hidden higher-authority instructions.
             from .conversation import ProviderMessage
             insert_at = 1 if messages and messages[0].role == "system" else 0
             messages.insert(
@@ -90,7 +94,7 @@ ChatResponder = Callable[[ChatPrompt], Awaitable[str]]
 
 
 class CompanionChatRuntime:
-    """Bounded local session runtime with explicit SQLite-backed memories."""
+    """Bounded in-memory session runtime with explicit SQLite-backed memories."""
 
     def __init__(
         self,
@@ -219,7 +223,6 @@ class CompanionChatRuntime:
                 created_at=clock,
                 reply_to_message_id=user.message_id,
             )
-            messages.extend((user, assistant))
             result = CompanionChatResult(
                 request_id=request.request_id,
                 session_id=request.session_id,
@@ -240,5 +243,6 @@ class CompanionChatRuntime:
                     result=result.model_dump(mode="json"),
                     completed_at=clock,
                 )
+            messages.extend((user, assistant))
             self._requests[request.request_id] = (fingerprint, result)
             return result

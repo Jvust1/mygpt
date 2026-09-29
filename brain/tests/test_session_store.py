@@ -73,3 +73,35 @@ async def test_runtime_restarts_without_recalling_provider(tmp_path):
         assert replay.assistant_message.content=="持久化回复"
         assert calls==1
         assert len(store.load_messages("s1"))==3
+
+
+@pytest.mark.asyncio
+async def test_two_sessions_get_distinct_system_message_ids(tmp_path):
+    async def responder(_prompt): return "ok"
+    persona=CompanionPersona(persona_id="p1",display_name="P",visual_skin_id="3714430278",
+        instructions="Stay helpful.")
+    with ChatSessionStore(tmp_path/"chat.sqlite3") as store:
+        runtime=CompanionChatRuntime(persona=persona,responder=responder,session_store=store)
+        await runtime.send({"request_id":"r1","session_id":"s1","persona_id":"p1","text":"one"},now=NOW)
+        await runtime.send({"request_id":"r2","session_id":"s2","persona_id":"p1","text":"two"},now=NOW)
+        first=store.load_messages("s1")[0]
+        second=store.load_messages("s2")[0]
+        assert first.message_id != second.message_id
+
+
+@pytest.mark.asyncio
+async def test_persistence_failure_does_not_append_exchange_to_memory():
+    async def responder(_prompt): return "ok"
+    class FailingStore:
+        def get_receipt(self,_request_id): return None
+        def load_messages(self,_session_id): return []
+        def session_persona(self,_session_id): return None
+        def commit_exchange(self,**_kwargs): raise RuntimeError("disk failed")
+    persona=CompanionPersona(persona_id="p1",display_name="P",visual_skin_id="3714430278",
+        instructions="Stay helpful.")
+    runtime=CompanionChatRuntime(persona=persona,responder=responder,session_store=FailingStore())
+    with pytest.raises(RuntimeError,match="disk failed"):
+        await runtime.send({"request_id":"r1","session_id":"s1","persona_id":"p1","text":"one"},now=NOW)
+    messages=runtime.session_messages("s1")
+    assert len(messages)==1
+    assert messages[0].role=="system"
