@@ -46,6 +46,28 @@
         "backup_skin_image_01"
       ],
       "candidate_registry": "android_spike/skin_candidates.json"
+    },
+    "skin_utilization_policy": {
+      "authority": "Jvust/Live",
+      "plan": "docs/SKIN_FULL_UTILIZATION_PLAN.md",
+      "rule": "mygpt consumes the full normalized capability set of a skin; first-frame or default-only rendering is not completion.",
+      "current_skin_3714430278": {
+        "maturity": "L2_PARTIAL",
+        "target": "L6_DEVICE_ACCEPTED_FULL_CAPABILITY",
+        "forms": [
+          "default",
+          "aim",
+          "cover"
+        ],
+        "required_next": [
+          "full inventory",
+          "capability manifest",
+          "state graph",
+          "multi-form renderer",
+          "transition mapping",
+          "Xiaomi 14 acceptance"
+        ]
+      }
     }
   },
   "dependencies": {
@@ -79,7 +101,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Uninstall the prior dev.mygpt.spike test build if Android reports a signature mismatch, install the self-contained APK, verify that 3714430278 auto-loads without file selection, then test idle/cues/background-reopen. After device acceptance, connect genuine trusted Book Android study events.",
+  "next_step": "Use docs/SKIN_FULL_UTILIZATION_PLAN.md: fully inventory 3714430278, implement default/aim/cover and authored transitions, map mygpt semantic cues to the full capability set, then run Xiaomi 14 device acceptance. Do not mark the skin complete at default-only rendering.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
