@@ -1,3 +1,18 @@
+## 2026-09-29 · 自包含 3714430278 APK
+
+用户真机反馈上一版仍要求手动选择 ZIP，且所选文件 SHA-256 为 `578b...`，与 Live 权威包 `eb6edd...` 不一致。当前源码已具备“优先自动加载 APK 内置 `3714430278.zip`”逻辑；在此基础上已生成一份真正自包含的私有测试 APK：
+
+- 内置资产：`assets/3714430278.zip`
+- 资产 SHA-256：`eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+- APK：13,724,357 bytes
+- APK SHA-256：`fe694d9b7ce24a6dae5018b0f5711082b632308343bdd0c27dea0d52aadf9c01`
+- APK Signature Scheme v2：本地密码学结构验证 PASS
+- ZIP 完整性：PASS
+- `lib/arm64-v8a/libgdx.so`：16K 对齐保持 PASS
+- 启动行为：首次启动直接从 APK assets 自动安装并加载主皮肤；“更换皮肤包”只作为可选入口。
+- 因本次本地私有测试 APK 重新签名，若与已安装测试版签名不同，需要先卸载旧 `dev.mygpt.spike` 再安装。
+- 仍未宣称真机显示已通过；需要用户安装后确认首帧、idle、cue 与后台/恢复。
+
 ## 2026-09-29 · PR #13 刷新验收
 
 - PR #13 从 PR #10 最新 head `3ad7d14a5446a3c0c6f23aa7e00703a3535f4e7e` 派生，保留 PR #10 当天新增的 CURRENT_STATE / EVALUATION_LEDGER / HANDOFF 状态。
