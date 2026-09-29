@@ -1,3 +1,12 @@
+## 2026-09-29 · Live 主/备皮肤同步
+
+- 主动态皮肤继续为 Live `3714430278`：Spine 4.1.20，Android CI 已通过，真机待验。
+- CI APK SHA-256：`44bb4863c944c05e0acb30a7be9df6b9751b3600fc144e05812f4ee74d68fae2`；长期 Drive artifact ID：`1keutv3dGtexS2mMYoV8ptF7sOpq5f-7H`。
+- 新增静态备选皮肤 `backup_skin_image_01`，Live Drive ID：`1adRumPFELRvB_4d7ORfnvUZRPhUTOLDW`，SHA-256：`9d03cf43b5d60a8ae486c17979e72bd294e479fc58732971aaa205df7e3f5cff`。
+- 备选图当前仅作为静态 fallback / 人物视觉参考，不宣称具有 Spine/Live2D 动态能力。
+- 新增 `android_spike/skin_candidates.json` 记录主/备关系；Live 继续是皮肤资产权威源。
+- 本节现已重放到 PR #10 最新 head；PR #10 在 2026-09-29 新增的状态/评估/交接内容全部保留。
+
 ## 当前 Android Spine 渲染 exact-head CI 已通过（真机待验）
 
 截至 2026-09-29，Draft PR #10 的精确头提交 `a076be06e2e4c3eeecdab3f1860143771bfef0d3` 已通过 Android companion boundary workflow run [36449517394](https://github.com/Jvust/mygpt/actions/runs/36449517394)。Java 8 package-layout smoke job `109020458878` 与 Android `assembleDebug`/Spine native payload job `109020458429` 均成功。GitHub Actions artifact `10983131261`（`mygpt-spine-3714430278-android-spike`，1,256,529 bytes，SHA-256 `1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411`，保留至 2026-10-01）是当前 CI 证据；它是短期可重建产物，不是 Drive 长期归档。
