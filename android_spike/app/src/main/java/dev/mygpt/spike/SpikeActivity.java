@@ -75,7 +75,7 @@ public final class SpikeActivity extends AndroidApplication {
         characterRuntime = new SpineCharacterRuntime(spineApp, character);
         coordinator = new CompanionCoordinator((event, nowMs) -> !revoked, characterRuntime);
 
-        addButton(column, "首次导入 / 更换 3714430278.zip", this::openSkinPackage);
+        addButton(column, "更换皮肤包（可选）", this::openSkinPackage);
 
         optIn = new Switch(this);
         optIn.setText("允许轻量学习提醒（仅本次演示）");
@@ -101,7 +101,7 @@ public final class SpikeActivity extends AndroidApplication {
                 clearDemoSession("模拟授权已撤销；会话与提醒许可已清除"));
         addButton(column, "结束会话", () -> send(CompanionCoordinator.Kind.SESSION_ENDED, null));
 
-        loadInstalledOrRememberedSkin();
+        loadBundledOrInstalledSkin();
     }
 
 
@@ -109,7 +109,7 @@ public final class SpikeActivity extends AndroidApplication {
         return new File(new File(getFilesDir(), "skins"), SpinePackageLayout.SKIN_ID);
     }
 
-    private void loadInstalledOrRememberedSkin() {
+    private void loadBundledOrInstalledSkin() {
         File installed = installedSkinDirectory();
         new Thread(() -> {
             try {
@@ -121,12 +121,28 @@ public final class SpikeActivity extends AndroidApplication {
                 return;
             } catch (Throwable ignored) {
             }
+
+            // Release/test APKs may carry the canonical Live package as an injected build asset.
+            // GitHub source does not own the binary; Live remains the asset authority.
+            try (InputStream bundled = getAssets().open("3714430278.zip")) {
+                SpinePackageLayout.InstalledSkin skin =
+                        SpinePackageLayout.install(bundled, installed);
+                runOnUiThread(() -> {
+                    status.setText("已自动安装 APK 内置 3714430278 · Spine "
+                            + skin.spineVersion + " · " + skin.identityMode);
+                    characterRuntime.load(skin.directory);
+                });
+                return;
+            } catch (Throwable ignored) {
+                // Development CI APKs may intentionally omit the private deployment asset.
+            }
+
             String persisted = getSharedPreferences(PREFS, MODE_PRIVATE)
                     .getString(PREF_SKIN_URI, null);
             if (persisted != null) {
                 runOnUiThread(() -> loadSkin(Uri.parse(persisted), false));
             } else {
-                runOnUiThread(() -> status.setText("首次导入 3714430278.zip 一次即可，成功后以后自动加载。"));
+                runOnUiThread(() -> status.setText("此开发 APK 未带内置皮肤；可手动导入。正式自包含 APK 会自动加载 3714430278。"));
             }
         }, "mygpt-installed-skin-check").start();
     }
