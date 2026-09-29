@@ -445,8 +445,27 @@
       "related_branch": "feat/spine-3714430278-runtime-refresh-20260929",
       "related_commit": "83b303d89ddc4691b7cbc979b9cd5ae9a6a55e82",
       "purpose": "Private device-test APK that bundles Live skin 3714430278 and auto-loads it on first launch. File picker remains optional override only.",
-      "status": "current_device_validation_candidate",
+      "status": "superseded_historical",
       "verification": "APK contains assets/3714430278.zip with SHA-256 eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f, assets/SPINE_RUNTIME_LICENSE.txt, classes.dex and arm64 libgdx.so. APK v2 signature cryptographic verification PASS, signed content digest matches, ZIP integrity PASS, libgdx.so data offset 1146880 is 16K aligned. Drive metadata read-back confirms file ID, name, size and project artifact parent."
+    },
+    {
+      "artifact_id": "mygpt-3714430278-ui-v005-selfcontained-20260929",
+      "file_name": "mygpt-3714430278-ui-v0.0.5-20260929.apk",
+      "type": "android_selfcontained_debug_apk",
+      "drive_file_id_or_path": "1qQ7BJNmN6qh900Qo8rRfAeft6gBH9eN5",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "d53c9c0e9bda17fcfaf5fe607690449154a1089c5289e2571f4702460765a34b",
+      "size_bytes": 13721603,
+      "version": "0.0.5-companion-ui-3714430278",
+      "created_at": "2026-09-29",
+      "source": "assistant_built_from_exact_head_ci_plus_live_authoritative_skin",
+      "related_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+      "related_commit": "da0642c84ce85d36b99fbd3309fb66db7abe259b",
+      "workflow_run": "https://github.com/Jvust/mygpt/actions/runs/36523316210",
+      "workflow_artifact_id": 11013646223,
+      "purpose": "Polished MyGPT Android device candidate with product-facing companion UI and bundled Live skin 3714430278 for automatic first-launch loading.",
+      "status": "current_device_validation_candidate",
+      "verification": "Exact-head Java8 and Android CI PASS. Embedded skin SHA-256 eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f. ZIP integrity PASS. libgdx.so remains 16K aligned. APK v2 signer certificate SHA-256 42221fbf403ebe655ce71ffe514f1f3424c50f7abfd39a650f49c82bb1c8dac6 matches previous self-contained APK signer."
     }
   ],
   "notes": [
@@ -468,7 +487,8 @@
     "2026-09-29: recorded the exact-head Spine 4.1 renderer CI artifact for skin 3714430278; GitHub Actions evidence is short-lived/re-creatable, no Drive duplicate was created, physical-device validation remains pending.",
     "2026-09-29: backup static skin image 01 archived under Live/skin and registered as mygpt fallback; primary remains dynamic Spine skin 3714430278.",
     "2026-09-29: PR #13 refresh aligned skin 3714430278 and backup registry to PR #10 latest head; CI run 36511143238 passed and exact artifact was archived to Drive.",
-    "2026-09-29: archived the self-contained 3714430278 Android device-test APK; it auto-loads the bundled Live skin and replaces the earlier manual-import-first test flow."
+    "2026-09-29: archived the self-contained 3714430278 Android device-test APK; it auto-loads the bundled Live skin and replaces the earlier manual-import-first test flow.",
+    "2026-09-29: promoted polished MyGPT 0.0.5 self-contained Android APK; previous self-contained APK retained as historical. New UI exact-head CI passed and uses the same debug signing certificate for in-place upgrade."
   ],
   "last_updated": "2026-09-29"
 }
