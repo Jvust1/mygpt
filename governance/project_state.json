@@ -68,6 +68,10 @@
           "Xiaomi 14 acceptance"
         ]
       }
+    },
+    "skin_audio_policy": {
+      "enabled": false,
+      "scope": "Skin voice/BGM/SFX are excluded from runtime, semantic mapping, acceptance, and completion metrics."
     }
   },
   "dependencies": {
@@ -101,7 +105,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Use docs/SKIN_FULL_UTILIZATION_PLAN.md: fully inventory 3714430278, implement default/aim/cover and authored transitions, map mygpt semantic cues to the full capability set, then run Xiaomi 14 device acceptance. Do not mark the skin complete at default-only rendering.",
+  "next_step": "Continue full visual utilization of 3714430278 (default/aim/cover, animations, transitions, visual effects) with skin audio disabled; then run Xiaomi 14 acceptance.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
