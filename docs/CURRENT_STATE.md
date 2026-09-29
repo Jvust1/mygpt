@@ -1,3 +1,34 @@
+## 2026-09-29 · 0.0.6 安装修复 + 三形态
+
+上一份 0.0.5 自包含 APK 在 Android 真机出现“解析软件包时出现问题”。复核确认 ZIP 本体和内置皮肤没有损坏；问题来自本地重签名步骤生成了结构错误的 APK v2 signer framing。0.0.5 设备包因此降级为不可用历史证据。
+
+当前修正版：
+- `0.0.6-multiform-3714430278`
+- 源码 head：`327638d084d46d565b5a833ac064810ef8d1b124`
+- CI run：`36525176168`，Java8 full-package smoke / Android assembleDebug / native payload 全部 PASS
+- APK：`mygpt-3714430278-v0.0.6-multiform-fixed-20260929.apk`
+- APK SHA-256：`638f48511dc00a52dcde78bdc13a9d17a3fd673c3c3636eb96ff031b56b66a71`
+- Drive ID：`1NoYIaXGgFdMtgxcOw9MCI84wxI07U4DR`
+- 内置皮肤 SHA-256：`eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+- APK v2 signer 结构 / RSA 签名 / signed content digest：PASS
+- ZIP 完整性：PASS
+- arm64 `libgdx.so` 16K 对齐：PASS
+
+3714430278 已从 default-only 推进到 L4 代码实现：
+- 完整提取并校验 13/13 文件
+- DEFAULT：`skeleton.bin + c610_00.atlas + c610_00.png`
+- AIM：`misc_01.bin + misc_02.atlas + misc_04.png`
+- COVER：`misc_08.bin + misc_03.atlas + misc_05.png`
+- AIM → COVER：先播放 `to_cover`，完成后切换 COVER
+- COVER → AIM：先播放 `to_aim`，完成后切换 AIM
+- 其他无原生过渡的路径采用直接 form swap，并明确记录为 direct switch
+- 一次性动作结束自动回当前形态 idle
+- 页面新增 DEFAULT / AIM / COVER 和“待机 / 主要动作 / 反应动作 / 下一个动作”控制，可循环验收完整动作集合
+- 音频继续完全关闭
+- 已新增 `skin_inventory.json`、`skin_capabilities.json`、`skin_state_graph.json`
+
+下一门槛是 L6：小米 14 真机安装 + 三形态首帧/动作/切换/后台恢复验收。
+
 ## 2026-09-29 · MyGPT 0.0.5 页面美化版
 
 PR #13 已完成 Android 页面第一轮产品化美化，并通过最新 exact-head CI。
