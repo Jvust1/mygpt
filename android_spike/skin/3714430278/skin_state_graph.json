@@ -1,0 +1,51 @@
+{
+  "schema_version": "mygpt_skin_state_graph_v1",
+  "skin_id": "3714430278",
+  "initial": "default",
+  "nodes": [
+    "default",
+    "aim",
+    "cover"
+  ],
+  "edges": [
+    {
+      "from": "aim",
+      "to": "cover",
+      "mode": "AUTHORED_ANIMATION_THEN_FORM_SWAP",
+      "animation": "to_cover"
+    },
+    {
+      "from": "cover",
+      "to": "aim",
+      "mode": "AUTHORED_ANIMATION_THEN_FORM_SWAP",
+      "animation": "to_aim"
+    },
+    {
+      "from": "default",
+      "to": "aim",
+      "mode": "DIRECT_RUNTIME_FORM_SWAP"
+    },
+    {
+      "from": "default",
+      "to": "cover",
+      "mode": "DIRECT_RUNTIME_FORM_SWAP"
+    },
+    {
+      "from": "aim",
+      "to": "default",
+      "mode": "DIRECT_RUNTIME_FORM_SWAP"
+    },
+    {
+      "from": "cover",
+      "to": "default",
+      "mode": "DIRECT_RUNTIME_FORM_SWAP"
+    }
+  ],
+  "idle_by_form": {
+    "default": "idle",
+    "aim": "aim_idle",
+    "cover": "cover_idle"
+  },
+  "one_shot_return_policy": "after non-transition action completes, return to current form idle",
+  "rapid_transition_policy": "new request increments generation token; stale completion callbacks are ignored"
+}
