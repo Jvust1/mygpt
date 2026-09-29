@@ -62,7 +62,10 @@ def main() -> int:
         )
         if sessions.session_persona(session_id) is None and card.greetings:
             print(f"{persona.display_name}> {card.greetings[0]}")
-        print("Commands: :remember <text> | :memories | :quit")
+        print(
+            "Commands: :remember <text> | :update <id> <text> | "
+            ":forget <id> | :history <id> | :memories | :quit"
+        )
         while True:
             try:
                 raw = input("you> ").strip()
@@ -97,6 +100,47 @@ def main() -> int:
                 )
                 memory.put(record)
                 print(f"remembered> {record.memory_id}")
+                continue
+            if raw.startswith(":update "):
+                remainder = raw[len(":update "):].strip()
+                memory_id, separator, text = remainder.partition(" ")
+                if not separator or not text.strip():
+                    print("usage> :update <memory-id> <replacement text>")
+                    continue
+                try:
+                    memory.update(
+                        memory_id,
+                        text=text.strip(),
+                        updated_at=datetime.now(timezone.utc),
+                    )
+                except ValueError as error:
+                    print(f"memory error> {error}")
+                    continue
+                print(f"updated> {memory_id}")
+                continue
+            if raw.startswith(":forget "):
+                memory_id = raw[len(":forget "):].strip()
+                if not memory_id:
+                    print("usage> :forget <memory-id>")
+                    continue
+                removed = memory.delete(
+                    memory_id, deleted_at=datetime.now(timezone.utc)
+                )
+                print(f"forgotten> {memory_id}" if removed else "memory not found")
+                continue
+            if raw.startswith(":history "):
+                memory_id = raw[len(":history "):].strip()
+                if not memory_id:
+                    print("usage> :history <memory-id>")
+                    continue
+                events = memory.history(memory_id)
+                if not events:
+                    print("(no history)")
+                for event in reversed(events):
+                    print(
+                        f"- {event.action} {event.created_at.isoformat()} "
+                        f"{event.previous_value!r} -> {event.new_value!r}"
+                    )
                 continue
 
             request = CompanionChatRequest(

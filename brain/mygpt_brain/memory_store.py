@@ -3,10 +3,15 @@
 The store is deliberately explicit: chat transcripts are not silently turned
 into memories. Callers must create bounded MemoryRecord values after a separate
 policy/consent decision.
+
+The update/delete/history lifecycle and audit-log shape are adapted from Mem0's
+Apache-2.0 licensed memory APIs and MemoryHistoryManager. See
+third_party/mem0/NOTICE.md.
 """
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import json
 from pathlib import Path
 import sqlite3
 import threading
@@ -25,6 +30,7 @@ MemoryKind = Literal[
 ]
 MemorySource = Literal["user_explicit", "reviewed_inference", "imported_reference"]
 MemoryTag = Annotated[str, Field(min_length=1, max_length=48)]
+MemoryAction = Literal["ADD", "UPDATE", "DELETE"]
 
 
 class MemoryRecord(Contract):
@@ -62,8 +68,24 @@ class MemoryRecord(Contract):
         return value
 
 
+class MemoryHistoryEvent(Contract):
+    schema_version: Literal["mygpt.memory-history.v1"] = "mygpt.memory-history.v1"
+    history_id: Annotated[int, Field(strict=True, ge=1)]
+    memory_id: Identifier
+    previous_value: str | None = None
+    new_value: str | None = None
+    action: MemoryAction
+    created_at: AwareDatetime
+    is_deleted: bool = False
+
+    @field_validator("created_at")
+    @classmethod
+    def normalize_time(cls, value: datetime) -> datetime:
+        return value.astimezone(timezone.utc)
+
+
 class MemoryStore:
-    """SQLite-backed local memory index with bounded retrieval."""
+    """SQLite-backed local memory index with bounded retrieval and edit history."""
 
     def __init__(self, path: str | Path = ":memory:") -> None:
         self.path = str(path)
@@ -108,6 +130,21 @@ class MemoryStore:
                 "CREATE INDEX IF NOT EXISTS idx_memories_namespace_updated "
                 "ON memories(namespace, updated_at DESC)"
             )
+            self._db.execute(
+                """CREATE TABLE IF NOT EXISTS memory_history(
+                       history_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       memory_id TEXT NOT NULL,
+                       previous_value TEXT,
+                       new_value TEXT,
+                       action TEXT NOT NULL,
+                       created_at TEXT NOT NULL,
+                       is_deleted INTEGER NOT NULL DEFAULT 0
+                   )"""
+            )
+            self._db.execute(
+                "CREATE INDEX IF NOT EXISTS idx_memory_history_id "
+                "ON memory_history(memory_id, history_id DESC)"
+            )
 
     def close(self) -> None:
         with self._lock:
@@ -119,15 +156,45 @@ class MemoryStore:
     def __exit__(self, *_args) -> None:
         self.close()
 
+    @staticmethod
+    def _checked_time(value: datetime | None) -> datetime:
+        result = value or datetime.now(timezone.utc)
+        if result.tzinfo is None or result.utcoffset() is None:
+            raise ValueError("memory lifecycle time must be timezone-aware")
+        return result.astimezone(timezone.utc)
+
+    def _add_history(
+        self,
+        *,
+        memory_id: str,
+        previous_value: str | None,
+        new_value: str | None,
+        action: MemoryAction,
+        at: datetime,
+        is_deleted: bool = False,
+    ) -> None:
+        self._db.execute(
+            """INSERT INTO memory_history(
+                   memory_id,previous_value,new_value,action,created_at,is_deleted
+               ) VALUES(?,?,?,?,?,?)""",
+            (
+                memory_id,
+                previous_value,
+                new_value,
+                action,
+                at.isoformat(),
+                1 if is_deleted else 0,
+            ),
+        )
+
     def put(self, record: MemoryRecord, *, allow_update: bool = False) -> MemoryRecord:
         record = MemoryRecord.model_validate(record)
         if record.updated_at < record.created_at:
             raise ValueError("updated_at cannot precede created_at")
-        import json
         tags_json = json.dumps(record.tags, ensure_ascii=False, separators=(",", ":"))
         with self._lock, self._db:
             existing = self._db.execute(
-                "SELECT memory_id FROM memories WHERE memory_id=?", (record.memory_id,)
+                "SELECT * FROM memories WHERE memory_id=?", (record.memory_id,)
             ).fetchone()
             if existing is not None and not allow_update:
                 raise ValueError("memory_id already exists")
@@ -148,22 +215,120 @@ class MemoryStore:
                         record.updated_at.isoformat(),
                     ),
                 )
+                self._add_history(
+                    memory_id=record.memory_id,
+                    previous_value=None,
+                    new_value=record.text,
+                    action="ADD",
+                    at=record.updated_at,
+                )
             else:
+                immutable_existing = (
+                    existing["namespace"],
+                    existing["kind"],
+                    existing["source"],
+                    existing["created_at"],
+                )
+                immutable_new = (
+                    record.namespace,
+                    record.kind,
+                    record.source,
+                    record.created_at.isoformat(),
+                )
+                if immutable_existing != immutable_new:
+                    raise ValueError("immutable memory identity fields changed")
+                if record.updated_at < datetime.fromisoformat(existing["updated_at"]):
+                    raise ValueError("memory update time cannot move backwards")
+                if existing["text"] == record.text and existing["tags"] == tags_json:
+                    return record
                 self._db.execute(
                     """UPDATE memories
-                       SET namespace=?, kind=?, text=?, tags=?, source=?, updated_at=?
+                       SET text=?, tags=?, updated_at=?
                        WHERE memory_id=?""",
                     (
-                        record.namespace,
-                        record.kind,
                         record.text,
                         tags_json,
-                        record.source,
                         record.updated_at.isoformat(),
                         record.memory_id,
                     ),
                 )
+                self._add_history(
+                    memory_id=record.memory_id,
+                    previous_value=existing["text"],
+                    new_value=record.text,
+                    action="UPDATE",
+                    at=record.updated_at,
+                )
         return record
+
+    def update(
+        self,
+        memory_id: str,
+        *,
+        text: str,
+        tags: list[str] | None = None,
+        updated_at: datetime | None = None,
+    ) -> MemoryRecord:
+        """Update one memory atomically while preserving an audit event."""
+        current = self.get(memory_id)
+        if current is None:
+            raise ValueError("memory_id not found")
+        next_record = current.model_copy(
+            update={
+                "text": text,
+                "tags": current.tags if tags is None else tags,
+                "updated_at": self._checked_time(updated_at),
+            }
+        )
+        return self.put(next_record, allow_update=True)
+
+    def delete(self, memory_id: str, *, deleted_at: datetime | None = None) -> bool:
+        """Delete active memory bytes while preserving the edit/delete audit trail."""
+        at = self._checked_time(deleted_at)
+        with self._lock, self._db:
+            existing = self._db.execute(
+                "SELECT * FROM memories WHERE memory_id=?", (memory_id,)
+            ).fetchone()
+            if existing is None:
+                return False
+            if at < datetime.fromisoformat(existing["updated_at"]):
+                raise ValueError("memory delete time cannot precede latest update")
+            self._add_history(
+                memory_id=memory_id,
+                previous_value=existing["text"],
+                new_value=None,
+                action="DELETE",
+                at=at,
+                is_deleted=True,
+            )
+            self._db.execute("DELETE FROM memories WHERE memory_id=?", (memory_id,))
+        return True
+
+    def history(self, memory_id: str, *, limit: int = 100) -> list[MemoryHistoryEvent]:
+        if type(limit) is not int or not 1 <= limit <= 100:
+            raise ValueError("limit must be in 1..100")
+        with self._lock:
+            rows = self._db.execute(
+                """SELECT history_id,memory_id,previous_value,new_value,action,
+                          created_at,is_deleted
+                   FROM memory_history
+                   WHERE memory_id=?
+                   ORDER BY history_id DESC
+                   LIMIT ?""",
+                (memory_id, limit),
+            ).fetchall()
+        return [
+            MemoryHistoryEvent(
+                history_id=row["history_id"],
+                memory_id=row["memory_id"],
+                previous_value=row["previous_value"],
+                new_value=row["new_value"],
+                action=row["action"],
+                created_at=datetime.fromisoformat(row["created_at"]),
+                is_deleted=bool(row["is_deleted"]),
+            )
+            for row in rows
+        ]
 
     def get(self, memory_id: str) -> MemoryRecord | None:
         with self._lock:
@@ -200,9 +365,6 @@ class MemoryStore:
 
         tokens: list[str] = []
         lowered = query.lower()
-        # Latin/digit words use whitespace tokenization. CJK text additionally
-        # contributes short bigrams so natural Chinese queries can retrieve
-        # a concise memory such as "喜欢简洁回答" from "请简洁一点陪我学习".
         for raw in lowered.split():
             token = "".join(ch for ch in raw if ch.isalnum() or "\u4e00" <= ch <= "\u9fff")
             if len(token) >= 2 and token not in tokens:
@@ -236,7 +398,6 @@ class MemoryStore:
 
     @staticmethod
     def _from_row(row: sqlite3.Row) -> MemoryRecord:
-        import json
         return MemoryRecord(
             memory_id=row["memory_id"],
             namespace=row["namespace"],

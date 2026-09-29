@@ -423,11 +423,17 @@
       "repo": "mem0ai/mem0",
       "area": "Long-term memory",
       "priority": "P1",
-      "mode": "ADOPT_PATTERN",
-      "why": "Memory extraction/retrieval architecture useful for companion continuity.",
+      "mode": "CODE_ADAPTED",
+      "why": "Local companion memory lifecycle: explicit add/search/get/update/delete/history with transactional audit history.",
       "url": "https://github.com/mem0ai/mem0",
-      "code_copied": false,
-      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "local_paths": [
+        "brain/mygpt_brain/memory_store.py",
+        "third_party/mem0/LICENSE",
+        "third_party/mem0/NOTICE.md"
+      ]
     },
     {
       "repo": "pydantic/pydantic-ai",
