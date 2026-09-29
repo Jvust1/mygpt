@@ -1,3 +1,13 @@
+## 当前 Android Spine 渲染 exact-head CI 已通过（真机待验）
+
+截至 2026-09-29，Draft PR #10 的精确头提交 `a076be06e2e4c3eeecdab3f1860143771bfef0d3` 已通过 Android companion boundary workflow run [36449517394](https://github.com/Jvust/mygpt/actions/runs/36449517394)。Java 8 package-layout smoke job `109020458878` 与 Android `assembleDebug`/Spine native payload job `109020458429` 均成功。GitHub Actions artifact `10983131261`（`mygpt-spine-3714430278-android-spike`，1,256,529 bytes，SHA-256 `1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411`，保留至 2026-10-01）是当前 CI 证据；它是短期可重建产物，不是 Drive 长期归档。
+
+这一步把状态从“renderer coded / CI pending”推进到“renderer exact-head CI pass / device pending”。已验证的是包布局校验、Spine 4.1.20 资源路径、Java 8 边界 smoke、Android 构建和 APK native payload；仍未验证小米 14 真机上的 SAF 导入、首帧、idle/cue 切换、后台恢复，以及真实 Book Android study-event producer。Spine Runtime 许可证仍是任何可分发构建的独立门槛；PR #10 保持 Draft，main 未修改。
+
+下一步：在小米 14 安装该 exact-head debug APK，选择已解密 `3714430278.zip`，逐项记录首帧、`QUIET/PAUSED/NEEDS_INPUT/GENTLE_CHECK_IN`、后台重开和失败恢复，再接入真实且可撤销的 Book 事件源。
+
+---
+
 ## 当前 Android 生命周期成果与源码快照
 
 项目分支 `feat/android-companion-boundary-20260928` 持续保持 Draft PR #10。最新代码验证：push run `36369308484` 与 PR run `36369310978` 的 Java 8 smoke、Android debug 构建通过。当前 debug APK Drive ID `1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG`（SHA-256 `78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed`）；完整源码快照 Drive ID `1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy`（commit `bf996e6e64c3f4d078102d337be31480dedf2f88`，131 tracked files，SHA-256 `006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc`）；变更文件评审包 Drive ID `16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq`（SHA-256 `c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a`）。真机生命周期验证及真实 Book/Live 接入仍待完成。

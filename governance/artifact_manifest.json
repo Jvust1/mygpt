@@ -1,6 +1,6 @@
 {
   "schema_version": "mygpt_artifact_manifest_v1",
-  "updated_date": "2026-09-28",
+  "updated_date": "2026-09-29",
   "project": {
     "repository": "Jvust/mygpt",
     "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
@@ -343,6 +343,26 @@
       "purpose": "Complete tracked GitHub branch source snapshot including the Android lifecycle spike, current governance records and docs; excludes build artifacts other than those separately listed.",
       "status": "current_source_snapshot",
       "verification": "The local baseline declared source commit 150832f75565ccbcc5978602c072f8ed2d0bb15e. GitHub compare reports 21 commits ahead with 21 changed paths and 0 behind; all changed files were fetched from current branch. Archive contains exactly 131 files, matching all 131 blob paths in the recursive GitHub tree at branch head bf996e6. ZIP CRC passed; Drive metadata read-back confirms name, 1,954,056-byte size and target folder. The archive's embedded artifact manifest predates registration of this self-referential snapshot."
+    },
+    {
+      "artifact_id": "mygpt-android-spine-3714430278-ci-20260929",
+      "file_name": "mygpt-spine-3714430278-android-spike.apk",
+      "type": "github_actions_artifact",
+      "drive_file_id_or_path": null,
+      "related_branch": "feat/android-companion-boundary-20260928",
+      "related_commit": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
+      "workflow_run": "https://github.com/Jvust/mygpt/actions/runs/36449517394",
+      "workflow_run_id": 36449517394,
+      "workflow_artifact_id": 10983131261,
+      "workflow_artifact_name": "mygpt-spine-3714430278-android-spike",
+      "artifact_sha256": "1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411",
+      "size_bytes": 1256529,
+      "created_at": "2026-09-29",
+      "expires_at": "2026-10-01T16:16:10Z",
+      "source": "github_actions_artifact",
+      "purpose": "Exact-head CI evidence for the private/debug Spine 4.1 renderer evaluation of Live skin 3714430278. Includes Java 8 package-layout smoke, Android assembleDebug and APK native payload verification; it is re-creatable and is not a Drive archive or production release.",
+      "status": "ci_verified_device_pending",
+      "verification": "Run 36449517394 passed at exact head a076be06e2e4c3eeecdab3f1860143771bfef0d3. java8-boundary job 109020458878 and android-debug-host job 109020458429 succeeded; artifact digest and size are recorded from GitHub."
     }
   ],
   "notes": [
@@ -360,7 +380,8 @@
     "PR #8 integration artifact proves combined CI compatibility without importing PR #7 stale state-file replacements; merge and independent review remain separate gates.",
     "2026-09-27: current review branch and validation bundle uploaded after GitHub push; historical artifacts were preserved and not duplicated.",
     "2026-09-27: r2 current source snapshot uploaded after authorized Book bridge E2E and provenance alignment; prior snapshot retained as historical.",
-    "2026-09-28: synchronized final Book Android + mygpt + Live target and 51-project upstream registry; historical ZIP artifacts were preserved and a current Drive sync receipt was added without manufacturing a new full-source archive."
+    "2026-09-28: synchronized final Book Android + mygpt + Live target and 51-project upstream registry; historical ZIP artifacts were preserved and a current Drive sync receipt was added without manufacturing a new full-source archive.",
+    "2026-09-29: recorded the exact-head Spine 4.1 renderer CI artifact for skin 3714430278; GitHub Actions evidence is short-lived/re-creatable, no Drive duplicate was created, physical-device validation remains pending."
   ],
-  "last_updated": "2026-09-28"
+  "last_updated": "2026-09-29"
 }

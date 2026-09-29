@@ -1,3 +1,27 @@
+## E013 — Spine 4.1 renderer exact-head CI pass (2026-09-29)
+
+**Status:** ACCEPTED_EXACT_HEAD_CI / DEVICE_PENDING
+
+**Source:** Draft PR #10, `a076be06e2e4c3eeecdab3f1860143771bfef0d3` on `feat/android-companion-boundary-20260928`.
+
+### Evidence
+
+- Workflow run [36449517394](https://github.com/Jvust/mygpt/actions/runs/36449517394) completed with conclusion `success`.
+- `java8-boundary` job `109020458878`: Java 8 compile and `SpinePackageLayoutSmoke`/coordinator smoke passed.
+- `android-debug-host` job `109020458429`: hosted Android SDK check, `:app:assembleDebug`, and native payload check passed.
+- Artifact `10983131261`, `mygpt-spine-3714430278-android-spike`: 1,256,529 bytes; SHA-256 `1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411`; expires 2026-10-01.
+- The exact-head source path remains `3714430278.zip -> SAF URI grant -> bounded/validated extraction -> SpinePackageLayout -> SpineSkinApplication -> SpineCharacterRuntime -> CompanionCoordinator cue`.
+
+### Interpretation
+
+This is the first accepted exact-head CI evidence for the real Spine renderer implementation. It confirms the package-validation contract, Java 8 boundary, Android APK assembly and native payload presence. It does not prove a physical Android render or real Book producer.
+
+### Limits and next gate
+
+No Xiaomi 14 installation, SAF import, first-frame check, cue-transition check or background-reopen check has been performed. Book events remain synthetic; paid provider calls remain zero; the Spine Runtime license gate still blocks any production/public redistribution claim. Next gate is a user-device validation record, followed by the genuine trusted Book Android study-event producer.
+
+---
+
 ## E012 — Current GitHub and Drive handoff alignment
 
 Synchronized the current state and handoff to include the CI-passing synthetic Android lifecycle host, APK, changed-files review bundle, complete 131-file source snapshot, latest Drive IDs and checksums. The source snapshot is explicitly tied to source commit `bf996e6e64c3f4d078102d337be31480dedf2f88`; GitHub branch head subsequently advances through documentation-only synchronization commits. The Drive sync receipt receives a top addendum superseding the earlier no-APK statement. Earlier APK and source archives remain historical; no PR merge or main update.
