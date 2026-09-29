@@ -4,8 +4,8 @@
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-  "phase": "ANDROID_SPINE_3714430278_REFRESH_ALIGNED_CI_PENDING",
-  "status": "PR10_LATEST_HEAD_PRESERVED_SKIN_DELTA_REPLAYED_CI_PENDING",
+  "phase": "ANDROID_SPINE_3714430278_REFRESH_CI_VERIFIED",
+  "status": "PR10_LATEST_HEAD_ALIGNED_SPINE_REFRESH_CI_PASS_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -79,7 +79,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Run refresh-branch CI against PR #10 latest head 3ad7d14, then archive the resulting APK and validate it on Xiaomi 14. After device acceptance, connect genuine trusted Book Android study events.",
+  "next_step": "Install the refresh CI APK on Xiaomi 14, select the exact Live 3714430278.zip through SAF, verify first frame/idle/cue transitions/background-reopen and wrong-package rejection. After device acceptance, connect genuine trusted Book Android study events.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -509,7 +509,7 @@
     "branch": "feat/android-companion-boundary-20260928",
     "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
     "scope": "Pure Java 8 Book event coordinator, renderer-neutral Live cue port, and isolated synthetic Android debug host",
-    "verification": "PR10_LATEST_BASELINE_EXACT_HEAD_CI_PASS; REFRESH_WITH_LICENSE_BACKUP_REGISTRY_CI_PENDING",
+    "verification": "REFRESH_BRANCH_JAVA8_AND_ANDROID_CI_PASS_NATIVE_AND_LICENSE_PAYLOAD_VERIFIED_DEVICE_PENDING",
     "book_live_transport": "NOT_CONNECTED",
     "apk": "DEBUG_APK_BUILT_SYNTHETIC_DEVICE_PENDING",
     "provider_calls": 0,
@@ -525,7 +525,7 @@
       "kind": "SYNTHETIC_ANDROID_DEBUG_ONLY",
       "build": "CI_PASS",
       "book_authentication": "TEST_DOUBLE",
-      "live_renderer": "SPINE_LIBGDX_4_1_EXACT_HEAD_CI_PASS_DEVICE_PENDING",
+      "live_renderer": "SPINE_LIBGDX_4_1_REFRESH_CI_PASS_DEVICE_PENDING",
       "permissions": [],
       "implementation_commit": "eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b",
       "ci": {
@@ -563,8 +563,8 @@
       },
       "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
       "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
-      "renderer_ci_run": 36448862550,
-      "renderer_ci_status": "REFRESH_PENDING",
+      "renderer_ci_run": 36511143238,
+      "renderer_ci_status": "SUCCESS",
       "renderer_baseline_ci": {
         "source_commit": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
         "run_id": 36449517394,
@@ -579,6 +579,27 @@
         "arm64_libgdx_present": true,
         "spine_license_notice_present": false,
         "note": "PR #10 latest baseline before refresh; refresh branch adds the runtime license notice and skin governance without reverting PR #10."
+      },
+      "renderer_ci_source_commit": "b48268e66633f6b1d1230d392afa450ebb0c3ab4",
+      "renderer_ci_jobs": {
+        "java8_boundary": "SUCCESS",
+        "android_debug_host": "SUCCESS",
+        "native_payload_check": "SUCCESS"
+      },
+      "renderer_artifact": {
+        "github_artifact_id": 11008074830,
+        "github_artifact_name": "mygpt-spine-3714430278-android-spike",
+        "github_artifact_digest": "sha256:70546d140e5d2aee8442776866741d7f68f4c07b6d27bc86dddfd59ad5757420",
+        "github_artifact_size_bytes": 1257407,
+        "github_expires_at": "2026-10-02T02:09:35Z",
+        "drive_archive_id": "1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa",
+        "drive_archive_name": "mygpt-spine-3714430278-refresh-run36511143238.zip",
+        "apk_name": "app-debug.apk",
+        "apk_size_bytes": 1381959,
+        "apk_sha256": "9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593",
+        "arm64_libgdx_present": true,
+        "spine_license_notice_present": true,
+        "classes_dex_present": true
       }
     },
     "selected_live_skin": {
@@ -589,7 +610,7 @@
       "config_drive_file_id": "1O87dhnMOs2faZvFMWepm2DM-1Lqa51RW",
       "preview_drive_file_id": "1DwSlVnuGPp6EAOAnECSkNfm0mZeExTZx",
       "mygpt_asset_copy": false,
-      "status": "SELECTED_DECRYPTED_RUNTIME_PACKAGE_PR10_BASE_CI_PASS_REFRESH_PENDING",
+      "status": "SELECTED_DECRYPTED_RUNTIME_PACKAGE_REFRESH_CI_PASS_DEVICE_PENDING",
       "runtime_package": {
         "file_name": "3714430278.zip",
         "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
@@ -619,15 +640,16 @@
         "runtime": "spine-libgdx",
         "runtime_version": "4.1.0",
         "libgdx_line": "1.10.0",
-        "status": "PR10_BASE_CI_PASS_REFRESH_WITH_LICENSE_PENDING",
+        "status": "REFRESH_CI_VERIFIED_DEVICE_PENDING",
         "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION",
         "abi": "arm64-v8a",
         "native_packaging": "lib/arm64-v8a/libgdx.so from gdx-platform:1.10.0:natives-arm64-v8a",
         "license_notice_path": "android_spike/app/src/main/assets/SPINE_RUNTIME_LICENSE.txt",
-        "ci_run": 36449606217,
-        "apk_sha256": "44bb4863c944c05e0acb30a7be9df6b9751b3600fc144e05812f4ee74d68fae2",
+        "ci_run": 36511143238,
+        "apk_sha256": "9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593",
         "baseline_ci_run": 36449517394,
-        "baseline_apk_sha256": "d7eea8e80e1d782e0ff0e8f350d6064b9f7b415f595af480c03e22667d7b56c9"
+        "baseline_apk_sha256": "d7eea8e80e1d782e0ff0e8f350d6064b9f7b415f595af480c03e22667d7b56c9",
+        "drive_artifact_id": "1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa"
       },
       "motion_mapping": {
         "QUIET": "idle",
