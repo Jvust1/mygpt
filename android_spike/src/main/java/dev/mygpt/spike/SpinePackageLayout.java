@@ -24,6 +24,15 @@ public final class SpinePackageLayout {
     public static final String EXPECTED_ARCHIVE_SHA256 =
             "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f";
 
+    // A ZIP may be repacked without changing the actual skin. These three hashes pin the
+    // executable/rendered content rather than ZIP container metadata.
+    private static final String EXPECTED_SKELETON_SHA256 =
+            "990dbb1e9eafddfbc4972dd8431cee4c9ca1532f6448548ee0eaddf1c9e3d66e";
+    private static final String EXPECTED_ATLAS_SHA256 =
+            "de4677f5dc475f0399fa18b4a652f46a6ddea9762aafd5d0a591cd5ce67de8b0";
+    private static final String EXPECTED_TEXTURE_SHA256 =
+            "01dab8b08ad1b848e0788c0df7ae05357c1476704ad5d15f62fb31ec6bc98434";
+
     private static final long MAX_ARCHIVE_BYTES = 16L * 1024L * 1024L;
     private static final long MAX_ENTRY_BYTES = 8L * 1024L * 1024L;
     private static final long MAX_TOTAL_EXTRACTED_BYTES = 20L * 1024L * 1024L;
@@ -44,21 +53,39 @@ public final class SpinePackageLayout {
         public final File directory;
         public final String spineVersion;
         public final String archiveSha256;
+        public final String identityMode;
 
-        InstalledSkin(File directory, String spineVersion, String archiveSha256) {
+        InstalledSkin(File directory, String spineVersion, String archiveSha256, String identityMode) {
             this.directory = directory;
             this.spineVersion = spineVersion;
             this.archiveSha256 = archiveSha256;
+            this.identityMode = identityMode;
         }
     }
 
-    /** Production import path for the selected first skin: exact archive identity is mandatory. */
+    /**
+     * User import path. Prefer the canonical ZIP SHA, but permit a repacked ZIP when its actual
+     * Spine skeleton, atlas and texture bytes exactly match Live skin 3714430278.
+     */
     public static InstalledSkin install(InputStream source, File targetDirectory) throws IOException {
-        return install(source, targetDirectory, EXPECTED_ARCHIVE_SHA256);
+        return installInternal(source, targetDirectory, EXPECTED_ARCHIVE_SHA256,
+                false, true);
     }
 
-    /** Package-private overload keeps deterministic tests independent of the private production ZIP. */
+    /** Package-private exact-container overload for deterministic tests. */
     static InstalledSkin install(InputStream source, File targetDirectory, String expectedSha256)
+            throws IOException {
+        return installInternal(source, targetDirectory, expectedSha256,
+                expectedSha256 != null, false);
+    }
+
+    /** Validate an already-installed app-private copy so normal launches need no file picker. */
+    public static String validateInstalled(File directory) throws IOException {
+        return validateExtracted(directory, true);
+    }
+
+    private static InstalledSkin installInternal(InputStream source, File targetDirectory,
+            String expectedSha256, boolean requireExactArchive, boolean verifyProductionCore)
             throws IOException {
         if (source == null) throw new IllegalArgumentException("source cannot be null");
         if (targetDirectory == null) throw new IllegalArgumentException("targetDirectory cannot be null");
@@ -73,7 +100,9 @@ public final class SpinePackageLayout {
         deleteRecursively(staging);
 
         String archiveSha = copyAndDigest(source, archive);
-        if (expectedSha256 != null && !expectedSha256.equalsIgnoreCase(archiveSha)) {
+        boolean exactArchive = expectedSha256 != null
+                && expectedSha256.equalsIgnoreCase(archiveSha);
+        if (requireExactArchive && !exactArchive) {
             deleteRecursively(archive);
             throw new IOException("archive SHA-256 mismatch: " + archiveSha);
         }
@@ -128,31 +157,12 @@ public final class SpinePackageLayout {
             throw new IOException("missing required runtime files: " + missing);
         }
 
-        String manifest = readUtf8(new File(staging, "lpk_files.json"));
-        if (!manifest.contains("\"fileId\": \"" + SKIN_ID + "\"")
-                && !manifest.contains("\"fileId\":\"" + SKIN_ID + "\"")) {
+        final String version;
+        try {
+            version = validateExtracted(staging, verifyProductionCore);
+        } catch (IOException error) {
             deleteRecursively(staging);
-            throw new IOException("package is not Live skin " + SKIN_ID);
-        }
-
-        String model = readUtf8(new File(staging, "model.json"));
-        if ((!model.contains("\"type\":9") && !model.contains("\"type\": 9"))
-                || !model.contains("\"idle\"")) {
-            deleteRecursively(staging);
-            throw new IOException("unexpected Spine model metadata");
-        }
-
-        String atlas = readUtf8(new File(staging, "c610_00.atlas"));
-        if (!atlas.startsWith("c610_00.png")
-                || (!atlas.contains("pma:true") && !atlas.contains("pma: true"))) {
-            deleteRecursively(staging);
-            throw new IOException("unexpected atlas identity or PMA setting");
-        }
-
-        String version = detectSpineVersion(new File(staging, "skeleton.bin"));
-        if (version == null || !version.startsWith("4.1.")) {
-            deleteRecursively(staging);
-            throw new IOException("unsupported Spine binary version: " + version);
+            throw error;
         }
 
         deleteRecursively(targetDirectory);
@@ -160,7 +170,76 @@ public final class SpinePackageLayout {
             deleteRecursively(staging);
             throw new IOException("cannot promote installed skin");
         }
-        return new InstalledSkin(targetDirectory, version, archiveSha);
+
+        String identityMode = exactArchive ? "EXACT_ARCHIVE" :
+                (verifyProductionCore ? "VERIFIED_CORE_CONTENT" : "STRUCTURE_ONLY_TEST");
+        return new InstalledSkin(targetDirectory, version, archiveSha, identityMode);
+    }
+
+    private static String validateExtracted(File directory, boolean verifyProductionCore)
+            throws IOException {
+        if (directory == null || !directory.isDirectory())
+            throw new IOException("installed skin directory missing");
+
+        for (String name : REQUIRED) {
+            if (!new File(directory, name).isFile())
+                throw new IOException("installed skin missing: " + name);
+        }
+
+        String manifest = readUtf8(new File(directory, "lpk_files.json"));
+        if (!manifest.contains("\"fileId\": \"" + SKIN_ID + "\"")
+                && !manifest.contains("\"fileId\":\"" + SKIN_ID + "\"")) {
+            throw new IOException("package is not Live skin " + SKIN_ID);
+        }
+
+        String model = readUtf8(new File(directory, "model.json"));
+        if ((!model.contains("\"type\":9") && !model.contains("\"type\": 9"))
+                || !model.contains("\"idle\"")) {
+            throw new IOException("unexpected Spine model metadata");
+        }
+
+        String atlas = readUtf8(new File(directory, "c610_00.atlas"));
+        if (!atlas.startsWith("c610_00.png")
+                || (!atlas.contains("pma:true") && !atlas.contains("pma: true"))) {
+            throw new IOException("unexpected atlas identity or PMA setting");
+        }
+
+        String version = detectSpineVersion(new File(directory, "skeleton.bin"));
+        if (version == null || !version.startsWith("4.1.")) {
+            throw new IOException("unsupported Spine binary version: " + version);
+        }
+
+        if (verifyProductionCore) {
+            verifyFileSha(new File(directory, "skeleton.bin"),
+                    EXPECTED_SKELETON_SHA256, "skeleton.bin");
+            verifyFileSha(new File(directory, "c610_00.atlas"),
+                    EXPECTED_ATLAS_SHA256, "c610_00.atlas");
+            verifyFileSha(new File(directory, "c610_00.png"),
+                    EXPECTED_TEXTURE_SHA256, "c610_00.png");
+        }
+
+        return version;
+    }
+
+    private static void verifyFileSha(File file, String expected, String label) throws IOException {
+        String actual = sha256(file);
+        if (!expected.equalsIgnoreCase(actual))
+            throw new IOException(label + " content mismatch: " + actual);
+    }
+
+    private static String sha256(File file) throws IOException {
+        final MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException impossible) {
+            throw new IOException("SHA-256 unavailable", impossible);
+        }
+        byte[] buffer = new byte[32 * 1024];
+        try (FileInputStream in = new FileInputStream(file)) {
+            int read;
+            while ((read = in.read(buffer)) != -1) digest.update(buffer, 0, read);
+        }
+        return hex(digest.digest());
     }
 
     private static String copyAndDigest(InputStream source, File archive) throws IOException {
