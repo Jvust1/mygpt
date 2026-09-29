@@ -64,7 +64,7 @@ public final class SpineSkinApplication extends ApplicationAdapter {
     }
 
     @Override public void render() {
-        Gdx.gl.glClearColor(247f / 255f, 245f / 255f, 239f / 255f, 1f);
+        Gdx.gl.glClearColor(239f / 255f, 243f / 255f, 238f / 255f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (skeleton == null || animationState == null) return;
 
