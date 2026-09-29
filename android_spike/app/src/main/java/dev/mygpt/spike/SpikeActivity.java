@@ -61,7 +61,7 @@ public final class SpikeActivity extends AndroidApplication {
         character.setPadding(16, 16, 16, 16);
         column.addView(character, new LinearLayout.LayoutParams(-1, 80));
 
-        status = label("请选择 3714430278.zip；选择一次后会记住该文件授权。", 14, Color.DKGRAY);
+        status = label("正在检查已安装的 3714430278…", 14, Color.DKGRAY);
         column.addView(status);
 
         spineApp = new SpineSkinApplication(message -> runOnUiThread(() -> status.setText(message)));
@@ -75,7 +75,7 @@ public final class SpikeActivity extends AndroidApplication {
         characterRuntime = new SpineCharacterRuntime(spineApp, character);
         coordinator = new CompanionCoordinator((event, nowMs) -> !revoked, characterRuntime);
 
-        addButton(column, "选择 / 更换 3714430278.zip", this::openSkinPackage);
+        addButton(column, "首次导入 / 更换 3714430278.zip", this::openSkinPackage);
 
         optIn = new Switch(this);
         optIn.setText("允许轻量学习提醒（仅本次演示）");
@@ -101,8 +101,34 @@ public final class SpikeActivity extends AndroidApplication {
                 clearDemoSession("模拟授权已撤销；会话与提醒许可已清除"));
         addButton(column, "结束会话", () -> send(CompanionCoordinator.Kind.SESSION_ENDED, null));
 
-        String persisted = getSharedPreferences(PREFS, MODE_PRIVATE).getString(PREF_SKIN_URI, null);
-        if (persisted != null) loadSkin(Uri.parse(persisted), false);
+        loadInstalledOrRememberedSkin();
+    }
+
+
+    private File installedSkinDirectory() {
+        return new File(new File(getFilesDir(), "skins"), SpinePackageLayout.SKIN_ID);
+    }
+
+    private void loadInstalledOrRememberedSkin() {
+        File installed = installedSkinDirectory();
+        new Thread(() -> {
+            try {
+                String version = SpinePackageLayout.validateInstalled(installed);
+                runOnUiThread(() -> {
+                    status.setText("已自动加载已安装皮肤 · Spine " + version);
+                    characterRuntime.load(installed);
+                });
+                return;
+            } catch (Throwable ignored) {
+            }
+            String persisted = getSharedPreferences(PREFS, MODE_PRIVATE)
+                    .getString(PREF_SKIN_URI, null);
+            if (persisted != null) {
+                runOnUiThread(() -> loadSkin(Uri.parse(persisted), false));
+            } else {
+                runOnUiThread(() -> status.setText("首次导入 3714430278.zip 一次即可，成功后以后自动加载。"));
+            }
+        }, "mygpt-installed-skin-check").start();
     }
 
     private void openSkinPackage() {
@@ -143,9 +169,7 @@ public final class SpikeActivity extends AndroidApplication {
                             .putString(PREF_SKIN_URI, uri.toString()).apply();
                 }
                 runOnUiThread(() -> {
-                    status.setText("校验通过 · Spine " + installed.spineVersion
-                            + " · SHA " + installed.archiveSha256.substring(0, 12)
-                            + "… · 正在进入渲染器");
+                    status.setText("校验通过 · Spine " + installed.spineVersion + " · " + installed.identityMode + " · 后续自动加载");
                     characterRuntime.load(installed.directory);
                 });
             } catch (Throwable error) {
