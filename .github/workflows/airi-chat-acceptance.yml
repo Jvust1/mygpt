@@ -9,6 +9,7 @@ on:
       - 'brain/mygpt_brain/session_store.py'
       - 'brain/mygpt_brain/companion_chat.py'
       - 'brain/mygpt_brain/providers.py'
+      - 'brain/mygpt_brain/companion_service.py'
       - 'brain/mygpt_brain/character_card.py'
       - 'brain/personas/**'
       - 'brain/tests/test_conversation.py'
@@ -17,6 +18,7 @@ on:
       - 'brain/tests/test_companion_chat.py'
       - 'brain/tests/test_providers.py'
       - 'brain/tests/test_character_card.py'
+      - 'brain/tests/test_companion_service.py'
       - '.github/workflows/airi-chat-acceptance.yml'
 
 permissions:
