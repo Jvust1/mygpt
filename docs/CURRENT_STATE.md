@@ -1,3 +1,13 @@
+## 2026-09-29 · PR #13 刷新验收
+
+- PR #13 从 PR #10 最新 head `3ad7d14a5446a3c0c6f23aa7e00703a3535f4e7e` 派生，保留 PR #10 当天新增的 CURRENT_STATE / EVALUATION_LEDGER / HANDOFF 状态。
+- refresh 测试 head：`b48268e66633f6b1d1230d392afa450ebb0c3ab4`。
+- workflow run `36511143238`：Java8 boundary PASS、Android assembleDebug PASS、`lib/arm64-v8a/libgdx.so` payload PASS。
+- APK：1,381,959 bytes，SHA-256 `9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593`；Spine runtime license notice 已包含。
+- 长期 Drive artifact：`1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa`。
+- PR #12 作为旧对账线被 PR #13 取代；主动态皮肤仍为 `3714430278`，静态备选仍为 `backup_skin_image_01`。
+- 下一门槛仍是小米 14 真机显示验收；真实 Book Android 学习事件尚未接入。
+
 ## 2026-09-29 · Live 主/备皮肤同步
 
 - 主动态皮肤继续为 Live `3714430278`：Spine 4.1.20，Android CI 已通过，真机待验。
