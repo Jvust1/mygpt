@@ -6,6 +6,7 @@
 - 资产 SHA-256：`eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
 - APK：13,724,357 bytes
 - APK SHA-256：`fe694d9b7ce24a6dae5018b0f5711082b632308343bdd0c27dea0d52aadf9c01`
+- Drive 长期归档：`19TBASO7hsyRRA8RTyjCL7wVHEIxHZaT6`（`mygpt/02_Generated_Artifacts/mygpt-3714430278-selfcontained-20260929.apk`）
 - APK Signature Scheme v2：本地密码学结构验证 PASS
 - ZIP 完整性：PASS
 - `lib/arm64-v8a/libgdx.so`：16K 对齐保持 PASS
