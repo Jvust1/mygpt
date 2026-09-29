@@ -101,7 +101,7 @@ public final class SpikeActivity extends AndroidApplication {
         characterHeader.addView(character);
 
         FrameLayout renderShell = new FrameLayout(this);
-        renderShell.setBackground(roundRect(SURFACE_ALT, 20));
+        renderShell.setBackground(roundRect(SURFACE_ALT, 20));\n        if (Build.VERSION.SDK_INT >= 21) {\n            renderShell.setClipToOutline(true);\n            renderShell.setElevation(dp(1));\n        }
         LinearLayout.LayoutParams renderParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(430));
         renderParams.setMargins(dp(12), dp(4), dp(12), 0);
