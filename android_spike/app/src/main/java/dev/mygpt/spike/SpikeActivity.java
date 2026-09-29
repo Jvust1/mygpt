@@ -217,6 +217,47 @@ public final class SpikeActivity extends AndroidApplication {
         endParams.setMargins(dp(14), dp(6), dp(14), dp(14));
         studyCard.addView(endRow, endParams);
 
+        TextView sectionMotion = sectionTitle("形态与动作");
+        page.addView(sectionMotion, topMargin(22));
+
+        LinearLayout motionCard = card(SURFACE, 20);
+        page.addView(motionCard, topMargin(10));
+
+        TextView motionHint = label(
+                "完整利用 3714430278：切换三种形态，并逐个测试当前形态的全部视觉动作。",
+                12, MUTED, false);
+        motionHint.setPadding(dp(16), dp(14), dp(16), dp(8));
+        motionCard.addView(motionHint);
+
+        LinearLayout formRow = actionRow();
+        formRow.addView(weightedButton("DEFAULT", ButtonStyle.SOFT,
+                () -> characterRuntime.switchForm(SkinCapabilityCatalog.Form.DEFAULT)));
+        formRow.addView(horizontalGap());
+        formRow.addView(weightedButton("AIM", ButtonStyle.SOFT,
+                () -> characterRuntime.switchForm(SkinCapabilityCatalog.Form.AIM)));
+        formRow.addView(horizontalGap());
+        formRow.addView(weightedButton("COVER", ButtonStyle.SOFT,
+                () -> characterRuntime.switchForm(SkinCapabilityCatalog.Form.COVER)));
+        motionCard.addView(formRow, rowMargins());
+
+        LinearLayout motionRow = actionRow();
+        motionRow.addView(weightedButton("待机", ButtonStyle.OUTLINE,
+                characterRuntime::playIdle));
+        motionRow.addView(horizontalGap());
+        motionRow.addView(weightedButton("主要动作", ButtonStyle.OUTLINE,
+                characterRuntime::playPrimaryAction));
+        motionCard.addView(motionRow, rowMargins());
+
+        LinearLayout motionRow2 = actionRow();
+        motionRow2.addView(weightedButton("反应动作", ButtonStyle.OUTLINE,
+                characterRuntime::playReaction));
+        motionRow2.addView(horizontalGap());
+        motionRow2.addView(weightedButton("下一个动作", ButtonStyle.PRIMARY,
+                characterRuntime::cycleAction));
+        LinearLayout.LayoutParams motionEnd = rowMargins();
+        motionEnd.setMargins(dp(14), dp(6), dp(14), dp(14));
+        motionCard.addView(motionRow2, motionEnd);
+
         TextView sectionRole = sectionTitle("角色设置");
         page.addView(sectionRole, topMargin(22));
 
