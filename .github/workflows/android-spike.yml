@@ -38,11 +38,15 @@ jobs:
           mkdir -p android_spike/build/classes
           javac --release 8 -d android_spike/build/classes \
             android_spike/src/main/java/dev/mygpt/spike/CompanionCoordinator.java \
+            android_spike/src/main/java/dev/mygpt/spike/SkinCapabilityCatalog.java \
             android_spike/src/main/java/dev/mygpt/spike/SpinePackageLayout.java \
             android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java \
-            android_spike/src/test/java/dev/mygpt/spike/SpinePackageLayoutSmoke.java
+            android_spike/src/test/java/dev/mygpt/spike/SpinePackageLayoutSmoke.java \
+            android_spike/src/test/java/dev/mygpt/spike/SkinCapabilityCatalogSmoke.java
           java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.SpinePackageLayoutSmoke
+          java -cp android_spike/build/classes dev.mygpt.spike.SkinCapabilityCatalogSmoke
+
   android-debug-host:
     if: github.repository == 'Jvust/mygpt'
     runs-on: ubuntu-24.04
@@ -85,6 +89,8 @@ jobs:
                   raise SystemExit(f"missing {required}")
               if "classes.dex" not in names:
                   raise SystemExit("missing classes.dex")
+              if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
+                  raise SystemExit("missing Spine runtime license notice")
               print("APK native payload PASS:", required)
           PY
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
