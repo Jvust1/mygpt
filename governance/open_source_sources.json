@@ -285,11 +285,18 @@
       "repo": "ggml-org/llama.cpp",
       "area": "On-device LLM",
       "priority": "P0",
-      "mode": "ENGINE_CANDIDATE",
-      "why": "Primary GGUF local LLM candidate; current upstream includes Android bindings/examples.",
+      "mode": "CODE_ADAPTED_INTERFACE",
+      "why": "Android on-device GGUF engine lifecycle/concurrency contract adapted now; native JNI backend remains benchmark-gated.",
       "url": "https://github.com/ggml-org/llama.cpp",
-      "code_copied": false,
-      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+      "code_copied": true,
+      "license_status": "MIT_VERIFIED",
+      "pinned_commit": "ba0ba54d93b25faf1e149f4ccedd3e9d84798563",
+      "local_paths": [
+        "android_spike/src/main/java/dev/mygpt/spike/LocalLlmEngine.java",
+        "android_spike/src/main/java/dev/mygpt/spike/SerializedLocalLlmEngine.java",
+        "third_party/llama.cpp/LICENSE",
+        "third_party/llama.cpp/NOTICE.md"
+      ]
     },
     {
       "repo": "ggml-org/whisper.cpp",
