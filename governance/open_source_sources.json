@@ -115,11 +115,18 @@
       "repo": "princekin-f/EasyFloat",
       "area": "Floating companion",
       "priority": "P0",
-      "mode": "DEPENDENCY_CANDIDATE",
-      "why": "Draggable system/app floating windows, lifecycle filtering and overlay permission flow.",
+      "mode": "CODE_ADAPTED_IN_APP_ONLY",
+      "why": "Permission-free current-activity drag/snap layer for a future mini companion; system overlay remains separately permission-gated.",
       "url": "https://github.com/princekin-f/EasyFloat",
-      "code_copied": false,
-      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "1a65226084a46cafc7ebcb27f0a077aebefa9b0e",
+      "local_paths": [
+        "android_spike/src/main/java/dev/mygpt/spike/FloatDragPolicy.java",
+        "android_spike/app/src/main/java/dev/mygpt/spike/InAppCompanionDragController.java",
+        "third_party/easyfloat/LICENSE",
+        "third_party/easyfloat/NOTICE.md"
+      ]
     },
     {
       "repo": "guolindev/PermissionX",
