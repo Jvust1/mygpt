@@ -411,6 +411,25 @@
       "purpose": "Sync receipt for primary Spine skin 3714430278, CI-verified Android artifact, and backup static skin image 01.",
       "status": "current_sync_receipt",
       "verification": "Google Doc created, populated and moved into mygpt Drive root; parent and file ID returned successfully."
+    },
+    {
+      "artifact_id": "mygpt-spine-3714430278-refresh-ci-20260929",
+      "file_name": "mygpt-spine-3714430278-refresh-run36511143238.zip",
+      "type": "android_ci_artifact",
+      "drive_file_id_or_path": "1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa",
+      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
+      "sha256": "70546d140e5d2aee8442776866741d7f68f4c07b6d27bc86dddfd59ad5757420",
+      "size_bytes": 1257407,
+      "version": "spine-3714430278-refresh-run36511143238",
+      "created_at": "2026-09-29",
+      "source": "github_actions_artifact",
+      "related_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+      "related_commit": "b48268e66633f6b1d1230d392afa450ebb0c3ab4",
+      "workflow_run": "https://github.com/Jvust/mygpt/actions/runs/36511143238",
+      "workflow_artifact_id": 11008074830,
+      "purpose": "PR #13 refresh CI artifact aligned to PR #10 latest head; includes arm64 Spine/libGDX renderer, exact skin metadata and bundled Spine runtime license notice.",
+      "status": "current_ci_verified_device_pending",
+      "verification": "Java8 boundary PASS, Android assembleDebug PASS, native libgdx payload PASS. APK 1,381,959 bytes SHA-256 9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593; assets/SPINE_RUNTIME_LICENSE.txt present."
     }
   ],
   "notes": [
@@ -430,7 +449,8 @@
     "2026-09-27: r2 current source snapshot uploaded after authorized Book bridge E2E and provenance alignment; prior snapshot retained as historical.",
     "2026-09-28: synchronized final Book Android + mygpt + Live target and 51-project upstream registry; historical ZIP artifacts were preserved and a current Drive sync receipt was added without manufacturing a new full-source archive.",
     "2026-09-29: recorded the exact-head Spine 4.1 renderer CI artifact for skin 3714430278; GitHub Actions evidence is short-lived/re-creatable, no Drive duplicate was created, physical-device validation remains pending.",
-    "2026-09-29: backup static skin image 01 archived under Live/skin and registered as mygpt fallback; primary remains dynamic Spine skin 3714430278."
+    "2026-09-29: backup static skin image 01 archived under Live/skin and registered as mygpt fallback; primary remains dynamic Spine skin 3714430278.",
+    "2026-09-29: PR #13 refresh aligned skin 3714430278 and backup registry to PR #10 latest head; CI run 36511143238 passed and exact artifact was archived to Drive."
   ],
   "last_updated": "2026-09-29"
 }
