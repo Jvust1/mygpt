@@ -4,8 +4,8 @@
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-  "phase": "ANDROID_SPINE_3714430278_SELFCONTAINED_APK_READY",
-  "status": "SELFCONTAINED_APK_READY_FOR_DEVICE_VALIDATION",
+  "phase": "ANDROID_COMPANION_UI_V005_SELFCONTAINED_READY",
+  "status": "POLISHED_UI_SELFCONTAINED_APK_CI_PASS_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -105,7 +105,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Continue full visual utilization of 3714430278 (default/aim/cover, animations, transitions, visual effects) with skin audio disabled; then run Xiaomi 14 acceptance.",
+  "next_step": "Install MyGPT 0.0.5 polished self-contained APK on Xiaomi 14, verify the redesigned companion page plus automatic 3714430278 loading, then validate idle/cues/background-reopen. After that continue full visual utilization of default/aim/cover and real Book Android events.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -720,31 +720,35 @@
       "authority": "Jvust/Live + Live Drive skin library"
     },
     "selfcontained_device_build": {
-      "source_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-      "source_head_with_auto_load": "83b303d89ddc4691b7cbc979b9cd5ae9a6a55e82",
-      "build_basis_run": 36515156062,
-      "build_basis_artifact_id": 11009599783,
+      "source_head": "da0642c84ce85d36b99fbd3309fb66db7abe259b",
+      "build_basis_run": 36523316210,
+      "build_basis_artifact_id": 11013646223,
       "bundled_asset": "assets/3714430278.zip",
       "bundled_asset_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
-      "apk_size_bytes": 13724357,
-      "apk_sha256": "fe694d9b7ce24a6dae5018b0f5711082b632308343bdd0c27dea0d52aadf9c01",
+      "apk_file_name": "mygpt-3714430278-ui-v0.0.5-20260929.apk",
+      "apk_size_bytes": 13721603,
+      "apk_sha256": "d53c9c0e9bda17fcfaf5fe607690449154a1089c5289e2571f4702460765a34b",
+      "drive_file_id": "1qQ7BJNmN6qh900Qo8rRfAeft6gBH9eN5",
       "signature_scheme": "APK Signature Scheme v2",
-      "v2_crypto_verification": "PASS",
+      "signer_cert_sha256": "42221fbf403ebe655ce71ffe514f1f3424c50f7abfd39a650f49c82bb1c8dac6",
+      "same_signer_as_previous_selfcontained": true,
       "zip_integrity": "PASS",
-      "native_alignment": "lib/arm64-v8a/libgdx.so data offset 1146880; 16K aligned",
-      "install_note": "Locally re-signed debug artifact uses a new debug key; uninstall a differently-signed prior dev.mygpt.spike build before installation if required.",
-      "drive_archive_id": "19TBASO7hsyRRA8RTyjCL7wVHEIxHZaT6",
-      "distribution": "PRIVATE_DEVICE_TEST_ONLY",
-      "drive_archive_name": "mygpt-3714430278-selfcontained-20260929.apk",
-      "drive_parent_id": "1aVb6MQTme7UAGhlcJ4V-Hgac8BhR3ouV",
-      "drive_archive_status": "ARCHIVED_AND_METADATA_READBACK_VERIFIED",
-      "final_verification": {
-        "bundled_skin_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
-        "v2_signature_crypto": "PASS",
-        "content_digest_match": true,
-        "zip_integrity": "PASS",
-        "libgdx_16k_alignment": "PASS"
-      }
+      "native_alignment_16k": "PASS",
+      "auto_load": true,
+      "manual_picker_role": "optional override only",
+      "distribution": "PRIVATE_DEVICE_TEST_ONLY"
+    },
+    "ui_candidate_v005": {
+      "source_head": "da0642c84ce85d36b99fbd3309fb66db7abe259b",
+      "version_code": 5,
+      "version_name": "0.0.5-companion-ui-3714430278",
+      "app_label": "MyGPT",
+      "layout": "brand header + character card + status card + learning controls + character settings",
+      "audio": false,
+      "ci_run": 36523316210,
+      "ci_java8": "SUCCESS",
+      "ci_android": "SUCCESS",
+      "native_payload": "SUCCESS"
     }
   }
 }
