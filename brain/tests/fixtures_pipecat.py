@@ -30,6 +30,9 @@ class Processor:
 
 def create_processor(bridge, **kwargs):
     from mygpt_brain.pipecat_bridge import create_pipecat_companion_processor
+    async def identity_speech(text):
+        return text
+    kwargs.setdefault("speech_formatter", identity_speech)
     return create_pipecat_companion_processor(
         bridge, frame_processor_base=Processor, frame_types=Frames,
         downstream_direction="down", **kwargs,

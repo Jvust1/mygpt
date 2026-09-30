@@ -69,3 +69,33 @@ acknowledge; expiry blocks later admission, rather than retroactively deleting
 completed history. Authorization TTL bounds the future wait. This closes
 the native API's admitted-request gap without replacing its loopback/token/Host
 security boundary or introducing another web framework.
+
+## 2026-09-30: existing Markdown filter wired into actual speech output
+
+The production companion processor invokes the installed, pinned upstream
+`MarkdownTextFilter.filter` only for short, flat heading/link presentation.
+Source: `src/pipecat/utils/text/markdown_text_filter.py`, Git blob
+`08b2a1f743d8cf7d2faa937915e97f52e3997d04` at the same immutable commit above.
+The installed 1.12.0 bytes are asserted against this blob in real-SDK tests.
+Full BSD-2-Clause copyright/license remains in this directory.
+Eligibility rechecked 2026-09-30 20:25 UTC: **16,093 stars**, not archived.
+
+No duplicate Markdown implementation or new dependency is vendored. Independent
+review found unrestricted upstream filtering destructive to learning operators,
+code and table cell boundaries, and expensive on nested brackets. MyGPT therefore
+preserves ambiguous/operator/code/table/list/image replies verbatim, parses only
+a flat recognized subset of at most 1200 characters and 16 delimiters, and runs
+eligible conversion off the event loop in a worker. Repeated-sequence deletion
+is disabled. A new filter per response avoids cross-turn state. Native/durable
+replies remain unchanged. Running thread work cannot be forcibly stopped, but
+interruption discards its output and the input/grammar gates bound parser work.
+
+The existing task-ownership adaptation is completed around both responder and
+speech formatter callbacks with explicit child futures. A callback's `uncancel()`
+cannot clear the calling transport task's cancellation. Late provider output
+is rejected if the monotonic response deadline passed, including a callback
+that swallows timeout cancellation or briefly blocks the event loop. This does
+not claim preemptive interruption of synchronous CPU work or a hard deadline
+against a callback that never finishes cancellation. A model exchange committed
+before a later speech interruption remains in history; obsolete speech is
+suppressed rather than retrospectively deleting valid history.

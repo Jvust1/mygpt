@@ -255,3 +255,203 @@ async def test_real_pipecat_interruption_closes_ollama_http_connection(monkeypat
         for task in list(connections): task.cancel()
         await asyncio.gather(*connections, return_exceptions=True)
     assert setup.task_manager.current_tasks() == []
+
+
+class SynthesisTextProbe(TTSService):
+    """Keep actual aggregation/filter/context machinery; replace synthesis only."""
+    def __init__(self):
+        super().__init__(enable_direct_mode=True, settings=TTSSettings(model=None, voice=None, language=None))
+        self.spoken = []
+
+    async def run_tts(self, text, context_id):
+        self.spoken.append(text)
+        if False:
+            yield None
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("source,expected", [
+    ("先看定义，再做 [练习](https://example.invalid/book)。", "先看定义，再做 练习。"),
+    ("## 学习数字\n保留 100000 和 aaaaa。", "学习数字 保留 100000 和 aaaaa。"),
+    ("## 学习小结\n\n先看定义。", "学习小结 先看定义。"),
+    ("使用 `x_1` 与 `x_2`。", "使用 `x_1` 与 `x_2`。"),
+    ("![diagram](https://example.invalid/diagram)", "![diagram](https://example.invalid/diagram)"),
+])
+async def test_real_markdown_filter_reaches_actual_synthesis_boundary_only(tmp_path, source, expected):
+    async def responder(_): return source + '<|ACT:{"emotion":"happy"}|>'
+    with ChatSessionStore(tmp_path / "speech.sqlite3") as store:
+        runtime = runtime_for(responder, store)
+        processor = create_pipecat_companion_processor(PipecatCompanionBridge(runtime, session_id="speech"))
+        tts = SynthesisTextProbe()
+        processor.link(tts)
+        setup = setup_for()
+        await processor.setup(setup)
+        await tts.setup(setup)
+        ended = asyncio.Event()
+        outputs = []
+        @tts.event_handler("on_after_process_frame")
+        async def complete(_processor, frame):
+            if isinstance(frame, frames.LLMFullResponseEndFrame):
+                ended.set()
+        @processor.event_handler("on_before_push_frame")
+        async def record(_processor, frame):
+            if isinstance(frame, frames.LLMTextFrame):
+                outputs.append(frame)
+        try:
+            await processor.queue_frame(frames.StartFrame())
+            await processor.queue_frame(transcript("继续学习"))
+            await asyncio.wait_for(ended.wait(), 2)
+            assert " ".join("".join(tts.spoken).split()) == expected
+            assert len(outputs) == 1
+            assert outputs[0].metadata["mygpt"]["presentation_emotion"] == "happy"
+            assert store.load_messages("speech")[-1].content == source
+            assert runtime.session_messages("speech")[-1].content == source
+            if not expected:
+                assert tts.spoken == []
+        finally:
+            await processor.cleanup()
+            await tts.cleanup()
+        assert setup.task_manager.current_tasks() == []
+
+
+def test_actual_markdown_filter_matches_pinned_source_blob():
+    import hashlib
+    import inspect
+    from pathlib import Path
+    from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
+    raw = Path(inspect.getfile(MarkdownTextFilter)).read_bytes()
+    assert hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest() == "08b2a1f743d8cf7d2faa937915e97f52e3997d04"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("fail_after_cancel", [False, True])
+async def test_actual_queue_cancels_owned_formatter_without_timeout_fallback(fail_after_cancel):
+    entered = asyncio.Event()
+    interrupted = asyncio.Event()
+    calls = 0
+    async def responder(_): return "**answer**"
+    async def formatter(_):
+        nonlocal calls
+        calls += 1
+        if calls > 1:
+            return "fresh"
+        entered.set()
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            asyncio.current_task().uncancel()
+            if fail_after_cancel:
+                raise RuntimeError("obsolete private formatting failure")
+            return "stale speech"
+    runtime = runtime_for(responder)
+    processor = create_pipecat_companion_processor(PipecatCompanionBridge(runtime, session_id="s1"), speech_formatter=formatter)
+    tts = SynthesisTextProbe()
+    processor.link(tts)
+    setup = setup_for()
+    await processor.setup(setup)
+    await tts.setup(setup)
+    logs = []
+    sink = logger.add(lambda message: logs.append(str(message)))
+    fresh = asyncio.Event()
+    @tts.event_handler("on_after_process_frame")
+    async def complete(_processor, frame):
+        if isinstance(frame, frames.InterruptionFrame):
+            interrupted.set()
+        if isinstance(frame, frames.LLMFullResponseEndFrame):
+            fresh.set()
+    try:
+        await processor.queue_frame(frames.StartFrame())
+        await processor.queue_frame(transcript("old"))
+        await asyncio.wait_for(entered.wait(), 2)
+        await processor.queue_frame(frames.InterruptionFrame())
+        await asyncio.wait_for(interrupted.wait(), 2)
+        assert not any("timed out waiting for task to cancel" in line for line in logs)
+        assert tts.spoken == []
+        # The authorized model reply was committed before speech formatting.
+        assert runtime.session_messages("s1")[-1].content == "**answer**"
+        await processor.queue_frame(transcript("new"))
+        await asyncio.wait_for(fresh.wait(), 2)
+        assert tts.spoken == ["fresh"]
+    finally:
+        await processor.cleanup()
+        await tts.cleanup()
+        logger.remove(sink)
+    assert setup.task_manager.current_tasks() == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("source", ["2 * 3 = 6", "`a|b`", "`a**b`", "|1|2|", "## Math\n2 * 3 = 6", "[" * 4000 + "]" * 4000])
+async def test_actual_synthesis_handoff_keeps_operators_code_and_cell_boundaries(source):
+    async def responder(_): return source
+    processor = create_pipecat_companion_processor(PipecatCompanionBridge(runtime_for(responder), session_id="literal"))
+    tts = SynthesisTextProbe()
+    processor.link(tts)
+    setup = setup_for()
+    await processor.setup(setup)
+    await tts.setup(setup)
+    ended = asyncio.Event()
+    @tts.event_handler("on_after_process_frame")
+    async def complete(_processor, frame):
+        if isinstance(frame, frames.LLMFullResponseEndFrame): ended.set()
+    try:
+        await processor.queue_frame(frames.StartFrame())
+        await processor.queue_frame(transcript("keep the meaning"))
+        await asyncio.wait_for(ended.wait(), 2)
+        assert "".join(tts.spoken) == source
+    finally:
+        await processor.cleanup()
+        await tts.cleanup()
+    assert setup.task_manager.current_tasks() == []
+
+
+@pytest.mark.asyncio
+async def test_actual_upstream_filter_runs_off_loop_and_interruption_discards_worker_result(monkeypatch):
+    import threading
+    from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
+    original = MarkdownTextFilter.filter
+    entered, release, finished = threading.Event(), threading.Event(), threading.Event()
+    observed_threads = []
+    main_thread = threading.get_ident()
+    async def delayed_filter(self, text):
+        observed_threads.append(threading.get_ident())
+        if len(observed_threads) == 1:
+            entered.set()
+            try:
+                assert release.wait(3)
+                return await original(self, text)
+            finally:
+                finished.set()
+        return await original(self, text)
+    monkeypatch.setattr(MarkdownTextFilter, "filter", delayed_filter)
+    async def responder(_): return "## Heading\nlearn"
+    processor = create_pipecat_companion_processor(PipecatCompanionBridge(runtime_for(responder), session_id="worker"))
+    tts = SynthesisTextProbe()
+    processor.link(tts)
+    setup = setup_for()
+    await processor.setup(setup)
+    await tts.setup(setup)
+    interrupted, fresh = asyncio.Event(), asyncio.Event()
+    @tts.event_handler("on_after_process_frame")
+    async def complete(_processor, frame):
+        if isinstance(frame, frames.InterruptionFrame): interrupted.set()
+        if isinstance(frame, frames.LLMFullResponseEndFrame): fresh.set()
+    try:
+        await processor.queue_frame(frames.StartFrame())
+        await processor.queue_frame(transcript("old"))
+        assert await asyncio.wait_for(asyncio.to_thread(entered.wait, 2), 2.5)
+        assert observed_threads[0] != main_thread
+        await processor.queue_frame(frames.InterruptionFrame())
+        await asyncio.wait_for(interrupted.wait(), 2)
+        assert not finished.is_set() and tts.spoken == []
+        release.set()
+        assert await asyncio.wait_for(asyncio.to_thread(finished.wait, 2), 2.5)
+        await processor.queue_frame(transcript("new"))
+        await asyncio.wait_for(fresh.wait(), 2)
+        assert " ".join("".join(tts.spoken).split()) == "Heading learn"
+        assert all(thread != main_thread for thread in observed_threads)
+    finally:
+        release.set()
+        await asyncio.to_thread(finished.wait, 2)
+        await processor.cleanup()
+        await tts.cleanup()
+    assert setup.task_manager.current_tasks() == []

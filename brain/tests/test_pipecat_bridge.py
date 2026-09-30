@@ -190,3 +190,92 @@ async def test_provider_swallowing_cancel_cannot_resurrect_runtime_task(fail_aft
         await task
     assert task.cancelled()
     assert runtime.session_messages("s1") == []
+
+
+@pytest.mark.asyncio
+async def test_speech_projection_leaves_original_reply_history_and_emotion_intact():
+    async def responder(_): return '**学习**<|ACT:{"emotion":"happy"}|>'
+    async def format_speech(text):
+        assert text == "**学习**"
+        return "学习"
+    runtime = runtime_for(responder)
+    processor = create_processor(PipecatCompanionBridge(runtime, session_id="s1"), speech_formatter=format_speech)
+    await processor.process_frame(Frames.TranscriptionFrame("question"), "down")
+    output = next(f for f, _ in processor.pushed if isinstance(f, Frames.LLMTextFrame))
+    assert output.text == "学习" and output.metadata["mygpt"]["presentation_emotion"] == "happy"
+    assert runtime.session_messages("s1")[-1].content == "**学习**"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("result", ["", " \n "])
+async def test_empty_speech_projection_still_completes_response_lifecycle(result):
+    async def responder(_): return "![diagram](local-reference)"
+    async def format_speech(_): return result
+    runtime = runtime_for(responder)
+    processor = create_processor(PipecatCompanionBridge(runtime, session_id="s1"), speech_formatter=format_speech)
+    await processor.process_frame(Frames.TranscriptionFrame("question"), "down")
+    assert [type(f) for f, _ in processor.pushed] == [Frames.LLMFullResponseStartFrame, Frames.LLMTextFrame, Frames.LLMFullResponseEndFrame]
+    assert processor.pushed[1][0].text == result
+    assert runtime.session_messages("s1")[-1].content == "![diagram](local-reference)"
+    assert not processor.errors
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("fail_after_cancel", [False, True])
+async def test_formatter_cannot_swallow_queue_cancellation_even_after_uncancel(fail_after_cancel):
+    entered = asyncio.Event()
+    async def responder(_): return "**old**"
+    async def stubborn_formatter(_):
+        entered.set()
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            asyncio.current_task().uncancel()
+            if fail_after_cancel:
+                raise RuntimeError("private formatter details")
+            return "stale speech"
+    runtime = runtime_for(responder)
+    processor = create_processor(PipecatCompanionBridge(runtime, session_id="s1"), speech_formatter=stubborn_formatter)
+    task = asyncio.create_task(processor.process_frame(Frames.TranscriptionFrame("old"), "down"))
+    await entered.wait()
+    await processor.process_frame(Frames.InterruptionFrame(), "down")
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+    assert not any(isinstance(f, (Frames.LLMTextFrame, Frames.LLMFullResponseEndFrame)) for f, _ in processor.pushed)
+    assert not processor.errors
+    # Inference already finished while authorized; interruption does not undo it.
+    assert runtime.session_messages("s1")[-1].content == "**old**"
+
+
+@pytest.mark.asyncio
+async def test_formatter_failure_is_sanitized_and_fresh_turn_recovers():
+    calls = 0
+    async def responder(_): return "**answer**"
+    async def formatter(_):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise RuntimeError("private details")
+        return "answer"
+    processor = create_processor(PipecatCompanionBridge(runtime_for(responder), session_id="s1"), speech_formatter=formatter)
+    await processor.process_frame(Frames.TranscriptionFrame("one"), "down")
+    assert processor.errors == ["MyGPT companion reply unavailable"]
+    assert not any(isinstance(f, Frames.LLMTextFrame) for f, _ in processor.pushed)
+    await processor.process_frame(Frames.TranscriptionFrame("two"), "down")
+    assert [f.text for f, _ in processor.pushed if isinstance(f, Frames.LLMTextFrame)] == ["answer"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("text", [
+    "2 * 3 = 6", "`a|b`", "`a**b`", "|1|2|", "## Heading\n2 * 3 = 6",
+    "先看 **定义**，再做 [练习](https://example.invalid/book)。",
+    "[" * 4000 + "]" * 4000, "## Heading\n[[nested]]", "## Heading\n- 1",
+    "## Heading\n1. first\n2. second", "## Heading\nx_1", "## Heading\n§12",
+])
+async def test_conservative_speech_gate_preserves_ambiguous_or_complex_content(monkeypatch, text):
+    from mygpt_brain.pipecat_bridge import _format_speech_text
+    def forbidden(_):
+        raise AssertionError("Unsafe Markdown must not enter the upstream parser")
+    monkeypatch.setattr("mygpt_brain.pipecat_bridge._filter_speech_blocking", forbidden)
+    assert await _format_speech_text(text) == text

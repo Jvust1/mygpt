@@ -1,3 +1,13 @@
+## 2026-09-30 · Pipecat speech formatting and owned response callbacks
+
+The production voice processor now invokes the pinned upstream Markdown filter
+for bounded heading/link presentation off the event loop. Operators, code and
+table boundaries remain verbatim; native/durable replies are unchanged. Explicit child-task ownership prevents callbacks from clearing the
+transport's cancellation; expired model replies cannot commit. Strict Brain
+passes 676/0/0 and actual Pipecat tests pass 23. See [scope and evidence](PIPECAT_SPEECH_TEXT_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · AIRI paired history removes orphan assistant replies
 
 The live Python prompt compactor now directly uses AIRI's turn/reaction reverse

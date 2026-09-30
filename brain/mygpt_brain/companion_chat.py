@@ -268,21 +268,27 @@ class CompanionChatRuntime:
             )
             prompt = ChatPrompt(self.persona, window, memories)
 
+            loop = asyncio.get_running_loop()
+            deadline = loop.time() + self.request_timeout_seconds
+            response_timeout = asyncio.timeout_at(deadline)
             try:
-                raw_reply = await asyncio.wait_for(
-                    self.responder(prompt),
-                    timeout=self.request_timeout_seconds,
-                )
+                async with response_timeout:
+                    # Explicit child ownership matters: on supported Python
+                    # versions wait_for(coroutine) can run in the caller task,
+                    # allowing a provider's uncancel() to clear our cancellation.
+                    raw_reply = await asyncio.ensure_future(self.responder(prompt))
             except TimeoutError:
                 raise RuntimeError("chat responder timeout") from None
             finally:
-                # A provider can swallow cancellation and either return or
-                # raise another error. Both must preserve the owning task's
-                # cancellation, rather than keep a realtime queue alive until
-                # the transport timeout or emit an obsolete error downstream.
+                # Preserve caller cancellation even when the child catches it,
+                # clears its own count, then returns or raises an ordinary error.
                 owner = asyncio.current_task()
                 if owner is not None and owner.cancelling():
                     raise asyncio.CancelledError
+                # A child can also swallow deadline cancellation; synchronous
+                # work can delay the loop's timer. Neither may commit late output.
+                if response_timeout.expired() or loop.time() >= deadline:
+                    raise RuntimeError("chat responder timeout") from None
             # A transport interruption can arrive while the provider is running,
             # including providers that finish after receiving cancellation.
             # Check again before creating or persisting any assistant exchange.

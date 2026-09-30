@@ -12,9 +12,11 @@ Copyright (c) 2024–2026, Daily. BSD-2-Clause; third_party/pipecat/LICENSE.
 """
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 import hashlib
-from typing import Any
+import re
+from typing import Any, Awaitable, Callable
 
 from .companion_chat import CompanionChatRuntime, SupersededChatTurn
 from .turn_control import TurnLease, VoiceTurnController
@@ -99,6 +101,57 @@ class PipecatCompanionBridge:
         )
 
 
+# The upstream full Markdown filter intentionally discards some punctuation.
+# Learning replies need literal operators/code/cell boundaries, so only a
+# narrow, flat heading/link presentation subset is eligible for conversion.
+_MAX_SPEECH_FILTER_CHARS = 1200
+_FLAT_SPEECH_LINK = re.compile(r"\[([^\[\]\n]{1,200})\]\((https?://[^\s()]{1,500})\)")
+
+
+def _speech_filter_eligible(text: str) -> bool:
+    if len(text) > _MAX_SPEECH_FILTER_CHARS:
+        return False
+    if any(char in text for char in "`*|_\\<>§&~") or "![" in text:
+        return False
+    if sum(text.count(char) for char in "[]()") > 16:
+        return False
+    # Keep signs, list numbering and separators rather than asking a Markdown
+    # renderer whether they were mathematical content or presentation syntax.
+    if re.search(r"(?m)^[ \t]*(?:[-+=>]|[0-9]+[.)][ \t])", text):
+        return False
+    plain, links = _FLAT_SPEECH_LINK.subn(r"\1", text)
+    if any(char in plain for char in "[]()"):
+        return False
+    heading = re.search(r"(?m)^#{1,6}[ \t]+[^\n]*\w", text)
+    return bool(links or heading)
+
+
+def _filter_speech_blocking(text: str) -> str:
+    """Execute the actual pinned upstream filter off the event loop."""
+    from pipecat.utils.text.markdown_text_filter import MarkdownTextFilter
+
+    formatter = MarkdownTextFilter(params=MarkdownTextFilter.InputParams(
+        enable_text_filter=True,
+        filter_code=False,
+        filter_tables=False,
+        filter_repeated_sequences=False,
+    ))
+    return asyncio.run(formatter.filter(text))
+
+
+async def _format_speech_text(text: str) -> str:
+    """Use pinned Pipecat formatting only for short, unambiguous headings/links.
+
+    Source blob 08b2a1f743d8cf7d2faa937915e97f52e3997d04, BSD-2-Clause (Daily).
+    Unsafe/complex syntax is preserved verbatim, not guessed or truncated. The
+    bounded eligible subset runs in a worker; interruption abandons its result,
+    not the thread itself. A fresh filter avoids cross-response state.
+    """
+    if not _speech_filter_eligible(text):
+        return text
+    return await asyncio.to_thread(_filter_speech_blocking, text)
+
+
 def create_pipecat_companion_processor(
     bridge: PipecatCompanionBridge,
     *,
@@ -106,10 +159,13 @@ def create_pipecat_companion_processor(
     frame_processor_base: type[Any] | None = None,
     frame_types: Any | None = None,
     downstream_direction: Any | None = None,
+    speech_formatter: Callable[[str], Awaitable[str]] | None = None,
 ) -> Any:
     """Create a Pipecat FrameProcessor lazily.
 
-    Tests may inject the frame module and processor base. Production lazily
+    Tests may inject frame types, processor base and the speech formatter.
+    Production uses conservative pinned Pipecat heading/link speech presentation
+    while durable/native replies retain their original text. Production lazily
     imports the pinned Pipecat API. Final downstream transcriptions become
     Start -> LLMText -> End, so TTS flushes short responses. Interruption and
     CancelFrame invalidate the turn before Pipecat cancels its processing task.
@@ -126,6 +182,8 @@ def create_pipecat_companion_processor(
         frame_processor_base = frame_processor_base or FrameProcessor
         frame_types = frame_types or frames
         downstream_direction = downstream_direction or FrameDirection.DOWNSTREAM
+
+    format_speech = speech_formatter or _format_speech_text
 
     class CompanionProcessor(frame_processor_base):  # type: ignore[misc, valid-type]
         async def process_frame(self, frame: Any, direction: Any):
@@ -156,7 +214,18 @@ def create_pipecat_companion_processor(
                     await self.push_frame(frame_types.LLMFullResponseStartFrame(), direction)
                     reply = await bridge.respond(text, lease=lease)
                     if bridge.is_current(lease):
-                        output = frame_types.LLMTextFrame(reply.text)
+                        try:
+                            # Isolate callback cancellation from this queue's
+                            # owner, including a callback that uncancels itself.
+                            speech_text = await asyncio.ensure_future(format_speech(reply.text))
+                        finally:
+                            owner = asyncio.current_task()
+                            if owner is not None and owner.cancelling():
+                                raise asyncio.CancelledError
+                        if not isinstance(speech_text, str):
+                            raise TypeError("invalid speech formatter result")
+                    if bridge.is_current(lease):
+                        output = frame_types.LLMTextFrame(speech_text)
                         output.metadata["mygpt"] = {
                             "request_id": reply.request_id,
                             "presentation_emotion": reply.emotion,
