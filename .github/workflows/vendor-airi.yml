@@ -1,0 +1,64 @@
+name: Vendor AIRI snapshot
+
+on:
+  push:
+    branches:
+      - feat/vendor-airi-20260930
+    paths:
+      - .github/workflows/vendor-airi.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vendor-airi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          ref: feat/vendor-airi-20260930
+          fetch-depth: 0
+
+      - name: Fetch AIRI upstream
+        run: |
+          rm -rf .tmp-airi
+          git clone --depth=1 https://github.com/SEKAI-OS/AIRI.git .tmp-airi
+
+      - name: Replace vendored AIRI source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf vendor/airi
+          mkdir -p vendor/airi
+
+          rsync -a .tmp-airi/ vendor/airi/             --exclude '.git'             --exclude '.github'             --exclude 'node_modules'             --exclude 'docs/content/public'
+
+          cp .tmp-airi/LICENSE vendor/airi/LICENSE
+          git -C .tmp-airi rev-parse HEAD > vendor/airi/UPSTREAM_COMMIT.txt
+          printf '%s\n' 'https://github.com/SEKAI-OS/AIRI' > vendor/airi/UPSTREAM_REPOSITORY.txt
+          printf '%s\n' 'Jvust/mygpt' > vendor/airi/INTEGRATION_TARGET.txt
+
+          : > vendor/airi/VENDOR_EXCLUDED_LARGE_FILES.txt
+          while IFS= read -r -d '' f; do
+            rel="${f#vendor/airi/}"
+            printf '%s\n' "$rel" >> vendor/airi/VENDOR_EXCLUDED_LARGE_FILES.txt
+            rm -f "$f"
+          done < <(find vendor/airi -type f -size +95M -print0)
+
+          rm -rf .tmp-airi
+
+      - name: Commit vendored snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add vendor/airi
+          if git diff --cached --quiet; then
+            echo "No AIRI changes to commit."
+            exit 0
+          fi
+          git commit -m "feat: vendor AIRI source snapshot"
+          git push origin HEAD:feat/vendor-airi-20260930
