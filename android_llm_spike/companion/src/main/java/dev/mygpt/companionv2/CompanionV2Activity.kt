@@ -273,7 +273,7 @@ class CompanionV2Activity : AndroidApplication() {
 
     private fun importSkin(uri: Uri) {
         characterState.text = "角色：正在校验…"
-        generationJob = scope.launch {
+        scope.launch {
             runCatching {
                 withContext(Dispatchers.IO) {
                     contentResolver.openInputStream(uri).use { stream ->
