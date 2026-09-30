@@ -5,6 +5,7 @@ writes. Internal hashes detect damage; trust still requires an external SHA-256.
 """
 from __future__ import annotations
 import argparse
+import configparser
 import hashlib
 import json
 from pathlib import Path, PurePosixPath
@@ -13,16 +14,36 @@ import stat
 import subprocess
 import zipfile
 
-ROOT_FILES = {'.gitignore', '.gitattributes', 'AGENTS.md', 'SECURITY_POLICY.md', 'README.md',
+ROOT_FILES = {'.gitmodules', '.gitignore', '.gitattributes', 'AGENTS.md', 'SECURITY_POLICY.md', 'README.md',
               'package.json', 'package-lock.json', 'run_mygpt.py', 'START_HERE.md',
               'desktop.py', 'desktop_adapter.py', 'desktop_runtime.py', 'desktop_state.py',
               'desktop_workspace.py'}
 DIRECTORIES = {'brain', 'host', 'companion', 'demo', 'docs', 'governance', 'scripts', 'tests', '.github',
-               'desktop_ui', 'tools'}
+               'desktop_ui', 'tools', 'android_spike', 'android_llm_spike',
+               'android_voice_spike', 'third_party'}
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'node_modules', '__pycache__', '.pytest_cache',
-                   '.env', 'credentials', 'secrets', 'models', 'weights', 'cache'}
+                   '.env', 'credentials', 'secrets', 'models', 'weights', 'cache',
+                   'build', '.gradle', 'local.properties'}
 FORBIDDEN_EXTENSIONS = {'.ttf', '.otf', '.woff', '.woff2', '.pem', '.key', '.db', '.sqlite',
-                        '.pkl', '.pyc', '.zip', '.bin', '.safetensors', '.ckpt'}
+                        '.pkl', '.pyc', '.zip', '.bin', '.safetensors', '.ckpt', '.sqlite3',
+                        '.gguf', '.onnx', '.tflite', '.pt', '.pth', '.apk', '.aar', '.jar',
+                        '.class', '.so', '.dll', '.dylib', '.exe', '.o', '.a', '.jks', '.keystore', '.log'}
+# The sole already-tracked build bootstrap binary. Never relax the jar denylist.
+BUILD_BOOTSTRAPS = {
+    'android_llm_spike/gradle/wrapper/gradle-wrapper.jar':
+        'e996d452d2645e70c01c11143ca2d3742734a28da2bf61f25c82bdc288c9e637',
+}
+# Metadata only: no clone, submodule update, checkout, or dependency execution.
+EXTERNAL_SUBMODULES = {
+    'third_party/llama.cpp/upstream': {
+        'url': 'https://github.com/ggml-org/llama.cpp.git',
+        'commit': 'ba0ba54d93b25faf1e149f4ccedd3e9d84798563',
+    },
+    'third_party/sherpa-onnx/upstream': {
+        'url': 'https://github.com/k2-fsa/sherpa-onnx.git',
+        'commit': '040afe360a38e25daaa325ce8889abf93ea02609',
+    },
+}
 MANIFEST = 'SOURCE_MANIFEST.json'
 MAX_FILE = 8 * 1024 * 1024
 MAX_TOTAL = 32 * 1024 * 1024
@@ -37,11 +58,86 @@ def safe_path(name: str) -> bool:
         return False
     if any(x.lower() in FORBIDDEN_PARTS or x.lower().startswith('.env.') for x in parts):
         return False
-    if PurePosixPath(name).suffix.lower() in FORBIDDEN_EXTENSIONS:
+    if PurePosixPath(name).suffix.lower() in FORBIDDEN_EXTENSIONS and name not in BUILD_BOOTSTRAPS:
         return False
     if any(re.fullmatch(r'(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?', x, re.I) for x in parts):
         return False
     return name in ROOT_FILES or (len(parts) > 1 and parts[0] in DIRECTORIES)
+
+
+
+def check_portable_names(names) -> None:
+    """Reject aliases that would overwrite files during Windows recovery."""
+    lowered = [name.casefold() for name in names]
+    keys = set(lowered)
+    if len(keys) != len(lowered):
+        raise ValueError('case_colliding_source_paths')
+    for name in lowered:
+        parts = name.split('/')
+        if any('/'.join(parts[:i]) in keys for i in range(1, len(parts))):
+            raise ValueError('file_directory_source_collision')
+
+
+def check_submodules(files: dict[str, bytes], links: list[dict]) -> None:
+    """Validate the two recorded external Gitlinks without consulting the network."""
+    seen = set()
+    for link in links:
+        if not isinstance(link, dict) or set(link) != {'path', 'url', 'commit', 'source_included'}:
+            raise ValueError('invalid_submodule_reference')
+        path = link['path']
+        if not isinstance(path, str) or path in seen or path not in EXTERNAL_SUBMODULES:
+            raise ValueError('unregistered_submodule')
+        expected = EXTERNAL_SUBMODULES[path]
+        if (link['url'] != expected['url'] or link['commit'] != expected['commit']
+                or link['source_included'] is not False):
+            raise ValueError('submodule_identity_mismatch')
+        if any(name == path or name.startswith(path + '/') for name in files):
+            raise ValueError('submodule_source_must_remain_external')
+        parent = str(PurePosixPath(path).parent)
+        if not all(parent + '/' + name in files for name in ('LICENSE', 'NOTICE.md')):
+            raise ValueError('missing_submodule_license_or_notice')
+        seen.add(path)
+    raw = files.get('.gitmodules')
+    if raw is None:
+        if links:
+            raise ValueError('missing_gitmodules')
+        return
+    config = configparser.ConfigParser(interpolation=None, strict=True)
+    try:
+        config.read_string(raw.decode('utf-8'))
+        if config.defaults() or len(config.sections()) != len(links):
+            raise ValueError('unexpected_gitmodules_config')
+        configured = set()
+        for section in config.sections():
+            match = re.fullmatch(r'submodule "([^"\n]+)"', section)
+            if not match or set(config[section]) != {'path', 'url'}:
+                raise ValueError('unexpected_gitmodules_config')
+            path = config[section]['path']
+            if (path != match[1] or path not in seen or path in configured
+                    or config[section]['url'] != EXTERNAL_SUBMODULES[path]['url']):
+                raise ValueError('gitmodules_reference_mismatch')
+            configured.add(path)
+        if configured != seen:
+            raise ValueError('gitmodules_reference_mismatch')
+    except (configparser.Error, UnicodeDecodeError) as error:
+        raise ValueError('invalid_gitmodules') from error
+
+
+def check_notices(files: dict[str, bytes]) -> None:
+    groups = {name.split('/')[1] for name in files if name.startswith('third_party/')}
+    for group in groups:
+        if not all(f'third_party/{group}/{name}' in files for name in ('LICENSE', 'NOTICE.md')):
+            raise ValueError('missing_upstream_license_or_notice')
+
+
+def check_bootstraps(files: dict[str, bytes]) -> list[dict]:
+    entries = []
+    for path, expected in BUILD_BOOTSTRAPS.items():
+        if path in files:
+            if hashlib.sha256(files[path]).hexdigest() != expected:
+                raise ValueError('build_bootstrap_identity_mismatch')
+            entries.append({'path': path, 'sha256': expected})
+    return entries
 
 
 def git(root: Path, *args: str) -> bytes:
@@ -82,11 +178,17 @@ def build(root: Path, commit: str, output: Path) -> dict:
     rows = [r for r in rows if r]
     if not 1 <= len(rows) <= MAX_FILES:
         raise ValueError('source_file_count_limit')
-    entries, files, total = [], {}, 0
+    entries, files, links, total = [], {}, [], 0
     for row in rows:
         header, path = row.split(b'\t', 1)
         mode, kind, oid = header.decode('ascii').split()
         name = path.decode('utf-8')
+        if kind == 'commit' and mode == '160000':
+            expected = EXTERNAL_SUBMODULES.get(name)
+            if expected is None or oid != expected['commit']:
+                raise ValueError('unregistered_submodule_identity')
+            links.append({'path': name, **expected, 'source_included': False})
+            continue
         if not safe_path(name) or kind != 'blob' or mode not in ('100644', '100755'):
             raise ValueError('unsafe_or_unsupported_tracked_path')
         size = int(git(root, 'cat-file', '-s', oid))
@@ -99,9 +201,17 @@ def build(root: Path, commit: str, output: Path) -> dict:
         files[name] = data
         entries.append({'path': name, 'mode': mode, 'bytes': size, 'git_blob': oid,
                         'sha256': hashlib.sha256(data).hexdigest()})
-    manifest = {'schema': 'mygpt.source-bundle.v1', 'repository': 'Jvust/mygpt',
-                'source_commit': commit, 'scope': 'TRACKED_PROJECT_SOURCE_ONLY',
-                'includes_dependencies': False, 'files': sorted(entries, key=lambda x: x['path'])}
+    check_portable_names([*files, *(link['path'] for link in links)])
+    check_submodules(files, links)
+    check_notices(files)
+    bootstraps = check_bootstraps(files)
+    manifest = {'schema': 'mygpt.source-bundle.v2', 'repository': 'Jvust1/mygpt',
+                'source_commit': commit,
+                'scope': 'TRACKED_PROJECT_SOURCE_WITH_EXTERNAL_SUBMODULE_REFERENCES',
+                'includes_dependencies': False,
+                'external_submodules': sorted(links, key=lambda x: x['path']),
+                'build_bootstraps': bootstraps,
+                'files': sorted(entries, key=lambda x: x['path'])}
     raw = (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + '\n').encode()
     with output.open('xb') as stream, zipfile.ZipFile(stream, 'w') as archive:
         for entry in manifest['files']:
@@ -123,6 +233,7 @@ def verify(path: Path, expected_sha256: str) -> dict:
     with zipfile.ZipFile(path) as archive:
         infos = archive.infolist()
         names = [i.filename for i in infos]
+        check_portable_names(names)
         if len(names) != len(set(names)) or not 2 <= len(names) <= MAX_FILES + 1:
             raise ValueError('invalid_member_set')
         total = 0
@@ -135,7 +246,7 @@ def verify(path: Path, expected_sha256: str) -> dict:
                 raise ValueError('archive_member_limit')
         raw = archive.read(MANIFEST)
         manifest = json.loads(raw)
-        if not isinstance(manifest, dict) or manifest.get('schema') != 'mygpt.source-bundle.v1' or not re.fullmatch('[0-9a-f]{40}', manifest.get('source_commit', '')):
+        if not isinstance(manifest, dict) or manifest.get('schema') not in ('mygpt.source-bundle.v1', 'mygpt.source-bundle.v2') or not re.fullmatch('[0-9a-f]{40}', manifest.get('source_commit', '')):
             raise ValueError('invalid_manifest')
         entries = manifest.get('files', [])
         if not isinstance(entries, list) or len(entries) != len(names) - 1:
@@ -146,14 +257,33 @@ def verify(path: Path, expected_sha256: str) -> dict:
         indexed = [e['path'] for e in entries]
         if len(indexed) != len(set(indexed)) or set(names) != set(indexed) | {MANIFEST}:
             raise ValueError('manifest_member_mismatch')
+        files = {}
         for entry in entries:
             data = archive.read(entry['path'])
+            files[entry['path']] = data
             if (len(data) != entry['bytes'] or hashlib.sha256(data).hexdigest() != entry['sha256']
                     or git_blob(data) != entry['git_blob']
                     or entry['mode'] not in ('100644', '100755')
                     or archive.getinfo(entry['path']).external_attr >> 16 != int(entry['mode'], 8)):
                 raise ValueError('member_identity_mismatch')
+        links = manifest.get('external_submodules', [])
+        if not isinstance(links, list):
+            raise ValueError('invalid_submodule_references')
+        check_submodules(files, links)
+        check_portable_names([*files, *(link['path'] for link in links)])
+        check_notices(files)
+        bootstraps = check_bootstraps(files)
+        if manifest['schema'] == 'mygpt.source-bundle.v2':
+            if (manifest.get('repository') != 'Jvust1/mygpt'
+                    or manifest.get('scope') != 'TRACKED_PROJECT_SOURCE_WITH_EXTERNAL_SUBMODULE_REFERENCES'
+                    or manifest.get('includes_dependencies') is not False
+                    or manifest.get('build_bootstraps') != bootstraps):
+                raise ValueError('invalid_source_scope')
+        elif links or bootstraps:
+            raise ValueError('unsupported_legacy_dependency_metadata')
     return {'status': 'PASS', 'source_commit': manifest['source_commit'], 'files_verified': len(entries),
+            'external_submodules': links, 'build_bootstraps': bootstraps,
+            'submodule_sources_included': False,
             'extracted_files': 0, 'authenticity': 'requires_trusted_external_hash'}
 
 

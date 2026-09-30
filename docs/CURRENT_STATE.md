@@ -1,3 +1,14 @@
+## 2026-09-30 · fused source recovery
+
+The source-only recovery builder now supports the current Android and upstream
+notice tree, with strict exact-pin metadata for two external Gitlinks. It never
+fetches their sources or packages model/private assets. The sole tracked Gradle
+bootstrap jar has an exact-content exception; generated/model/distribution
+binaries remain denied. Current-owner CI rebuilds twice and tests the recovered
+Python/JavaScript/Java sources. See [scope and limits](FUSION_SOURCE_RECOVERY_20260930.md).
+
+---
+
 ## 2026-09-30 · coherent companion fusion acceptance
 
 The existing stack now has integrated voice→memory→Ollama-adapter→emotion→TTS→
