@@ -129,6 +129,17 @@ else {
     Write-Host "No benchmark report captured yet. Run the in-app benchmark first." -ForegroundColor Yellow
 }
 
+$SupervisionGate = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest cat files/adb-supervision-gate.txt 2>&1
+$SupervisionGateExit = $LASTEXITCODE
+$SupervisionGateText = ($SupervisionGate | Out-String).Trim()
+if ($SupervisionGateExit -eq 0) {
+    $SupervisionGate | Out-File (Join-Path $OutputDirectory "supervision-gate.txt") -Encoding utf8
+}
+else {
+    $SupervisionGate | Out-File (Join-Path $OutputDirectory "supervision-gate-error.txt") -Encoding utf8
+}
+$SupervisionStatus = if ($SupervisionGateText -eq "PASS") { "PASS" } else { "UNKNOWN_OR_NOT_RUN" }
+
 $BookResult = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest cat files/adb-book-result.txt 2>&1
 $BookResultExit = $LASTEXITCODE
 $BookResultText = ($BookResult | Out-String)
@@ -184,6 +195,7 @@ $Summary = @(
     "source_branch=$SourceBranch",
     "device_serial=$DeviceSerial",
     "book_gate=$BookGateStatus",
+    "supervision=$SupervisionStatus",
     "benchmark=$BenchmarkStatus",
     "permission_boundary=PASS",
     "audio_persistence=PASS"
@@ -194,5 +206,6 @@ Write-Host "Evidence collected: $OutputDirectory" -ForegroundColor Green
 Write-Host "permission_boundary=PASS" -ForegroundColor Green
 Write-Host "audio_persistence=PASS" -ForegroundColor Green
 Write-Host "book_gate=$BookGateStatus"
+Write-Host "supervision=$SupervisionStatus"
 Write-Host "benchmark=$BenchmarkStatus"
 Write-Host "Add your remaining visual/voice/model PASS/FAIL notes before archiving the evidence directory."

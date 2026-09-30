@@ -342,6 +342,16 @@ if ($PositiveUiText -notmatch "synthetic-book") {
 }
 Write-Host "Companion Book status UI PASS." -ForegroundColor Green
 
+Write-Host "Running signed Book quiet-first supervision gate..." -ForegroundColor Cyan
+$SupervisionScript = Join-Path $ScriptDir "test_companion_supervision.ps1"
+if (-not (Test-Path $SupervisionScript)) {
+    throw "Supervision acceptance script missing: $SupervisionScript"
+}
+& $SupervisionScript -AdbPath $Adb -DeviceSerial $DeviceSerial -OutputDirectory $EvidenceDir
+if ($LASTEXITCODE -ne 0) {
+    throw "Supervision acceptance script failed."
+}
+
 Invoke-Checked $Adb $SenderActivityArgs
 
 $ClearCommandArgs = @(
@@ -380,7 +390,7 @@ Write-Host ""
 Write-Host "Build/install/signature checks complete." -ForegroundColor Green
 Write-Host "Evidence directory: $EvidenceDir" -ForegroundColor Green
 Write-Host ""
-Write-Host "Automated gates completed: signatures + shell-negative Book + same-signature Book context + clear." -ForegroundColor Green
+Write-Host "Automated gates completed: signatures + Book context + quiet-first supervision + clear." -ForegroundColor Green
 Write-Host "Remaining manual/device gates:" -ForegroundColor Yellow
 Write-Host "1. Import decrypted 3714430278.zip."
 Write-Host "2. Import a compatible GGUF and load the local model."

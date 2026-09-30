@@ -175,6 +175,26 @@ function Run-Step {
 
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
 
+$NowMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+$NegativeStudyArgs = @(
+    "-s", $DeviceSerial,
+    "shell", "am", "broadcast",
+    "-n", "dev.mygpt.companionv2/.BookStudySignalReceiver",
+    "-a", "dev.mygpt.companionv2.action.BOOK_STUDY_EVENT_V1",
+    "--es", "kind", "SESSION_STARTED",
+    "--es", "session_id", "shell-supervision",
+    "--el", "sequence", "1",
+    "--el", "epoch", "1",
+    "--el", "expires_at_ms", "$($NowMs + 120000)"
+)
+$NegativeStudy = & $AdbPath @NegativeStudyArgs 2>&1
+$NegativeStudyText = ($NegativeStudy | Out-String)
+$NegativeStudy | Out-File (Join-Path $OutputDirectory "negative-study-shell.txt") -Encoding utf8
+if ($NegativeStudyText -match "result=-1") {
+    throw "SECURITY FAILURE: adb shell study signal was accepted by Companion V2."
+}
+Write-Host "Study shell-origin negative gate did not return RESULT_OK." -ForegroundColor Green
+
 Invoke-AdbChecked @(
     "-s", $DeviceSerial,
     "shell", "am", "start", "-W",
@@ -194,4 +214,12 @@ Run-Step "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_RESUME_V1" "resume" "
 Run-Step "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_END_V1" "end" "ACCEPTED_SESSION_ENDED" "QUIET" "false"
 
 "PASS" | Out-File (Join-Path $OutputDirectory "supervision-gate.txt") -Encoding utf8
+
+$PersistGateArgs = @(
+    "-s", $DeviceSerial,
+    "shell", "run-as", "dev.mygpt.bookcontexttest",
+    "sh", "-c", "echo PASS > files/adb-supervision-gate.txt"
+)
+Invoke-AdbChecked $PersistGateArgs
+
 Write-Host "Signed Book quiet-first supervision gate PASS." -ForegroundColor Green
