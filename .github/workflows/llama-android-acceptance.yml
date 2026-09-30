@@ -64,7 +64,7 @@ jobs:
           ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13113456
         run: |
           set -euo pipefail
-          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             --no-daemon --stacktrace
+          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             --no-daemon --stacktrace
 
       - name: Verify upstream JNI and MyGPT bridge AARs
         shell: bash
@@ -72,8 +72,10 @@ jobs:
           set -euo pipefail
           llama_aar="third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
           bridge_aar="android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
+          apk="android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
           test -f "$llama_aar"
           test -f "$bridge_aar"
+          test -f "$apk"
           python - <<'PY'
           import zipfile
           llama = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
@@ -89,6 +91,12 @@ jobs:
               if "classes.jar" not in names:
                   raise SystemExit("bridge AAR missing classes.jar")
               print("MyGPT bridge AAR PASS")
+          with zipfile.ZipFile("android_llm_spike/app/build/outputs/apk/debug/app-debug.apk") as z:
+              names=set(z.namelist())
+              native=[n for n in names if n.endswith("/libai-chat.so")]
+              if "classes.dex" not in names or not native:
+                  raise SystemExit("local LLM APK missing classes.dex or libai-chat.so")
+              print("MyGPT local LLM APK PASS:", native)
           PY
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -97,5 +105,6 @@ jobs:
           path: |
             third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar
             android_llm_spike/bridge/build/outputs/aar/bridge-release.aar
+            android_llm_spike/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 3

@@ -18,3 +18,5 @@ include(":llama-lib")
 project(":llama-lib").projectDir =
     file("../third_party/llama.cpp/upstream/examples/llama.android/lib")
 include(":bridge")
+
+include(":app")
