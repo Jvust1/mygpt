@@ -14,7 +14,7 @@ import java.util.Locale;
  * conservatively below that native boundary before JNI.
  */
 public final class CompanionPromptBudget {
-    public static final int MAX_PROMPT_CHARS = 5600;
+    public static final int MAX_PROMPT_CHARS = 5200;
     public static final int MAX_USER_CHARS = 4000;
     private static final int MAX_BOOK_TEXT_CHARS = 2800;
     private static final int MAX_BOOK_TITLE_CHARS = 180;

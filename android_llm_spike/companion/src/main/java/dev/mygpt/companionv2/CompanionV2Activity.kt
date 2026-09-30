@@ -1370,7 +1370,11 @@ class CompanionV2Activity : AndroidApplication(),
         - Text outside the ACT marker is the user-visible reply.
         """.trimIndent()
 
-        return personaCard.renderInstructions() + "\n\n" + runtimePolicy
+        val prompt = personaCard.renderInstructions() + "\n\n" + runtimePolicy
+        require(prompt.length <= MAX_SYSTEM_PROMPT_CHARS) {
+            "system prompt exceeds safe llama context budget"
+        }
+        return prompt
     }
 
     override fun onStart() {
