@@ -1,3 +1,29 @@
+## E020 — reusable Book producer SDK checkpoint (2026-09-30)
+
+**Exact head:** `2e687fd348edfe1e787cb6634f272df69c05e0cf`
+
+**Implemented**
+- `android_llm_spike/book-client-sdk` Android library, minSdk 21 / Java 8.
+- `BookCompanionSession`: context/study sequence and epoch state.
+- `BookContextPayload`: sender-side contract validation.
+- `BookCompanionClient`: context/clear/study/revoke ordered broadcasts.
+- synthetic device sender now exercises the SDK.
+- Windows acceptance builds and hashes the SDK AAR.
+
+**Important semantic guarantee**
+A reserved sequence is committed only when the protected Companion receiver returns `Activity.RESULT_OK`. Rejected delivery keeps the previous sequence so a retry can use the same expected next value.
+
+**Not accepted yet**
+- hosted exact-head compilation: blocked before runner allocation;
+- Windows exact-head build: not run;
+- Xiaomi 14 Book SDK positive/negative gate: not run;
+- Jvust/Book AAR adoption: not performed;
+- real Book/Companion signing identity: not verified.
+
+This closes the code-design gap for the producer but not the real-app/device gate.
+
+---
+
 ## E019 — shared persona + supervision agency automation (2026-09-30)
 
 **Status:** CODE_READY / DEVICE_GATE_AUTOMATED / DEVICE_NOT_RUN

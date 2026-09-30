@@ -1,3 +1,20 @@
+## Latest handoff · Book client SDK ready · 2026-09-30
+
+Current branch/head: `feat/airi-chat-memory-brain-20260929` @ `2e687fd348edfe1e787cb6634f272df69c05e0cf`; Draft PR #15; main untouched.
+
+The future real Book Android producer no longer needs to reimplement the broadcast protocol. Use `android_llm_spike/book-client-sdk` / `book-client-sdk-release.aar`. The synthetic same-signature device sender now uses the same SDK, so the Xiaomi 14 acceptance route validates the intended producer API rather than a separate hand-written intent path.
+
+Do not describe Book as connected yet. Remaining Book-side gates are:
+1. build the AAR at this exact head;
+2. pass the same-signature synthetic sender gates on Xiaomi 14;
+3. adopt the AAR in Jvust/Book;
+4. verify Book and Companion signing identities;
+5. replace synthetic inputs with bounded real structured Book projections.
+
+GitHub Actions remains infrastructure-blocked before step 1 (runner_id=0). Do not merge PR #15.
+
+---
+
 ## Latest handoff · PR #15 · exact head 907208ac0db090635fcf1fc342223ad51f97fdaa
 
 The current branch has a unified 3714430278 persona source and an automated

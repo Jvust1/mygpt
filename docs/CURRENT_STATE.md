@@ -1,3 +1,26 @@
+## 2026-09-30 · Book client SDK producer gap closed in mygpt · PR #15
+
+Exact head: `2e687fd348edfe1e787cb6634f272df69c05e0cf`.
+
+The real Book repository is still untouched, but the **producer implementation is no longer missing**. PR #15 now contains `android_llm_spike/book-client-sdk`, an Android library that builds `book-client-sdk-release.aar`.
+
+The SDK provides:
+- receiver-compatible context validation;
+- explicit-package ordered delivery;
+- context clear;
+- study start/context-change/pause/resume/end/help/repeated-error/revoke;
+- independent context/study sequence state;
+- study epoch state;
+- sequence/epoch commit **only after Companion returns `Activity.RESULT_OK`**;
+- rejected deliveries do not advance the local sequence and therefore do not create a permanent receiver gap;
+- a merged `uses-permission` request for the Companion signature permission.
+
+The same-signature synthetic Book sender now calls this SDK for automated context and supervision acceptance; it no longer hand-builds those protected Companion broadcasts. The Windows build route also builds the SDK AAR and records its SHA-256 in the evidence directory.
+
+Boundary unchanged: this does **not** mean the real Book APK is connected. Jvust/Book must still adopt the AAR and be signed with a certificate accepted by Companion V2. Xiaomi 14 execution remains pending. Exact-head hosted runs still show runner_id=0 / zero executed steps and therefore provide no code result.
+
+---
+
 ## 2026-09-30 · shared persona + deterministic supervision presentation · PR #15
 
 Exact head: `907208ac0db090635fcf1fc342223ad51f97fdaa`.

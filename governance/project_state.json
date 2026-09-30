@@ -4,8 +4,8 @@
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/airi-chat-memory-brain-20260929",
-  "phase": "COMPANION_V2_PIP_BOOK_SUPERVISION_DEVICE_GATE",
-  "status": "DRAFT_LOCAL_ACCEPTANCE_AUTOMATED_REMOTE_RUNNER_BLOCKED",
+  "phase": "COMPANION_V2_BOOK_CLIENT_SDK_XIAOMI14_GATE",
+  "status": "DRAFT_BOOK_SDK_READY_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -86,12 +86,12 @@
     "Real provider teaching quality remains disabled/unverified.",
     "GitHub hosted Actions currently fail before runner allocation (runner_id=0, zero steps), so exact-head Companion V2/voice builds have not executed.",
     "Companion V2 local llama/sherpa/TTS stack has not yet been built or installed on Xiaomi 14.",
-    "Real authenticated Book Android producer/context transport remains unconnected.",
     "Real Book APK signing identity must match Companion V2 before the signature-protected producer contract can replace the synthetic test sender.",
     "On-device GGUF choice remains benchmark-gated; no default model is accepted before Xiaomi 14 measurements.",
     "Current exact-head GitHub hosted Actions still receive runner_id=0 and execute zero steps.",
     "PiP, signed Book supervision, local LLM/ASR/TTS and automated Windows gates are code-ready but have not run on Xiaomi 14.",
-    "Real Book APK has not yet adopted the same-signature context/study producer contract."
+    "Real Book APK has not yet adopted the same-signature context/study producer contract.",
+    "Book client SDK is code-ready in mygpt, but Jvust/Book has not yet adopted the AAR and its APK signing identity has not been verified against Companion V2."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -113,7 +113,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Build exact head 907208ac0db090635fcf1fc342223ad51f97fdaa on Windows using android_llm_spike/scripts/build_and_install_companion_v2.ps1. Let the script run Book signature/context and quiet-first supervision agency gates on Xiaomi 14. Then import 3714430278, GGUF, sherpa ASR and optional Melo TTS; test PiP, local chat/voice/memory and run the llama benchmark. Finish with collect_companion_v2_evidence.ps1 before any merge.",
+  "next_step": "Build exact head 2e687fd348edfe1e787cb6634f272df69c05e0cf on Windows with android_llm_spike/scripts/build_and_install_companion_v2.ps1. This now builds/records book-client-sdk-release.aar and the same-signature synthetic sender exercises BookCompanionClient for context and study events. Run the automated Book/supervision gates on Xiaomi 14, then import 3714430278 + GGUF + sherpa ASR + optional Melo TTS, test PiP/local chat/voice/memory and collect evidence. Only after that should Jvust/Book adopt the AAR under a matching signing identity.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -905,7 +905,7 @@
     "branch": "feat/airi-chat-memory-brain-20260929",
     "draft_pr": 15,
     "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-    "exact_head": "907208ac0db090635fcf1fc342223ad51f97fdaa",
+    "exact_head": "2e687fd348edfe1e787cb6634f272df69c05e0cf",
     "target": "All-local Android companion: Book-aware chat + 3714430278 + on-device LLM + ASR/TTS + explicit memory",
     "android": {
       "module": "android_llm_spike/companion",
@@ -1041,23 +1041,22 @@
       ],
       "exact_head_remote_ci": {
         "status": "NOT_EXECUTED_RUNNER_PROVISIONING_FAILURE",
-        "exact_head": "907208ac0db090635fcf1fc342223ad51f97fdaa",
-        "note": "GitHub Status reports Actions operational; private-repo hosted jobs still receive runner_id=0 and execute zero steps.",
+        "exact_head": "2e687fd348edfe1e787cb6634f272df69c05e0cf",
         "runs": [
           {
-            "id": 36665189835,
+            "id": 36666041328,
             "workflow": "Companion V2 local AI Android acceptance",
             "runner_id": 0,
             "steps": 0
           },
           {
-            "id": 36665189915,
+            "id": 36666041371,
             "workflow": "Android companion boundary spike",
             "runner_id": 0,
             "steps": 0
           },
           {
-            "id": 36665189892,
+            "id": 36666041273,
             "workflow": "sherpa-onnx Android voice acceptance",
             "runner_id": 0,
             "steps": 0
@@ -1100,7 +1099,12 @@
       "adb_command_receiver": "android_llm_spike/book-sender-test/src/main/java/dev/mygpt/bookcontexttest/BookContextTestCommandReceiver.java",
       "automated_windows_gate": true,
       "real_book_connected": false,
-      "device_test": "NOT_RUN"
+      "device_test": "NOT_RUN",
+      "client_sdk": "android_llm_spike/book-client-sdk",
+      "client_sdk_artifact": "book-client-sdk-release.aar",
+      "synthetic_sender_uses_sdk": true,
+      "real_book_sender_implementation_missing": false,
+      "real_book_adoption_pending": true
     },
     "conversation_continuity": {
       "store": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalConversationStore.kt",
@@ -1162,10 +1166,12 @@
         "adb-shell Book context negative permission probe",
         "same-signature Book context positive + UI marker",
         "quiet-first supervision shell-negative + sender-positive + local-user opt-in agency gate",
-        "Book context clear + unavailable UI marker"
+        "Book context clear + unavailable UI marker",
+        "book-client-sdk AAR build + SHA-256 evidence",
+        "synthetic same-signature sender uses BookCompanionClient SDK for context/study events"
       ],
       "device": "Xiaomi 14",
-      "status": "READY_TO_EXECUTE_NOT_RUN",
+      "status": "READY_TO_EXECUTE_WITH_BOOK_SDK_NOT_RUN",
       "supervision_gate_persisted_marker": "Book test sender files/adb-supervision-gate.txt"
     },
     "cross_app_companion": {
@@ -1242,5 +1248,34 @@
       "android_asset": "assets/3714430278.json",
       "duplicate_persona_copy": false
     }
+  },
+  "book_client_sdk": {
+    "status": "CODE_READY_AAR_BUILD_DEVICE_PENDING",
+    "module": "android_llm_spike/book-client-sdk",
+    "artifact": "book-client-sdk-release.aar",
+    "package": "dev.mygpt.bookbridge",
+    "min_sdk": 21,
+    "java_target": "Java 8",
+    "manifest_permission": "dev.mygpt.companionv2.permission.BOOK_CONTEXT",
+    "protection_dependency": "Companion V2 defines permission at signature level",
+    "api": [
+      "BookCompanionSession",
+      "BookContextPayload",
+      "BookCompanionClient",
+      "BookCompanionContract"
+    ],
+    "guarantees": [
+      "context sequence advances only after Activity.RESULT_OK",
+      "study sequence/epoch advances only after Activity.RESULT_OK",
+      "rejected delivery does not create a sequence gap",
+      "new Book process must create a new session id",
+      "explicit-package ordered broadcast only",
+      "Book cannot enable MyGPT supervision opt-in"
+    ],
+    "synthetic_sender_uses_sdk": true,
+    "windows_build_records_aar_sha256": true,
+    "real_book_repo_modified": false,
+    "real_book_adopted": false,
+    "device_test": "NOT_RUN"
   }
 }
