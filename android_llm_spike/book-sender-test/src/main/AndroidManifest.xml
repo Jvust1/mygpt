@@ -13,5 +13,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".BookContextTestCommandReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_SEND_CONTEXT_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_CLEAR_CONTEXT_V1" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

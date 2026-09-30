@@ -36,3 +36,33 @@ The sender uses ordered broadcasts and reports whether MyGPT returned
 
 It still does **not** prove that the real Book APK uses the same signing
 certificate or implements the producer contract.
+
+
+## ADB-driven positive signature test
+
+The test sender also exposes an **acceptance-only** command receiver:
+
+- `dev.mygpt.bookcontexttest.action.AUTOMATED_SEND_CONTEXT_V1`
+- `dev.mygpt.bookcontexttest.action.AUTOMATED_CLEAR_CONTEXT_V1`
+
+Example:
+
+```powershell
+adb shell am broadcast ^
+  -n dev.mygpt.bookcontexttest/.BookContextTestCommandReceiver ^
+  -a dev.mygpt.bookcontexttest.action.AUTOMATED_SEND_CONTEXT_V1
+
+adb exec-out run-as dev.mygpt.bookcontexttest ^
+  cat files/adb-book-result.txt
+```
+
+The command receiver itself is intentionally exported because it contains only
+synthetic test data. Crucially, it does **not** bypass the Companion permission:
+the nested `BOOK_CONTEXT_V1` broadcast is created and sent by the installed
+Book test sender process, so Android still evaluates the sender APK's signing
+certificate against Companion V2's `signature` permission.
+
+`adb-book-result.txt` records `accepted=true` only when the Companion receiver
+returns `Activity.RESULT_OK`.
+
+This mechanism is test-only and must not be copied into the real Book app.
