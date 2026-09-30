@@ -16,6 +16,7 @@ import asyncio
 from dataclasses import dataclass
 import hashlib
 import re
+import uuid
 from typing import Any, Awaitable, Callable
 
 from .companion_chat import CompanionChatRuntime, SupersededChatTurn
@@ -28,6 +29,7 @@ class PipecatCompanionReply:
     session_id: str
     text: str
     emotion: str
+    replayed: bool = False
 
 
 class PipecatCompanionBridge:
@@ -42,6 +44,10 @@ class PipecatCompanionBridge:
         self.companion = companion
         self.session_id = session_id.strip()
         self._turn = 0
+        # Automatic voice events are new inputs, even when text/counter repeat
+        # after restart. This ephemeral correlation nonce is never a credential
+        # or separately persisted identity. Explicit IDs remain retry keys.
+        self._incarnation = uuid.uuid4().hex
         self.turn_controller = turn_controller or VoiceTurnController()
         self.closed = False
 
@@ -63,7 +69,7 @@ class PipecatCompanionBridge:
     def _request_id(self, text: str) -> str:
         self._turn += 1
         digest = hashlib.sha256(
-            f"{self.session_id}\x1f{self._turn}\x1f{text}".encode("utf-8")
+            f"{self.session_id}\x1f{self._incarnation}\x1f{self._turn}\x1f{text}".encode("utf-8")
         ).hexdigest()[:20]
         return f"pipecat-{digest}"
 
@@ -73,7 +79,7 @@ class PipecatCompanionBridge:
         transcript = str(text).strip()
         if not transcript:
             raise ValueError("transcription text must be non-empty")
-        rid = request_id or self._request_id(transcript)
+        rid = self._request_id(transcript) if request_id is None else request_id
         lease = lease or self.begin_turn()
         if not self.is_current(lease):
             raise SupersededChatTurn("companion turn superseded")
@@ -98,7 +104,28 @@ class PipecatCompanionBridge:
             session_id=result.session_id,
             text=result.assistant_message.content,
             emotion=result.presentation_emotion,
+            replayed=result.replayed,
         )
+
+
+def _explicit_frame_request_id(frame: Any) -> str | None:
+    """Optional receipt retry key; it cannot override session/persona authority."""
+    metadata = getattr(frame, "metadata", {})
+    if not isinstance(metadata, dict):
+        raise ValueError("invalid frame metadata")
+    if "mygpt" not in metadata:
+        return None
+    control = metadata["mygpt"]
+    if not isinstance(control, dict):
+        raise ValueError("invalid MyGPT frame metadata")
+    if "request_id" not in control:
+        return None
+    value = control["request_id"]
+    if not isinstance(value, str) or not value:
+        raise ValueError("explicit request_id must be a nonempty string")
+    # Identifier syntax/length are validated by CompanionChatRequest, not a
+    # second divergent transport schema. Invalid values never fall back to new.
+    return value
 
 
 # The upstream full Markdown filter intentionally discards some punctuation.
@@ -208,11 +235,16 @@ def create_pipecat_companion_processor(
                     await self.push_frame(frame, direction)
                 # Adapted from Pipecat BaseOpenAILLMService.process_frame:
                 # start/end lifecycle frames are part of the TTS contract.
+                reply = None
                 try:
                     if not bridge.is_current(lease):
                         return
                     await self.push_frame(frame_types.LLMFullResponseStartFrame(), direction)
-                    reply = await bridge.respond(text, lease=lease)
+                    reply = await bridge.respond(text, request_id=_explicit_frame_request_id(frame), lease=lease)
+                    if reply.replayed:
+                        # Receipt recovery retrieves stored data, not a new
+                        # speech command. No formatter/synthesis side effect.
+                        return
                     if bridge.is_current(lease):
                         try:
                             # Isolate callback cancellation from this queue's
@@ -229,6 +261,7 @@ def create_pipecat_companion_processor(
                         output.metadata["mygpt"] = {
                             "request_id": reply.request_id,
                             "presentation_emotion": reply.emotion,
+                            "replayed": False,
                         }
                         await self.push_frame(output, direction)
                 except SupersededChatTurn:
@@ -241,7 +274,12 @@ def create_pipecat_companion_processor(
                     # An interruption frame already clears downstream TTS. Do
                     # not flush stale text/end frames after that invalidation.
                     if bridge.is_current(lease):
-                        await self.push_frame(frame_types.LLMFullResponseEndFrame(), direction)
+                        end = frame_types.LLMFullResponseEndFrame()
+                        if reply is not None:
+                            end.metadata["mygpt"] = {
+                                "request_id": reply.request_id, "replayed": reply.replayed,
+                            }
+                        await self.push_frame(end, direction)
                 return
             await self.push_frame(frame, direction)
 
