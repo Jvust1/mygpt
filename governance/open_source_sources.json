@@ -1,8 +1,8 @@
 {
   "schema_version": "mygpt_open_source_sources_v1",
-  "updated_date": "2026-09-27",
+  "updated_date": "2026-09-30",
   "target": "Book Android + mygpt + Live character companion",
-  "code_copied_by_registry": false,
+  "code_copied_by_registry": true,
   "policy": {
     "default": "reference-first",
     "direct_import_requires": [
@@ -15,13 +15,33 @@
     "restricted_or_copyleft": "reference-only until explicit decision"
   },
   "counts": {
-    "total": 51,
-    "p0": 18,
-    "p1": 16,
+    "total": 53,
+    "p0": 19,
+    "p1": 17,
     "p2": 15,
     "p3": 2
   },
   "sources": [
+    {
+      "repo": "moeru-ai/airi",
+      "area": "Companion chat/session/character agent runtime",
+      "priority": "P0",
+      "mode": "CODE_ADAPTED",
+      "why": "Authority-aware chat, durable sessions, character cards, renderer-neutral emotion protocol and ACT marker parsing integrated into companion runtime.",
+      "url": "https://github.com/moeru-ai/airi",
+      "license_status": "MIT_VERIFIED",
+      "pinned_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
+      "code_copied": true,
+      "local_paths": [
+        "brain/mygpt_brain/conversation.py",
+        "brain/mygpt_brain/session_store.py",
+        "brain/mygpt_brain/character_card.py",
+        "android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java",
+        "android_spike/src/main/java/dev/mygpt/spike/AiriActEmotionParser.java",
+        "third_party/airi/LICENSE",
+        "third_party/airi/NOTICE.md"
+      ]
+    },
     {
       "repo": "android/nowinandroid",
       "area": "Android architecture",
@@ -96,11 +116,18 @@
       "repo": "princekin-f/EasyFloat",
       "area": "Floating companion",
       "priority": "P0",
-      "mode": "DEPENDENCY_CANDIDATE",
-      "why": "Draggable system/app floating windows, lifecycle filtering and overlay permission flow.",
+      "mode": "CODE_ADAPTED_IN_APP_ONLY",
+      "why": "Permission-free current-activity drag/snap layer for a future mini companion; system overlay remains separately permission-gated.",
       "url": "https://github.com/princekin-f/EasyFloat",
-      "code_copied": false,
-      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "1a65226084a46cafc7ebcb27f0a077aebefa9b0e",
+      "local_paths": [
+        "android_spike/src/main/java/dev/mygpt/spike/FloatDragPolicy.java",
+        "android_spike/app/src/main/java/dev/mygpt/spike/InAppCompanionDragController.java",
+        "third_party/easyfloat/LICENSE",
+        "third_party/easyfloat/NOTICE.md"
+      ]
     },
     {
       "repo": "guolindev/PermissionX",
@@ -266,11 +293,22 @@
       "repo": "ggml-org/llama.cpp",
       "area": "On-device LLM",
       "priority": "P0",
-      "mode": "ENGINE_CANDIDATE",
-      "why": "Primary GGUF local LLM candidate; current upstream includes Android bindings/examples.",
+      "mode": "SOURCE_PINNED_AND_CODE_ADAPTED",
+      "why": "Pinned full upstream submodule plus isolated Android JNI bridge, GGUF validation/import, local chat and Companion V2 integration.",
       "url": "https://github.com/ggml-org/llama.cpp",
-      "code_copied": false,
-      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+      "code_copied": true,
+      "license_status": "MIT_VERIFIED",
+      "pinned_commit": "ba0ba54d93b25faf1e149f4ccedd3e9d84798563",
+      "local_paths": [
+        "third_party/llama.cpp/upstream",
+        "android_llm_spike/bridge",
+        "android_llm_spike/app",
+        "android_llm_spike/companion",
+        "android_spike/src/main/java/dev/mygpt/spike/LocalLlmEngine.java",
+        "android_spike/src/main/java/dev/mygpt/spike/SerializedLocalLlmEngine.java",
+        "android_spike/src/main/java/dev/mygpt/spike/GgufModelProbe.java",
+        "android_spike/src/main/java/dev/mygpt/spike/GgufModelInstaller.java"
+      ]
     },
     {
       "repo": "ggml-org/whisper.cpp",
@@ -284,13 +322,22 @@
     },
     {
       "repo": "k2-fsa/sherpa-onnx",
-      "area": "Speech stack",
+      "area": "Offline Android ASR/TTS",
       "priority": "P0",
-      "mode": "ENGINE_CANDIDATE",
-      "why": "Cross-platform offline ASR/TTS/VAD options suitable for Android evaluation.",
+      "mode": "SOURCE_PINNED_AND_CODE_ADAPTED",
+      "why": "Pinned source submodule; Android microphone/PCM, streaming zh/en ASR, Melo zh/en local TTS and external model import paths integrated into Companion V2.",
       "url": "https://github.com/k2-fsa/sherpa-onnx",
-      "code_copied": false,
-      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "040afe360a38e25daaa325ce8889abf93ea02609",
+      "local_paths": [
+        "third_party/sherpa-onnx/upstream",
+        "android_voice_spike",
+        "android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java",
+        "android_spike/app/src/main/java/dev/mygpt/spike/VoiceCaptureSession.java"
+      ],
+      "runtime_version": "v1.13.8",
+      "runtime_commit": "11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf"
     },
     {
       "repo": "pytorch/executorch",
@@ -406,11 +453,18 @@
       "repo": "mem0ai/mem0",
       "area": "Long-term memory",
       "priority": "P1",
-      "mode": "ADOPT_PATTERN",
-      "why": "Memory extraction/retrieval architecture useful for companion continuity.",
+      "mode": "CODE_ADAPTED",
+      "why": "Explicit local memory lifecycle on Python and Android: add/search/get/update/delete/history plus full-erasure purge on Android.",
       "url": "https://github.com/mem0ai/mem0",
-      "code_copied": false,
-      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "local_paths": [
+        "brain/mygpt_brain/memory_store.py",
+        "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt",
+        "third_party/mem0/LICENSE",
+        "third_party/mem0/NOTICE.md"
+      ]
     },
     {
       "repo": "pydantic/pydantic-ai",
@@ -531,6 +585,22 @@
       "url": "https://github.com/guansss/pixi-live2d-display",
       "code_copied": false,
       "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "apache/commons-compress",
+      "area": "Model archive import",
+      "priority": "P1",
+      "mode": "PINNED_DEPENDENCY",
+      "why": "Streaming support for official sherpa model archives in ZIP/TAR.BZ2/TAR.GZ while MyGPT retains strict extraction allowlists and size limits.",
+      "url": "https://github.com/apache/commons-compress",
+      "code_copied": false,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "version": "1.28.0",
+      "local_paths": [
+        "android_voice_spike/app/src/main/java/dev/mygpt/voicespike/ModelArchiveReader.java",
+        "third_party/commons-compress/LICENSE",
+        "third_party/commons-compress/NOTICE.md"
+      ]
     }
   ]
 }

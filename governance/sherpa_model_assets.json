@@ -1,0 +1,36 @@
+{
+  "schema": "mygpt.sherpa-release-assets.v1",
+  "updated_date": "2026-09-30",
+  "archive_policy": "GITHUB_RELEASE_ASSET_ID_PLUS_EXACT_BYTES_THEN_POST_EXTRACT_CORE_SHA",
+  "runtime": "sherpa-onnx-v1.13.8",
+  "assets": [
+    {
+      "id": "asr",
+      "role": "streaming zh/en ASR",
+      "release_tag": "asr-models",
+      "release_id": 130628817,
+      "asset_id": 170453803,
+      "file": "sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2",
+      "exact_bytes": 511274346,
+      "api_asset_url": "https://api.github.com/repos/k2-fsa/sherpa-onnx/releases/assets/170453803",
+      "browser_download_url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2",
+      "github_digest": null,
+      "post_extract_identity": "ALL_FOUR_RUNTIME_CORE_FILES_HARD_LOCKED",
+      "model_revision": "98590b7ed6443e77b714204da2757d75e1a642f4"
+    },
+    {
+      "id": "tts",
+      "role": "Melo zh/en TTS",
+      "release_tag": "tts-models",
+      "release_id": 130612623,
+      "asset_id": 203769960,
+      "file": "vits-melo-tts-zh_en.tar.bz2",
+      "exact_bytes": 167006755,
+      "api_asset_url": "https://api.github.com/repos/k2-fsa/sherpa-onnx/releases/assets/203769960",
+      "browser_download_url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-melo-tts-zh_en.tar.bz2",
+      "github_digest": null,
+      "post_extract_identity": "MODEL_ONNX_HARD_LOCKED_PLUS_SUPPORT_FILE_MANIFEST",
+      "model_revision": "a0d5c6a264c0ef92d70d8661d8cc502d79627cd6"
+    }
+  ]
+}

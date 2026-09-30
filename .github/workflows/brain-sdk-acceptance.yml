@@ -2,7 +2,7 @@ name: Brain SDK acceptance (no live model)
 
 on:
   push:
-    branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925]
+    branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925, feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930]
     paths:
       - 'host/fixtures.js'
       - 'host/examples/selection-demo.json'
@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   offline-sdk:
-    if: github.repository == 'Jvust/mygpt'
+    if: github.repository == 'Jvust1/mygpt'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:

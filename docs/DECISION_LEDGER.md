@@ -72,3 +72,45 @@ A skin is not considered fully integrated merely because one skeleton, atlas, te
 ## D024 — skin audio is out of scope
 Skin integration in mygpt/Live is visual and interaction focused. Voice, BGM and SFX packaged with skins are not loaded, played, mapped or counted toward skin utilization/completion. Full-utilization requirements cover visual forms, animations, expressions, transitions, effects, layout and interaction only.
 
+
+## D025 — companion chat authority and memory are explicit/local
+MyGPT directly adapts AIRI's MIT-licensed authority-separated conversation, merge/deduplication, bounded-history and local-first session persistence patterns from pinned upstream commit `b40e3e87b149ea5fb75d4944440493829e601411`. Trusted persona/developer instructions remain distinct from application context and recalled memory; context/memory is projected as data, not silently upgraded to system authority. Long-term memory is explicit/reviewed local state rather than automatic transcript ingestion. The first real provider adapter is deliberately loopback-only Ollama; arbitrary remote provider URLs are outside this candidate. Full attribution is retained in `third_party/airi/`.
+
+## D026 — long-term memory must be correctable and auditable
+MyGPT memory is not append-only truth. Following Mem0-style lifecycle semantics, explicit memories support update, delete and history. Updates preserve memory identity fields and append an audit event; deletes remove the active memory while preserving the audit event. Raw conversation is not automatically promoted into long-term memory.
+
+## D027 — voice capture is explicit and engine-neutral
+The first Android voice layer is a 16 kHz mono PCM capture foundation adapted from sherpa-onnx. It does not request RECORD_AUDIO permission automatically, persist raw audio, or commit to one ASR engine. Permission must follow an explicit user action; sherpa-onnx, whisper.cpp or another local engine can be benchmarked behind the same frame interface.
+
+## D028 — brain-to-character emotion uses a renderer-neutral protocol
+MyGPT adopts AIRI's renderer-neutral emotion vocabulary so chat/voice logic does not depend on one skin. A specific skin may play only authored semantically matching animations. For 3714430278, happy/sad/surprised map to smile/sad/surprise; unsupported emotions fall back to idle rather than guessing with unrelated combat/action animations.
+
+## D029 — Android local model stacks stay isolated until device acceptance
+llama.cpp's current Android binding requires a newer Android/Java/native toolchain than the accepted Java-8 Spine host. MyGPT therefore keeps `android_llm_spike` isolated (minSdk 33, Java/Kotlin 17) and pins the complete upstream llama.cpp source as a submodule. The existing Java-8/minSdk24 Spine artifact is not silently upgraded. Merge/consolidation waits for exact-head build and Xiaomi 14 acceptance.
+
+## D030 — voice input/output is explicit, local and model-weight external
+Microphone capture starts only after an explicit user action and RECORD_AUDIO grant. Raw audio is not persisted. ASR/TTS weights are external user-selected model packages stored app-private; sherpa source and runtime identities are recorded separately. TTS is default-off and streams generated samples to AudioTrack without writing audio files.
+
+## D031 — long-term Android memory is explicit and erasable
+Companion V2 does not auto-capture chat transcripts. Relevant explicit memories may be recalled as application data, never system authority. Updates retain audit history. Android additionally exposes a purge path used by explicit forget commands to remove both active memory content and its audit history.
+
+## D032 — official model archives are parsed through a strict allowlist
+MyGPT accepts ZIP, TAR.BZ2 and TAR.GZ model packages through Apache Commons Compress 1.28.0. Archive paths are never materialized directly: ASR/TTS installers select known basenames only, enforce per-file and total decompressed-size limits, and preserve README/LICENSE when present.
+
+## D033 — Book Android context requires same-signature explicit delivery
+Companion V2 exposes a custom Android signature permission for Book semantic context. The receiver also requires explicit targeting to the MyGPT package/component, validates TTL, monotonic sequence, session identity and source SHA-256, and stores accepted Book text in process memory only. Every llama user turn explicitly declares current Book state as fresh or unavailable; prior Book blocks retained by llama KV history are historical data only.
+
+## D034 — recent conversation persistence is not long-term memory
+Visible user/assistant text may be kept in a bounded local conversation store solely to recover conversational continuity after model reload/process restart. It excludes Book blocks, recalled-memory blocks, raw audio, TTS audio, system prompt and ACT markers. Explicit long-term memory remains a separate user-controlled store and policy.
+
+## D035 — Activity lifecycle must not destroy llama.cpp's process singleton
+The pinned llama.cpp Android AiChat implementation retains a process-wide static InferenceEngine singleton. MyGPT therefore unloads models on Activity-level close/replacement and leaves final native backend destruction to process termination. Destroying the singleton inside Activity lifecycle is prohibited because later Activity recreation would reuse a destroyed singleton reference.
+
+## D036 — default on-device GGUF is benchmark-gated
+MyGPT does not name a default Xiaomi 14 GGUF before device evidence exists. Candidate models must be compared using the local llama benchmark plus real-chat first-token latency, sustained memory/thermal behavior, crash/OOM behavior and reply quality. Benchmark reports stay app-private unless the user explicitly collects the local evidence directory.
+
+## D037 — native PiP is the first cross-app companion surface
+Companion V2 uses Android Picture-in-Picture as the first cross-application 3714430278 surface. PiP requires explicit user entry, shows only the character render shell, does not auto-enter, and does not require SYSTEM_ALERT_WINDOW, Accessibility, screen capture or a background overlay service. System-overlay approaches remain a later separately permission-gated option.
+
+## D038 — supervision is explicit Book signal + local MyGPT consent
+MyGPT does not infer attention, motivation or failure from inactivity, screen observation or time spent. Supervision cues are driven only by same-signature explicit Book study events plus MyGPT-local per-session user consent. Book cannot enable supervision. PRACTICE_REPEATED_ERROR stays QUIET without opt-in and can yield GENTLE_CHECK_IN only after local opt-in and the cooldown gate. End/revoke clears consent.

@@ -1,3 +1,230 @@
+## 2026-09-30 · LLM quality matrix + sherpa native loopback checkpoint · PR #15
+
+Implementation checkpoint: `9920d53800ad1aec741630300283d385825fd986` (this governance-only commit follows it).
+
+The Xiaomi 14 gate now covers more than file/import checks:
+
+- **LLM matrix:** speed / balanced / quality fixed GGUF identities run the same local benchmark.
+- **Fixed Chinese qualitative suite:** every candidate runs the same five synthetic companion/Book/authority cases with the exact production Character Card, shared system prompt, and prompt budget. A candidate gate requires all 5 cases to execute and return visible text, but **no automatic score/rank/winner is produced**.
+- **Human comparison:** `run_llm_matrix.ps1` writes `llm-quality-comparison.md`, grouping the three candidates side-by-side by case with wall time, AIRI emotion and visible reply.
+- **Prompt budget:** current hard user-turn ceiling is **5200 chars**, not the older 5600 value. The production shared system prompt is coupled through a conservative 7200-character combined guard; current 3714430278 system prompt measured 1506 chars, so the turn stays capped at 5200. This is a character guard, not a tokenizer claim.
+- **Sherpa integrity:** imported core ASR/TTS files are fingerprinted and re-verified on restore; large hashing runs off the UI thread.
+- **Native voice execution:** when both fixed sherpa packages are present, a debug-only gate synthesizes `你好，今天一起学习。` through production Melo config, keeps PCM in memory, resamples to 16 kHz, feeds the production streaming ASR, and requires a non-empty transcript. No microphone/speaker/audio file is used by this gate.
+
+Latest hosted runs `36681413185`, `36681413136`, and `36681413222` again have runner_id=0 and zero executed steps. They remain infrastructure failures and provide no code result.
+
+The remaining decisive gate is the Windows/Xiaomi 14 path. Real microphone input, audible TTS, visual Spine/PiP behavior and final model choice remain physical-device decisions.
+
+---
+
+## 2026-09-30 · verified 3714430278 self-contained local build path · PR #15
+
+Exact head: `90e5a8dc2528951fa664412a8ae66ec45a018e01`.
+
+The primary skin no longer has to be manually selected on a Windows/Xiaomi 14 acceptance build.
+
+The authenticated Drive source was verified as:
+- Drive file id: `1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt`
+- hierarchy: `My Drive/Live/skin/workshop/3714430278/3714430278.zip`
+- bytes: `12342220`
+- SHA-256: `eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+
+The ZIP is **not committed to Git**. The Windows build optionally discovers it from an explicit `-SkinZip`, `MYGPT_SKIN_ZIP`, or allowlisted Google Drive Desktop paths. It is copied only into the module build directory after exact size+SHA verification. The built APK is then reopened and `assets/3714430278.zip` is independently SHA-verified again.
+
+At runtime Companion V2 validates any already-installed app-private 3714430278 first; otherwise it attempts to install the bundled asset through the same production `SpinePackageLayout.install()` gates. An unbundled build retains the manual SAF picker.
+
+When a verified skin is bundled, the Windows acceptance route automatically runs the PiP-over-Book gate. Final evidence now stays in the same build evidence directory.
+
+Remaining large external inputs are the chat GGUF and sherpa ASR/optional TTS. Drive search found image-oriented Qwen-Image GGUF but no accepted conversational default, and no matching sherpa model packages; these remain benchmark/import gates rather than guessed defaults.
+
+---
+
+## 2026-09-30 · pre-device hardening checkpoint · PR #15
+
+Exact head: `4efd70b716ab35f94af7556ee7ed5149e77d60a9`.
+
+The code path is now hardened specifically for long-running Xiaomi 14 use before the first exact-head device build:
+
+- **Prompt budget:** `CompanionPromptBudget` caps the pre-JNI user-turn prompt at 5600 characters. It always preserves the complete current user message (<=4000 chars), then prioritizes current signed Book data, supervision state, relevant explicit memory, and finally recent conversation. Book text/memory/history are rendered in bounded data blocks; no content is written to the budget evidence report.
+- **Sherpa model integrity:** ASR/TTS imports create deterministic core-file SHA-256 manifests. Restore recomputes and verifies them; legacy app-private installs without a manifest receive a one-time migration. Large hashing now runs off the Android UI thread.
+- **Signed-state TTL:** a 1-second in-memory ticker runs only while Companion is foregrounded or visibly in PiP. Book expiry becomes unavailable; supervision expiry clears session/opt-in and returns the character to QUIET. There is no network polling, service, wake lock or screen inspection.
+- **PiP privacy:** entering PiP explicitly stops microphone capture.
+- **Interrupted llama recovery:** cancellation/native generation failure is treated as potentially inconsistent KV state. The interrupted exchange is not persisted; the local model is reloaded and only completed visible conversation is re-primed.
+
+Validation remains deliberately unresolved at this head. Latest hosted runs `36667831029`, `36667831060`, and `36667831014` all have `runner_id=0` and 0 executed steps. They are infrastructure failures, not code results. Independent execution also could not clone GitHub because the execution environment DNS could not resolve github.com.
+
+Next real gate: exact-head Windows build + Xiaomi 14 evidence. PR #15 remains Draft and main remains untouched.
+
+---
+
+## 2026-09-30 · Book client SDK producer gap closed in mygpt · PR #15
+
+Exact head: `2e687fd348edfe1e787cb6634f272df69c05e0cf`.
+
+The real Book repository is still untouched, but the **producer implementation is no longer missing**. PR #15 now contains `android_llm_spike/book-client-sdk`, an Android library that builds `book-client-sdk-release.aar`.
+
+The SDK provides:
+- receiver-compatible context validation;
+- explicit-package ordered delivery;
+- context clear;
+- study start/context-change/pause/resume/end/help/repeated-error/revoke;
+- independent context/study sequence state;
+- study epoch state;
+- sequence/epoch commit **only after Companion returns `Activity.RESULT_OK`**;
+- rejected deliveries do not advance the local sequence and therefore do not create a permanent receiver gap;
+- a merged `uses-permission` request for the Companion signature permission.
+
+The same-signature synthetic Book sender now calls this SDK for automated context and supervision acceptance; it no longer hand-builds those protected Companion broadcasts. The Windows build route also builds the SDK AAR and records its SHA-256 in the evidence directory.
+
+Boundary unchanged: this does **not** mean the real Book APK is connected. Jvust/Book must still adopt the AAR and be signed with a certificate accepted by Companion V2. Xiaomi 14 execution remains pending. Exact-head hosted runs still show runner_id=0 / zero executed steps and therefore provide no code result.
+
+---
+
+## 2026-09-30 · shared persona + deterministic supervision presentation · PR #15
+
+Exact head: `907208ac0db090635fcf1fc342223ad51f97fdaa`.
+
+Additional hardening after the PiP/supervision checkpoint:
+
+- Python Brain and Android Companion V2 now consume the **same authoritative** `brain/personas/3714430278.json` AIRI-style Character Card. Android validates the bundled asset and derives identity/personality/scenario/consistency/examples from it; only Android authority/freshness rules remain platform-local.
+- Accepted signed supervision events do **not** automatically call the LLM. Companion V2 renders deterministic low-pressure local copy for QUIET/PAUSED/NEEDS_INPUT/GENTLE_CHECK_IN and sends current supervision state to later chat only as `STUDY_SUPERVISION_STATE_JSON` application data.
+- The same-signature test sender now has automated study lifecycle actions, and the Xiaomi 14 supervision script verifies user agency: repeated error is QUIET before local opt-in and GENTLE_CHECK_IN only after ADB physically taps the MyGPT-local supervision control.
+- Device automation scrolls back to a stable Book status position after supervision checks; Book status and supervision controls expose ASCII accessibility markers for PowerShell/UIAutomator evidence.
+- The final evidence collector records the persisted test-only supervision PASS marker in addition to permission/audio/benchmark/Book evidence.
+
+Hosted Actions remain non-evidence at this head because jobs receive no runner and execute zero steps. PR #15 remains Draft.
+
+---
+
+## 2026-09-30 · Companion V2 PiP + signed Book quiet-supervision checkpoint · PR #15
+
+Exact head: `4d26563d8c03453f27c9a31186a484004d6d1535`.
+
+New since the prior local-device checkpoint:
+
+- **Android native PiP companion mode**: explicit button, 1:1 render-only character surface, skin-ready gate, no auto-enter, no SYSTEM_ALERT_WINDOW/Accessibility/screen-capture requirement. This is the first cross-App 3714430278 companion surface intended to sit above Book.
+- **live in-process Book updates**: the process-memory Book mailbox now notifies Companion V2 immediately when same-signature context changes/clears, including while PiP remains visible.
+- **signed Book study-event receiver**: Book may explicitly send start/context/pause/resume/end/help/repeated-error/revoke events; it cannot inject source_ref/body into the supervisor.
+- **quiet-first supervision**: repeated practice errors produce no prompt until the user explicitly turns on supervision inside MyGPT for the current session. Opt-in resets on end/revoke/new session; gentle prompts have a 10-minute cooldown.
+- **same-signature automated study sender** plus Xiaomi 14 script: the device gate proves shell-origin study events are rejected, sender-origin events are accepted, and the same repeated-error signal stays QUIET before a real local button tap but becomes GENTLE_CHECK_IN after that tap.
+- Windows acceptance now records exact source identity, requires JDK17/Android 36 native toolchain, verifies APK signing and runs automated Book context + supervision gates before manual model/voice/PiP testing.
+- Final evidence collection records permission boundary, audio non-persistence, benchmark presence and supervision gate status.
+
+Remote CI remains unavailable, not failing assertions. Exact-head runs `36665189835`, `36665189915` and `36665189892` all show `runner_id=0` and zero steps.
+
+Real Book/Live repositories remain untouched; real Book producer integration is still pending.
+
+---
+
+## 2026-09-30 · Book signed bridge + durable conversation + local acceptance path · PR #15
+
+Exact head: `5b932e6f1bbe1ca7db645802475d50b322c32ec4`.
+
+Since the prior Companion V2 checkpoint, the candidate now also includes:
+
+- a **signature-permission-protected Book Android context bridge**. Valid context is explicit-package only, TTL-bounded, sequence-checked, process-memory only, and is rendered as lower-authority model data. Every turn marks Book as `fresh` or `unavailable` so stale context retained in llama KV history cannot silently stay current;
+- a **same-signature synthetic Book sender APK** built beside Companion V2 for physical-device validation without weakening the production receiver permission;
+- a separate bounded **recent conversation SQLite store**. It contains visible user/assistant text only, primes at most 10 turns after model reload, and remains distinct from explicit Mem0-style long-term memory;
+- a llama.cpp lifecycle fix for the upstream **process-wide AiChat singleton**: Activity-level close now unloads the model instead of destroying the process singleton;
+- an in-app **local llama benchmark** that records model hash/bytes, wall-clock, PSS/native/Java heap and Android thermal status to app-private `benchmark-last.txt`;
+- a pinned Gradle 8.14.3 wrapper plus Windows scripts for exact-head build/install, same-signature verification, Xiaomi 14 installation and post-run evidence collection.
+
+The preferred next validation path is now local Windows + Xiaomi 14 because GitHub hosted Actions remain unavailable. Exact-head runs `36662638935`, `36662638952` and `36662638973` all terminated before step 1 with `runner_id=0` and zero steps. This remains an infrastructure failure, not a code test result.
+
+Real Book is **not connected yet**. The synthetic sender proves only the receiver contract/signature boundary once device-tested; the real Book APK must later use the same signing certificate and producer contract.
+
+---
+
+## 2026-09-30 · Companion V2 全本地栈代码集成 checkpoint · PR #15
+
+当前精确 head：`a83680c1810242d541941b6c2b1a361c8d00bf71`。PR #15 仍为 Draft，base 为 `feat/spine-3714430278-runtime-refresh-20260929`，main 未修改。
+
+本轮已把候选从“聊天 Brain + PCM 基础”推进成同一 Android Companion V2 里的全本地链路：
+
+```text
+文字输入 ─────────────────────────────┐
+麦克风 -> sherpa streaming ASR ─────┤
+                                    ↓
+                         显式相关长期记忆召回
+                                    ↓
+                         llama.cpp Android JNI / GGUF
+                                    ↓
+                    可见文本 + AIRI <|ACT:{...}|> 情绪
+                         ↓                     ↓
+                 sherpa Melo TTS         3714430278 Spine
+                 （可选、默认关闭）        （保守动作映射）
+```
+
+关键实现：
+- 完整 `llama.cpp` 上游以 git submodule 固定到 `ba0ba54d...`；独立 `android_llm_spike` 使用上游 JNI，而不是残缺复制。
+- GGUF 通过 SAF 导入 App 私有目录；先校验 GGUF header，再做有界流式复制、SHA-256 地址化和重复检测。
+- Companion V2 同一应用内同时包含 3714430278 Spine、llama JNI、sherpa JNI、显式 Android SQLite 长期记忆。
+- sherpa 源码 submodule 固定 `040afe36...`；运行时二进制明确固定 `v1.13.8 / 11afbd00...`，两种身份不混写。
+- ASR：用户点击语音按钮才申请 `RECORD_AUDIO`；16 kHz mono；raw audio 不落盘；识别 endpoint 后自动送入本地 LLM。
+- TTS：Melo 中英模型外置导入；默认关闭；开启后将去除 ACT 标记后的可见回复直接流式写入 AudioTrack，不保存 wav。
+- 模型导入支持 ZIP / TAR.BZ2 / TAR.GZ；只提取白名单文件，并保留 README/LICENSE（如归档包含）。
+- Android 长期记忆采用 Mem0 风格 add/search/update/delete/history；聊天不自动进入长期记忆；`:forget` 使用 purge 同时删除活动内容与审计历史。
+- AIRI ACT 情绪白名单为 happy/sad/angry/think/surprised/awkward/question/curious/neutral；3714430278 只对 smile/sad/surprise 做精确语义映射，其余回 idle。
+- Companion V2 Manifest 当前仅新增 `RECORD_AUDIO`；没有 INTERNET、SYSTEM_ALERT_WINDOW 或广泛存储权限。
+
+验证边界：
+- 早期 AIRI Python 候选 18/18 本地测试通过；若干纯 Java 8 协议 smoke 曾独立 PASS。
+- **当前精确 head 的 Android/llama/sherpa workflow 没有真正执行代码**：run `36659174083`、`36659174123`、`36659174091` 均为 `runner_id=0`、0 steps。
+- 因此 Companion V2 APK、Voice Spike APK、llama JNI bridge 的 exact-head build 仍是 **NOT EXECUTED**，不能写成 PASS 或代码 FAIL。
+- 小米 14 本地 GGUF/ASR/TTS/Spine 全链实机仍待验收；真实 Book Android producer 仍未连接。
+
+---
+
+## 2026-09-29 · PR #15 expanded companion runtime checkpoint
+
+PR #15 has advanced from the initial AIRI chat/session candidate into a broader companion runtime stack.
+
+Direct bounded upstream adoption now includes:
+- **Project AIRI (MIT):** authority-aware conversation, stored/current message merge/dedupe, bounded history, Character Card fields, and renderer-neutral emotion vocabulary;
+- **Mem0 (Apache-2.0):** explicit memory update/delete/history lifecycle with auditable local change records;
+- **sherpa-onnx (Apache-2.0):** Android 16 kHz mono AudioRecord capture pattern and PCM16 normalization foundation.
+
+MyGPT-specific integration added:
+- ephemeral Book semantic context enters chat only as lower-authority application data and is not persisted in chat history or memory;
+- skin `3714430278` now has an approved MyGPT character card with persona/scenario/greeting/example-dialogue fields;
+- memory CLI supports `:remember`, `:update`, `:forget`, `:history`;
+- Android voice capture does not request microphone permission automatically and does not write raw audio to disk;
+- chat replies can carry AIRI-compatible `happy/sad/angry/think/surprised/awkward/question/curious/neutral` presentation emotions;
+- 3714430278 only maps exact authored matches (`smile/sad/surprise`); unsupported emotions fail safe to the current form's idle.
+
+Validation:
+- initial Python companion candidate: **18/18 local tests passed** before the later Book/card/memory-history/voice/emotion expansion;
+- independent local Java-8 smoke for PCM + emotion protocol: **PASS**;
+- GitHub Actions remains infrastructure-blocked: representative Brain run `36594289643` and Android run `36594581646` have `runner_id=0` and zero executed steps. These are not assertion/test failures;
+- exact-head full Python suite, live Ollama inference, microphone device capture and Xiaomi 14 chat/voice integration remain unaccepted.
+
+Current exact branch head at this checkpoint: `741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5`. Main remains untouched and PR #15 stays Draft.
+
+---
+
+## 2026-09-29 · AIRI-derived companion brain candidate · PR #15
+
+A new stacked draft branch `feat/airi-chat-memory-brain-20260929` now sits on top of the current PR #13 skin/Android line. This is the first bounded direct AIRI code adoption for MyGPT rather than a reference-only registry entry.
+
+Implemented:
+- chat message authority separation: system/developer vs application context;
+- AIRI-style durable/current merge and message dedupe;
+- bounded recent conversation compaction without silently converting old raw chat into semantic memory;
+- explicit SQLite long-term memory with Chinese tag/query support;
+- durable SQLite sessions and request receipts, including replay across process restarts;
+- loopback-only Ollama adapter at `127.0.0.1:11434/api/chat`;
+- runnable `brain/scripts/chat_local_ollama.py`, where long-term memory is created only through explicit `:remember`;
+- pinned AIRI MIT license and adaptation notice.
+
+Verification:
+- isolated local candidate suite: **18 passed / 0 failed**;
+- GitHub Actions run `36590899728` attempted twice but both ended before step 1 with `runner_id=0` and no steps, so remote code tests are **not executed**, not failed assertions;
+- no live Ollama model call has been accepted as evidence yet.
+
+Commits: `226c477d` (implementation) + `6438752d` (persistence hardening / CI branch enablement). Draft PR: #15. Main remains untouched. The existing Xiaomi 14 multi-form skin acceptance gate remains independently pending.
+
+---
+
 ## 2026-09-29 · 0.0.6 安装修复 + 三形态
 
 上一份 0.0.5 自包含 APK 在 Android 真机出现“解析软件包时出现问题”。复核确认 ZIP 本体和内置皮肤没有损坏；问题来自本地重签名步骤生成了结构错误的 APK v2 signer framing。0.0.5 设备包因此降级为不可用历史证据。

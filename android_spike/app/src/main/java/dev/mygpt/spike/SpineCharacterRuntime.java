@@ -60,6 +60,14 @@ public final class SpineCharacterRuntime implements CompanionCoordinator.Charact
         main.post(() -> fallback.setText(formLabel(form) + " · " + action));
     }
 
+    public void showEmotion(PresentationEmotion emotion) {
+        SkinCapabilityCatalog.Form form = renderer.currentForm();
+        String animation = SkinCapabilityCatalog.emotionAnimation(form, emotion);
+        renderer.requestAnimation(animation);
+        main.post(() -> fallback.setText(
+                formLabel(form) + " · " + emotion.wireValue + " · " + animation));
+    }
+
     @Override public void show(CompanionCoordinator.Cue cue) {
         renderer.requestCue(cue);
         main.post(() -> fallback.setText(cueText(cue)));

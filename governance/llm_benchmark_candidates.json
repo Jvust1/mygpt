@@ -1,0 +1,58 @@
+{
+  "schema": "mygpt.llm-benchmark-candidates.v2",
+  "updated_date": "2026-09-30",
+  "selection_policy": "BENCHMARK_ONLY_NO_DEFAULT_BEFORE_XIAOMI14_EVIDENCE",
+  "engine": {
+    "repo": "ggml-org/llama.cpp",
+    "pinned_commit": "ba0ba54d93b25faf1e149f4ccedd3e9d84798563",
+    "qwen35_supported": true
+  },
+  "identity_policy": "PINNED_HF_COMMIT_PLUS_EXACT_BYTES_PLUS_SHA256",
+  "candidates": [
+    {
+      "id": "speed",
+      "label": "Qwen3.5-0.8B-Q4_0",
+      "repo": "ggml-org/Qwen3.5-0.8B-GGUF",
+      "file": "Qwen3.5-0.8B-Q4_0.gguf",
+      "quant": "Q4_0",
+      "exact_size_bytes": 563036064,
+      "sha256": "57d1997790d1744fba5b40a7317df71ea5e2acee28c47e78f0cce39c0703f8cf",
+      "upstream_commit": "9447f74101aeb4e93621884dfa36ee8effb8831b",
+      "license": "Apache-2.0",
+      "role": "speed baseline",
+      "url": "https://huggingface.co/ggml-org/Qwen3.5-0.8B-GGUF/resolve/9447f74101aeb4e93621884dfa36ee8effb8831b/Qwen3.5-0.8B-Q4_0.gguf",
+      "source_verified_at": "2026-09-30",
+      "source_identity": "Hugging Face LFS/Xet pointer"
+    },
+    {
+      "id": "balanced",
+      "label": "Qwen3-1.7B-Q4_K_M",
+      "repo": "ggml-org/Qwen3-1.7B-GGUF",
+      "file": "Qwen3-1.7B-Q4_K_M.gguf",
+      "quant": "Q4_K_M",
+      "exact_size_bytes": 1282439264,
+      "sha256": "d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5",
+      "upstream_commit": "daeb8e2d528a760970442092f6bf1e55c3b659eb",
+      "license": "Apache-2.0",
+      "role": "balanced candidate",
+      "url": "https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF/resolve/daeb8e2d528a760970442092f6bf1e55c3b659eb/Qwen3-1.7B-Q4_K_M.gguf",
+      "source_verified_at": "2026-09-30",
+      "source_identity": "Hugging Face LFS/Xet pointer"
+    },
+    {
+      "id": "quality",
+      "label": "Qwen3-4B-Q4_K_M",
+      "repo": "ggml-org/Qwen3-4B-GGUF",
+      "file": "Qwen3-4B-Q4_K_M.gguf",
+      "quant": "Q4_K_M",
+      "exact_size_bytes": 2497280640,
+      "sha256": "ab27b9bfa375a178d6cba48f3ad892b94b7739659dcc7aae8058ce0ffed6b328",
+      "upstream_commit": "2f3b082b1356a6123f7ed71e65aea340da25d53c",
+      "license": "Apache-2.0",
+      "role": "quality ceiling candidate",
+      "url": "https://huggingface.co/ggml-org/Qwen3-4B-GGUF/resolve/2f3b082b1356a6123f7ed71e65aea340da25d53c/Qwen3-4B-Q4_K_M.gguf",
+      "source_verified_at": "2026-09-30",
+      "source_identity": "Hugging Face LFS/Xet pointer"
+    }
+  ]
+}

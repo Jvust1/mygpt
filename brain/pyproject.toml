@@ -10,6 +10,11 @@ requires-python = ">=3.11"
 dependencies = ["pydantic==2.13.4"]
 
 [project.optional-dependencies]
+agents = ["openai-agents"]
+mem0 = ["mem0ai"]
+livekit = ["livekit-agents"]
+realtime = ["pipecat-ai"]
+voice = ["openwakeword", "silero-vad"]
 integrations = ["pydantic-ai-slim==2.46.0", "mcp==2.2.0"]
 test = ["pytest==9.0.2", "pytest-asyncio==1.3.0"]
 

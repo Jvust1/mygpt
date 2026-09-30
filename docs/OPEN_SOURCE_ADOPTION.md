@@ -1,3 +1,45 @@
+## 2026-09-30 · Companion V2 multi-upstream direct adoption
+
+PR #15 now contains bounded direct/pinned integration from:
+- **AIRI / MIT** — authority-separated conversation, Character Card, emotion vocabulary and ACT control marker semantics.
+- **Mem0 / Apache-2.0** — explicit correctable memory lifecycle and audit history; Android adds full-erasure `purge`.
+- **llama.cpp / MIT** — full upstream git submodule pin plus real Android JNI bridge; no GGUF weights committed.
+- **sherpa-onnx / Apache-2.0** — source submodule pin, explicit runtime binary pin, 16 kHz streaming ASR and local Melo TTS; no model weights committed.
+- **EasyFloat / Apache-2.0** — only permission-free current-Activity drag/snap logic; no system overlay permission.
+- **Apache Commons Compress 1.28.0 / Apache-2.0** — dependency for direct official ZIP/TAR.BZ2/TAR.GZ model archive ingestion.
+
+The final candidate remains dependency-minimized: large model weights are user-selected inputs stored app-private, not vendored into Git. Book and Live repositories are not mutated.
+
+---
+
+## Additional direct adoption — Mem0 + sherpa-onnx + AIRI Character/Emotion (2026-09-29)
+
+- `mem0ai/mem0@94c3fe9f...` (Apache-2.0): adapted update/delete/history audit semantics into `brain/mygpt_brain/memory_store.py`. MyGPT keeps memory creation explicit and local; no transcript-wide auto-capture was enabled.
+- `k2-fsa/sherpa-onnx@040afe36...` (Apache-2.0): adapted the Android Java demo's 16 kHz mono AudioRecord/PCM normalization foundation. Recognizer/model weights are **not** bundled yet; microphone permission is not auto-requested.
+- `moeru-ai/airi@b40e3e87...` (MIT): added Character Card fields and the shared renderer-neutral emotion vocabulary. Imported cards cannot self-promote to system authority; explicit approval is required.
+
+Attribution and upstream licenses are stored under `third_party/airi`, `third_party/mem0`, and `third_party/sherpa-onnx`.
+
+---
+
+## Implemented bounded adoption — Project AIRI (2026-09-29)
+
+AIRI is no longer only a research reference. Draft PR #15 directly adapts a bounded MIT-licensed subset from pinned upstream commit `b40e3e87b149ea5fb75d4944440493829e601411`.
+
+Implemented in MyGPT:
+- authority-separated chat/context contracts;
+- stable stored/current message merge and deduplication;
+- bounded recent-turn compaction;
+- durable SQLite session persistence and idempotent request receipts;
+- explicit local memory (MyGPT-original integration layer; transcripts are not auto-promoted);
+- loopback-only Ollama provider adapter and local developer CLI.
+
+Attribution is mandatory and lives in `third_party/airi/LICENSE` + `third_party/airi/NOTICE.md`. This does **not** vendor the whole AIRI monorepo. Android Pocket/Tamagotchi and richer agent modules remain later candidates and must be adopted only when they directly advance the final MyGPT product.
+
+Verification at this checkpoint: local candidate tests 18/18 pass. GitHub Actions run 36590899728 failed twice before step 1 with runner_id=0, so remote code tests have not executed yet.
+
+---
+
 # mygpt Open-Source Adoption Plan
 
 Date: 2026-09-27

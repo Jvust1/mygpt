@@ -1,3 +1,186 @@
+## Latest handoff · Xiaomi 14 full matrix + native voice loopback ready · 2026-09-30
+
+Implementation checkpoint: `9920d53800ad1aec741630300283d385825fd986`; Draft PR #15; main untouched.
+
+Do not add more default-model guesses. Run the existing Windows acceptance route. For the broadest automatic gate, use the verified 3714430278 local source plus `-LlmMatrix -SherpaModels`. That path now exercises signed Book/supervision/PiP, three fixed GGUF performance runs, five fixed Chinese output samples per candidate, sherpa import/integrity, and an in-memory TTS->ASR native loopback. The final collector gathers all of those into one evidence directory.
+
+Important corrections:
+- prompt hard turn limit is 5200 chars; combined system+turn character guard is 7200;
+- LLM qualitative execution PASS does not mean “best model”;
+- synthetic voice loopback PASS does not replace live microphone or audible TTS testing;
+- GitHub hosted red runs are still zero-step runner-provisioning failures.
+
+Do not merge until Xiaomi 14 evidence exists.
+
+---
+
+## Latest handoff · verified 3714430278 auto-bundle path · 2026-09-30
+
+Branch/head: `feat/airi-chat-memory-brain-20260929` @ `90e5a8dc2528951fa664412a8ae66ec45a018e01`; Draft PR #15; main untouched.
+
+Use `android_llm_spike/scripts/build_and_install_companion_v2.ps1`. If Google Drive Desktop exposes the verified `Live/skin/workshop/3714430278/3714430278.zip`, the script should find it automatically. You can also pass `-SkinZip` or `MYGPT_SKIN_ZIP`.
+
+A skin is never bundled by filename alone: exact 12,342,220-byte size and fixed SHA-256 are required before copying, and the APK entry is SHA-verified again after build. The binary stays outside Git.
+
+With a bundled skin, Companion V2 auto-installs it at first launch and the Windows acceptance route automatically exercises PiP above the Book test sender. If no local verified ZIP is available, the APK remains valid and exposes the manual picker.
+
+Next unresolved device inputs are a benchmark candidate **chat** GGUF and sherpa ASR/optional TTS model packages. Do not use the Drive Qwen-Image GGUF as the conversation brain.
+
+Do not merge PR #15 before Xiaomi 14 evidence.
+
+---
+
+## Latest handoff · pre-device hardening complete · 2026-09-30
+
+Current exact head: `4efd70b716ab35f94af7556ee7ed5149e77d60a9`; Draft PR #15; main untouched.
+
+Before adding more product features, run the existing Windows/Xiaomi 14 path. Current code now includes prompt budgeting, verified sherpa fingerprints, off-main model restore verification, active signed-state expiry, PiP microphone stop, and interrupted-llama session recovery.
+
+Use:
+`android_llm_spike/scripts/build_and_install_companion_v2.ps1`
+
+After 3714430278 is loaded, run:
+`android_llm_spike/scripts/test_companion_pip.ps1`
+
+Then import a candidate GGUF + sherpa ASR/TTS, run the in-app benchmark and local chat/voice/memory checks, then:
+`android_llm_spike/scripts/collect_companion_v2_evidence.ps1`
+
+Do not claim the current head builds yet: hosted jobs still receive no runner and execute zero steps. Do not merge PR #15.
+
+---
+
+## Latest handoff · Book client SDK ready · 2026-09-30
+
+Current branch/head: `feat/airi-chat-memory-brain-20260929` @ `2e687fd348edfe1e787cb6634f272df69c05e0cf`; Draft PR #15; main untouched.
+
+The future real Book Android producer no longer needs to reimplement the broadcast protocol. Use `android_llm_spike/book-client-sdk` / `book-client-sdk-release.aar`. The synthetic same-signature device sender now uses the same SDK, so the Xiaomi 14 acceptance route validates the intended producer API rather than a separate hand-written intent path.
+
+Do not describe Book as connected yet. Remaining Book-side gates are:
+1. build the AAR at this exact head;
+2. pass the same-signature synthetic sender gates on Xiaomi 14;
+3. adopt the AAR in Jvust/Book;
+4. verify Book and Companion signing identities;
+5. replace synthetic inputs with bounded real structured Book projections.
+
+GitHub Actions remains infrastructure-blocked before step 1 (runner_id=0). Do not merge PR #15.
+
+---
+
+## Latest handoff · PR #15 · exact head 907208ac0db090635fcf1fc342223ad51f97fdaa
+
+The current branch has a unified 3714430278 persona source and an automated
+quiet-supervision agency gate. Do not duplicate the persona in Android or weaken
+the signature permission.
+
+Next command on Windows:
+
+`powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\build_and_install_companion_v2.ps1`
+
+The script invokes the supervision gate automatically. After manual skin/model/
+voice/PiP checks and the in-app llama benchmark, run:
+
+`powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\collect_companion_v2_evidence.ps1`
+
+Do not merge until the exact-head local/device evidence exists.
+
+---
+
+## Latest handoff · PR #15 · PiP + quiet-first supervision gate ready
+
+Current exact head: `4d26563d8c03453f27c9a31186a484004d6d1535`.
+
+Do not wait for hosted Actions; they still fail before runner allocation. Run:
+
+`android_llm_spike/scripts/build_and_install_companion_v2.ps1`
+
+The Windows script now automatically checks same-signature Book context and invokes:
+
+`android_llm_spike/scripts/test_companion_supervision.ps1`
+
+That supervision gate proves Book cannot independently turn on proactive supervision: the same signed repeated-error event remains QUIET before the MyGPT-local opt-in tap and becomes GENTLE_CHECK_IN only after that tap.
+
+After installing/importing the real skin/models, validate PiP above Book, run the local llama benchmark, test ASR/TTS/memory, then run:
+
+`android_llm_spike/scripts/collect_companion_v2_evidence.ps1`
+
+Main remains untouched; PR #15 remains Draft; Book/Live repositories are not modified.
+
+---
+
+## Latest handoff · PR #15 · local-device gate ready
+
+Current head: `5b932e6f1bbe1ca7db645802475d50b322c32ec4`.
+
+The next operator should **not wait on GitHub hosted runners**. Use the pinned Windows wrapper path:
+
+`android_llm_spike/scripts/build_and_install_companion_v2.ps1`
+
+Then follow:
+
+`docs/COMPANION_V2_XIAOMI14_ACCEPTANCE.md`
+
+After manual Book/skin/GGUF/ASR/TTS/memory/benchmark checks, collect final evidence with:
+
+`android_llm_spike/scripts/collect_companion_v2_evidence.ps1`
+
+Important boundaries remain:
+- main untouched; PR #15 Draft;
+- Book/Live repositories untouched;
+- real Book producer not yet connected;
+- synthetic Book sender is test-only;
+- Companion V2 has no INTERNET, SYSTEM_ALERT_WINDOW or broad-storage permission;
+- Book context stays process-memory only;
+- recent conversation is not semantic long-term memory;
+- model weights remain external user inputs.
+
+Do not mark Companion V2 accepted until the exact-head local build and Xiaomi 14 evidence package exist.
+
+---
+
+## Latest handoff · 2026-09-30 · PR #15 Companion V2 all-local candidate
+
+Current branch/head: `feat/airi-chat-memory-brain-20260929` @ `a83680c1810242d541941b6c2b1a361c8d00bf71`; Draft PR #15; base `feat/spine-3714430278-runtime-refresh-20260929`; main untouched.
+
+Current candidate is no longer just an AIRI chat experiment. The isolated Companion V2 code now combines:
+`3714430278 Spine + app-private GGUF + llama.cpp JNI + sherpa streaming ASR + optional Melo TTS + explicit Android memory + AIRI ACT emotion`.
+
+Runtime intent is fully local after models/skin are imported. Companion V2 requests only RECORD_AUDIO; it does not request INTERNET, SYSTEM_ALERT_WINDOW or broad storage access. Model weights remain external inputs and are not committed.
+
+Do **not** claim the new APKs/AARs build successfully yet. GitHub hosted Actions still fail before runner allocation; exact-head runs `36659174083`, `36659174123`, and `36659174091` all show runner_id=0 and zero steps. Earlier accepted PR #13 / v0.0.6 skin evidence remains historical and must not be overwritten.
+
+Highest-value next step: execute the exact-head llama/sherpa/Companion V2 builds on a functioning runner, then install on Xiaomi 14 and test model load, typed chat, mic ASR, TTS, memory and 3714430278 reactions. After that, connect real authenticated Book context. Do not auto-merge.
+
+---
+
+## Latest parallel checkpoint · PR #15 companion runtime expansion
+
+Draft PR #15 is now at `741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5`, stacked on the current PR #13 skin branch. It contains direct, attributed code adoption from AIRI (MIT), Mem0 (Apache-2.0) and sherpa-onnx (Apache-2.0).
+
+The current added layers are:
+`Book ephemeral context -> authority-aware chat -> explicit/auditable memory -> local Ollama interface -> renderer-neutral emotion`, plus an Android PCM capture foundation for future offline ASR.
+
+Important limits:
+- Book/Live repositories were not modified;
+- no raw Book context is persisted by the chat candidate;
+- no chat transcript is auto-promoted to memory;
+- no real Ollama call accepted yet;
+- microphone permission is not automatically requested;
+- raw audio is not stored;
+- GitHub Actions is presently failing before runner allocation (`runner_id=0`, zero steps), so do not report remote CI as passed or as a code assertion failure;
+- Android physical-device acceptance remains pending.
+
+Use `third_party/*/NOTICE.md` and `governance/open_source_sources.json` before further direct code copying. Do not auto-merge PR #15.
+
+---
+
+## Parallel candidate · PR #15 · AIRI chat/memory brain
+
+A stacked draft PR #15 (`feat/airi-chat-memory-brain-20260929` → `feat/spine-3714430278-runtime-refresh-20260929`) now contains the first bounded direct AIRI adoption: authority-aware chat contracts, durable local sessions/request receipts, explicit SQLite memory, and a loopback-only Ollama adapter. AIRI is pinned at `b40e3e87b149ea5fb75d4944440493829e601411` under MIT with in-repo attribution. Local isolated tests are 18/18; GitHub run `36590899728` failed twice before allocating a runner, so remote tests remain pending. Do not describe this as live-model or Android acceptance yet. Do not auto-merge.
+
+The Android/skin Xiaomi 14 gate below remains valid and independent; PR #15 must not overwrite that historical/device state.
+
+---
+
 ## 当前接手点 · Spine exact-head CI 通过，进入小米 14 真机门
 
 - 分支：`feat/android-companion-boundary-20260928`；Draft PR #10；精确 head `a076be06e2e4c3eeecdab3f1860143771bfef0d3`；未合并，main 未修改。

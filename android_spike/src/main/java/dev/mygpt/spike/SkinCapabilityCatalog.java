@@ -78,4 +78,19 @@ public final class SkinCapabilityCatalog {
             default: return "smile";
         }
     }
+
+    /**
+     * Conservative emotion mapping for the current authored package.
+     * Only exact semantic matches are used; unsupported emotions fall back to
+     * the current form's idle instead of guessing with combat animations.
+     */
+    public static String emotionAnimation(Form form, PresentationEmotion emotion) {
+        if (form != Form.DEFAULT) return idle(form);
+        switch (emotion) {
+            case HAPPY: return contains(form, "smile") ? "smile" : idle(form);
+            case SAD: return contains(form, "sad") ? "sad" : idle(form);
+            case SURPRISED: return contains(form, "surprise") ? "surprise" : idle(form);
+            default: return idle(form);
+        }
+    }
 }
