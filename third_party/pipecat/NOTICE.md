@@ -24,6 +24,11 @@ BSD-2-Clause, source repository `pipecat-ai/pipecat`.
 - `src/pipecat/frames/frames.py`,
   Git blob `bd2bde1f592d18e60f0faf8c98052c7cce90aa6b`
   - response and interruption frame contract used by the actual runtime
+- `src/pipecat/utils/asyncio/task_manager.py`,
+  Git blob `35bdec122c78829d45412dbe8ae8637891269ebd`
+  - `TaskManager.cancel_task` ownership distinction between a cancelled child
+    and a newly cancelled caller is directly adapted into
+    `brain/mygpt_brain/voice_activation.py`
 
 Derived/adapted local file: `brain/mygpt_brain/pipecat_bridge.py`.
 Runtime verification uses the separately version-pinned PyPI release
@@ -36,3 +41,13 @@ is rejected before SQLite commit; stale response-end frames are suppressed after
 interruption; only cleaned visible text and presentation metadata go downstream.
 Provider errors are sanitized. No OpenAI backend, cloud transport, model or audio
 device is enabled by this integration.
+
+## Wake/ASR entry-path completion
+
+The existing `VoiceActivationRuntime` now owns and cancels its active asynchronous
+ASR/model task when a newer wake-qualified utterance supersedes it. The port keeps
+the self-await guard and cancellation-count check; MyGPT additionally suppresses
+obsolete child errors without logging source text, preserves external caller
+cancellation across all teardown outcomes, and keeps retiring tasks owned until
+completion. Generation guards run after transcription, before chat commit and
+before caller delivery. No Pipecat SDK import is needed by this local path.

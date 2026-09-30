@@ -1,3 +1,13 @@
+## 2026-09-30 · Pipecat task ownership completes wake/ASR path
+
+The existing wake/ASR entry now directly uses Pipecat-derived cancellation
+ownership and always-enforced generation guards. New qualified utterances
+supersede old ASR/model work; close joins retiring tasks; external cancellation
+and failure recovery preserve correct state. Strict Brain acceptance passes
+612/0/0 on Python 3.12/3.13. See [scope and reproduction](WAKE_TURN_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · official Ollama async HTTP runtime fusion candidate
 
 The existing Ollama responder now directly uses the official async lifecycle
