@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":bridge"))
     implementation(libs.androidx.core.ktx)
     implementation("com.github.k2-fsa.sherpa-onnx:sherpa-onnx:v1.13.8")
+    implementation("org.apache.commons:commons-compress:1.28.0")
     implementation("com.esotericsoftware.spine:spine-libgdx:$spineVersion")
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")

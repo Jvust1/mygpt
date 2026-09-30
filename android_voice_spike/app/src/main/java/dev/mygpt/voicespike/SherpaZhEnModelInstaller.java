@@ -7,11 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * Imports the official bilingual streaming Zipformer model into app-private storage.
+ * Accepts ZIP, TAR.BZ2, or TAR.GZ archives.
  */
 public final class SherpaZhEnModelInstaller {
     private static final long MAX_TOTAL_BYTES = 1024L * 1024L * 1024L;
@@ -23,11 +22,15 @@ public final class SherpaZhEnModelInstaller {
     private static final String TOKENS = "tokens.txt";
 
     private static final Set<String> REQUIRED = new HashSet<>();
+    private static final Set<String> OPTIONAL_NOTICE = new HashSet<>();
     static {
         REQUIRED.add(ENCODER);
         REQUIRED.add(DECODER);
         REQUIRED.add(JOINER);
         REQUIRED.add(TOKENS);
+        OPTIONAL_NOTICE.add("LICENSE");
+        OPTIONAL_NOTICE.add("LICENSE.txt");
+        OPTIONAL_NOTICE.add("README.md");
     }
 
     public static final class Installed {
@@ -64,36 +67,35 @@ public final class SherpaZhEnModelInstaller {
         deleteRecursively(temp);
         if (!temp.mkdirs()) throw new IOException("failed to create temporary ASR directory");
 
-        long total = 0L;
-        Set<String> seen = new HashSet<>();
+        final long[] total = {0L};
+        Set<String> seenRequired = new HashSet<>();
+        Set<String> seenAll = new HashSet<>();
         boolean committed = false;
-        try (ZipInputStream zip = new ZipInputStream(source)) {
-            ZipEntry entry;
-            byte[] buffer = new byte[1024 * 1024];
-            while ((entry = zip.getNextEntry()) != null) {
-                if (entry.isDirectory()) continue;
-                String name = basename(entry.getName());
-                if (!REQUIRED.contains(name)) continue;
-                if (!seen.add(name)) throw new IOException("duplicate ASR model entry: " + name);
+
+        try {
+            ModelArchiveReader.forEachEntry(source, (entryName, directory, input) -> {
+                if (directory) return;
+
+                String name = basename(entryName);
+                boolean required = REQUIRED.contains(name);
+                boolean notice = OPTIONAL_NOTICE.contains(name);
+                if (!required && !notice) return;
+                if (!seenAll.add(name)) {
+                    throw new IOException("duplicate ASR model entry: " + name);
+                }
 
                 File out = new File(temp, name);
-                long fileBytes = 0L;
-                try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(out))) {
-                    while (true) {
-                        int count = zip.read(buffer);
-                        if (count < 0) break;
-                        fileBytes += count;
-                        total += count;
-                        if (fileBytes > MAX_ONE_FILE_BYTES || total > MAX_TOTAL_BYTES) {
-                            throw new IOException("ASR model package exceeds size limits");
-                        }
-                        stream.write(buffer, 0, count);
+                long fileBytes = copyBounded(input, out, total);
+                if (required) {
+                    if (fileBytes == 0L) {
+                        throw new IOException("empty ASR model file: " + name);
                     }
+                    seenRequired.add(name);
                 }
-            }
+            });
 
-            if (!seen.equals(REQUIRED)) {
-                throw new IOException("ASR model ZIP missing required files: " + missing(seen));
+            if (!seenRequired.equals(REQUIRED)) {
+                throw new IOException("ASR model archive missing required files: " + missing(seenRequired));
             }
 
             Installed staged = new Installed(temp);
@@ -113,6 +115,26 @@ public final class SherpaZhEnModelInstaller {
     public static Installed existing(File modelsRoot) {
         Installed installed = new Installed(new File(modelsRoot, "sherpa-zh-en-streaming"));
         return installed.isComplete() ? installed : null;
+    }
+
+    private static long copyBounded(InputStream input, File out, long[] total)
+            throws IOException {
+        byte[] buffer = new byte[1024 * 1024];
+        long fileBytes = 0L;
+        try (BufferedOutputStream stream =
+                     new BufferedOutputStream(new FileOutputStream(out))) {
+            while (true) {
+                int count = input.read(buffer);
+                if (count < 0) break;
+                fileBytes += count;
+                total[0] += count;
+                if (fileBytes > MAX_ONE_FILE_BYTES || total[0] > MAX_TOTAL_BYTES) {
+                    throw new IOException("ASR model archive exceeds size limits");
+                }
+                stream.write(buffer, 0, count);
+            }
+        }
+        return fileBytes;
     }
 
     private static String basename(String value) {

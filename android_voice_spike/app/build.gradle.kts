@@ -25,4 +25,5 @@ android {
 
 dependencies {
     implementation("com.github.k2-fsa.sherpa-onnx:sherpa-onnx:v1.13.8")
+    implementation("org.apache.commons:commons-compress:1.28.0")
 }

@@ -7,11 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * Imports sherpa-onnx vits-melo-tts-zh_en into app-private storage.
+ * Accepts ZIP, TAR.BZ2, or TAR.GZ archives.
  *
  * Runtime-required model files are copied with strict basename allowlisting.
  * README/LICENSE are preserved when present so model provenance is not discarded.
@@ -83,48 +82,37 @@ public final class SherpaMeloTtsModelInstaller {
         deleteRecursively(temp);
         if (!temp.mkdirs()) throw new IOException("failed to create temporary TTS directory");
 
-        long total = 0L;
+        final long[] total = {0L};
         Set<String> seenRequired = new HashSet<>();
         Set<String> seenAll = new HashSet<>();
         boolean committed = false;
 
-        try (ZipInputStream zip = new ZipInputStream(source)) {
-            ZipEntry entry;
-            byte[] buffer = new byte[1024 * 1024];
+        try {
+            ModelArchiveReader.forEachEntry(source, (entryName, directory, input) -> {
+                if (directory) return;
 
-            while ((entry = zip.getNextEntry()) != null) {
-                if (entry.isDirectory()) continue;
-                String name = basename(entry.getName());
+                String name = basename(entryName);
                 boolean required = REQUIRED.contains(name);
                 boolean notice = OPTIONAL_NOTICE.contains(name);
-                if (!required && !notice) continue;
-                if (!seenAll.add(name)) throw new IOException("duplicate TTS entry: " + name);
+                if (!required && !notice) return;
+                if (!seenAll.add(name)) {
+                    throw new IOException("duplicate TTS model entry: " + name);
+                }
 
                 File out = new File(temp, name);
-                long fileBytes = 0L;
-                try (BufferedOutputStream stream =
-                             new BufferedOutputStream(new FileOutputStream(out))) {
-                    while (true) {
-                        int count = zip.read(buffer);
-                        if (count < 0) break;
-                        fileBytes += count;
-                        total += count;
-                        if (fileBytes > MAX_ONE_FILE_BYTES || total > MAX_TOTAL_BYTES) {
-                            throw new IOException("TTS model package exceeds size limits");
-                        }
-                        stream.write(buffer, 0, count);
-                    }
-                }
+                long fileBytes = copyBounded(input, out, total);
                 if (required) {
-                    if (fileBytes == 0L) throw new IOException("empty TTS model file: " + name);
+                    if (fileBytes == 0L) {
+                        throw new IOException("empty TTS model file: " + name);
+                    }
                     seenRequired.add(name);
                 }
-            }
+            });
 
             if (!seenRequired.equals(REQUIRED)) {
                 Set<String> missing = new HashSet<>(REQUIRED);
                 missing.removeAll(seenRequired);
-                throw new IOException("TTS model ZIP missing required files: " + missing);
+                throw new IOException("TTS model archive missing required files: " + missing);
             }
 
             Installed staged = new Installed(temp);
@@ -144,6 +132,26 @@ public final class SherpaMeloTtsModelInstaller {
     public static Installed existing(File modelsRoot) {
         Installed installed = new Installed(new File(modelsRoot, "sherpa-melo-zh-en-tts"));
         return installed.isComplete() ? installed : null;
+    }
+
+    private static long copyBounded(InputStream input, File out, long[] total)
+            throws IOException {
+        byte[] buffer = new byte[1024 * 1024];
+        long fileBytes = 0L;
+        try (BufferedOutputStream stream =
+                     new BufferedOutputStream(new FileOutputStream(out))) {
+            while (true) {
+                int count = input.read(buffer);
+                if (count < 0) break;
+                fileBytes += count;
+                total[0] += count;
+                if (fileBytes > MAX_ONE_FILE_BYTES || total[0] > MAX_TOTAL_BYTES) {
+                    throw new IOException("TTS model archive exceeds size limits");
+                }
+                stream.write(buffer, 0, count);
+            }
+        }
+        return fileBytes;
     }
 
     private static String basename(String value) {
