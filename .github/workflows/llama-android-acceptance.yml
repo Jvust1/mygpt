@@ -30,7 +30,7 @@ jobs:
   companion-v2:
     if: github.repository == 'Jvust/mygpt'
     runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    timeout-minutes: 55
 
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
@@ -53,7 +53,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           llama="$(git -C third_party/llama.cpp/upstream rev-parse HEAD)"
           sherpa="$(git -C third_party/sherpa-onnx/upstream rev-parse HEAD)"
 
@@ -67,12 +66,12 @@ jobs:
           echo "llama pin:  $llama"
           echo "sherpa pin: $sherpa"
 
-      - name: Verify Companion V2 permission boundary
+      - name: Verify source permission boundary
         shell: bash
         run: |
           set -euo pipefail
-
           manifest="android_llm_spike/companion/src/main/AndroidManifest.xml"
+          debug_manifest="android_llm_spike/companion/src/debug/AndroidManifest.xml"
           sender="android_llm_spike/book-sender-test/src/main/AndroidManifest.xml"
 
           grep -q 'android.permission.RECORD_AUDIO' "$manifest"
@@ -86,24 +85,29 @@ jobs:
           ! grep -q 'WRITE_EXTERNAL_STORAGE' "$manifest"
           ! grep -q 'MANAGE_EXTERNAL_STORAGE' "$manifest"
 
-          echo "Companion V2 manifest boundary PASS"
+          grep -q 'DebugModelImportReceiver' "$debug_manifest"
+          grep -q 'IMPORT_ACCEPTANCE_MODEL_V1' "$debug_manifest"
+          ! grep -q 'DebugModelImportReceiver' "$manifest"
+          ! grep -q 'IMPORT_ACCEPTANCE_MODEL_V1' "$manifest"
+
+          echo "Companion V2 source permission/debug boundary PASS"
 
       - name: Install llama.cpp Android native toolchain
         shell: bash
         run: |
           set -euo pipefail
           yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "ndk;29.0.13113456" "cmake;3.31.6"
+          sdkmanager             "platform-tools"             "platforms;android-36"             "build-tools;36.0.0"             "ndk;29.0.13113456"             "cmake;3.31.6"
 
-      - name: Build llama JNI, bridge, local chat, Companion V2 and Book sender
+      - name: Build local stack including Companion debug and release
         shell: bash
         env:
           ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13113456
         run: |
           set -euo pipefail
-          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             :companion:assembleDebug             :book-sender-test:assembleDebug             :book-client-sdk:assembleRelease             --no-daemon             --stacktrace
+          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             :companion:assembleDebug             :companion:assembleRelease             :book-sender-test:assembleDebug             :book-client-sdk:assembleRelease             --no-daemon             --stacktrace
 
-      - name: Verify AAR and APK payloads
+      - name: Verify AAR/APK payloads and debug-only receiver isolation
         shell: bash
         run: |
           set -euo pipefail
@@ -111,24 +115,29 @@ jobs:
           llama_aar="third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
           bridge_aar="android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
           local_apk="android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
-          companion_apk="android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
+          debug_apk="android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
           sender_apk="android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
           book_sdk_aar="android_llm_spike/book-client-sdk/build/outputs/aar/book-client-sdk-release.aar"
+          release_apk="$(find android_llm_spike/companion/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)"
 
           test -f "$llama_aar"
           test -f "$bridge_aar"
           test -f "$local_apk"
-          test -f "$companion_apk"
+          test -f "$debug_apk"
           test -f "$sender_apk"
           test -f "$book_sdk_aar"
+          test -n "$release_apk"
+          test -f "$release_apk"
 
-          python - <<'PY'
+          DEBUG_APK="$debug_apk" RELEASE_APK="$release_apk" python - <<'PY'
+          import os
           import zipfile
 
           llama_aar = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
           bridge_aar = "android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
           local_apk = "android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
-          companion_apk = "android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
+          debug_apk = os.environ["DEBUG_APK"]
+          release_apk = os.environ["RELEASE_APK"]
           sender_apk = "android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
           book_sdk_aar = "android_llm_spike/book-client-sdk/build/outputs/aar/book-client-sdk-release.aar"
 
@@ -137,34 +146,10 @@ jobs:
               native = [n for n in names if n.endswith("/libai-chat.so")]
               if "classes.jar" not in names or not native:
                   raise SystemExit("llama AAR missing classes.jar or libai-chat.so")
-              print("llama AAR PASS:", native)
 
           with zipfile.ZipFile(bridge_aar) as z:
               if "classes.jar" not in set(z.namelist()):
                   raise SystemExit("MyGPT bridge AAR missing classes.jar")
-              print("MyGPT bridge AAR PASS")
-
-          with zipfile.ZipFile(local_apk) as z:
-              names = set(z.namelist())
-              native = [n for n in names if n.endswith("/libai-chat.so")]
-              if "classes.dex" not in names or not native:
-                  raise SystemExit("local LLM APK missing classes.dex or libai-chat.so")
-              print("local LLM APK PASS:", native)
-
-          with zipfile.ZipFile(companion_apk) as z:
-              names = set(z.namelist())
-              llama = [n for n in names if n.endswith("/libai-chat.so")]
-              gdx = [n for n in names if n.endswith("/libgdx.so")]
-              sherpa = [n for n in names if n.endswith("/libsherpa-onnx-jni.so")]
-              if "classes.dex" not in names or not llama or not gdx or not sherpa:
-                  raise SystemExit(
-                      "Companion V2 missing classes.dex, llama, gdx, or sherpa JNI"
-                  )
-              if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
-                  raise SystemExit("Companion V2 missing Spine runtime license notice")
-              if "assets/3714430278.json" not in names:
-                  raise SystemExit("Companion V2 missing shared 3714430278 Character Card")
-              print("Companion V2 APK PASS:", llama, gdx, sherpa)
 
           with zipfile.ZipFile(book_sdk_aar) as z:
               names = set(z.namelist())
@@ -173,12 +158,58 @@ jobs:
               manifest = z.read("AndroidManifest.xml").decode("utf-8", errors="ignore")
               if "dev.mygpt.companionv2.permission.BOOK_CONTEXT" not in manifest:
                   raise SystemExit("Book client SDK AAR missing signature-permission request")
-              print("Book client SDK AAR PASS")
+
+          def apk_payload(path):
+              with zipfile.ZipFile(path) as z:
+                  names = set(z.namelist())
+                  dex_names = sorted(
+                      n for n in names
+                      if n.startswith("classes") and n.endswith(".dex")
+                  )
+                  dex = b"".join(z.read(n) for n in dex_names)
+                  return names, dex
+
+          local_names, _ = apk_payload(local_apk)
+          if "classes.dex" not in local_names:
+              raise SystemExit("local LLM APK missing classes.dex")
+          if not any(n.endswith("/libai-chat.so") for n in local_names):
+              raise SystemExit("local LLM APK missing libai-chat.so")
+
+          debug_names, debug_dex = apk_payload(debug_apk)
+          release_names, release_dex = apk_payload(release_apk)
+
+          for names, label in ((debug_names, "debug"), (release_names, "release")):
+              if "classes.dex" not in names:
+                  raise SystemExit(f"Companion {label} APK missing classes.dex")
+              if not any(n.endswith("/libai-chat.so") for n in names):
+                  raise SystemExit(f"Companion {label} APK missing llama JNI")
+              if not any(n.endswith("/libgdx.so") for n in names):
+                  raise SystemExit(f"Companion {label} APK missing libgdx.so")
+              if not any(n.endswith("/libsherpa-onnx-jni.so") for n in names):
+                  raise SystemExit(f"Companion {label} APK missing sherpa JNI")
+              if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
+                  raise SystemExit(f"Companion {label} APK missing Spine license")
+              if "assets/3714430278.json" not in names:
+                  raise SystemExit(f"Companion {label} APK missing Character Card")
+
+          receiver_marker = b"DebugModelImportReceiver"
+          action_marker = b"dev.mygpt.companionv2.debug.IMPORT_ACCEPTANCE_MODEL_V1"
+
+          if receiver_marker not in debug_dex or action_marker not in debug_dex:
+              raise SystemExit("debug APK missing expected acceptance receiver/action")
+
+          if receiver_marker in release_dex or action_marker in release_dex:
+              raise SystemExit(
+                  "SECURITY FAILURE: debug acceptance receiver/action leaked into release APK"
+              )
 
           with zipfile.ZipFile(sender_apk) as z:
               if "classes.dex" not in set(z.namelist()):
                   raise SystemExit("Book context sender APK missing classes.dex")
-              print("Book context sender APK PASS")
+
+          print("Companion debug/release isolation PASS")
+          print("debug:", debug_apk)
+          print("release:", release_apk)
           PY
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -189,6 +220,7 @@ jobs:
             android_llm_spike/bridge/build/outputs/aar/bridge-release.aar
             android_llm_spike/app/build/outputs/apk/debug/app-debug.apk
             android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk
+            android_llm_spike/companion/build/outputs/apk/release/*.apk
             android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk
             android_llm_spike/book-client-sdk/build/outputs/aar/book-client-sdk-release.aar
           if-no-files-found: error
