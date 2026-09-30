@@ -1,6 +1,7 @@
 import asyncio
 
 from mygpt_brain.livekit_bridge import LiveKitAgentBridge
+from mygpt_brain.turn_control import VoiceTurnController
 
 
 class FakeSession:
@@ -49,4 +50,25 @@ def test_livekit_bridge_only_speaks_after_voice_gate_ready():
         assert session.spoken == []
         assert await bridge.say_when_ready(Gate(True), "回应") is True
         assert session.spoken == [("回应", False)]
+    asyncio.run(run())
+
+
+
+def test_livekit_bridge_skips_stale_turn_after_user_interrupt():
+    async def run():
+        turns = VoiceTurnController()
+        session = FakeSession()
+        bridge = LiveKitAgentBridge(session, turn_controller=turns)
+        await bridge.start(agent="agent", room="room")
+
+        stale = turns.begin_user_turn()
+        assert turns.begin_assistant_turn(stale) is True
+        current = turns.begin_user_turn()
+        assert current.interrupted_previous is True
+
+        assert await bridge.say_for_turn("旧回复", stale) is None
+        assert session.spoken == []
+        assert await bridge.say_for_turn("新回复", current) == "speech-handle"
+        assert session.spoken == [("新回复", True)]
+
     asyncio.run(run())
