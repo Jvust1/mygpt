@@ -1,18 +1,23 @@
-"""Optional Pipecat text bridge for the mygpt companion brain.
+"""Pipecat response lifecycle fused with the mygpt companion brain.
 
 Upstream: pipecat-ai/pipecat @
 49dea682fb84bfc515d881d00dfeaaa9e9f1075f (BSD-2-Clause).
 
 Pipecat owns realtime transports/STT/TTS/frame flow. mygpt keeps persona,
 memory, Book context and supervision policy inside CompanionChatRuntime.
+
+The response Start/try/End lifecycle is adapted from Pipecat's
+src/pipecat/services/openai/base_llm.py at the pinned revision.
+Copyright (c) 2024–2026, Daily. BSD-2-Clause; third_party/pipecat/LICENSE.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
-from typing import Any, Callable
+from typing import Any
 
-from .companion_chat import CompanionChatRuntime
+from .companion_chat import CompanionChatRuntime, SupersededChatTurn
+from .turn_control import TurnLease, VoiceTurnController
 
 
 @dataclass(frozen=True)
@@ -26,12 +31,32 @@ class PipecatCompanionReply:
 class PipecatCompanionBridge:
     """Convert finalized transcriptions into CompanionChatRuntime turns."""
 
-    def __init__(self, companion: CompanionChatRuntime, *, session_id: str) -> None:
+    def __init__(
+        self, companion: CompanionChatRuntime, *, session_id: str,
+        turn_controller: VoiceTurnController | None = None,
+    ) -> None:
         if not isinstance(session_id, str) or not session_id.strip():
             raise ValueError("session_id must be non-empty")
         self.companion = companion
         self.session_id = session_id.strip()
         self._turn = 0
+        self.turn_controller = turn_controller or VoiceTurnController()
+        self.closed = False
+
+    def begin_turn(self) -> TurnLease:
+        if self.closed:
+            raise RuntimeError("Pipecat companion session is closed")
+        return self.turn_controller.begin_user_turn()
+
+    def is_current(self, lease: TurnLease) -> bool:
+        return not self.closed and self.turn_controller.is_current(lease)
+
+    def interrupt(self) -> None:
+        self.turn_controller.begin_user_turn()
+
+    def close(self) -> None:
+        self.closed = True
+        self.interrupt()
 
     def _request_id(self, text: str) -> str:
         self._turn += 1
@@ -40,20 +65,32 @@ class PipecatCompanionBridge:
         ).hexdigest()[:20]
         return f"pipecat-{digest}"
 
-    async def respond(self, text: str, *, request_id: str | None = None) -> PipecatCompanionReply:
+    async def respond(
+        self, text: str, *, request_id: str | None = None, lease: TurnLease | None = None,
+    ) -> PipecatCompanionReply:
         transcript = str(text).strip()
         if not transcript:
             raise ValueError("transcription text must be non-empty")
         rid = request_id or self._request_id(transcript)
-        result = await self.companion.send(
-            {
-                "schema_version": "mygpt.companion-chat.v1",
-                "request_id": rid,
-                "session_id": self.session_id,
-                "persona_id": self.companion.persona.persona_id,
-                "text": transcript,
-            }
-        )
+        lease = lease or self.begin_turn()
+        if not self.is_current(lease):
+            raise SupersededChatTurn("companion turn superseded")
+        self.turn_controller.begin_assistant_turn(lease)
+        try:
+            result = await self.companion.send(
+                {
+                    "schema_version": "mygpt.companion-chat.v1",
+                    "request_id": rid,
+                    "session_id": self.session_id,
+                    "persona_id": self.companion.persona.persona_id,
+                    "text": transcript,
+                },
+                is_current=lambda: self.is_current(lease),
+            )
+            if not self.is_current(lease):
+                raise SupersededChatTurn("companion turn superseded")
+        finally:
+            self.turn_controller.finish_assistant_turn(lease)
         return PipecatCompanionReply(
             request_id=result.request_id,
             session_id=result.session_id,
@@ -67,42 +104,80 @@ def create_pipecat_companion_processor(
     *,
     forward_transcription: bool = False,
     frame_processor_base: type[Any] | None = None,
-    transcription_frame_type: type[Any] | None = None,
-    text_frame_type: type[Any] | None = None,
+    frame_types: Any | None = None,
+    downstream_direction: Any | None = None,
 ) -> Any:
     """Create a Pipecat FrameProcessor lazily.
 
-    Tests may inject frame classes; production imports Pipecat only here.
-    Final TranscriptionFrame input is converted into a TextFrame reply that
-    downstream Pipecat TTS/output processors can consume.
+    Tests may inject the frame module and processor base. Production lazily
+    imports the pinned Pipecat API. Final downstream transcriptions become
+    Start -> LLMText -> End, so TTS flushes short responses. Interruption and
+    CancelFrame invalidate the turn before Pipecat cancels its processing task.
+    EndFrame is graceful: it closes after previously queued work has drained.
     """
-    if frame_processor_base is None or transcription_frame_type is None or text_frame_type is None:
+    if frame_processor_base is None or frame_types is None or downstream_direction is None:
         try:
-            from pipecat.frames.frames import TextFrame, TranscriptionFrame
-            from pipecat.processors.frame_processor import FrameProcessor
+            from pipecat.frames import frames
+            from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
         except ImportError as exc:
             raise RuntimeError(
                 "Pipecat is optional; install brain[realtime] before enabling the bridge"
             ) from exc
         frame_processor_base = frame_processor_base or FrameProcessor
-        transcription_frame_type = transcription_frame_type or TranscriptionFrame
-        text_frame_type = text_frame_type or TextFrame
+        frame_types = frame_types or frames
+        downstream_direction = downstream_direction or FrameDirection.DOWNSTREAM
 
     class CompanionProcessor(frame_processor_base):  # type: ignore[misc, valid-type]
         async def process_frame(self, frame: Any, direction: Any):
+            # Invalidate before super(): Pipecat's interruption handler awaits
+            # task cancellation, and a provider may take time to acknowledge it.
+            if isinstance(frame, frame_types.InterruptionFrame):
+                bridge.interrupt()
+            elif isinstance(frame, (frame_types.CancelFrame, frame_types.EndFrame)):
+                bridge.close()
             await super().process_frame(frame, direction)
-            if isinstance(frame, transcription_frame_type):
+            if isinstance(frame, frame_types.TranscriptionFrame) and direction == downstream_direction:
                 text = str(getattr(frame, "text", "") or "").strip()
                 finalized = bool(getattr(frame, "finalized", True))
+                if bridge.closed:
+                    return
                 if not text or not finalized:
                     if forward_transcription:
                         await self.push_frame(frame, direction)
                     return
-                reply = await bridge.respond(text)
+                lease = bridge.begin_turn()
                 if forward_transcription:
                     await self.push_frame(frame, direction)
-                await self.push_frame(text_frame_type(reply.text), direction)
+                # Adapted from Pipecat BaseOpenAILLMService.process_frame:
+                # start/end lifecycle frames are part of the TTS contract.
+                try:
+                    if not bridge.is_current(lease):
+                        return
+                    await self.push_frame(frame_types.LLMFullResponseStartFrame(), direction)
+                    reply = await bridge.respond(text, lease=lease)
+                    if bridge.is_current(lease):
+                        output = frame_types.LLMTextFrame(reply.text)
+                        output.metadata["mygpt"] = {
+                            "request_id": reply.request_id,
+                            "presentation_emotion": reply.emotion,
+                        }
+                        await self.push_frame(output, direction)
+                except SupersededChatTurn:
+                    pass
+                except Exception:
+                    # No raw provider error, user transcript or credentials in
+                    # pipeline error output. Cancellation remains a BaseException.
+                    await self.push_error(error_msg="MyGPT companion reply unavailable")
+                finally:
+                    # An interruption frame already clears downstream TTS. Do
+                    # not flush stale text/end frames after that invalidation.
+                    if bridge.is_current(lease):
+                        await self.push_frame(frame_types.LLMFullResponseEndFrame(), direction)
                 return
             await self.push_frame(frame, direction)
+
+        async def cleanup(self):
+            bridge.close()
+            await super().cleanup()
 
     return CompanionProcessor()

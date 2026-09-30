@@ -1,9 +1,11 @@
 import pytest
+import asyncio
+
+from fixtures_pipecat import Frames, create_processor
 
 from mygpt_brain.companion_chat import CompanionChatRuntime, CompanionPersona
 from mygpt_brain.pipecat_bridge import (
     PipecatCompanionBridge,
-    create_pipecat_companion_processor,
 )
 
 
@@ -43,35 +45,148 @@ async def test_pipecat_processor_handles_only_finalized_transcriptions():
         session_id="s1",
     )
 
-    class Base:
-        def __init__(self):
-            self.pushed = []
+    processor = create_processor(bridge)
 
-        async def process_frame(self, frame, direction):
-            return None
-
-        async def push_frame(self, frame, direction):
-            self.pushed.append((frame, direction))
-
-    class Transcription:
-        def __init__(self, text, finalized=True):
-            self.text = text
-            self.finalized = finalized
-
-    class Text:
-        def __init__(self, text):
-            self.text = text
-
-    processor = create_pipecat_companion_processor(
-        bridge,
-        frame_processor_base=Base,
-        transcription_frame_type=Transcription,
-        text_frame_type=Text,
-    )
-
-    await processor.process_frame(Transcription("半句", finalized=False), "down")
+    await processor.process_frame(Frames.TranscriptionFrame("半句", finalized=False), "down")
     assert processor.pushed == []
 
-    await processor.process_frame(Transcription("完整一句", finalized=True), "down")
-    assert len(processor.pushed) == 1
-    assert processor.pushed[0][0].text == "收到"
+    await processor.process_frame(Frames.TranscriptionFrame("完整一句", finalized=True), "down")
+    assert [type(frame) for frame, _ in processor.pushed] == [
+        Frames.LLMFullResponseStartFrame, Frames.LLMTextFrame, Frames.LLMFullResponseEndFrame,
+    ]
+    assert processor.pushed[1][0].text == "收到"
+    assert processor.pushed[1][0].metadata["mygpt"]["presentation_emotion"] == "neutral"
+
+
+def runtime_for(responder, store=None):
+    return CompanionChatRuntime(
+        persona=CompanionPersona(persona_id="p1", display_name="P", visual_skin_id="3714430278", instructions="Trusted."),
+        responder=responder, session_store=store,
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("frame_type", [Frames.InterruptionFrame, Frames.CancelFrame, Frames.EndFrame])
+async def test_interrupt_and_shutdown_reject_late_reply_before_sqlite_commit(tmp_path, frame_type):
+    from mygpt_brain.session_store import ChatSessionStore
+    entered, release = asyncio.Event(), asyncio.Event()
+    async def responder(_prompt):
+        entered.set()
+        await release.wait()
+        return '旧回复<|ACT:{"emotion":"happy"}|>'
+    with ChatSessionStore(tmp_path / "chat.sqlite3") as store:
+        runtime = runtime_for(responder, store)
+        bridge = PipecatCompanionBridge(runtime, session_id="s1")
+        processor = create_processor(bridge)
+        old = asyncio.create_task(processor.process_frame(Frames.TranscriptionFrame("旧问题"), "down"))
+        await asyncio.wait_for(entered.wait(), 1)
+        await processor.process_frame(frame_type(), "down")
+        release.set()
+        await old
+        assert not any(isinstance(f, (Frames.LLMTextFrame, Frames.LLMFullResponseEndFrame)) for f, _ in processor.pushed)
+        assert store.load_messages("s1") == []
+        assert runtime.session_messages("s1") == []
+        assert not bridge.turn_controller.assistant_active
+
+
+@pytest.mark.asyncio
+async def test_interrupted_turn_recovers_with_only_fresh_response():
+    entered, release = asyncio.Event(), asyncio.Event()
+    calls = 0
+    async def responder(_prompt):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            entered.set()
+            await release.wait()
+            return "旧回复"
+        return "新回复"
+    runtime = runtime_for(responder)
+    bridge = PipecatCompanionBridge(runtime, session_id="s1")
+    processor = create_processor(bridge)
+    old = asyncio.create_task(processor.process_frame(Frames.TranscriptionFrame("old"), "down"))
+    await entered.wait()
+    await processor.process_frame(Frames.InterruptionFrame(), "down")
+    release.set()
+    await old
+    await processor.process_frame(Frames.TranscriptionFrame("new"), "down")
+    assert [f.text for f, _ in processor.pushed if isinstance(f, Frames.LLMTextFrame)] == ["新回复"]
+    assert [m.content for m in runtime.session_messages("s1")] == ["Trusted.", "new", "新回复"]
+
+
+@pytest.mark.asyncio
+async def test_upstream_transcription_is_forwarded_without_model_call():
+    async def responder(_prompt): raise AssertionError("upstream input must not generate")
+    processor = create_processor(PipecatCompanionBridge(runtime_for(responder), session_id="s1"))
+    frame = Frames.TranscriptionFrame("upstream")
+    await processor.process_frame(frame, "up")
+    assert processor.pushed == [(frame, "up")]
+
+
+@pytest.mark.asyncio
+async def test_provider_error_closes_response_without_leaking_details():
+    async def responder(_prompt): raise RuntimeError("private provider URL and prompt")
+    bridge = PipecatCompanionBridge(runtime_for(responder), session_id="s1")
+    processor = create_processor(bridge)
+    await processor.process_frame(Frames.TranscriptionFrame("hello"), "down")
+    assert [type(f) for f, _ in processor.pushed] == [Frames.LLMFullResponseStartFrame, Frames.LLMFullResponseEndFrame]
+    assert processor.errors == ["MyGPT companion reply unavailable"]
+    assert not bridge.turn_controller.assistant_active
+
+
+@pytest.mark.asyncio
+async def test_closed_processor_never_calls_model_and_cleanup_invalidates_bridge():
+    async def responder(_prompt): raise AssertionError("closed session")
+    bridge = PipecatCompanionBridge(runtime_for(responder), session_id="s1")
+    processor = create_processor(bridge)
+    await processor.cleanup()
+    assert processor.cleaned and bridge.closed
+    await processor.process_frame(Frames.TranscriptionFrame("late"), "down")
+    with pytest.raises(RuntimeError, match="closed"):
+        await bridge.respond("late")
+
+
+@pytest.mark.asyncio
+async def test_optional_transcription_forwarding_precedes_response_frames():
+    async def responder(_prompt): return "ok"
+    processor = create_processor(PipecatCompanionBridge(runtime_for(responder), session_id="s1"), forward_transcription=True)
+    frame = Frames.TranscriptionFrame("hello")
+    await processor.process_frame(frame, "down")
+    assert [type(f) for f, _ in processor.pushed] == [Frames.TranscriptionFrame, Frames.LLMFullResponseStartFrame, Frames.LLMTextFrame, Frames.LLMFullResponseEndFrame]
+
+
+@pytest.mark.asyncio
+async def test_queued_superseded_turn_never_invokes_provider():
+    from mygpt_brain.companion_chat import SupersededChatTurn
+    called = False
+    async def responder(_prompt):
+        nonlocal called
+        called = True
+        return "must not run"
+    runtime = runtime_for(responder)
+    with pytest.raises(SupersededChatTurn):
+        await runtime.send(dict(request_id="r1", session_id="s1", persona_id="p1", text="old"), is_current=lambda: False)
+    assert not called
+    assert runtime.session_messages("s1") == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("fail_after_cancel", [False, True])
+async def test_provider_swallowing_cancel_cannot_resurrect_runtime_task(fail_after_cancel):
+    entered = asyncio.Event()
+    async def responder(_prompt):
+        entered.set()
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            if fail_after_cancel:
+                raise RuntimeError("obsolete provider failure")
+            return "late"
+    runtime = runtime_for(responder)
+    task = asyncio.create_task(runtime.send(dict(request_id="r1", session_id="s1", persona_id="p1", text="old")))
+    await entered.wait()
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+    assert task.cancelled()
+    assert runtime.session_messages("s1") == []

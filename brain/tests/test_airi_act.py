@@ -10,7 +10,7 @@ from mygpt_brain.airi_act import (
     parse_act_reply,
 )
 from mygpt_brain.companion_chat import CompanionChatRuntime, CompanionPersona, CompanionReply
-from mygpt_brain.pipecat_bridge import PipecatCompanionBridge, create_pipecat_companion_processor
+from mygpt_brain.pipecat_bridge import PipecatCompanionBridge
 
 
 @pytest.mark.parametrize("name", sorted(EMOTION_VALUES))
@@ -185,17 +185,7 @@ async def test_existing_pipecat_path_emits_only_visible_speech():
     assert reply.text == "继续，我在。"
     assert reply.emotion == "happy"
 
-    class Base:
-        def __init__(self): self.pushed = []
-        async def process_frame(self, frame, direction): pass
-        async def push_frame(self, frame, direction): self.pushed.append(frame)
-    class Transcription:
-        text = "继续学习"
-        finalized = True
-    class Text:
-        def __init__(self, text): self.text = text
-    processor = create_pipecat_companion_processor(
-        bridge, frame_processor_base=Base, transcription_frame_type=Transcription, text_frame_type=Text,
-    )
-    await processor.process_frame(Transcription(), "down")
-    assert [frame.text for frame in processor.pushed] == ["继续，我在。"]
+    from fixtures_pipecat import Frames, create_processor
+    processor = create_processor(bridge)
+    await processor.process_frame(Frames.TranscriptionFrame("继续学习"), "down")
+    assert [frame.text for frame, _ in processor.pushed if isinstance(frame, Frames.LLMTextFrame)] == ["继续，我在。"]

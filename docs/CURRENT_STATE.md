@@ -1,3 +1,15 @@
+## 2026-09-30 · Pipecat speech lifecycle fusion review candidate
+
+The existing Pipecat processor now directly incorporates upstream response
+start/end framing, flushing short text through real Pipecat TTS aggregation.
+Interruption/cancel invalidates the companion turn before queue cancellation,
+preventing late speech and SQLite commits. Full strict Brain acceptance is
+574 passed / 0 skipped; seven real Pipecat 1.12.0 integration tests pass locally.
+See [scope, attribution and reproduction](PIPECAT_RUNTIME_FUSION_20260930.md).
+This stacks on AIRI runtime PR #31 and does not claim device/audio acceptance.
+
+---
+
 ## 2026-09-30 · AIRI ACT Python runtime fusion review candidate
 
 The existing Python/Ollama reply path now directly calls the pinned MIT AIRI ACT
