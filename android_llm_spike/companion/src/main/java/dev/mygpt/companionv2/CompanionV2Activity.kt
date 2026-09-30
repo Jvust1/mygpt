@@ -22,6 +22,8 @@ import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import dev.mygpt.llama.LlamaCppCompanionEngine
 import dev.mygpt.spike.AiriActEmotionParser
+import dev.mygpt.spike.BookContextMailbox
+import dev.mygpt.spike.BookContextSnapshot
 import dev.mygpt.spike.GgufModelInstaller
 import dev.mygpt.spike.SpineCharacterRuntime
 import dev.mygpt.spike.SpinePackageLayout
@@ -48,6 +50,7 @@ class CompanionV2Activity : AndroidApplication() {
     private lateinit var characterRuntime: SpineCharacterRuntime
     private lateinit var characterState: TextView
     private lateinit var modelState: TextView
+    private lateinit var bookState: TextView
     private lateinit var reply: TextView
     private lateinit var input: EditText
     private lateinit var loadModelButton: Button
@@ -130,6 +133,10 @@ class CompanionV2Activity : AndroidApplication() {
             isEnabled = false
         }
         page.addView(loadModelButton)
+
+        bookState = label("Book：等待同签名 Book App 上下文", 13)
+        bookState.setPadding(0, dp(16), 0, dp(8))
+        page.addView(bookState)
 
         voiceState = label("语音：尚未导入 sherpa 模型", 13)
         voiceState.setPadding(0, dp(16), 0, dp(8))
@@ -687,6 +694,16 @@ class CompanionV2Activity : AndroidApplication() {
         }
     }
 
+    private fun refreshBookContextStatus() {
+        val current = BookContextMailbox.shared().current(System.currentTimeMillis())
+        bookState.text = if (current == null) {
+            "Book：无新鲜签名上下文"
+        } else {
+            "Book：" + current.bookId + " · " + current.sectionId
+                + " · " + current.mode.wireValue
+        }
+    }
+
     private fun rememberInput() {
         val text = input.text?.toString()?.trim().orEmpty()
         if (text.isEmpty()) {
@@ -794,8 +811,15 @@ class CompanionV2Activity : AndroidApplication() {
     private fun buildUserPrompt(
         text: String,
         recalled: List<LocalCompanionMemoryStore.Memory>,
+        bookContext: BookContextSnapshot?,
     ): String {
-        if (recalled.isEmpty()) return "[USER_MESSAGE]\\n" + text
+        val prefix = StringBuilder()
+        if (bookContext != null) {
+            prefix.append(bookContext.dataBlock()).append("\\n\\n")
+        }
+        if (recalled.isEmpty()) {
+            return prefix.toString() + "[USER_MESSAGE]\\n" + text
+        }
 
         val memoryText = StringBuilder()
         for (memory in recalled) {
@@ -823,6 +847,7 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun sendText(text: String) {
+        refreshBookContextStatus()
         val local = llm ?: return
         if (text.isBlank()) return
         stopRecording(null)
@@ -836,7 +861,9 @@ class CompanionV2Activity : AndroidApplication() {
             runCatching {
                 withContext(Dispatchers.IO) {
                     val recalled = memoryStore.search(PERSONA_ID, text, 6)
-                    val prompt = buildUserPrompt(text, recalled)
+                    val bookContext = BookContextMailbox.shared()
+                        .current(System.currentTimeMillis())
+                    val prompt = buildUserPrompt(text, recalled, bookContext)
                     val raw = StringBuilder()
                     local.generate(prompt, 512).collect { token ->
                         if (raw.length + token.length > 16000) error("reply too long")
@@ -883,6 +910,7 @@ class CompanionV2Activity : AndroidApplication() {
     override fun onStart() {
         super.onStart()
         foreground = true
+        refreshBookContextStatus()
     }
 
     override fun onStop() {
