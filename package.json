@@ -1,0 +1,14 @@
+{
+  "name": "mygpt-companion-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dot Brain Bridge + supervision-first companion runtime for mygpt",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "demo": "node examples/demo.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "policy": {
+    "supervisionWeight": 0.7,
+    "companionshipWeight": 0.3,
+    "defaultMode": "companion",
+    "checkInMinutes": 25,
+    "cooldownMinutes": 8
+  },
+  "thresholds": {
+    "light": 0.2,
+    "firm": 0.45,
+    "focus": 0.7
+  },
+  "live": {
+    "defaultEmotion": "neutral",
+    "supervisionEmotion": "focused",
+    "completionEmotion": "happy"
+  }
+}

@@ -8,6 +8,9 @@ __pycache__/
 .env.*
 !.env.example
 
+# Runtime spool / Dot bridge
+runtime-spool/
+
 # Build and test output
 dist/
 build/
