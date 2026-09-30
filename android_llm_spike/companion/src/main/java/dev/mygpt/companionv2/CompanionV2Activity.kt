@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class CompanionV2Activity : AndroidApplication() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -133,7 +134,7 @@ class CompanionV2Activity : AndroidApplication() {
         voiceState = label("语音：尚未导入 sherpa 模型", 13)
         voiceState.setPadding(0, dp(16), 0, dp(8))
         page.addView(voiceState)
-        page.addView(button("选择 sherpa 中英模型 ZIP") { chooseAsrModel() })
+        page.addView(button("选择 sherpa 中英模型包") { chooseAsrModel() })
 
         voiceButton = button("语音说一句") { toggleVoice() }.apply {
             isEnabled = false
@@ -143,7 +144,7 @@ class CompanionV2Activity : AndroidApplication() {
         ttsState = label("语音回复：尚未导入 Melo TTS 模型", 13)
         ttsState.setPadding(0, dp(16), 0, dp(8))
         page.addView(ttsState)
-        page.addView(button("选择 Melo 中英 TTS 模型 ZIP") { chooseTtsModel() })
+        page.addView(button("选择 Melo 中英 TTS 模型包") { chooseTtsModel() })
         ttsToggleButton = button("开启语音回复") { toggleTts() }.apply {
             isEnabled = false
         }
@@ -211,7 +212,13 @@ class CompanionV2Activity : AndroidApplication() {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
             putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
-                "application/zip", "application/x-zip", "application/octet-stream"
+                "application/zip",
+                "application/x-zip",
+                "application/x-bzip2",
+                "application/gzip",
+                "application/x-gzip",
+                "application/x-tar",
+                "application/octet-stream"
             ))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
@@ -223,7 +230,13 @@ class CompanionV2Activity : AndroidApplication() {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
             putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
-                "application/zip", "application/x-zip", "application/octet-stream"
+                "application/zip",
+                "application/x-zip",
+                "application/x-bzip2",
+                "application/gzip",
+                "application/x-gzip",
+                "application/x-tar",
+                "application/octet-stream"
             ))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
@@ -645,19 +658,22 @@ class CompanionV2Activity : AndroidApplication() {
         if (!ttsEnabled || !foreground || text.isBlank()) return
         val epoch = ttsEpoch
         val value = text.take(1200)
+        ttsState.text = "语音回复：正在本地合成/播放 · 音频不落盘"
 
         scope.launch {
             runCatching {
                 withContext(Dispatchers.IO) {
                     val engine = getOrCreateTtsEngine()
                     if (!ttsEnabled || epoch != ttsEpoch || !foreground) return@withContext
-                    engine.speak(value)
+                    val future = engine.speak(value)
+                    future.get(120, TimeUnit.SECONDS)
                 }
             }.onSuccess {
                 if (ttsEnabled && epoch == ttsEpoch) {
-                    ttsState.text = "语音回复：正在播放 · 音频不落盘"
+                    ttsState.text = "语音回复：播放完成"
                 }
             }.onFailure { error ->
+                stopTtsPlayback(null)
                 ttsState.text = "语音回复失败 · " + error.javaClass.simpleName
             }
         }

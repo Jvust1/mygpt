@@ -59,7 +59,7 @@ public final class VoiceSpikeActivity extends Activity {
         status.setPadding(0, dp(14), 0, dp(8));
         page.addView(status);
 
-        page.addView(button("选择模型 ZIP", this::chooseModel));
+        page.addView(button("选择模型包", this::chooseModel));
 
         startButton = button("开始实时识别", this::startVoice);
         startButton.setEnabled(false);
@@ -86,7 +86,13 @@ public final class VoiceSpikeActivity extends Activity {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
-                "application/zip", "application/x-zip", "application/octet-stream"
+                "application/zip",
+                "application/x-zip",
+                "application/x-bzip2",
+                "application/gzip",
+                "application/x-gzip",
+                "application/x-tar",
+                "application/octet-stream"
         });
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(intent, REQUEST_MODEL_ZIP);
@@ -105,7 +111,7 @@ public final class VoiceSpikeActivity extends Activity {
         startButton.setEnabled(false);
         new Thread(() -> {
             try (InputStream input = getContentResolver().openInputStream(uri)) {
-                if (input == null) throw new IllegalStateException("cannot open model ZIP");
+                if (input == null) throw new IllegalStateException("cannot open model archive");
                 SherpaZhEnModelInstaller.Installed installed =
                         SherpaZhEnModelInstaller.install(
                                 input,
