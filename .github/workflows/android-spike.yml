@@ -5,6 +5,8 @@ on:
       - 'android_spike/**'
       - 'android_llm_spike/book-client-sdk/**'
       - 'android_voice_spike/app/src/main/java/dev/mygpt/voicespike/ModelFingerprintManifest.java'
+      - 'android_voice_spike/app/src/main/java/dev/mygpt/voicespike/SherpaModelIdentity.java'
+      - 'android_voice_spike/app/src/main/java/dev/mygpt/voicespike/SherpaModelIdentity.java'
       - 'android_voice_spike/app/src/test/java/dev/mygpt/voicespike/ModelFingerprintManifestSmoke.java'
       - 'android_voice_spike/app/src/main/java/dev/mygpt/voicespike/ModelFingerprintManifest.java'
       - 'android_voice_spike/app/src/test/java/dev/mygpt/voicespike/ModelFingerprintManifestSmoke.java'
@@ -64,6 +66,7 @@ jobs:
             android_llm_spike/book-client-sdk/src/main/java/dev/mygpt/bookbridge/BookContextPayload.java \
             android_llm_spike/book-client-sdk/src/main/java/dev/mygpt/bookbridge/BookCompanionSession.java \
             android_voice_spike/app/src/main/java/dev/mygpt/voicespike/ModelFingerprintManifest.java \
+            android_voice_spike/app/src/main/java/dev/mygpt/voicespike/SherpaModelIdentity.java \
             android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/SpinePackageLayoutSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/SkinCapabilityCatalogSmoke.java \
@@ -78,7 +81,8 @@ jobs:
             android_spike/src/test/java/dev/mygpt/spike/CompanionPromptBudgetSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/LlmBenchmarkCandidateCatalogSmoke.java \
             android_llm_spike/book-client-sdk/src/test/java/dev/mygpt/bookbridge/BookClientSdkSmoke.java \
-            android_voice_spike/app/src/test/java/dev/mygpt/voicespike/ModelFingerprintManifestSmoke.java
+            android_voice_spike/app/src/test/java/dev/mygpt/voicespike/ModelFingerprintManifestSmoke.java \
+            android_voice_spike/app/src/test/java/dev/mygpt/voicespike/SherpaModelIdentitySmoke.java
           java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.SpinePackageLayoutSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.SkinCapabilityCatalogSmoke
@@ -94,6 +98,7 @@ jobs:
           java -cp android_spike/build/classes dev.mygpt.spike.LlmBenchmarkCandidateCatalogSmoke
           java -cp android_spike/build/classes dev.mygpt.bookbridge.BookClientSdkSmoke
           java -cp android_spike/build/classes dev.mygpt.voicespike.ModelFingerprintManifestSmoke
+          java -cp android_spike/build/classes dev.mygpt.voicespike.SherpaModelIdentitySmoke
 
   android-debug-host:
     if: github.repository == 'Jvust/mygpt'

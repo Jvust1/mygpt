@@ -113,6 +113,8 @@ public final class SherpaZhEnModelInstaller {
                 throw new IOException("ASR model install incomplete");
             }
 
+            SherpaModelIdentity.requireAsrCore(temp);
+
             ModelFingerprintManifest.write(
                     temp,
                     "sherpa-streaming-zipformer-zh-en",
@@ -160,6 +162,8 @@ public final class SherpaZhEnModelInstaller {
         }
 
         try {
+            SherpaModelIdentity.requireAsrCore(directory);
+
             if (!installed.fingerprintManifest.isFile()) {
                 // One-time migration for models installed before fingerprint v1.
                 ModelFingerprintManifest.write(

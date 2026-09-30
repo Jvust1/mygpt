@@ -129,6 +129,8 @@ public final class SherpaMeloTtsModelInstaller {
                 throw new IOException("TTS model install incomplete");
             }
 
+            SherpaModelIdentity.requireTtsExecutableModel(temp);
+
             ModelFingerprintManifest.write(
                     temp,
                     "sherpa-vits-melo-tts-zh-en",
@@ -182,6 +184,8 @@ public final class SherpaMeloTtsModelInstaller {
         }
 
         try {
+            SherpaModelIdentity.requireTtsExecutableModel(directory);
+
             if (!installed.fingerprintManifest.isFile()) {
                 // One-time migration for models installed before fingerprint v1.
                 ModelFingerprintManifest.write(
