@@ -3,15 +3,17 @@
 
 class Frames:
     class TranscriptionFrame:
-        def __init__(self, text, finalized=True):
+        def __init__(self, text, finalized=True, metadata=None):
             self.text, self.finalized = text, finalized
+            self.metadata = {} if metadata is None else metadata
 
     class LLMTextFrame:
         def __init__(self, text):
             self.text, self.metadata = text, {}
 
     class LLMFullResponseStartFrame: pass
-    class LLMFullResponseEndFrame: pass
+    class LLMFullResponseEndFrame:
+        def __init__(self): self.metadata = {}
     class InterruptionFrame: pass
     class CancelFrame: pass
     class EndFrame: pass

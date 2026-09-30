@@ -99,3 +99,19 @@ not claim preemptive interruption of synchronous CPU work or a hard deadline
 against a callback that never finishes cancellation. A model exchange committed
 before a later speech interruption remains in history; obsolete speech is
 suppressed rather than retrospectively deleting valid history.
+
+
+## Voice receipt recovery hardening (2026-09-30)
+
+The existing MyGPT bridge adds ephemeral per-instance correlation randomness to
+its automatic request IDs, preventing deterministic counter/text collisions
+against durable receipts after restart. This is MyGPT integration code, not a
+new upstream feature or an authentication identity. Explicit request IDs retain
+the existing SQLite idempotency/fingerprint checks.
+
+The Pipecat processor accepts optional `mygpt.request_id` frame metadata, carries
+the trusted receipt replay flag into response-end metadata, and suppresses repeat
+LLM text/formatting/TTS output for completed receipt retrieval. Start/end lifecycle
+framing remains based on the same pinned BaseOpenAILLMService pattern. Actual SDK
+queue/TTS plus close/reopen/cancellation tests verify recovery; no exactly-once
+physical-audio delivery or new persisted playback acknowledgment is claimed.

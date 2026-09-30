@@ -15,6 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_CASES = {
     "test_voice_to_real_components_to_durable_native_replay",
     "test_book_native_story_keeps_context_ephemeral_and_rejects_expiry",
+    "test_real_voice_restart_same_utterance_produces_new_reply_once",
+    "test_real_voice_cold_receipt_replay_retrieves_data_without_duplicate_speech",
+    "test_real_cancel_restart_retry_commits_and_speaks_only_recovered_turn",
     "test_oracle_is_exact_pinned_upstream_release",
     "test_tokenizer_and_scores_match_deterministic_randomized_corpus",
     "test_pinned_source_and_license_identity",

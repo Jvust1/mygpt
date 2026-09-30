@@ -1,3 +1,14 @@
+## 2026-09-30 · fresh voice events and explicit recovery retries
+
+Automatic Pipecat request IDs now include an ephemeral bridge incarnation, fixing
+same-utterance restart collisions with old SQLite receipts. Explicit-ID recovery
+keeps stored data/idempotency and emits completion metadata without repeated
+speech/commit. Real queue/TTS/SQLite tests cover cold restart, interrupted retry,
+namespace conflicts and fresh continuation. Strict Brain 724 and combined upstream
+48 pass. See [receipt semantics and audio-delivery limits](PIPECAT_VOICE_RESTART_RECOVERY_20260930.md).
+
+---
+
 ## 2026-09-30 · Book prompt clipping preserves valid Unicode
 
 Book title/body clipping now uses the existing safe-prefix helper, fixing a
