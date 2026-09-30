@@ -142,7 +142,20 @@ public final class SherpaMeloTtsModelInstaller {
             );
 
             Installed staged = new Installed(temp);
-            if (!staged.isComplete()) throw new IOException("TTS model manifest incomplete");
+            if (!staged.isComplete()
+                    || !ModelFingerprintManifest.verify(
+                            temp,
+                            "sherpa-vits-melo-tts-zh-en",
+                            "sherpa-onnx-v1.13.8",
+                            "model.onnx",
+                            "tokens.txt",
+                            "lexicon.txt",
+                            "date.fst",
+                            "phone.fst",
+                            "number.fst"
+                    )) {
+                throw new IOException("TTS model manifest verification failed");
+            }
 
             deleteRecursively(target);
             if (!temp.renameTo(target)) {
@@ -156,8 +169,47 @@ public final class SherpaMeloTtsModelInstaller {
     }
 
     public static Installed existing(File modelsRoot) {
-        Installed installed = new Installed(new File(modelsRoot, "sherpa-melo-zh-en-tts"));
-        return installed.isComplete() ? installed : null;
+        File directory = new File(modelsRoot, "sherpa-melo-zh-en-tts");
+        Installed installed = new Installed(directory);
+
+        if (!installed.model.isFile()
+                || !installed.tokens.isFile()
+                || !installed.lexicon.isFile()
+                || !installed.dateFst.isFile()
+                || !installed.phoneFst.isFile()
+                || !installed.numberFst.isFile()) {
+            return null;
+        }
+
+        try {
+            if (!installed.fingerprintManifest.isFile()) {
+                // One-time migration for models installed before fingerprint v1.
+                ModelFingerprintManifest.write(
+                        directory,
+                        "sherpa-vits-melo-tts-zh-en",
+                        "sherpa-onnx-v1.13.8",
+                        "model.onnx",
+                        "tokens.txt",
+                        "lexicon.txt",
+                        "date.fst",
+                        "phone.fst",
+                        "number.fst"
+                );
+            }
+            return ModelFingerprintManifest.verify(
+                    directory,
+                    "sherpa-vits-melo-tts-zh-en",
+                    "sherpa-onnx-v1.13.8",
+                    "model.onnx",
+                    "tokens.txt",
+                    "lexicon.txt",
+                    "date.fst",
+                    "phone.fst",
+                    "number.fst"
+            ) ? new Installed(directory) : null;
+        } catch (IOException error) {
+            return null;
+        }
     }
 
     private static long copyBounded(InputStream input, File out, long[] total)

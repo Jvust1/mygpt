@@ -53,6 +53,39 @@ public final class ModelFingerprintManifestSmoke {
                     StandardCharsets.UTF_8
             );
             require(first.equals(second), "deterministic rewrite");
+            require(ModelFingerprintManifest.verify(
+                    root,
+                    "test-model",
+                    "runtime-v1",
+                    "b.txt",
+                    "a.bin"
+            ), "verify identical files");
+
+            // Tampering a core file must invalidate the stored manifest.
+            write(new File(root, "a.bin"), "abcd");
+            require(!ModelFingerprintManifest.verify(
+                    root,
+                    "test-model",
+                    "runtime-v1",
+                    "a.bin",
+                    "b.txt"
+            ), "tamper detected");
+
+            // Regenerating after an intentional model replacement restores validity.
+            ModelFingerprintManifest.write(
+                    root,
+                    "test-model",
+                    "runtime-v1",
+                    "a.bin",
+                    "b.txt"
+            );
+            require(ModelFingerprintManifest.verify(
+                    root,
+                    "test-model",
+                    "runtime-v1",
+                    "a.bin",
+                    "b.txt"
+            ), "replacement re-fingerprinted");
 
             expectFailure(() -> ModelFingerprintManifest.write(
                     root,

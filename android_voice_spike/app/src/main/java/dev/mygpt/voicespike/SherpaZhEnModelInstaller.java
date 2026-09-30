@@ -124,7 +124,18 @@ public final class SherpaZhEnModelInstaller {
             );
 
             Installed staged = new Installed(temp);
-            if (!staged.isComplete()) throw new IOException("ASR model manifest incomplete");
+            if (!staged.isComplete()
+                    || !ModelFingerprintManifest.verify(
+                            temp,
+                            "sherpa-streaming-zipformer-zh-en",
+                            "sherpa-onnx-v1.13.8",
+                            ENCODER,
+                            DECODER,
+                            JOINER,
+                            TOKENS
+                    )) {
+                throw new IOException("ASR model manifest verification failed");
+            }
 
             deleteRecursively(target);
             if (!temp.renameTo(target)) {
@@ -138,8 +149,41 @@ public final class SherpaZhEnModelInstaller {
     }
 
     public static Installed existing(File modelsRoot) {
-        Installed installed = new Installed(new File(modelsRoot, "sherpa-zh-en-streaming"));
-        return installed.isComplete() ? installed : null;
+        File directory = new File(modelsRoot, "sherpa-zh-en-streaming");
+        Installed installed = new Installed(directory);
+
+        if (!installed.encoder.isFile()
+                || !installed.decoder.isFile()
+                || !installed.joiner.isFile()
+                || !installed.tokens.isFile()) {
+            return null;
+        }
+
+        try {
+            if (!installed.fingerprintManifest.isFile()) {
+                // One-time migration for models installed before fingerprint v1.
+                ModelFingerprintManifest.write(
+                        directory,
+                        "sherpa-streaming-zipformer-zh-en",
+                        "sherpa-onnx-v1.13.8",
+                        ENCODER,
+                        DECODER,
+                        JOINER,
+                        TOKENS
+                );
+            }
+            return ModelFingerprintManifest.verify(
+                    directory,
+                    "sherpa-streaming-zipformer-zh-en",
+                    "sherpa-onnx-v1.13.8",
+                    ENCODER,
+                    DECODER,
+                    JOINER,
+                    TOKENS
+            ) ? new Installed(directory) : null;
+        } catch (IOException error) {
+            return null;
+        }
     }
 
     private static long copyBounded(InputStream input, File out, long[] total)
