@@ -111,8 +111,10 @@ class CompanionV2Activity : AndroidApplication(),
     @Volatile private var ttsEnabled = false
     @Volatile private var conversationPrimed = false
     @Volatile private var modelLoaded = false
+    @Volatile private var modelLoading = false
     @Volatile private var modelNeedsRecovery = false
     @Volatile private var generating = false
+    @Volatile private var generationEpoch = 0L
     @Volatile private var benchmarking = false
     private var generationJob: Job? = null
     @Volatile private var ttsEpoch = 0L
@@ -456,12 +458,13 @@ class CompanionV2Activity : AndroidApplication(),
     }
 
     private fun importModel(uri: Uri) {
-        if (generating || benchmarking) {
-            modelState.text = "模型：正在生成/基准测试，请稍后再换模型"
+        if (generating || benchmarking || modelLoading) {
+            modelState.text = "模型：正在生成/基准测试/加载，请稍后再换模型"
             return
         }
         stopRecording(null)
         stopTtsPlayback(null)
+        generationEpoch += 1L
         conversationPrimed = false
         modelLoaded = false
         modelState.text = "模型：正在校验并导入…"
@@ -749,11 +752,13 @@ class CompanionV2Activity : AndroidApplication(),
 
     private fun loadModel() {
         val file = modelFile ?: return
-        if (generating || benchmarking) {
-            modelState.text = "模型：正在生成/基准测试，请稍后再重载"
+        if (generating || benchmarking || modelLoading) {
+            modelState.text = "模型：正在生成/基准测试/加载，请稍后再重载"
             return
         }
 
+        generationEpoch += 1L
+        modelLoading = true
         stopRecording(null)
         stopTtsPlayback(null)
         modelState.text = "模型：正在加载…"
@@ -782,6 +787,7 @@ class CompanionV2Activity : AndroidApplication(),
                 }
                 local
             }.onSuccess {
+                modelLoading = false
                 modelLoaded = true
                 modelNeedsRecovery = false
                 conversationPrimed = false
@@ -791,6 +797,7 @@ class CompanionV2Activity : AndroidApplication(),
                 benchmarkButton.isEnabled = true
                 updateVoiceControls()
             }.onFailure { error ->
+                modelLoading = false
                 modelLoaded = false
                 modelNeedsRecovery = false
                 modelState.text = "模型加载失败 · " + error.javaClass.simpleName
@@ -839,7 +846,7 @@ class CompanionV2Activity : AndroidApplication(),
     private fun runLocalBenchmark() {
         val local = llm ?: return
         val file = modelFile ?: return
-        if (!modelLoaded || generating || benchmarking) return
+        if (!modelLoaded || generating || benchmarking || modelLoading) return
 
         stopRecording(null)
         stopTtsPlayback(null)
@@ -1114,8 +1121,8 @@ class CompanionV2Activity : AndroidApplication(),
     }
 
     private fun clearRecentConversation() {
-        if (generating || benchmarking) {
-            memoryState.text = "正在生成/基准测试，请稍后清空最近对话"
+        if (generating || benchmarking || modelLoading) {
+            memoryState.text = "正在生成/基准测试/加载，请稍后清空最近对话"
             return
         }
         scope.launch {
@@ -1260,6 +1267,8 @@ class CompanionV2Activity : AndroidApplication(),
         input.isEnabled = false
         sendButton.isEnabled = false
         generating = true
+        generationEpoch += 1L
+        val currentGenerationEpoch = generationEpoch
         reply.text = "生成中…"
         characterState.text = "角色：思考中"
 
@@ -1298,6 +1307,7 @@ class CompanionV2Activity : AndroidApplication(),
                     parsed
                 }
             }.onSuccess { parsed ->
+                if (currentGenerationEpoch != generationEpoch) return@onSuccess
                 generating = false
                 generationJob = null
                 val visible = parsed.visibleText.trim()
@@ -1314,6 +1324,7 @@ class CompanionV2Activity : AndroidApplication(),
                 sendButton.isEnabled = true
                 updateVoiceControls()
             }.onFailure { error ->
+                if (currentGenerationEpoch != generationEpoch) return@onFailure
                 generating = false
                 generationJob = null
 
@@ -1367,7 +1378,8 @@ class CompanionV2Activity : AndroidApplication(),
         refreshBookContextStatus()
         startExpiryTicker()
 
-        if (modelNeedsRecovery && modelFile != null && !generating && !benchmarking) {
+        if (modelNeedsRecovery && modelFile != null
+            && !generating && !benchmarking && !modelLoading) {
             modelState.text = "模型：正在恢复中断的本地会话…"
             loadModel()
         }
@@ -1379,7 +1391,8 @@ class CompanionV2Activity : AndroidApplication(),
             StudySupervisorRuntime.shared().removeListener(this)
             stopExpiryTicker()
             foreground = false
-            if (generating) {
+            if (generating || generationJob != null) {
+                generationEpoch += 1L
                 modelNeedsRecovery = true
                 modelLoaded = false
                 conversationPrimed = false
@@ -1402,6 +1415,7 @@ class CompanionV2Activity : AndroidApplication(),
         BookContextMailbox.shared().removeListener(this)
         StudySupervisorRuntime.shared().removeListener(this)
         stopRecording(null)
+        generationEpoch += 1L
         generationJob?.cancel()
         generationJob = null
         scope.cancel()
