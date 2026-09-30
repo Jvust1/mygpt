@@ -28,6 +28,10 @@ public final class StudySupervisorRuntimeSmoke {
         ).accepted, "start");
         check(!runtime.isSupervisionOptIn(), "start resets opt-in");
         check(runtime.setSupervisionOptIn(true), "opt-in active session");
+        String activeBlock = runtime.snapshot().dataBlock();
+        check(activeBlock.contains("STUDY_SUPERVISION_STATE_JSON"), "supervision data block");
+        check(activeBlock.contains("\"active\":true"), "active supervision state");
+        check(activeBlock.contains("\"opt_in\":true"), "opt-in state");
 
         BookContextSnapshot context = new BookContextSnapshot(
                 session,
@@ -78,6 +82,8 @@ public final class StudySupervisorRuntimeSmoke {
         ).accepted, "end accepted");
         check(!runtime.hasActiveSession(), "ended inactive");
         check(!runtime.isSupervisionOptIn(), "ended clears opt-in");
+        check(runtime.snapshot().dataBlock().contains("\"active\":false"),
+                "ended data block inactive");
 
         runtime.removeListener(listener);
         check(cues.contains(CompanionCoordinator.Cue.GENTLE_CHECK_IN),

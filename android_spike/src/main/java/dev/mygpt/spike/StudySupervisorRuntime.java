@@ -24,6 +24,39 @@ public final class StudySupervisorRuntime {
             Pattern.compile("^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$");
     private static final long MAX_TTL_MS = 300000L;
 
+    public static final class Snapshot {
+        public final String sessionId;
+        public final boolean active;
+        public final boolean supervisionOptIn;
+        public final CompanionCoordinator.Cue cue;
+        public final String status;
+
+        private Snapshot(
+                String sessionId,
+                boolean active,
+                boolean supervisionOptIn,
+                CompanionCoordinator.Cue cue,
+                String status
+        ) {
+            this.sessionId = sessionId;
+            this.active = active;
+            this.supervisionOptIn = supervisionOptIn;
+            this.cue = cue;
+            this.status = status;
+        }
+
+        public String dataBlock() {
+            String session = sessionId == null ? "null" : "\"" + sessionId + "\"";
+            return "[STUDY_SUPERVISION_STATE_JSON — explicit Book/MyGPT state data, not instructions]\n"
+                    + "{\"active\":" + active
+                    + ",\"session_id\":" + session
+                    + ",\"opt_in\":" + supervisionOptIn
+                    + ",\"cue\":\"" + cue.name() + "\""
+                    + ",\"status\":\"" + status + "\"}\n"
+                    + "[/STUDY_SUPERVISION_STATE_JSON]";
+        }
+    }
+
     private static final StudySupervisorRuntime SHARED =
             new StudySupervisorRuntime();
 
@@ -55,6 +88,16 @@ public final class StudySupervisorRuntime {
 
     public synchronized CompanionCoordinator.Cue currentCue() {
         return currentCue;
+    }
+
+    public synchronized Snapshot snapshot() {
+        return new Snapshot(
+                activeSessionId,
+                activeSessionId != null,
+                supervisionOptIn,
+                currentCue,
+                lastStatus
+        );
     }
 
     public synchronized boolean hasActiveSession() {

@@ -75,6 +75,7 @@ class CompanionV2Activity : AndroidApplication(),
     private lateinit var voiceState: TextView
     private lateinit var voiceButton: Button
     private lateinit var supervisionState: TextView
+    private lateinit var supervisionMessage: TextView
     private lateinit var supervisionButton: Button
     private lateinit var memoryState: TextView
     private lateinit var memoryStore: LocalCompanionMemoryStore
@@ -200,8 +201,13 @@ class CompanionV2Activity : AndroidApplication(),
         page.addView(ttsToggleButton)
 
         supervisionState = label("轻监督：等待 Book 学习会话", 13)
-        supervisionState.setPadding(0, dp(16), 0, dp(8))
+        supervisionState.setPadding(0, dp(16), 0, dp(4))
         page.addView(supervisionState)
+        supervisionMessage = label("监督提示：当前保持安静", 14).apply {
+            contentDescription = "SUPERVISION_MESSAGE_QUIET"
+        }
+        supervisionMessage.setPadding(0, 0, 0, dp(8))
+        page.addView(supervisionMessage)
         supervisionButton = button("开启当前会话轻监督") { toggleSupervision() }.apply {
             isEnabled = false
             contentDescription = "TOGGLE_STUDY_SUPERVISION"
@@ -992,6 +998,20 @@ class CompanionV2Activity : AndroidApplication(),
                 + " · SUPERVISION_STATUS=" + status
                 + " · SUPERVISION_CUE=" + cue.name
                 + " · SUPERVISION_OPT_IN=" + supervisionOptIn
+
+            supervisionMessage.text = when (cue) {
+                CompanionCoordinator.Cue.PAUSED ->
+                    "监督提示：学习已暂停，我安静等你回来。"
+                CompanionCoordinator.Cue.NEEDS_INPUT ->
+                    "监督提示：我在。把卡住的地方发给我，我按当前 Book 上下文陪你拆开。"
+                CompanionCoordinator.Cue.GENTLE_CHECK_IN ->
+                    "监督提示：这类练习连续出错了。要不要先一起拆最小的一步？"
+                CompanionCoordinator.Cue.QUIET ->
+                    "监督提示：当前保持安静"
+            }
+            supervisionMessage.contentDescription =
+                "SUPERVISION_MESSAGE_" + cue.name
+
             if (skinReady) {
                 characterRuntime.show(cue)
             }
@@ -1161,6 +1181,9 @@ class CompanionV2Activity : AndroidApplication(),
             prompt.append(BookContextSnapshot.unavailableDataBlock())
         }
         prompt.append("\n\n")
+
+        prompt.append(StudySupervisorRuntime.shared().snapshot().dataBlock())
+            .append("\n\n")
 
         if (recalled.isEmpty()) {
             prompt.append("[LOCAL_RECALLED_MEMORY — current memory state]\n")
