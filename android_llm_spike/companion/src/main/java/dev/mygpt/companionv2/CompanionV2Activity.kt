@@ -10,6 +10,9 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
+import android.os.Debug
+import android.os.PowerManager
+import android.os.SystemClock
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
@@ -55,6 +58,8 @@ class CompanionV2Activity : AndroidApplication() {
     private lateinit var reply: TextView
     private lateinit var input: EditText
     private lateinit var loadModelButton: Button
+    private lateinit var benchmarkState: TextView
+    private lateinit var benchmarkButton: Button
     private lateinit var sendButton: Button
     private lateinit var voiceState: TextView
     private lateinit var voiceButton: Button
@@ -76,6 +81,7 @@ class CompanionV2Activity : AndroidApplication() {
     @Volatile private var conversationPrimed = false
     @Volatile private var modelLoaded = false
     @Volatile private var generating = false
+    @Volatile private var benchmarking = false
     private var generationJob: Job? = null
     @Volatile private var ttsEpoch = 0L
     private var ttsModel: SherpaMeloTtsModelInstaller.Installed? = null
@@ -140,6 +146,15 @@ class CompanionV2Activity : AndroidApplication() {
             isEnabled = false
         }
         page.addView(loadModelButton)
+
+        benchmarkState = label("基准：加载模型后可运行", 13)
+        benchmarkState.setPadding(0, dp(8), 0, dp(4))
+        page.addView(benchmarkState)
+
+        benchmarkButton = button("运行本机模型基准") { runLocalBenchmark() }.apply {
+            isEnabled = false
+        }
+        page.addView(benchmarkButton)
 
         bookState = label("Book：等待同签名 Book App 上下文", 13)
         bookState.setPadding(0, dp(16), 0, dp(8))
@@ -309,8 +324,8 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun importModel(uri: Uri) {
-        if (generating) {
-            modelState.text = "模型：正在生成，请稍后再换模型"
+        if (generating || benchmarking) {
+            modelState.text = "模型：正在生成/基准测试，请稍后再换模型"
             return
         }
         stopRecording(null)
@@ -339,6 +354,7 @@ class CompanionV2Activity : AndroidApplication() {
                 modelFile = installed.file
                 getSharedPreferences(PREFS, MODE_PRIVATE).edit()
                     .putString(PREF_MODEL_PATH, installed.file.absolutePath)
+                    .putString(PREF_MODEL_SHA256, installed.sha256)
                     .apply()
                 modelState.text = "模型：GGUF v" + installed.header.version
                     + " · tensors " + installed.header.tensorCount
@@ -355,12 +371,17 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun restoreModel() {
-        val path = getSharedPreferences(PREFS, MODE_PRIVATE)
-            .getString(PREF_MODEL_PATH, null) ?: return
+        val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
+        val path = prefs.getString(PREF_MODEL_PATH, null) ?: return
         val file = File(path)
         if (file.isFile && file.canRead()) {
             modelFile = file
-            modelState.text = "模型：已找到 " + file.name
+            val hash = prefs.getString(PREF_MODEL_SHA256, null)
+            modelState.text = if (hash.isNullOrBlank()) {
+                "模型：已找到 " + file.name
+            } else {
+                "模型：已找到 " + file.name + " · SHA-256 " + hash.take(12) + "…"
+            }
             loadModelButton.isEnabled = true
         }
     }
@@ -413,8 +434,12 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun startVoice() {
-        if (!modelLoaded || llm == null) {
-            voiceState.text = "语音：请先加载本地 GGUF"
+        if (!modelLoaded || llm == null || benchmarking) {
+            voiceState.text = if (benchmarking) {
+                "语音：模型正在基准测试"
+            } else {
+                "语音：请先加载本地 GGUF"
+            }
             return
         }
         val selected = asrModel
@@ -582,8 +607,8 @@ class CompanionV2Activity : AndroidApplication() {
 
     private fun loadModel() {
         val file = modelFile ?: return
-        if (generating) {
-            modelState.text = "模型：正在生成，请稍后再重载"
+        if (generating || benchmarking) {
+            modelState.text = "模型：正在生成/基准测试，请稍后再重载"
             return
         }
 
@@ -619,13 +644,135 @@ class CompanionV2Activity : AndroidApplication() {
                 modelState.text = "模型：已加载 · 全本地"
                 loadModelButton.isEnabled = true
                 sendButton.isEnabled = true
+                benchmarkButton.isEnabled = true
                 updateVoiceControls()
             }.onFailure { error ->
                 modelLoaded = false
                 modelState.text = "模型加载失败 · " + error.javaClass.simpleName
                 loadModelButton.isEnabled = true
                 sendButton.isEnabled = false
+                benchmarkButton.isEnabled = false
                 updateVoiceControls()
+            }
+        }
+    }
+
+    private data class DeviceSnapshot(
+        val pssKb: Int,
+        val nativeHeapBytes: Long,
+        val javaUsedBytes: Long,
+        val thermalStatus: Int,
+    )
+
+    private fun captureDeviceSnapshot(): DeviceSnapshot {
+        val runtime = Runtime.getRuntime()
+        val javaUsed = runtime.totalMemory() - runtime.freeMemory()
+        val power = getSystemService(PowerManager::class.java)
+        return DeviceSnapshot(
+            pssKb = Debug.getPss(),
+            nativeHeapBytes = Debug.getNativeHeapAllocatedSize(),
+            javaUsedBytes = javaUsed,
+            thermalStatus = power.currentThermalStatus,
+        )
+    }
+
+    private fun thermalLabel(status: Int): String =
+        when (status) {
+            PowerManager.THERMAL_STATUS_NONE -> "NONE"
+            PowerManager.THERMAL_STATUS_LIGHT -> "LIGHT"
+            PowerManager.THERMAL_STATUS_MODERATE -> "MODERATE"
+            PowerManager.THERMAL_STATUS_SEVERE -> "SEVERE"
+            PowerManager.THERMAL_STATUS_CRITICAL -> "CRITICAL"
+            PowerManager.THERMAL_STATUS_EMERGENCY -> "EMERGENCY"
+            PowerManager.THERMAL_STATUS_SHUTDOWN -> "SHUTDOWN"
+            else -> "UNKNOWN(" + status + ")"
+        }
+
+    private fun mb(bytes: Long): String =
+        String.format("%.1f", bytes / (1024.0 * 1024.0))
+
+    private fun runLocalBenchmark() {
+        val local = llm ?: return
+        val file = modelFile ?: return
+        if (!modelLoaded || generating || benchmarking) return
+
+        stopRecording(null)
+        stopTtsPlayback(null)
+        benchmarking = true
+        benchmarkButton.isEnabled = false
+        sendButton.isEnabled = false
+        updateVoiceControls()
+        benchmarkState.text = "基准：运行中 · pp=128 / tg=64 / pl=1"
+
+        scope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    val before = captureDeviceSnapshot()
+                    val started = SystemClock.elapsedRealtime()
+                    val table = local.benchmark(
+                        promptProcessingTokens = 128,
+                        generatedTokens = 64,
+                        parallelSequences = 1,
+                        repetitions = 1,
+                    )
+                    val elapsedMs = SystemClock.elapsedRealtime() - started
+                    val after = captureDeviceSnapshot()
+                    val hash = getSharedPreferences(PREFS, MODE_PRIVATE)
+                        .getString(PREF_MODEL_SHA256, "unknown") ?: "unknown"
+
+                    val report = buildString {
+                        appendLine("schema=mygpt.android-llm-benchmark.v1")
+                        appendLine("model_file=" + file.name)
+                        appendLine("model_sha256=" + hash)
+                        appendLine("model_bytes=" + file.length())
+                        appendLine("elapsed_ms=" + elapsedMs)
+                        appendLine("pss_before_kb=" + before.pssKb)
+                        appendLine("pss_after_kb=" + after.pssKb)
+                        appendLine("native_heap_before_bytes=" + before.nativeHeapBytes)
+                        appendLine("native_heap_after_bytes=" + after.nativeHeapBytes)
+                        appendLine("java_used_before_bytes=" + before.javaUsedBytes)
+                        appendLine("java_used_after_bytes=" + after.javaUsedBytes)
+                        appendLine("thermal_before=" + thermalLabel(before.thermalStatus))
+                        appendLine("thermal_after=" + thermalLabel(after.thermalStatus))
+                        appendLine("llama_benchmark:")
+                        appendLine(table.trim())
+                    }
+                    File(filesDir, BENCHMARK_REPORT_FILE).writeText(report)
+
+                    Triple(before, after, Pair(elapsedMs, table))
+                }
+            }.onSuccess { result ->
+                benchmarking = false
+                benchmarkButton.isEnabled = modelLoaded
+                sendButton.isEnabled = modelLoaded
+                updateVoiceControls()
+
+                val before = result.first
+                val after = result.second
+                val elapsed = result.third.first
+                val table = result.third.second.trim()
+
+                benchmarkState.text = buildString {
+                    append("基准完成 · ")
+                    append(elapsed)
+                    append(" ms · PSS ")
+                    append(String.format("%.1f", before.pssKb / 1024.0))
+                    append("→")
+                    append(String.format("%.1f", after.pssKb / 1024.0))
+                    append(" MiB · native ")
+                    append(mb(after.nativeHeapBytes))
+                    append(" MiB · thermal ")
+                    append(thermalLabel(before.thermalStatus))
+                    append("→")
+                    append(thermalLabel(after.thermalStatus))
+                }
+                reply.text = "llama.cpp 本机基准\n\n" + table
+            }.onFailure { error ->
+                benchmarking = false
+                benchmarkButton.isEnabled = modelLoaded
+                sendButton.isEnabled = modelLoaded
+                updateVoiceControls()
+                benchmarkState.text = "基准失败 · " + error.javaClass.simpleName
             }
         }
     }
@@ -921,7 +1068,7 @@ class CompanionV2Activity : AndroidApplication() {
     private fun sendText(text: String) {
         refreshBookContextStatus()
         val local = llm ?: return
-        if (!modelLoaded || generating || text.isBlank()) return
+        if (!modelLoaded || generating || benchmarking || text.isBlank()) return
         stopRecording(null)
 
         input.isEnabled = false
@@ -1021,7 +1168,8 @@ class CompanionV2Activity : AndroidApplication() {
         generationJob?.cancel()
         generationJob = null
         generating = false
-        sendButton.isEnabled = modelLoaded
+        sendButton.isEnabled = modelLoaded && !benchmarking
+        benchmarkButton.isEnabled = modelLoaded && !benchmarking
         stopRecording("语音：已停止（离开前台）")
         stopTtsPlayback("语音回复：已停止（离开前台）")
         super.onStop()
@@ -1065,6 +1213,8 @@ class CompanionV2Activity : AndroidApplication() {
         private const val PERSONA_ID = "mygpt-3714430278"
         private const val PREFS = "mygpt_companion_v2"
         private const val PREF_MODEL_PATH = "gguf_path"
+        private const val PREF_MODEL_SHA256 = "gguf_sha256"
+        private const val BENCHMARK_REPORT_FILE = "benchmark-last.txt"
         private const val MAX_MODEL_BYTES = 16L * 1024L * 1024L * 1024L
     }
 }
