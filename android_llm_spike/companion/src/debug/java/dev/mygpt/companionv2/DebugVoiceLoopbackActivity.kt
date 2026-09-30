@@ -109,7 +109,7 @@ class DebugVoiceLoopbackActivity : Activity() {
 
             if (!endpoint) {
                 val silence = FloatArray(CHUNK_SAMPLES)
-                repeat(MAX_SILENCE_CHUNKS) {
+                for (index in 0 until MAX_SILENCE_CHUNKS) {
                     val result = asr.accept(silence)
                     if (result.text.isNotBlank()) {
                         transcript = result.text.trim()
@@ -119,7 +119,7 @@ class DebugVoiceLoopbackActivity : Activity() {
                         if (result.text.isNotBlank()) {
                             transcript = result.text.trim()
                         }
-                        return@repeat
+                        break
                     }
                 }
             }

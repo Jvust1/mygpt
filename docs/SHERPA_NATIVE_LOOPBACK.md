@@ -24,3 +24,9 @@ execution/integration validation rather than ASR accuracy scoring.
 
 No speaker or microphone is used in this gate. Real microphone capture and
 audible TTS playback remain separate Xiaomi 14 experience gates.
+
+
+The final evidence collector re-parses the loopback JSON whenever a PASS marker
+exists. It requires non-empty TTS/ASR sample counts, non-empty transcript,
+`completed=true`, and `audio_persisted=false`. A stale/inconsistent PASS
+marker therefore cannot silently pass the final evidence summary.

@@ -271,6 +271,21 @@ if ($LASTEXITCODE -eq 0 -and $VoiceLoopbackGateText -eq "PASS") {
     $VoiceLoopbackStatus = "PASS"
     $VoiceLoopbackGate | Out-File (Join-Path $OutputDirectory "voice-loopback-gate.txt") -Encoding utf8
     $VoiceLoopbackResult = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/voice-loopback-result.json 2>&1
+    $VoiceLoopbackResultText = ($VoiceLoopbackResult | Out-String)
+    try {
+        $VoiceLoopbackJson = $VoiceLoopbackResultText | ConvertFrom-Json
+    }
+    catch {
+        throw "Voice loopback PASS marker exists but result JSON is invalid."
+    }
+    if ($VoiceLoopbackJson.schema -ne "mygpt.voice-loopback.v1" -or
+        $VoiceLoopbackJson.completed -ne $true -or
+        $VoiceLoopbackJson.audio_persisted -ne $false -or
+        [int64]$VoiceLoopbackJson.tts_samples -le 0 -or
+        [int64]$VoiceLoopbackJson.asr_input_samples -le 0 -or
+        [string]::IsNullOrWhiteSpace([string]$VoiceLoopbackJson.transcript)) {
+        throw "Voice loopback PASS marker is inconsistent with result evidence."
+    }
     $VoiceLoopbackResult | Out-File (Join-Path $OutputDirectory "voice-loopback-result.json") -Encoding utf8
 }
 else {
