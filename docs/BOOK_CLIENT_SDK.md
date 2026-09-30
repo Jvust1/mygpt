@@ -96,3 +96,31 @@ AAR API intended for the future real Book app. Result files include
 
 The Windows local build also produces and SHA-256 records
 `book-client-sdk-release.aar`.
+
+
+## Preflight
+
+`BookCompanionClient.preflight()` checks the local integration before any
+sequence is reserved:
+
+- Companion package installed;
+- Android package signatures match according to `PackageManager.checkSignatures`;
+- the Book app currently holds
+  `dev.mygpt.companionv2.permission.BOOK_CONTEXT`.
+
+Possible statuses:
+- `READY`
+- `TARGET_NOT_INSTALLED`
+- `SIGNATURE_MISMATCH`
+- `PERMISSION_NOT_GRANTED`
+
+Every send method runs the same preflight. If it is not READY, the callback
+returns `PREFLIGHT_<STATUS>` and **no context/study sequence is consumed**.
+
+The library manifest also declares a package-visibility query for
+`dev.mygpt.companionv2`, so Android 11+ package visibility does not turn the
+preflight into a false "not installed" result.
+
+This makes real Book adoption failures diagnosable before any ordered broadcast
+and also catches install/signature configuration problems without weakening the
+signature-protected receiver.

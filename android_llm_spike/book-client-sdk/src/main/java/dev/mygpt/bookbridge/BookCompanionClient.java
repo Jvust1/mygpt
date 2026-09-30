@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -15,6 +16,32 @@ import android.os.Looper;
 public final class BookCompanionClient {
     public interface DeliveryCallback {
         void onResult(DeliveryResult result);
+    }
+
+    public enum PreflightStatus {
+        READY,
+        TARGET_NOT_INSTALLED,
+        SIGNATURE_MISMATCH,
+        PERMISSION_NOT_GRANTED
+    }
+
+    public static final class PreflightResult {
+        public final boolean ready;
+        public final PreflightStatus status;
+        public final int signatureCheckCode;
+        public final int permissionCheckCode;
+
+        PreflightResult(
+                boolean ready,
+                PreflightStatus status,
+                int signatureCheckCode,
+                int permissionCheckCode
+        ) {
+            this.ready = ready;
+            this.status = status;
+            this.signatureCheckCode = signatureCheckCode;
+            this.permissionCheckCode = permissionCheckCode;
+        }
     }
 
     public static final class DeliveryResult {
@@ -42,6 +69,59 @@ public final class BookCompanionClient {
         this.main = new Handler(Looper.getMainLooper());
     }
 
+    /**
+     * Local install/signature/permission readiness check.
+     *
+     * No sequence or study state is consumed by this method.
+     */
+    public PreflightResult preflight() {
+        PackageManager pm = appContext.getPackageManager();
+
+        try {
+            pm.getPackageInfo(BookCompanionContract.TARGET_PACKAGE, 0);
+        } catch (PackageManager.NameNotFoundException missing) {
+            return new PreflightResult(
+                    false,
+                    PreflightStatus.TARGET_NOT_INSTALLED,
+                    PackageManager.SIGNATURE_UNKNOWN_PACKAGE,
+                    PackageManager.PERMISSION_DENIED
+            );
+        }
+
+        int signature = pm.checkSignatures(
+                appContext.getPackageName(),
+                BookCompanionContract.TARGET_PACKAGE
+        );
+        if (signature != PackageManager.SIGNATURE_MATCH) {
+            return new PreflightResult(
+                    false,
+                    PreflightStatus.SIGNATURE_MISMATCH,
+                    signature,
+                    PackageManager.PERMISSION_DENIED
+            );
+        }
+
+        int permission = pm.checkPermission(
+                BookCompanionContract.PERMISSION,
+                appContext.getPackageName()
+        );
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            return new PreflightResult(
+                    false,
+                    PreflightStatus.PERMISSION_NOT_GRANTED,
+                    signature,
+                    permission
+            );
+        }
+
+        return new PreflightResult(
+                true,
+                PreflightStatus.READY,
+                signature,
+                permission
+        );
+    }
+
     public void sendContext(
             BookCompanionSession session,
             BookContextPayload payload,
@@ -51,6 +131,7 @@ public final class BookCompanionClient {
         if (session == null) throw new IllegalArgumentException("session is required");
         if (payload == null) throw new IllegalArgumentException("payload is required");
         payload.requireIdentity(session);
+        if (!ensureReady(callback)) return;
 
         final long sequence = session.reserveContextSequence();
         final long nowMs = System.currentTimeMillis();
@@ -84,6 +165,7 @@ public final class BookCompanionClient {
     ) {
         requireCallback(callback);
         if (session == null) throw new IllegalArgumentException("session is required");
+        if (!ensureReady(callback)) return;
 
         final long sequence = session.reserveContextSequence();
         Intent intent = new Intent(BookCompanionContract.ACTION_CONTEXT_CLEAR)
@@ -107,6 +189,7 @@ public final class BookCompanionClient {
         requireCallback(callback);
         requireTtl(ttlMs);
         if (session == null) throw new IllegalArgumentException("session is required");
+        if (!ensureReady(callback)) return;
 
         final long nowMs = System.currentTimeMillis();
         final BookCompanionSession.StudyReservation reservation =
@@ -136,6 +219,7 @@ public final class BookCompanionClient {
         requireCallback(callback);
         requireTtl(ttlMs);
         if (session == null) throw new IllegalArgumentException("session is required");
+        if (!ensureReady(callback)) return;
 
         final BookCompanionSession.StudyReservation reservation =
                 session.reserveStudyEvent(kind);
@@ -161,6 +245,7 @@ public final class BookCompanionClient {
     ) {
         requireCallback(callback);
         if (session == null) throw new IllegalArgumentException("session is required");
+        if (!ensureReady(callback)) return;
 
         Intent intent = new Intent(BookCompanionContract.ACTION_STUDY_EVENT)
                 .setPackage(BookCompanionContract.TARGET_PACKAGE)
@@ -171,6 +256,18 @@ public final class BookCompanionClient {
                 session::finishRevoke,
                 callback
         );
+    }
+
+    private boolean ensureReady(DeliveryCallback callback) {
+        PreflightResult result = preflight();
+        if (result.ready) return true;
+
+        main.post(() -> callback.onResult(new DeliveryResult(
+                false,
+                Activity.RESULT_CANCELED,
+                "PREFLIGHT_" + result.status.name()
+        )));
+        return false;
     }
 
     private static Intent studyIntent(

@@ -1,3 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="dev.mygpt.companionv2.permission.BOOK_CONTEXT" />
+
+    <queries>
+        <package android:name="dev.mygpt.companionv2" />
+    </queries>
 </manifest>
