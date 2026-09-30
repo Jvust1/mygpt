@@ -1,0 +1,93 @@
+name: llama.cpp Android library acceptance
+
+on:
+  push:
+    branches: [feat/airi-chat-memory-brain-20260929]
+    paths:
+      - '.gitmodules'
+      - 'third_party/llama.cpp/**'
+      - '.github/workflows/llama-android-acceptance.yml'
+  pull_request:
+    paths:
+      - '.gitmodules'
+      - 'third_party/llama.cpp/**'
+      - '.github/workflows/llama-android-acceptance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  llama-android-lib:
+    if: github.repository == 'Jvust/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+          submodules: recursive
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a
+        with:
+          gradle-version: '8.14.3'
+
+      - name: Verify pinned llama.cpp source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f third_party/llama.cpp/upstream/LICENSE
+          test -f third_party/llama.cpp/upstream/examples/llama.android/lib/src/main/cpp/ai_chat.cpp
+          test -f third_party/llama.cpp/upstream/examples/llama.android/lib/src/main/java/com/arm/aichat/InferenceEngine.kt
+          actual="$(git -C third_party/llama.cpp/upstream rev-parse HEAD)"
+          test "$actual" = "ba0ba54d93b25faf1e149f4ccedd3e9d84798563"
+          echo "llama.cpp pin PASS: $actual"
+
+      - name: Install upstream Android native toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "ndk;29.0.13113456" "cmake;3.31.6"
+
+      - name: Build pinned upstream Android inference library
+        shell: bash
+        working-directory: third_party/llama.cpp/upstream/examples/llama.android
+        env:
+          ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13113456
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew :lib:assembleRelease --no-daemon --stacktrace
+
+      - name: Verify release AAR
+        shell: bash
+        run: |
+          set -euo pipefail
+          aar="third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
+          test -f "$aar"
+          python - <<'PY'
+          import zipfile
+          aar = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
+          with zipfile.ZipFile(aar) as z:
+              names=set(z.namelist())
+              if "classes.jar" not in names:
+                  raise SystemExit("missing classes.jar")
+              native=[n for n in names if n.endswith("/libai-chat.so")]
+              if not native:
+                  raise SystemExit("missing libai-chat.so")
+              print("AAR PASS:", native)
+          PY
+
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: mygpt-llama-android-lib
+          path: third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar
+          if-no-files-found: error
+          retention-days: 3
