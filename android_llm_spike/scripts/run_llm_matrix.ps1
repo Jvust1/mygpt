@@ -49,12 +49,16 @@ foreach($Candidate in $Candidates){
     $Passed.Add($Candidate)
 }
 
+$QualityFiles=@(Get-ChildItem -LiteralPath $OutputDirectory -Filter "llm-quality-*.json" -File -ErrorAction SilentlyContinue)
+
 $Summary=@(
-    "schema=mygpt.llm-benchmark-matrix.v1",
+    "schema=mygpt.llm-benchmark-matrix.v2",
     "device_serial=$DeviceSerial",
     "candidate_directory=$CandidateDirectory",
     "pass_count=$($Passed.Count)",
-    "passed=$($Passed -join ',')"
+    "passed=$($Passed -join ',')",
+    "quality_sample_count=$($QualityFiles.Count)",
+    "automatic_quality_ranking=DISABLED"
 )
 $Summary | Out-File (Join-Path $OutputDirectory "llm-matrix-summary.txt") -Encoding utf8
 Write-Host ("LLM matrix PASS: "+($Passed -join ", ")) -ForegroundColor Green

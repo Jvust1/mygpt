@@ -144,6 +144,36 @@ $ReportText=($Report | Out-String)
 $Report | Out-File (Join-Path $OutputDirectory $ReportName) -Encoding utf8
 if($ReportText -notmatch ("candidate_id="+$CandidateId) -or $ReportText -notmatch ("model_sha256="+$Sha)){ throw "Benchmark report identity mismatch." }
 
+# Run fixed qualitative samples in a fresh process. No automatic model ranking.
+Invoke-AdbChecked @("-s",$DeviceSerial,"shell","am","force-stop","dev.mygpt.companionv2")
+& $AdbPath -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 rm -f ("files/llm-quality-"+$CandidateId+".json") 2>$null
+$EvalStart=& $AdbPath -s $DeviceSerial shell am start -W -n dev.mygpt.companionv2/.DebugLlmQualityEvalActivity 2>&1
+$EvalStart | Out-File (Join-Path $OutputDirectory ("llm-quality-start-"+$CandidateId+".txt")) -Encoding utf8
+
+$QualityText=""
+for($i=0;$i -lt 900;$i++){
+    Start-Sleep -Seconds 1
+    $Quality=& $AdbPath -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat ("files/llm-quality-"+$CandidateId+".json") 2>&1
+    if($LASTEXITCODE -eq 0){
+        $QualityText=($Quality | Out-String)
+        if($QualityText -match '"completed"\s*:\s*true'){ break }
+    }
+}
+$QualityPath=Join-Path $OutputDirectory ("llm-quality-"+$CandidateId+".json")
+$QualityText | Out-File $QualityPath -Encoding utf8
+if($QualityText -notmatch '"schema"\s*:\s*"mygpt\.llm-quality-sample\.v1"'){
+    throw "LLM fixed quality suite did not produce a valid report."
+}
+if($QualityText -notmatch ('"candidate_id"\s*:\s*"'+[regex]::Escape($CandidateId)+'"')){
+    throw "LLM quality report candidate identity mismatch."
+}
+if($QualityText -notmatch ('"model_sha256"\s*:\s*"'+[regex]::Escape($Sha)+'"')){
+    throw "LLM quality report SHA identity mismatch."
+}
+if($QualityText -notmatch '"completed"\s*:\s*true'){
+    throw "LLM fixed quality suite timed out or remained incomplete."
+}
+
 $GateFile="adb-llm-gate-"+$CandidateId+".txt"
 Invoke-AdbChecked @("-s",$DeviceSerial,"shell","run-as","dev.mygpt.companionv2","sh","-c",("echo PASS > files/"+$GateFile))
-Write-Host "Local GGUF import/load/benchmark gate PASS: $CandidateId" -ForegroundColor Green
+Write-Host "Local GGUF import/load/benchmark + fixed quality sample gate PASS: $CandidateId" -ForegroundColor Green
