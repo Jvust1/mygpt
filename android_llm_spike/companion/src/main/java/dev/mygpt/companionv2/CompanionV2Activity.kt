@@ -911,8 +911,8 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun clearRecentConversation() {
-        if (generating) {
-            memoryState.text = "正在生成，请稍后清空最近对话"
+        if (generating || benchmarking) {
+            memoryState.text = "正在生成/基准测试，请稍后清空最近对话"
             return
         }
         scope.launch {
