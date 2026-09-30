@@ -50,7 +50,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class CompanionV2Activity : AndroidApplication() {
+class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private lateinit var page: LinearLayout
@@ -953,6 +953,12 @@ class CompanionV2Activity : AndroidApplication() {
         }
     }
 
+    override fun onBookContextChanged(current: BookContextSnapshot?) {
+        runOnUiThread {
+            refreshBookContextStatus()
+        }
+    }
+
     private fun refreshBookContextStatus() {
         val current = BookContextMailbox.shared().current(System.currentTimeMillis())
         bookState.text = if (current == null) {
@@ -1234,11 +1240,13 @@ class CompanionV2Activity : AndroidApplication() {
     override fun onStart() {
         super.onStart()
         foreground = true
+        BookContextMailbox.shared().addListener(this)
         refreshBookContextStatus()
     }
 
     override fun onStop() {
         if (!isInPictureInPictureMode) {
+            BookContextMailbox.shared().removeListener(this)
             foreground = false
             generationJob?.cancel()
             generationJob = null
@@ -1254,6 +1262,7 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     override fun onDestroy() {
+        BookContextMailbox.shared().removeListener(this)
         stopRecording(null)
         generationJob?.cancel()
         generationJob = null

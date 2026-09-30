@@ -5,10 +5,19 @@ public final class BookContextMailboxSmoke {
         BookContextMailbox mailbox = BookContextMailbox.shared();
         mailbox.resetForTests();
 
+        final int[] listenerEvents = {0};
+        final BookContextSnapshot[] listenerLast = {null};
+        BookContextMailbox.Listener listener = value -> {
+            listenerEvents[0]++;
+            listenerLast[0] = value;
+        };
+        mailbox.addListener(listener);
+
         long now = 1_800_000_000_000L;
         BookContextSnapshot first = context("s1", 1, "book@v1", "sec1", "src1", now, now + 60_000);
         mailbox.accept(first, now + 1);
         require(mailbox.current(now + 2) == first, "first accepted");
+        require(listenerEvents[0] == 1 && listenerLast[0] == first, "listener first");
 
         expectFailure(() -> mailbox.accept(first, now + 3), "replay");
 
@@ -25,6 +34,7 @@ public final class BookContextMailboxSmoke {
 
         require(mailbox.clear("s1", 3, now + 3000, now + 3001), "clear accepted");
         require(mailbox.current(now + 3002) == null, "cleared");
+        require(listenerEvents[0] == 3 && listenerLast[0] == null, "listener clear");
 
         BookContextSnapshot newSession = context(
                 "s2", 1, "book@v1", "sec9", "src9", now + 4000, now + 64_000);
@@ -48,6 +58,14 @@ public final class BookContextMailboxSmoke {
                 .contains("\"status\":\"unavailable\""), "unavailable marker");
 
         require(mailbox.current(now + 70_000) == null, "expiry");
+
+        mailbox.removeListener(listener);
+        int beforeRemove = listenerEvents[0];
+        mailbox.resetForTests();
+        BookContextSnapshot afterRemove = context(
+                "s3", 1, "book@v1", "sec1", "src1", now + 80000, now + 140000);
+        mailbox.accept(afterRemove, now + 80001);
+        require(listenerEvents[0] == beforeRemove, "listener removed");
 
         System.out.println("BookContextMailboxSmoke PASS");
     }
