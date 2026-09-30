@@ -96,3 +96,15 @@ Companion V2 does not auto-capture chat transcripts. Relevant explicit memories 
 
 ## D032 — official model archives are parsed through a strict allowlist
 MyGPT accepts ZIP, TAR.BZ2 and TAR.GZ model packages through Apache Commons Compress 1.28.0. Archive paths are never materialized directly: ASR/TTS installers select known basenames only, enforce per-file and total decompressed-size limits, and preserve README/LICENSE when present.
+
+## D033 — Book Android context requires same-signature explicit delivery
+Companion V2 exposes a custom Android signature permission for Book semantic context. The receiver also requires explicit targeting to the MyGPT package/component, validates TTL, monotonic sequence, session identity and source SHA-256, and stores accepted Book text in process memory only. Every llama user turn explicitly declares current Book state as fresh or unavailable; prior Book blocks retained by llama KV history are historical data only.
+
+## D034 — recent conversation persistence is not long-term memory
+Visible user/assistant text may be kept in a bounded local conversation store solely to recover conversational continuity after model reload/process restart. It excludes Book blocks, recalled-memory blocks, raw audio, TTS audio, system prompt and ACT markers. Explicit long-term memory remains a separate user-controlled store and policy.
+
+## D035 — Activity lifecycle must not destroy llama.cpp's process singleton
+The pinned llama.cpp Android AiChat implementation retains a process-wide static InferenceEngine singleton. MyGPT therefore unloads models on Activity-level close/replacement and leaves final native backend destruction to process termination. Destroying the singleton inside Activity lifecycle is prohibited because later Activity recreation would reuse a destroyed singleton reference.
+
+## D036 — default on-device GGUF is benchmark-gated
+MyGPT does not name a default Xiaomi 14 GGUF before device evidence exists. Candidate models must be compared using the local llama benchmark plus real-chat first-token latency, sustained memory/thermal behavior, crash/OOM behavior and reply quality. Benchmark reports stay app-private unless the user explicitly collects the local evidence directory.

@@ -5,7 +5,7 @@
   "default_branch": "main",
   "active_branch": "feat/airi-chat-memory-brain-20260929",
   "phase": "COMPANION_V2_LOCAL_AI_VOICE_MEMORY_INTEGRATION",
-  "status": "DRAFT_REMOTE_CI_RUNNER_BLOCKED_DEVICE_PENDING",
+  "status": "DRAFT_EXACT_HEAD_LOCAL_ACCEPTANCE_PATH_READY_REMOTE_RUNNER_BLOCKED",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -86,7 +86,9 @@
     "Real provider teaching quality remains disabled/unverified.",
     "GitHub hosted Actions currently fail before runner allocation (runner_id=0, zero steps), so exact-head Companion V2/voice builds have not executed.",
     "Companion V2 local llama/sherpa/TTS stack has not yet been built or installed on Xiaomi 14.",
-    "Real authenticated Book Android producer/context transport remains unconnected."
+    "Real authenticated Book Android producer/context transport remains unconnected.",
+    "Real Book APK signing identity must match Companion V2 before the signature-protected producer contract can replace the synthetic test sender.",
+    "On-device GGUF choice remains benchmark-gated; no default model is accepted before Xiaomi 14 measurements."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -108,7 +110,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Restore a usable GitHub Actions runner or execute the exact-head Android builds elsewhere; then install Companion V2 on Xiaomi 14 and validate the full local chain: 3714430278 Spine + imported GGUF + llama.cpp JNI + sherpa ASR + Melo TTS + explicit Android memory. After local/device acceptance, connect authenticated real Book Android semantic context.",
+  "next_step": "Use android_llm_spike/scripts/build_and_install_companion_v2.ps1 on Windows to build the exact head, verify same-signature Companion/Book-sender APKs, install on Xiaomi 14, and execute docs/COMPANION_V2_XIAOMI14_ACCEPTANCE.md. Run the in-app llama benchmark and collect final evidence with collect_companion_v2_evidence.ps1. Only after local stack acceptance should the real Book APK implement the same-signature producer contract.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -900,7 +902,7 @@
     "branch": "feat/airi-chat-memory-brain-20260929",
     "draft_pr": 15,
     "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-    "exact_head": "a83680c1810242d541941b6c2b1a361c8d00bf71",
+    "exact_head": "5b932e6f1bbe1ca7db645802475d50b322c32ec4",
     "target": "All-local Android companion: Book-aware chat + 3714430278 + on-device LLM + ASR/TTS + explicit memory",
     "android": {
       "module": "android_llm_spike/companion",
@@ -1036,19 +1038,19 @@
         "status": "NOT_EXECUTED_RUNNER_PROVISIONING_FAILURE",
         "runs": [
           {
-            "id": 36659174083,
-            "workflow": "llama.cpp Android library acceptance",
+            "id": 36662638935,
+            "workflow": "Companion V2 local AI Android acceptance",
             "runner_id": 0,
             "steps": 0
           },
           {
-            "id": 36659174123,
+            "id": 36662638952,
             "workflow": "sherpa-onnx Android voice acceptance",
             "runner_id": 0,
             "steps": 0
           },
           {
-            "id": 36659174091,
+            "id": 36662638973,
             "workflow": "Android companion boundary spike",
             "runner_id": 0,
             "steps": 0
@@ -1068,6 +1070,77 @@
       "network_provider_required": false,
       "computer_required_for_runtime": false,
       "model_weights_in_repo": false
+    },
+    "book_context": {
+      "contract": "docs/ANDROID_BOOK_CONTEXT_CONTRACT_V1.md",
+      "receiver": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/BookContextReceiver.java",
+      "permission": "dev.mygpt.companionv2.permission.BOOK_CONTEXT",
+      "protection_level": "signature",
+      "delivery": "explicit-package BroadcastReceiver",
+      "storage": "process-memory only",
+      "ttl_ms_max": 300000,
+      "sequence_rule": "new session starts at 1; exact +1 within session",
+      "current_turn_marker": [
+        "fresh",
+        "unavailable"
+      ],
+      "real_book_connected": false,
+      "synthetic_same_signature_sender": "android_llm_spike/book-sender-test",
+      "sender_device_test": "NOT_RUN"
+    },
+    "conversation_continuity": {
+      "store": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalConversationStore.kt",
+      "max_rows_per_persona": 100,
+      "persisted_content": "visible user/assistant text only",
+      "excluded": [
+        "Book context blocks",
+        "memory blocks",
+        "system prompt",
+        "raw audio",
+        "TTS audio",
+        "AIRI ACT markers"
+      ],
+      "prime_policy": "at most 10 recent turns once after model load/reload",
+      "clear_command": ":clear-chat",
+      "long_term_memory_separate": true
+    },
+    "llama_lifecycle": {
+      "upstream_engine": "process-wide AiChat singleton",
+      "activity_close_behavior": "best-effort cleanUp/unload; do not destroy singleton",
+      "model_replacement": "cleanUp -> loadModel -> setSystemPrompt",
+      "generation_background_behavior": "cancel Flow collection on Activity onStop",
+      "final_native_teardown": "Android process termination"
+    },
+    "local_benchmark": {
+      "ui": "运行本机模型基准",
+      "parameters": {
+        "prompt_processing_tokens": 128,
+        "generation_steps": 64,
+        "parallel_sequences": 1,
+        "repetitions": 1
+      },
+      "captures": [
+        "GGUF filename/hash/bytes",
+        "wall-clock",
+        "PSS before/after",
+        "native heap before/after",
+        "Java heap before/after",
+        "thermal before/after",
+        "llama benchmark table"
+      ],
+      "report": "files/benchmark-last.txt",
+      "uploaded": false,
+      "device_result": "NOT_RUN"
+    },
+    "local_acceptance": {
+      "gradle_wrapper": "android_llm_spike/gradlew.bat",
+      "gradle_version": "8.14.3",
+      "build_install_script": "android_llm_spike/scripts/build_and_install_companion_v2.ps1",
+      "evidence_collector": "android_llm_spike/scripts/collect_companion_v2_evidence.ps1",
+      "acceptance_doc": "docs/COMPANION_V2_XIAOMI14_ACCEPTANCE.md",
+      "evidence_dir": "android_llm_spike/device_evidence/ (gitignored)",
+      "device": "Xiaomi 14",
+      "status": "READY_TO_EXECUTE_NOT_RUN"
     }
   }
 }

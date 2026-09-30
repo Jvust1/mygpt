@@ -1,3 +1,22 @@
+## 2026-09-30 · Book signed bridge + durable conversation + local acceptance path · PR #15
+
+Exact head: `5b932e6f1bbe1ca7db645802475d50b322c32ec4`.
+
+Since the prior Companion V2 checkpoint, the candidate now also includes:
+
+- a **signature-permission-protected Book Android context bridge**. Valid context is explicit-package only, TTL-bounded, sequence-checked, process-memory only, and is rendered as lower-authority model data. Every turn marks Book as `fresh` or `unavailable` so stale context retained in llama KV history cannot silently stay current;
+- a **same-signature synthetic Book sender APK** built beside Companion V2 for physical-device validation without weakening the production receiver permission;
+- a separate bounded **recent conversation SQLite store**. It contains visible user/assistant text only, primes at most 10 turns after model reload, and remains distinct from explicit Mem0-style long-term memory;
+- a llama.cpp lifecycle fix for the upstream **process-wide AiChat singleton**: Activity-level close now unloads the model instead of destroying the process singleton;
+- an in-app **local llama benchmark** that records model hash/bytes, wall-clock, PSS/native/Java heap and Android thermal status to app-private `benchmark-last.txt`;
+- a pinned Gradle 8.14.3 wrapper plus Windows scripts for exact-head build/install, same-signature verification, Xiaomi 14 installation and post-run evidence collection.
+
+The preferred next validation path is now local Windows + Xiaomi 14 because GitHub hosted Actions remain unavailable. Exact-head runs `36662638935`, `36662638952` and `36662638973` all terminated before step 1 with `runner_id=0` and zero steps. This remains an infrastructure failure, not a code test result.
+
+Real Book is **not connected yet**. The synthetic sender proves only the receiver contract/signature boundary once device-tested; the real Book APK must later use the same signing certificate and producer contract.
+
+---
+
 ## 2026-09-30 · Companion V2 全本地栈代码集成 checkpoint · PR #15
 
 当前精确 head：`a83680c1810242d541941b6c2b1a361c8d00bf71`。PR #15 仍为 Draft，base 为 `feat/spine-3714430278-runtime-refresh-20260929`，main 未修改。

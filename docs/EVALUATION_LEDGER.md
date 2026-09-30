@@ -1,3 +1,41 @@
+## E017 — Companion V2 signed Book/local-device acceptance path (2026-09-30)
+
+**Status:** CODE_READY_FOR_LOCAL_BUILD / REMOTE_RUNNER_UNAVAILABLE / DEVICE_NOT_RUN
+
+**Exact head:** `5b932e6f1bbe1ca7db645802475d50b322c32ec4`
+
+### Added evidence mechanisms
+- signature-protected Book receiver + pure-Java mailbox contract;
+- same-build debug Book sender to exercise Android signature permission;
+- fresh/unavailable Book state marker on every llama user turn;
+- bounded recent visible conversation persistence, separated from explicit long-term memory;
+- llama process-singleton lifecycle hardening;
+- on-device llama benchmark with local PSS/heap/thermal report;
+- pinned Gradle 8.14.3 wrapper;
+- Windows exact-head build/install/signature-check script;
+- post-run ADB evidence collector.
+
+### Current remote status
+Representative exact-head jobs still never received a runner:
+- run 36662638935: Companion V2, runner_id=0, 0 steps;
+- run 36662638952: sherpa voice, runner_id=0, 0 steps;
+- run 36662638973: Android boundary jobs, runner_id=0, 0 steps.
+
+No checkout, compiler, Gradle task or test assertion ran in those jobs.
+
+### Acceptance still required
+- local exact-head Gradle build;
+- same-signature APK verification;
+- Xiaomi 14 install/reopen;
+- positive synthetic Book delivery and negative shell/non-signature probe;
+- 3714430278 rendering/reactions;
+- GGUF load/chat/benchmark/thermal behavior;
+- streaming ASR and optional TTS;
+- memory/history/forget and recent-chat reset;
+- final ADB/log/screenshot evidence package.
+
+---
+
 ## E016 — Companion V2 all-local stack exact-head checkpoint (2026-09-30)
 
 **Status:** CODE_INTEGRATED / EXACT_HEAD_REMOTE_EXECUTION_BLOCKED / DEVICE_PENDING

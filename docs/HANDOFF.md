@@ -1,3 +1,33 @@
+## Latest handoff · PR #15 · local-device gate ready
+
+Current head: `5b932e6f1bbe1ca7db645802475d50b322c32ec4`.
+
+The next operator should **not wait on GitHub hosted runners**. Use the pinned Windows wrapper path:
+
+`android_llm_spike/scripts/build_and_install_companion_v2.ps1`
+
+Then follow:
+
+`docs/COMPANION_V2_XIAOMI14_ACCEPTANCE.md`
+
+After manual Book/skin/GGUF/ASR/TTS/memory/benchmark checks, collect final evidence with:
+
+`android_llm_spike/scripts/collect_companion_v2_evidence.ps1`
+
+Important boundaries remain:
+- main untouched; PR #15 Draft;
+- Book/Live repositories untouched;
+- real Book producer not yet connected;
+- synthetic Book sender is test-only;
+- Companion V2 has no INTERNET, SYSTEM_ALERT_WINDOW or broad-storage permission;
+- Book context stays process-memory only;
+- recent conversation is not semantic long-term memory;
+- model weights remain external user inputs.
+
+Do not mark Companion V2 accepted until the exact-head local build and Xiaomi 14 evidence package exist.
+
+---
+
 ## Latest handoff · 2026-09-30 · PR #15 Companion V2 all-local candidate
 
 Current branch/head: `feat/airi-chat-memory-brain-20260929` @ `a83680c1810242d541941b6c2b1a361c8d00bf71`; Draft PR #15; base `feat/spine-3714430278-runtime-refresh-20260929`; main untouched.
