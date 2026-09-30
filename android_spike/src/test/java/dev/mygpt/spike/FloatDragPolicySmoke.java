@@ -27,11 +27,18 @@ public final class FloatDragPolicySmoke {
         require(nearestTop.x == 100 && nearestTop.y == 10, "nearest top");
 
         FloatDragPolicy.Position tiePrefersVertical = FloatDragPolicy.snap(
-                new FloatDragPolicy.Position(100, 155),
-                new FloatDragPolicy.Bounds(0, 0, 200, 310),
+                new FloatDragPolicy.Position(100, 100),
+                new FloatDragPolicy.Bounds(0, 0, 200, 200),
                 FloatDragPolicy.SnapMode.NEAREST_SIDE);
         require(tiePrefersVertical.x == 100 && tiePrefersVertical.y == 0,
                 "tie determinism");
+
+        FloatDragPolicy.Position rectangleCenter = FloatDragPolicy.snap(
+                new FloatDragPolicy.Position(100, 155),
+                new FloatDragPolicy.Bounds(0, 0, 200, 310),
+                FloatDragPolicy.SnapMode.NEAREST_SIDE);
+        require(rectangleCenter.x == 0 && rectangleCenter.y == 155,
+                "rectangle center is closer to horizontal sides, not a tie");
 
         System.out.println("FloatDragPolicySmoke PASS");
     }

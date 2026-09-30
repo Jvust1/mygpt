@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    // Strict streaming ACT decoding only; no reflective POJO mapping.
+    implementation("com.google.code.gson:gson:2.14.0")
     // 3714430278/skeleton.bin identifies itself as Spine 4.1.20.
     // Spine documents that runtimes match the exported major.minor line, so use 4.1.0.
     // Distribution remains license-gated; the exact runtime notice is bundled in assets.

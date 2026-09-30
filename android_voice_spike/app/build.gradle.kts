@@ -24,6 +24,8 @@ android {
 }
 
 dependencies {
+    // Shared ACT parser uses strict Gson streaming only, without POJO reflection.
+    implementation("com.google.code.gson:gson:2.14.0")
     implementation("com.github.k2-fsa.sherpa-onnx:sherpa-onnx:v1.13.8")
     implementation("org.apache.commons:commons-compress:1.28.0")
 }

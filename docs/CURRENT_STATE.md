@@ -1,3 +1,14 @@
+## 2026-09-30 · Android AIRI boundary compiles with strict Gson
+
+The shared Android ACT parser's inherited 22 syntax errors are repaired. Actual
+Gson strict streaming decoding now applies the reviewed quote/truncation/JSON
+boundaries before Companion V2 history, character emotion and speech. All four
+Gradle consumers are pinned with bundled notices. Eighteen local Java smoke
+entrypoints and 327 Python/Gson parity cases pass. The current-repository Java
+8/17 gate is enabled; APK/device acceptance remains separate. See [scope and evidence](ANDROID_GSON_ACT_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · Pipecat speech formatting and owned response callbacks
 
 The production voice processor now invokes the pinned upstream Markdown filter

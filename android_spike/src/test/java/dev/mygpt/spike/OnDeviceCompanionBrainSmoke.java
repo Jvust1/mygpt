@@ -3,6 +3,7 @@ package dev.mygpt.spike;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public final class OnDeviceCompanionBrainSmoke {
@@ -10,6 +11,7 @@ public final class OnDeviceCompanionBrainSmoke {
         String systemPrompt;
         String userPrompt;
         boolean destroyed;
+        String[] overrideTokens;
 
         @Override public void load(String modelPath) {}
 
@@ -23,6 +25,10 @@ public final class OnDeviceCompanionBrainSmoke {
                 LocalLlmEngine.TokenSink sink
         ) {
             userPrompt = prompt;
+            if (overrideTokens != null) {
+                for (String token : overrideTokens) sink.onToken(token);
+                return;
+            }
             sink.onToken("继续");
             sink.onToken("<|ACT:");
             sink.onToken("{\"emotion\":{\"name\":\"happy\",\"intensity\":0.75}}|>");
@@ -90,6 +96,21 @@ public final class OnDeviceCompanionBrainSmoke {
                     "book context is data boundary");
             require(backend.userPrompt.contains("[USER_MESSAGE]\n解释这一节"),
                     "user boundary");
+            backend.overrideTokens = new String[]{"Before", "<|ACT:{\"emotion\":\"sad\",\"note\":\"a|>b\"}|>", "After"};
+            OnDeviceCompanionBrain.Response quoted = brain.send("next", null).get(2, TimeUnit.SECONDS);
+            require("BeforeAfter".equals(quoted.text), "quoted delimiter never leaks into reply");
+            require(quoted.emotion == PresentationEmotion.SAD, "quoted payload emotion");
+            backend.overrideTokens = new String[]{"visible<|AC"};
+            require("visible".equals(brain.send("next", null).get(2, TimeUnit.SECONDS).text),
+                    "truncated marker hidden at real brain boundary");
+            backend.overrideTokens = new String[]{"<|ACT:{\"emotion\":\"happy\"}|>"};
+            try {
+                brain.send("next", null).get(2, TimeUnit.SECONDS);
+                throw new AssertionError("marker-only reply must fail");
+            } catch (ExecutionException expected) {
+                require(expected.getCause() instanceof IllegalStateException,
+                        "marker-only reply has no visible text");
+            }
         } finally {
             brain.close();
             require(backend.destroyed, "engine destroyed");
