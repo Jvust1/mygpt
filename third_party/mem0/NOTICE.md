@@ -32,3 +32,12 @@ The Android store keeps the same explicit add/search/get/update/delete/history
 lifecycle. It also adds a `purge()` privacy path that removes both active memory
 and its audit history when the user explicitly asks to forget/erase a memory.
 Chat turns are not automatically written to this store.
+
+
+Conversation continuity is stored separately from semantic long-term memory:
+- `android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalConversationStore.kt`
+
+This bounded SQLite store contains only visible user/assistant text and is used
+once to prime recent conversational continuity after a local model reload.
+It does not store Book context blocks, recalled-memory blocks, raw audio, or ACT
+control markers, and it never promotes conversation text into long-term memory.
