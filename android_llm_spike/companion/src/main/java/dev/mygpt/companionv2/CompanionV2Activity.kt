@@ -13,6 +13,8 @@ import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
 import android.os.Debug
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.os.SystemClock
 import android.util.Rational
@@ -56,6 +58,18 @@ import java.util.concurrent.TimeUnit
 class CompanionV2Activity : AndroidApplication(),
     BookContextMailbox.Listener,
     StudySupervisorRuntime.Listener {
+    private val expiryHandler = Handler(Looper.getMainLooper())
+    @Volatile private var expiryTickerRunning = false
+    private val expiryTick = object : Runnable {
+        override fun run() {
+            if (!expiryTickerRunning) return
+            val now = System.currentTimeMillis()
+            StudySupervisorRuntime.shared().expireIfNeeded(now)
+            refreshBookContextStatus()
+            expiryHandler.postDelayed(this, EXPIRY_TICK_MS)
+        }
+    }
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private lateinit var personaCard: AndroidCharacterCard
@@ -254,12 +268,25 @@ class CompanionV2Activity : AndroidApplication(),
         restoreSkin()
     }
 
+    private fun startExpiryTicker() {
+        if (expiryTickerRunning) return
+        expiryTickerRunning = true
+        expiryHandler.post(expiryTick)
+    }
+
+    private fun stopExpiryTicker() {
+        expiryTickerRunning = false
+        expiryHandler.removeCallbacks(expiryTick)
+    }
+
     private fun enterCompanionPip() {
         if (isInPictureInPictureMode) return
         if (!skinReady) {
             characterState.text = "角色：请先加载 3714430278"
             return
         }
+
+        stopRecording("语音：进入陪伴小窗已停止麦克风")
 
         val params = PictureInPictureParams.Builder()
             .setAspectRatio(Rational(1, 1))
@@ -1317,12 +1344,14 @@ class CompanionV2Activity : AndroidApplication(),
         BookContextMailbox.shared().addListener(this)
         StudySupervisorRuntime.shared().addListener(this)
         refreshBookContextStatus()
+        startExpiryTicker()
     }
 
     override fun onStop() {
         if (!isInPictureInPictureMode) {
             BookContextMailbox.shared().removeListener(this)
             StudySupervisorRuntime.shared().removeListener(this)
+            stopExpiryTicker()
             foreground = false
             generationJob?.cancel()
             generationJob = null
@@ -1338,6 +1367,7 @@ class CompanionV2Activity : AndroidApplication(),
     }
 
     override fun onDestroy() {
+        stopExpiryTicker()
         BookContextMailbox.shared().removeListener(this)
         StudySupervisorRuntime.shared().removeListener(this)
         stopRecording(null)

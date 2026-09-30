@@ -190,6 +190,18 @@ public final class StudySupervisorRuntime {
         return result;
     }
 
+    public synchronized boolean expireIfNeeded(long nowMs) {
+        if (nowMs < 0L) throw new IllegalArgumentException("invalid supervision clock");
+        if (!coordinator.expireIfNeeded(nowMs)) return false;
+
+        activeSessionId = null;
+        supervisionOptIn = false;
+        currentCue = coordinator.currentCue();
+        lastStatus = "SESSION_EXPIRED";
+        notifyAllListeners();
+        return true;
+    }
+
     public synchronized void revokeSignedSession() {
         coordinator.revokeSession();
         activeSessionId = null;

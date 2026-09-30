@@ -85,6 +85,19 @@ public final class StudySupervisorRuntimeSmoke {
         check(runtime.snapshot().dataBlock().contains("\"active\":false"),
                 "ended data block inactive");
 
+        check(runtime.acceptSigned(
+                "SESSION_STARTED", "study-expiry", 1, epoch + 1, now + 1000, now + 900
+        ).accepted, "expiry session start");
+        check(runtime.setSupervisionOptIn(true), "expiry session opt-in");
+        check(!runtime.expireIfNeeded(now + 999), "not expired before deadline");
+        check(runtime.expireIfNeeded(now + 1000), "expires at deadline");
+        check(!runtime.hasActiveSession(), "expiry clears active session");
+        check(!runtime.isSupervisionOptIn(), "expiry clears opt-in");
+        check(runtime.currentCue() == CompanionCoordinator.Cue.QUIET,
+                "expiry quiet cue");
+        check("SESSION_EXPIRED".equals(runtime.snapshot().status),
+                "expiry status");
+
         runtime.removeListener(listener);
         check(cues.contains(CompanionCoordinator.Cue.GENTLE_CHECK_IN),
                 "listener observed gentle cue");
