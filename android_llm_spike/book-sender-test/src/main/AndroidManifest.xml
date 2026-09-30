@@ -20,6 +20,13 @@
             <intent-filter>
                 <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_SEND_CONTEXT_V1" />
                 <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_CLEAR_CONTEXT_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_REVOKE_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_END_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_REPEATED_ERROR_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_RESUME_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_PAUSE_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_HELP_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_START_V1" />
             </intent-filter>
         </receiver>
     </application>

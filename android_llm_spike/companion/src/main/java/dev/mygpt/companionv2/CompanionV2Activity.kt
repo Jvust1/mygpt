@@ -202,6 +202,7 @@ class CompanionV2Activity : AndroidApplication(),
         page.addView(supervisionState)
         supervisionButton = button("开启当前会话轻监督") { toggleSupervision() }.apply {
             isEnabled = false
+            contentDescription = "TOGGLE_STUDY_SUPERVISION"
         }
         page.addView(supervisionButton)
 
@@ -981,7 +982,11 @@ class CompanionV2Activity : AndroidApplication(),
             } else {
                 "开启当前会话轻监督"
             }
-            supervisionState.text = "轻监督：" + status + " · cue=" + cue.name
+            supervisionState.text = "轻监督：" + status
+                + " · cue=" + cue.name
+                + " · SUPERVISION_STATUS=" + status
+                + " · SUPERVISION_CUE=" + cue.name
+                + " · SUPERVISION_OPT_IN=" + supervisionOptIn
             if (skinReady) {
                 characterRuntime.show(cue)
             }

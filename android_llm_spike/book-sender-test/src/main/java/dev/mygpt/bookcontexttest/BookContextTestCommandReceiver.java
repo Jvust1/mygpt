@@ -18,9 +18,8 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Synthetic ADB-command entry point for physical-device bridge acceptance.
  *
- * ADB invokes this exported receiver, but the nested Book-context broadcast is
- * sent by this app's UID. Therefore Companion V2 still enforces the real
- * signature permission between the two installed APKs.
+ * ADB invokes this exported receiver, but nested Book broadcasts are sent by
+ * this app's UID, so Companion V2 still enforces its real signature permission.
  */
 public final class BookContextTestCommandReceiver extends BroadcastReceiver {
     public static final String ACTION_SEND =
@@ -28,17 +27,38 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
     public static final String ACTION_CLEAR =
             "dev.mygpt.bookcontexttest.action.AUTOMATED_CLEAR_CONTEXT_V1";
 
+    public static final String ACTION_STUDY_START =
+            "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_START_V1";
+    public static final String ACTION_STUDY_HELP =
+            "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_HELP_V1";
+    public static final String ACTION_STUDY_PAUSE =
+            "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_PAUSE_V1";
+    public static final String ACTION_STUDY_RESUME =
+            "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_RESUME_V1";
+    public static final String ACTION_STUDY_REPEATED_ERROR =
+            "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_REPEATED_ERROR_V1";
+    public static final String ACTION_STUDY_END =
+            "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_END_V1";
+    public static final String ACTION_STUDY_REVOKE =
+            "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_REVOKE_V1";
+
     private static final String TARGET_PACKAGE = "dev.mygpt.companionv2";
     private static final String TARGET_ACTION =
             "dev.mygpt.companionv2.action.BOOK_CONTEXT_V1";
     private static final String TARGET_CLEAR =
             "dev.mygpt.companionv2.action.BOOK_CONTEXT_CLEAR_V1";
+    private static final String TARGET_STUDY =
+            "dev.mygpt.companionv2.action.BOOK_STUDY_EVENT_V1";
 
     private static final String PREFS = "book_context_test_sender";
     private static final String KEY_SESSION = "session";
     private static final String KEY_SEQUENCE = "sequence";
     private static final String KEY_SECTION = "section";
-    private static final String RESULT_FILE = "adb-book-result.txt";
+    private static final String KEY_STUDY_SEQUENCE = "study_sequence";
+    private static final String KEY_STUDY_EPOCH = "study_epoch";
+
+    private static final String BOOK_RESULT_FILE = "adb-book-result.txt";
+    private static final String STUDY_RESULT_FILE = "adb-study-result.txt";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -54,10 +74,47 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                 sendClear(context, pending);
                 return;
             }
-            writeResult(context, "command=unknown\naccepted=false\n");
-        } catch (Throwable error) {
+            if (ACTION_STUDY_START.equals(action)) {
+                sendStudyStart(context, pending);
+                return;
+            }
+            if (ACTION_STUDY_HELP.equals(action)) {
+                sendStudyEvent(context, pending, "HELP_REQUESTED", true);
+                return;
+            }
+            if (ACTION_STUDY_PAUSE.equals(action)) {
+                sendStudyEvent(context, pending, "SESSION_PAUSED", false);
+                return;
+            }
+            if (ACTION_STUDY_RESUME.equals(action)) {
+                sendStudyEvent(context, pending, "SESSION_RESUMED", false);
+                return;
+            }
+            if (ACTION_STUDY_REPEATED_ERROR.equals(action)) {
+                sendStudyEvent(context, pending, "PRACTICE_REPEATED_ERROR", true);
+                return;
+            }
+            if (ACTION_STUDY_END.equals(action)) {
+                sendStudyEvent(context, pending, "SESSION_ENDED", false);
+                return;
+            }
+            if (ACTION_STUDY_REVOKE.equals(action)) {
+                sendStudyRevoke(context, pending);
+                return;
+            }
+
             writeResult(
                     context,
+                    BOOK_RESULT_FILE,
+                    "command=unknown\naccepted=false\n"
+            );
+        } catch (Throwable error) {
+            String resultFile = action != null && action.contains("STUDY")
+                    ? STUDY_RESULT_FILE
+                    : BOOK_RESULT_FILE;
+            writeResult(
+                    context,
+                    resultFile,
                     "command=" + safe(action)
                             + "\naccepted=false"
                             + "\nerror=" + error.getClass().getSimpleName()
@@ -87,6 +144,8 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                 .putString(KEY_SESSION, session)
                 .putLong(KEY_SEQUENCE, sequence)
                 .putInt(KEY_SECTION, section)
+                .putLong(KEY_STUDY_SEQUENCE, 0L)
+                .putLong(KEY_STUDY_EPOCH, 0L)
                 .apply();
 
         Intent target = new Intent(TARGET_ACTION);
@@ -109,6 +168,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                 context,
                 target,
                 pending,
+                BOOK_RESULT_FILE,
                 "context",
                 session,
                 sequence,
@@ -123,11 +183,12 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
         long previous = prefs.getLong(KEY_SEQUENCE, 0L);
 
         if (session == null || previous < 1L) {
-            writeResult(
+            writeAndFinish(
                     context,
+                    pending,
+                    BOOK_RESULT_FILE,
                     "command=clear\naccepted=false\nerror=no_active_test_session\n"
             );
-            pending.finish();
             return;
         }
 
@@ -144,6 +205,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                 context,
                 target,
                 pending,
+                BOOK_RESULT_FILE,
                 "clear",
                 session,
                 sequence,
@@ -151,10 +213,138 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
         );
     }
 
+    private static void sendStudyStart(Context context, PendingResult pending) {
+        SharedPreferences prefs =
+                context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        String session = prefs.getString(KEY_SESSION, null);
+        if (session == null) {
+            writeAndFinish(
+                    context,
+                    pending,
+                    STUDY_RESULT_FILE,
+                    "command=SESSION_STARTED\naccepted=false\nerror=no_context_session\n"
+            );
+            return;
+        }
+
+        long epoch = System.currentTimeMillis();
+        if (epoch < 1L) epoch = 1L;
+
+        prefs.edit()
+                .putLong(KEY_STUDY_EPOCH, epoch)
+                .putLong(KEY_STUDY_SEQUENCE, 1L)
+                .apply();
+
+        Intent target = studyIntent(
+                session,
+                "SESSION_STARTED",
+                1L,
+                epoch,
+                System.currentTimeMillis() + 120_000L
+        );
+        sendOrdered(
+                context,
+                target,
+                pending,
+                STUDY_RESULT_FILE,
+                "SESSION_STARTED",
+                session,
+                1L,
+                ""
+        );
+    }
+
+    private static void sendStudyEvent(
+            Context context,
+            PendingResult pending,
+            String kind,
+            boolean needsFreshContext
+    ) {
+        SharedPreferences prefs =
+                context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        String session = prefs.getString(KEY_SESSION, null);
+        long epoch = prefs.getLong(KEY_STUDY_EPOCH, 0L);
+        long previous = prefs.getLong(KEY_STUDY_SEQUENCE, 0L);
+
+        if (session == null || epoch < 1L || previous < 1L) {
+            writeAndFinish(
+                    context,
+                    pending,
+                    STUDY_RESULT_FILE,
+                    "command=" + kind
+                            + "\naccepted=false\nerror=no_active_study_session\n"
+            );
+            return;
+        }
+
+        if (needsFreshContext) {
+            // The Companion is authoritative for context freshness. This flag is
+            // only recorded in the test result; it does not bypass that check.
+        }
+
+        long next = previous + 1L;
+        prefs.edit().putLong(KEY_STUDY_SEQUENCE, next).apply();
+
+        Intent target = studyIntent(
+                session,
+                kind,
+                next,
+                epoch,
+                System.currentTimeMillis() + 120_000L
+        );
+        sendOrdered(
+                context,
+                target,
+                pending,
+                STUDY_RESULT_FILE,
+                kind,
+                session,
+                next,
+                ""
+        );
+    }
+
+    private static void sendStudyRevoke(
+            Context context,
+            PendingResult pending
+    ) {
+        Intent target = new Intent(TARGET_STUDY);
+        target.setPackage(TARGET_PACKAGE);
+        target.putExtra("kind", "REVOKE");
+        sendOrdered(
+                context,
+                target,
+                pending,
+                STUDY_RESULT_FILE,
+                "REVOKE",
+                "",
+                0L,
+                ""
+        );
+    }
+
+    private static Intent studyIntent(
+            String session,
+            String kind,
+            long sequence,
+            long epoch,
+            long expiresAtMs
+    ) {
+        Intent target = new Intent(TARGET_STUDY);
+        target.setPackage(TARGET_PACKAGE);
+        target.putExtra("kind", kind);
+        target.putExtra("session_id", session);
+        target.putExtra("sequence", sequence);
+        target.putExtra("epoch", epoch);
+        target.putExtra("expires_at_ms", expiresAtMs);
+        return target;
+    }
+
     private static void sendOrdered(
             Context context,
             Intent target,
             PendingResult pending,
+            String resultFile,
             String command,
             String session,
             long sequence,
@@ -172,6 +362,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                         boolean accepted = code == Activity.RESULT_OK;
                         writeResult(
                                 resultContext,
+                                resultFile,
                                 "command=" + command
                                         + "\nsession=" + session
                                         + "\nsequence=" + sequence
@@ -190,9 +381,23 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
         );
     }
 
-    private static void writeResult(Context context, String value) {
-        File target = new File(context.getFilesDir(), RESULT_FILE);
-        File temp = new File(context.getFilesDir(), RESULT_FILE + ".tmp");
+    private static void writeAndFinish(
+            Context context,
+            PendingResult pending,
+            String file,
+            String value
+    ) {
+        writeResult(context, file, value);
+        pending.finish();
+    }
+
+    private static void writeResult(
+            Context context,
+            String fileName,
+            String value
+    ) {
+        File target = new File(context.getFilesDir(), fileName);
+        File temp = new File(context.getFilesDir(), fileName + ".tmp");
 
         try (FileOutputStream output = new FileOutputStream(temp, false)) {
             output.write(value.getBytes(StandardCharsets.UTF_8));
