@@ -1,3 +1,14 @@
+## 2026-09-30 · Book prompt clipping preserves valid Unicode
+
+Book title/body clipping now uses the existing safe-prefix helper, fixing a
+reproduced valid-input → invalid UTF-16/changed UTF-8 prompt failure. Fixed caps,
+1288 dynamic projections and 0..6-unit boundaries verify intact pairs, accurate
+truncation/accounting and full current-user preservation. This is a two-line
+runtime hardening of the existing integration, with no new dependency/upstream.
+See [output-integrity evidence](BOOK_UNICODE_OUTPUT_INTEGRITY_20260930.md).
+
+---
+
 ## 2026-09-30 · Unicode memory candidates reach the scorer
 
 The Python SQLite candidate path now shares the pinned sklearn Unicode
