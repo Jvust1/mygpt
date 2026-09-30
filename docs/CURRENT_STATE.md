@@ -1,3 +1,14 @@
+## 2026-09-30 · official Ollama async HTTP runtime fusion candidate
+
+The existing Ollama responder now directly uses the official async lifecycle
+instead of a blocking worker-thread request. Actual Pipecat interruption closes
+the local HTTP connection, with no stale speech or history. Strict Brain tests
+pass 595/0/0 on Python 3.12 and in two clean Python 3.13 environments; real
+Pipecat tests pass 8/8. The fixed loopback destination and no-credential boundary
+are preserved. See [source, tests and limits](OLLAMA_ASYNC_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · Pipecat speech lifecycle fusion review candidate
 
 The existing Pipecat processor now directly incorporates upstream response

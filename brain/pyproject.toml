@@ -7,7 +7,7 @@ name = "mygpt-brain-prototype"
 version = "0.1.0"
 description = "Simulation-only, quiet-first Book context bridge"
 requires-python = ">=3.11"
-dependencies = ["pydantic==2.13.4"]
+dependencies = ["pydantic==2.13.4", "httpx==0.28.1"]
 
 [project.optional-dependencies]
 agents = ["openai-agents"]

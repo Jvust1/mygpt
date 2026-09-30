@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 import http.client
 import json
+import httpx
 
 import pytest
 
@@ -22,17 +23,13 @@ NOW = datetime(2026, 9, 29, 16, 10, tzinfo=timezone.utc)
 def test_ollama_act_roundtrip_separates_voice_and_emotion_before_durable_replay(tmp_path, monkeypatch):
     """Real companion HTTP + actual Ollama adapter; model endpoint is stubbed."""
     calls = []
-    class Response:
-        status = 200
-        def __enter__(self): return self
-        def __exit__(self, *_): return False
-        def read(self, _limit):
-            return json.dumps({"message": {"content": '继续学这节。<|ACT:{"emotion":"happy"}|>'}}).encode()
-    def model_endpoint(req, timeout):
-        calls.append(json.loads(req.data))
-        assert req.full_url == "http://127.0.0.1:11434/api/chat"
-        return Response()
-    monkeypatch.setattr("mygpt_brain.providers.urllib_request.urlopen", model_endpoint)
+    def model_endpoint(req):
+        calls.append(json.loads(req.content))
+        assert str(req.url) == "http://127.0.0.1:11434/api/chat"
+        return httpx.Response(200, json={"message": {"content": '继续学这节。<|ACT:{"emotion":"happy"}|>'}})
+    def client_factory(**kwargs):
+        return httpx.AsyncClient(transport=httpx.MockTransport(model_endpoint), **kwargs)
+    monkeypatch.setattr("mygpt_brain.providers._ASYNC_CLIENT", client_factory)
     body = dict(request_id="airi-http", session_id="s1", persona_id="mygpt-3714430278", text="继续学习")
     runtime, store = make_runtime(tmp_path, responder=OllamaResponder("synthetic-test-model"))
     try:

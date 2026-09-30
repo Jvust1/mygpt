@@ -1,17 +1,24 @@
-"""Local-only chat provider adapters.
+"""Local-only, cancellable Ollama chat provider.
 
 No adapter here accepts arbitrary remote URLs. The first real provider path is
 Ollama on loopback, matching mygpt's local-first architecture.
+
+The async request/context-managed stream lifecycle is adapted from the official
+ollama/ollama-python client at 8785556559ec1d045d27a1ba9d9cc7330c3d3cb1.
+Copyright (c) Ollama. MIT; see third_party/ollama-python/LICENSE.
 """
 from __future__ import annotations
 
 import asyncio
-import json
-from urllib import request as urllib_request
-from urllib.error import HTTPError, URLError
+
+import httpx
 
 from .companion_chat import ChatPrompt
 from .airi_act import ACT_PRESENTATION_INSTRUCTION
+from .json_boundary import BoundaryError, load_object
+
+MAX_RESPONSE_BYTES = 1_000_000
+_ASYNC_CLIENT = httpx.AsyncClient
 
 
 class OllamaResponder:
@@ -33,9 +40,6 @@ class OllamaResponder:
         self.timeout_seconds = float(timeout_seconds)
 
     async def __call__(self, prompt: ChatPrompt) -> str:
-        return await asyncio.to_thread(self._call_sync, prompt)
-
-    def _call_sync(self, prompt: ChatPrompt) -> str:
         messages = [
             {"role": item.role, "content": item.content}
             for item in prompt.provider_messages()
@@ -48,26 +52,37 @@ class OllamaResponder:
             "stream": False,
             "messages": messages,
         }
-        body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-        req = urllib_request.Request(
-            self.endpoint,
-            data=body,
-            headers={"Content-Type": "application/json", "Accept": "application/json"},
-            method="POST",
-        )
         try:
-            with urllib_request.urlopen(req, timeout=self.timeout_seconds) as response:
-                if response.status != 200:
-                    raise RuntimeError("ollama returned non-200")
-                raw = response.read(1_000_001)
-        except (HTTPError, URLError, TimeoutError, OSError) as error:
-            raise RuntimeError("ollama unavailable") from error
-        if len(raw) > 1_000_000:
-            raise RuntimeError("ollama response too large")
+            # Unlike to_thread(urlopen), cancellation exits these async
+            # contexts and closes the in-flight HTTP connection. No provider
+            # host/API key/proxy is inherited from the environment.
+            async with asyncio.timeout(self.timeout_seconds):
+                async with _ASYNC_CLIENT(
+                    timeout=self.timeout_seconds,
+                    follow_redirects=False,
+                    trust_env=False,
+                    headers={"Accept": "application/json", "Accept-Encoding": "identity"},
+                ) as client:
+                    # Keep Ollama's stream=False wire contract, while reading
+                    # the HTTP body incrementally to enforce a hard byte cap.
+                    async with client.stream("POST", self.endpoint, json=payload) as response:
+                        if response.status_code != 200:
+                            raise RuntimeError("ollama returned non-200")
+                        if response.headers.get("content-encoding", "identity").lower() != "identity":
+                            raise RuntimeError("unsupported ollama response encoding")
+                        raw = bytearray()
+                        async for chunk in response.aiter_bytes(chunk_size=65536):
+                            if len(raw) + len(chunk) > MAX_RESPONSE_BYTES:
+                                raise RuntimeError("ollama response too large")
+                            raw.extend(chunk)
+        except (httpx.HTTPError, TimeoutError, OSError):
+            raise RuntimeError("ollama unavailable") from None
         try:
-            value = json.loads(raw.decode("utf-8"))
+            value = load_object(bytes(raw), max_bytes=MAX_RESPONSE_BYTES)
+            if value.get("error"):
+                raise RuntimeError("ollama returned an error")
             text = value["message"]["content"]
-        except (UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError):
+        except (BoundaryError, KeyError, TypeError):
             raise RuntimeError("invalid ollama response") from None
         if not isinstance(text, str) or not text.strip():
             raise RuntimeError("ollama returned empty reply")

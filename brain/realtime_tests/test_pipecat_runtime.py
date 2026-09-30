@@ -4,6 +4,8 @@ These tests do not mock FrameProcessor. Synthesis is replaced with a probe at
 the final text handoff; no audio device, model, provider or network is used.
 """
 import asyncio
+import json
+import httpx
 from importlib.metadata import version
 from types import SimpleNamespace
 
@@ -19,6 +21,7 @@ from pipecat.utils.asyncio.task_manager import TaskManager
 from mygpt_brain.companion_chat import CompanionChatRuntime, CompanionPersona
 from mygpt_brain.pipecat_bridge import PipecatCompanionBridge, create_pipecat_companion_processor
 from mygpt_brain.session_store import ChatSessionStore
+from mygpt_brain.providers import OllamaResponder
 
 DOWN = FrameDirection.DOWNSTREAM
 
@@ -189,4 +192,66 @@ async def test_real_end_frame_gracefully_drains_current_reply_before_closing():
         assert runtime.session_messages("s1")[-1].content == "完成当前回答"
     finally:
         await processor.cleanup()
+    assert setup.task_manager.current_tasks() == []
+
+
+@pytest.mark.asyncio
+async def test_real_pipecat_interruption_closes_ollama_http_connection(monkeypatch):
+    received, disconnected, interrupted = asyncio.Event(), asyncio.Event(), asyncio.Event()
+    connections = set()
+    async def serve(reader, writer):
+        task = asyncio.current_task()
+        connections.add(task)
+        try:
+            headers = await reader.readuntil(b"\r\n\r\n")
+            length = next(int(line.split(b":", 1)[1]) for line in headers.split(b"\r\n") if line.lower().startswith(b"content-length:"))
+            payload = json.loads(await reader.readexactly(length))
+            assert payload["model"] == "synthetic-cancel-test"
+            received.set()
+            assert await reader.read() == b""
+            disconnected.set()
+        finally:
+            writer.close()
+            await writer.wait_closed()
+            connections.discard(task)
+    server = await asyncio.start_server(serve, "127.0.0.1", 0)
+    port = server.sockets[0].getsockname()[1]
+    class OwnedTestPort(httpx.AsyncBaseTransport):
+        def __init__(self): self.inner = httpx.AsyncHTTPTransport()
+        async def handle_async_request(self, request):
+            assert str(request.url) == "http://127.0.0.1:11434/api/chat"
+            request.url = request.url.copy_with(port=port)
+            return await self.inner.handle_async_request(request)
+        async def aclose(self): await self.inner.aclose()
+    clients = []
+    def factory(**kwargs):
+        client = httpx.AsyncClient(transport=OwnedTestPort(), **kwargs)
+        clients.append(client)
+        return client
+    monkeypatch.setattr("mygpt_brain.providers._ASYNC_CLIENT", factory)
+    runtime = runtime_for(OllamaResponder("synthetic-cancel-test"))
+    processor = create_pipecat_companion_processor(PipecatCompanionBridge(runtime, session_id="s1"))
+    setup = setup_for()
+    await processor.setup(setup)
+    emitted = []
+    @processor.event_handler("on_before_push_frame")
+    async def record(_processor, frame):
+        emitted.append(frame)
+        if isinstance(frame, frames.InterruptionFrame): interrupted.set()
+    try:
+        await processor.queue_frame(frames.StartFrame())
+        await processor.queue_frame(transcript("先等一下"))
+        await asyncio.wait_for(received.wait(), 2)
+        await processor.queue_frame(frames.InterruptionFrame())
+        await asyncio.wait_for(interrupted.wait(), 2)
+        await asyncio.wait_for(disconnected.wait(), 2)
+        assert clients[0].is_closed
+        assert runtime.session_messages("s1") == []
+        assert not any(isinstance(f, (frames.LLMTextFrame, frames.ErrorFrame)) for f in emitted)
+    finally:
+        await processor.cleanup()
+        server.close()
+        await server.wait_closed()
+        for task in list(connections): task.cancel()
+        await asyncio.gather(*connections, return_exceptions=True)
     assert setup.task_manager.current_tasks() == []
