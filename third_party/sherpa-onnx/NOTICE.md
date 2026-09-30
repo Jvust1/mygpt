@@ -26,3 +26,14 @@ Material changes in MyGPT:
 
 The upstream Apache-2.0 license is reproduced in
 `third_party/sherpa-onnx/LICENSE`.
+
+
+Additional TTS adaptation:
+- `android_voice_spike/app/src/main/java/dev/mygpt/voicespike/SherpaMeloTtsModelInstaller.java`
+- `android_voice_spike/app/src/main/java/dev/mygpt/voicespike/SherpaMeloTtsEngine.java`
+
+The TTS path follows sherpa-onnx's Android `OfflineTts` + `AudioTrack`
+streaming pattern for the `vits-melo-tts-zh_en` model. MyGPT keeps model
+weights external, preserves README/LICENSE from imported model ZIPs when
+present, streams samples directly to AudioTrack, and does not save generated
+speech audio to disk.

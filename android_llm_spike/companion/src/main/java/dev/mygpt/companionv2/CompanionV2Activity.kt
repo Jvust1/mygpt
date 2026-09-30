@@ -27,6 +27,8 @@ import dev.mygpt.spike.SpineCharacterRuntime
 import dev.mygpt.spike.SpinePackageLayout
 import dev.mygpt.spike.SpineSkinApplication
 import dev.mygpt.spike.VoicePcm
+import dev.mygpt.voicespike.SherpaMeloTtsEngine
+import dev.mygpt.voicespike.SherpaMeloTtsModelInstaller
 import dev.mygpt.voicespike.SherpaStreamingAsrEngine
 import dev.mygpt.voicespike.SherpaZhEnModelInstaller
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +55,8 @@ class CompanionV2Activity : AndroidApplication() {
     private lateinit var voiceButton: Button
     private lateinit var memoryState: TextView
     private lateinit var memoryStore: LocalCompanionMemoryStore
+    private lateinit var ttsState: TextView
+    private lateinit var ttsToggleButton: Button
 
     private var modelFile: File? = null
     private var llm: LlamaCppCompanionEngine? = null
@@ -62,6 +66,10 @@ class CompanionV2Activity : AndroidApplication() {
     private var voiceThread: Thread? = null
     @Volatile private var recording = false
     @Volatile private var foreground = false
+    @Volatile private var ttsEnabled = false
+    @Volatile private var ttsEpoch = 0L
+    private var ttsModel: SherpaMeloTtsModelInstaller.Installed? = null
+    private var ttsEngine: SherpaMeloTtsEngine? = null
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
@@ -132,6 +140,15 @@ class CompanionV2Activity : AndroidApplication() {
         }
         page.addView(voiceButton)
 
+        ttsState = label("语音回复：尚未导入 Melo TTS 模型", 13)
+        ttsState.setPadding(0, dp(16), 0, dp(8))
+        page.addView(ttsState)
+        page.addView(button("选择 Melo 中英 TTS 模型 ZIP") { chooseTtsModel() })
+        ttsToggleButton = button("开启语音回复") { toggleTts() }.apply {
+            isEnabled = false
+        }
+        page.addView(ttsToggleButton)
+
         memoryState = label("长期记忆：显式保存，不自动记录聊天", 13)
         memoryState.setPadding(0, dp(16), 0, dp(8))
         page.addView(memoryState)
@@ -161,6 +178,7 @@ class CompanionV2Activity : AndroidApplication() {
 
         restoreModel()
         restoreAsrModel()
+        restoreTtsModel()
         restoreSkin()
     }
 
@@ -200,6 +218,18 @@ class CompanionV2Activity : AndroidApplication() {
         startActivityForResult(intent, REQUEST_ASR_MODEL)
     }
 
+    private fun chooseTtsModel() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                "application/zip", "application/x-zip", "application/octet-stream"
+            ))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivityForResult(intent, REQUEST_TTS_MODEL)
+    }
+
     @Deprecated("isolated spike keeps the simple result API")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -209,6 +239,7 @@ class CompanionV2Activity : AndroidApplication() {
             REQUEST_SKIN -> importSkin(uri)
             REQUEST_MODEL -> importModel(uri)
             REQUEST_ASR_MODEL -> importAsrModel(uri)
+            REQUEST_TTS_MODEL -> importTtsModel(uri)
         }
     }
 
@@ -541,6 +572,105 @@ class CompanionV2Activity : AndroidApplication() {
         }
     }
 
+    private fun importTtsModel(uri: Uri) {
+        stopTtsPlayback(null)
+        ttsEnabled = false
+        ttsEngine?.close()
+        ttsEngine = null
+        ttsState.text = "语音回复：正在导入 Melo TTS 模型…"
+        updateTtsControls()
+
+        scope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    contentResolver.openInputStream(uri).use { stream ->
+                        requireNotNull(stream) { "无法打开 TTS 模型包" }
+                        SherpaMeloTtsModelInstaller.install(
+                            stream,
+                            File(filesDir, "tts-models")
+                        )
+                    }
+                }
+            }.onSuccess { installed ->
+                ttsModel = installed
+                ttsState.text = "语音回复：Melo 中英模型已就绪"
+                updateTtsControls()
+            }.onFailure { error ->
+                ttsState.text = "TTS 模型导入失败 · " + error.javaClass.simpleName
+                updateTtsControls()
+            }
+        }
+    }
+
+    private fun restoreTtsModel() {
+        ttsModel = SherpaMeloTtsModelInstaller.existing(File(filesDir, "tts-models"))
+        if (ttsModel != null) {
+            ttsState.text = "语音回复：已恢复 Melo 中英模型"
+        }
+        updateTtsControls()
+    }
+
+    private fun updateTtsControls() {
+        if (!::ttsToggleButton.isInitialized) return
+        ttsToggleButton.isEnabled = ttsModel != null
+        ttsToggleButton.text = if (ttsEnabled) "关闭语音回复" else "开启语音回复"
+    }
+
+    private fun toggleTts() {
+        if (ttsModel == null) {
+            ttsState.text = "语音回复：请先导入 Melo TTS 模型"
+            return
+        }
+        ttsEnabled = !ttsEnabled
+        ttsEpoch += 1L
+        if (!ttsEnabled) {
+            stopTtsPlayback("语音回复：已关闭")
+        } else {
+            ttsState.text = "语音回复：已开启 · 本地流式播放 · 不落盘"
+        }
+        updateTtsControls()
+    }
+
+    @Synchronized
+    private fun getOrCreateTtsEngine(): SherpaMeloTtsEngine {
+        val current = ttsEngine
+        if (current != null) return current
+        val model = ttsModel ?: error("TTS model unavailable")
+        val created = SherpaMeloTtsEngine(model, 2)
+        ttsEngine = created
+        return created
+    }
+
+    private fun speakReply(text: String) {
+        if (!ttsEnabled || !foreground || text.isBlank()) return
+        val epoch = ttsEpoch
+        val value = text.take(1200)
+
+        scope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    val engine = getOrCreateTtsEngine()
+                    if (!ttsEnabled || epoch != ttsEpoch || !foreground) return@withContext
+                    engine.speak(value)
+                }
+            }.onSuccess {
+                if (ttsEnabled && epoch == ttsEpoch) {
+                    ttsState.text = "语音回复：正在播放 · 音频不落盘"
+                }
+            }.onFailure { error ->
+                ttsState.text = "语音回复失败 · " + error.javaClass.simpleName
+            }
+        }
+    }
+
+    private fun stopTtsPlayback(message: String? = null) {
+        ttsEpoch += 1L
+        ttsEngine?.stop()
+        if (message != null && ::ttsState.isInitialized) {
+            ttsState.text = message
+        }
+    }
+
     private fun rememberInput() {
         val text = input.text?.toString()?.trim().orEmpty()
         if (text.isEmpty()) {
@@ -707,6 +837,7 @@ class CompanionV2Activity : AndroidApplication() {
                         + " · " + String.format("%.2f", parsed.intensity)
                 }
                 characterRuntime.showEmotion(parsed.emotion)
+                if (visible.isNotEmpty()) speakReply(visible)
                 input.setText("")
                 input.isEnabled = true
                 sendButton.isEnabled = true
@@ -741,6 +872,7 @@ class CompanionV2Activity : AndroidApplication() {
     override fun onStop() {
         foreground = false
         stopRecording("语音：已停止（离开前台）")
+        stopTtsPlayback("语音回复：已停止（离开前台）")
         super.onStop()
     }
 
@@ -750,6 +882,8 @@ class CompanionV2Activity : AndroidApplication() {
         llm?.close()
         llm = null
         memoryStore.close()
+        ttsEngine?.close()
+        ttsEngine = null
         super.onDestroy()
     }
 
@@ -772,6 +906,7 @@ class CompanionV2Activity : AndroidApplication() {
         private const val REQUEST_MODEL = 9302
         private const val REQUEST_ASR_MODEL = 9303
         private const val REQUEST_MIC = 9304
+        private const val REQUEST_TTS_MODEL = 9305
         private const val PERSONA_ID = "mygpt-3714430278"
         private const val PREFS = "mygpt_companion_v2"
         private const val PREF_MODEL_PATH = "gguf_path"
