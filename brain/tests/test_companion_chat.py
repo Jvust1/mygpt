@@ -151,3 +151,28 @@ async def test_structured_reply_carries_renderer_neutral_emotion():
     },now=NOW)
     assert replay.presentation_emotion=="happy"
     assert replay.replayed is True
+
+
+@pytest.mark.asyncio
+async def test_paired_history_survives_sqlite_restart_without_deleting_history(tmp_path):
+    from mygpt_brain.session_store import ChatSessionStore
+    seen = []
+    async def responder(prompt):
+        seen.append([(m.role, m.content) for m in prompt.provider_messages()])
+        return "reply " + str(len(seen))
+    persona = CompanionPersona(persona_id="paired", display_name="P", visual_skin_id="skin", instructions="Trusted persona.")
+    path = tmp_path / "pairs.sqlite3"
+    with ChatSessionStore(path) as store:
+        runtime = CompanionChatRuntime(persona=persona, responder=responder, session_store=store, recent_turn_limit=2)
+        await runtime.send(dict(request_id="r1", session_id="s1", persona_id="paired", text="old question"), now=NOW)
+    with ChatSessionStore(path) as store:
+        runtime = CompanionChatRuntime(persona=persona, responder=responder, session_store=store, recent_turn_limit=2)
+        body = dict(request_id="r2", session_id="s1", persona_id="paired", text="new question")
+        result = await runtime.send(body, now=NOW)
+        assert seen[-1] == [("system", "Trusted persona."), ("user", "new question")]
+        assert len(result.compacted_message_ids) == 2
+        assert [m.content for m in store.load_messages("s1")] == ["Trusted persona.", "old question", "reply 1", "new question", "reply 2"]
+        assert runtime.memory_store.recent(namespace="paired") == []
+        replay = await runtime.send(body, now=NOW)
+        assert replay.replayed and replay.compacted_message_ids == result.compacted_message_ids
+        assert len(seen) == 2

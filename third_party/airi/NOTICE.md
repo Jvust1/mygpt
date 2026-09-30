@@ -74,3 +74,28 @@ No unrelated AIRI monorepo modules or duplicate vendor directory were imported.
 
 Eligibility checked at 2026-09-30 18:11 UTC via
 https://api.github.com/repos/moeru-ai/airi : 49,887 stars, MIT, not archived.
+
+## 2026-09-30: paired history fused into live prompt compaction
+
+`conversation.py` now directly ports the reverse scan from
+`keepRecentHistoryItems` in pinned `packages/core-agent/src/messages/compaction.ts`
+(blob `59a76a9877086f66b5abc09b0f22802e4e27df7d`). MyGPT maps user messages to
+upstream turns and following assistant messages to reactions. It retains the
+existing `recent_turn_limit` maximum-row budget by deriving the number of user
+turns inside that budget before the upstream scan; the output can shrink but
+never expand the configured row budget. If no complete user turn fits, the
+trimmed reaction-only tail is omitted. Untrimmed history is unchanged, including
+an intentional initial assistant greeting.
+
+This closes a real provider path where slicing two rows produced an orphan old
+assistant reply followed by the new user question. Compacted IDs include the
+whole omitted group; SQLite history and replay receipts are not deleted or
+rewritten. No summaries or long-term memories are generated.
+
+The exact upstream file is retained under `reference/compaction.ts` solely as an
+executable test oracle. Node 24's built-in type stripping executes it without npm
+packages or runtime Node requirements. Its bytes match the declared Git blob;
+full MIT license remains adjacent in this directory. Python tests compare the
+port and budget mapping against the actual source on randomized paired histories.
+
+Eligibility rechecked 2026-09-30 20:14 UTC: **49,890 stars**, MIT, not archived.

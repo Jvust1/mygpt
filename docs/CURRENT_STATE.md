@@ -1,3 +1,13 @@
+## 2026-09-30 · AIRI paired history removes orphan assistant replies
+
+The live Python prompt compactor now directly uses AIRI's turn/reaction reverse
+scan. The existing message budget is preserved, but a trimmed window never
+starts with a reply whose user question was discarded. Durable history and
+replay are unchanged. Strict Brain passes 653/0/0; actual unchanged AIRI source
+is exercised as a test oracle. See [scope and evidence](AIRI_PAIRED_HISTORY_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · scikit-learn recall closes the long-question gap
 
 The existing companion memory search now directly uses a bounded scikit-learn

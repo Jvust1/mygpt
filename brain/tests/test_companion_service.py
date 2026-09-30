@@ -523,3 +523,31 @@ def test_full_length_chat_retrieves_memory_and_preserves_native_prompt(tmp_path,
         assert len(runtime.memory_store.history("long-target")) == 1
     finally:
         store.close()
+
+
+def test_ollama_native_path_sends_paired_history_and_preserves_durable_rows(tmp_path, monkeypatch):
+    payloads = []
+    def endpoint(req):
+        payloads.append(json.loads(req.content))
+        return httpx.Response(200, json={"message": {"content": "reply " + str(len(payloads))}})
+    monkeypatch.setattr("mygpt_brain.providers._ASYNC_CLIENT",
+                        lambda **kwargs: httpx.AsyncClient(transport=httpx.MockTransport(endpoint), **kwargs))
+    runtime, store = make_runtime(tmp_path, responder=OllamaResponder("synthetic-test-model"))
+    runtime.recent_turn_limit = 2
+    try:
+        with create_companion_server(runtime) as server:
+            for index, text in [(1, "old question"), (2, "new question")]:
+                body = dict(request_id=f"paired-{index}", session_id="paired", persona_id=runtime.persona.persona_id, text=text)
+                status, reply = call(server, "POST", "/api/v1/chat", token=server.token, body=body)
+                assert status == 200
+            assert payloads[-1]["messages"] == [
+                {"role": "system", "content": "Trusted persona."},
+                {"role": "system", "content": ACT_PRESENTATION_INSTRUCTION},
+                {"role": "user", "content": "new question"},
+            ]
+            assert len(reply["compacted_message_ids"]) == 2
+            assert len(store.load_messages("paired")) == 5
+            status, replay = call(server, "POST", "/api/v1/chat", token=server.token, body=body)
+            assert status == 200 and replay["replayed"] and len(payloads) == 2
+    finally:
+        store.close()
