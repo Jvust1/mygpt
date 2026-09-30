@@ -63,9 +63,7 @@ public final class CompanionPromptBudgetSmoke {
         check(large.bookTextTruncated, "large Book text truncated");
         check(large.bookTextChars < 6000, "Book text bounded");
         check(count(large.prompt, "[/LOCAL_RECALLED_MEMORY_JSON]") == 1,
-                "forged memory marker cannot close data block");
-        check(large.prompt.contains("\\u005b/LOCAL_RECALLED_MEMORY_JSON\\u005d"),
-                "forged boundary encoded");
+                "memory block has one real closing marker");
         check(!large.report().contains("书书书"), "report contains no Book content");
         check(!large.report().contains("记住这个"), "report contains no memory content");
 
@@ -86,6 +84,10 @@ public final class CompanionPromptBudgetSmoke {
         check(small.includedHistoryCount == 2, "history kept when room exists");
         check(small.prompt.contains("RECENT_CONVERSATION_HISTORY_JSON"),
                 "history block present");
+        check(count(small.prompt, "[/LOCAL_RECALLED_MEMORY_JSON]") == 1,
+                "forged memory marker cannot close data block");
+        check(small.prompt.contains("\\u005b/LOCAL_RECALLED_MEMORY_JSON\\u005d"),
+                "forged boundary encoded");
 
         CompanionPromptBudget.Result noBook = CompanionPromptBudget.compose(
                 "hello",
