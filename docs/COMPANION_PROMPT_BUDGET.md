@@ -47,3 +47,19 @@ They are not token estimators. Their purpose is to keep the first user turn well
 below the pinned llama.cpp 8192-token native context before chat-template
 overhead and 512-token output allowance. If a future Character Card grows beyond
 this budget, model loading fails closed instead of relying on native truncation.
+
+
+## Combined system + user-turn guard
+
+The production Android system prompt is now budgeted together with the current
+user turn.
+
+- conservative combined pre-generation character ceiling: **7200**;
+- current 3714430278 system prompt: **1506 characters** at this checkpoint;
+- therefore the current user-turn cap remains the existing maximum **5600**;
+- if the persona/runtime system prompt grows in a future build, the user-turn
+  budget shrinks automatically rather than silently consuming the output/context
+  reserve.
+
+This remains a character guard, not a tokenizer claim. The pinned llama.cpp
+runtime still owns the true 8192-token context and native context shifting.

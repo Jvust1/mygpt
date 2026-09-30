@@ -8,6 +8,7 @@ package dev.mygpt.companionv2
  */
 object CompanionSystemPrompt {
     const val MAX_SYSTEM_PROMPT_CHARS = 6000
+    const val MAX_COMBINED_INPUT_CHARS = 7200
 
     fun render(personaCard: AndroidCharacterCard): String {
         val runtimePolicy = """
@@ -29,5 +30,17 @@ object CompanionSystemPrompt {
             "system prompt exceeds safe llama context budget"
         }
         return prompt
+    }
+
+    fun userTurnBudgetChars(personaCard: AndroidCharacterCard): Int {
+        val systemChars = render(personaCard).length
+        val remaining = MAX_COMBINED_INPUT_CHARS - systemChars
+        require(remaining >= 1024) {
+            "system prompt leaves insufficient user-turn context budget"
+        }
+        return minOf(
+            dev.mygpt.spike.CompanionPromptBudget.MAX_PROMPT_CHARS,
+            remaining,
+        )
     }
 }

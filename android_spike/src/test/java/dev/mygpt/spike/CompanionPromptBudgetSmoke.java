@@ -101,6 +101,19 @@ public final class CompanionPromptBudgetSmoke {
         check(noBook.prompt.contains("\"status\":\"none\""),
                 "none memory marker retained");
 
+        CompanionPromptBudget.Result dynamic = CompanionPromptBudget.compose(
+                "当前问题",
+                book,
+                supervision,
+                memories.subList(0, 1),
+                shortHistory,
+                4300
+        );
+        check(dynamic.prompt.length() <= 4300, "dynamic budget");
+        check(dynamic.maxPromptChars == 4300, "dynamic budget reported");
+        check(dynamic.report().contains("max_prompt_chars=4300"),
+                "dynamic report");
+
         System.out.println("CompanionPromptBudgetSmoke PASS");
     }
 

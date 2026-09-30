@@ -1292,6 +1292,7 @@ class CompanionV2Activity : AndroidApplication(),
             StudySupervisorRuntime.shared().snapshot().dataBlock(),
             memorySnippets,
             historyTurns,
+            CompanionSystemPrompt.userTurnBudgetChars(personaCard),
         )
     }
 

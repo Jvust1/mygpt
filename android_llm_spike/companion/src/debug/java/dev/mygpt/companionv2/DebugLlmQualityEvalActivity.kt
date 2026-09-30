@@ -97,17 +97,20 @@ class DebugLlmQualityEvalActivity : Activity() {
 
         val persona = AndroidCharacterCard.loadApproved(this)
         val systemPrompt = CompanionSystemPrompt.render(persona)
+        val userTurnBudget = CompanionSystemPrompt.userTurnBudgetChars(persona)
 
         output.put("candidate_id", candidate.id)
         output.put("candidate_label", candidate.label)
         output.put("model_sha256", modelSha)
         output.put("model_bytes", modelFile.length())
         output.put("system_prompt_sha256", sha256(systemPrompt))
+        output.put("system_prompt_chars", systemPrompt.length)
+        output.put("user_turn_budget_chars", userTurnBudget)
         output.put("predict_length", PREDICT_LENGTH)
 
         val cases = JSONArray()
         for (case in fixedCases()) {
-            cases.put(runCase(modelFile, systemPrompt, case))
+            cases.put(runCase(modelFile, systemPrompt, userTurnBudget, case))
             output.put("cases", cases)
             output.put("completed_cases", cases.length())
             persist(output, candidate.id)
@@ -122,6 +125,7 @@ class DebugLlmQualityEvalActivity : Activity() {
     private suspend fun runCase(
         modelFile: File,
         systemPrompt: String,
+        userTurnBudget: Int,
         case: EvalCase,
     ): JSONObject {
         val result = JSONObject()
@@ -141,6 +145,7 @@ class DebugLlmQualityEvalActivity : Activity() {
                 case.supervisionBlock,
                 case.memories,
                 emptyList(),
+                userTurnBudget,
             )
 
             val raw = StringBuilder()

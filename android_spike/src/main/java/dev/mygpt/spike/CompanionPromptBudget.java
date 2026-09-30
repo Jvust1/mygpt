@@ -55,6 +55,7 @@ public final class CompanionPromptBudget {
 
     public static final class Result {
         public final String prompt;
+        public final int maxPromptChars;
         public final int bookTextChars;
         public final boolean bookTextTruncated;
         public final int relevantMemoryCount;
@@ -64,6 +65,7 @@ public final class CompanionPromptBudget {
 
         Result(
                 String prompt,
+                int maxPromptChars,
                 int bookTextChars,
                 boolean bookTextTruncated,
                 int relevantMemoryCount,
@@ -72,6 +74,7 @@ public final class CompanionPromptBudget {
                 int includedHistoryCount
         ) {
             this.prompt = prompt;
+            this.maxPromptChars = maxPromptChars;
             this.bookTextChars = bookTextChars;
             this.bookTextTruncated = bookTextTruncated;
             this.relevantMemoryCount = relevantMemoryCount;
@@ -83,7 +86,7 @@ public final class CompanionPromptBudget {
         /** Content-free report suitable for app-private acceptance evidence. */
         public String report() {
             return "schema=mygpt.prompt-budget.v1\n"
-                    + "max_prompt_chars=" + MAX_PROMPT_CHARS + "\n"
+                    + "max_prompt_chars=" + maxPromptChars + "\n"
                     + "prompt_chars=" + prompt.length() + "\n"
                     + "book_text_chars=" + bookTextChars + "\n"
                     + "book_text_truncated=" + bookTextTruncated + "\n"
@@ -113,6 +116,28 @@ public final class CompanionPromptBudget {
             List<MemorySnippet> memories,
             List<HistoryTurn> history
     ) {
+        return compose(
+                userText,
+                bookContext,
+                supervisionBlock,
+                memories,
+                history,
+                MAX_PROMPT_CHARS
+        );
+    }
+
+    public static Result compose(
+            String userText,
+            BookContextSnapshot bookContext,
+            String supervisionBlock,
+            List<MemorySnippet> memories,
+            List<HistoryTurn> history,
+            int maxPromptChars
+    ) {
+        if (maxPromptChars < 1024 || maxPromptChars > maxPromptChars) {
+            throw new IllegalArgumentException(
+                    "maxPromptChars must be in 1024.." + maxPromptChars);
+        }
         String user = checkedUser(userText);
         if (supervisionBlock == null
                 || supervisionBlock.trim().isEmpty()
@@ -129,7 +154,7 @@ public final class CompanionPromptBudget {
         String memoryFallback = memoryFallback(safeMemories.size());
 
         int fixedSeparators = 6; // three "\n\n" joins before USER_MESSAGE
-        int bookBudget = MAX_PROMPT_CHARS
+        int bookBudget = maxPromptChars
                 - supervisionBlock.length()
                 - memoryFallback.length()
                 - userBlock.length()
@@ -161,7 +186,7 @@ public final class CompanionPromptBudget {
 
         int memoryBudget = Math.min(
                 MAX_MEMORY_BLOCK_CHARS,
-                MAX_PROMPT_CHARS - baseWithoutMemoryHistory - 2
+                maxPromptChars - baseWithoutMemoryHistory - 2
         );
         BlockResult memoryBlock = buildMemoryBlock(safeMemories, memoryBudget);
 
@@ -171,11 +196,11 @@ public final class CompanionPromptBudget {
 
         int historyBudget = Math.min(
                 MAX_HISTORY_BLOCK_CHARS,
-                MAX_PROMPT_CHARS - baseWithoutHistory - 2
+                maxPromptChars - baseWithoutHistory - 2
         );
         BlockResult historyBlock = buildHistoryBlock(safeHistory, historyBudget);
 
-        StringBuilder prompt = new StringBuilder(MAX_PROMPT_CHARS);
+        StringBuilder prompt = new StringBuilder(maxPromptChars);
         prompt.append(bookBlock).append("\n\n");
         prompt.append(supervisionBlock).append("\n\n");
         prompt.append(memoryBlock.text).append("\n\n");
@@ -184,12 +209,13 @@ public final class CompanionPromptBudget {
         }
         prompt.append(userBlock);
 
-        if (prompt.length() > MAX_PROMPT_CHARS) {
+        if (prompt.length() > maxPromptChars) {
             throw new IllegalStateException("prompt budget overflow");
         }
 
         return new Result(
                 prompt.toString(),
+                maxPromptChars,
                 bookTextChars,
                 bookTruncated,
                 safeMemories.size(),
