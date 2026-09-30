@@ -170,7 +170,10 @@ else {
     $BookResult | Out-File (Join-Path $OutputDirectory "book-sender-result-error.txt") -Encoding utf8
 }
 
-if ($BookResultText -match "accepted=true") {
+if ($BookResultText -match "accepted=true" -and
+    $BookResultText -match "sdk=true" -and
+    $BookResultText -match "preflight=READY" -and
+    $BookResultText -match "status=ACCEPTED") {
     $BookGateStatus = "PASS"
 }
 else {

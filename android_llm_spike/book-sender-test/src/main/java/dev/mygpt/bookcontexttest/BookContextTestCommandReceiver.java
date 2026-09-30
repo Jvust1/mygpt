@@ -168,7 +168,9 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                 120_000L
         );
 
-        new BookCompanionClient(context).sendContext(
+        BookCompanionClient client = new BookCompanionClient(context);
+        String preflight = client.preflight().status.name();
+        client.sendContext(
                 next,
                 payload,
                 result -> {
@@ -182,6 +184,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                             BOOK_RESULT_FILE,
                             "command=context"
                                     + "\nsdk=true"
+                                    + "\npreflight=" + preflight
                                     + "\nsession=" + sessionId
                                     + "\nsequence=" + next.contextSequence()
                                     + "\nsection_id=ch1-s1"
@@ -200,7 +203,9 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
             PendingResult pending
     ) {
         final BookCompanionSession active = requireSession();
-        new BookCompanionClient(context).clearContext(
+        BookCompanionClient client = new BookCompanionClient(context);
+        String preflight = client.preflight().status.name();
+        client.clearContext(
                 active,
                 result -> {
                     writeResult(
@@ -208,6 +213,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                             BOOK_RESULT_FILE,
                             "command=clear"
                                     + "\nsdk=true"
+                                    + "\npreflight=" + preflight
                                     + "\nsession=" + active.sessionId
                                     + "\nsequence=" + active.contextSequence()
                                     + "\nresult_code=" + result.resultCode
@@ -230,7 +236,9 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
             PendingResult pending
     ) {
         final BookCompanionSession active = requireSession();
-        new BookCompanionClient(context).startStudy(
+        BookCompanionClient client = new BookCompanionClient(context);
+        String preflight = client.preflight().status.name();
+        client.startStudy(
                 active,
                 120_000L,
                 result -> finishStudyResult(
@@ -238,6 +246,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                         pending,
                         active,
                         "SESSION_STARTED",
+                        preflight,
                         result
                 )
         );
@@ -249,7 +258,9 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
             BookCompanionContract.StudyKind kind
     ) {
         final BookCompanionSession active = requireSession();
-        new BookCompanionClient(context).sendStudyEvent(
+        BookCompanionClient client = new BookCompanionClient(context);
+        String preflight = client.preflight().status.name();
+        client.sendStudyEvent(
                 active,
                 kind,
                 120_000L,
@@ -258,6 +269,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                         pending,
                         active,
                         kind.name(),
+                        preflight,
                         result
                 )
         );
@@ -268,13 +280,16 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
             PendingResult pending
     ) {
         final BookCompanionSession active = requireSession();
-        new BookCompanionClient(context).revokeStudy(
+        BookCompanionClient client = new BookCompanionClient(context);
+        String preflight = client.preflight().status.name();
+        client.revokeStudy(
                 active,
                 result -> finishStudyResult(
                         context,
                         pending,
                         active,
                         "REVOKE",
+                        preflight,
                         result
                 )
         );
@@ -285,6 +300,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
             PendingResult pending,
             BookCompanionSession active,
             String command,
+            String preflight,
             BookCompanionClient.DeliveryResult result
     ) {
         writeResult(
@@ -292,6 +308,7 @@ public final class BookContextTestCommandReceiver extends BroadcastReceiver {
                 STUDY_RESULT_FILE,
                 "command=" + command
                         + "\nsdk=true"
+                        + "\npreflight=" + preflight
                         + "\nsession=" + active.sessionId
                         + "\nsequence=" + active.studySequence()
                         + "\nepoch=" + active.studyEpoch()

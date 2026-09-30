@@ -98,8 +98,11 @@ function Send-StudyCommand {
 
     $Result = Read-StudyResult
     $Result | Out-File (Join-Path $OutputDirectory ("study-" + $Label + "-result.txt")) -Encoding utf8
-    if ($Result -notmatch "accepted=true") {
-        throw "Study event was rejected: $Label"
+    if ($Result -notmatch "accepted=true" -or
+        $Result -notmatch "sdk=true" -or
+        $Result -notmatch "preflight=READY" -or
+        $Result -notmatch "status=ACCEPTED") {
+        throw "Study SDK/preflight event was rejected: $Label"
     }
 
     $FindArgs = @{

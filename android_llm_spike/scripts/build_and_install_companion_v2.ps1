@@ -321,8 +321,11 @@ Start-Sleep -Seconds 2
 $PositiveBook = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest cat files/adb-book-result.txt 2>&1
 $PositiveBookText = ($PositiveBook | Out-String)
 $PositiveBookText | Out-File (Join-Path $EvidenceDir "positive-book-result.txt") -Encoding utf8
-if ($PositiveBookText -notmatch "accepted=true") {
-    throw "Same-signature Book context gate failed. See positive-book-result.txt."
+if ($PositiveBookText -notmatch "accepted=true" -or
+    $PositiveBookText -notmatch "sdk=true" -or
+    $PositiveBookText -notmatch "preflight=READY" -or
+    $PositiveBookText -notmatch "status=ACCEPTED") {
+    throw "Same-signature Book SDK context/preflight gate failed. See positive-book-result.txt."
 }
 Write-Host "Same-signature Book context delivery PASS." -ForegroundColor Green
 
@@ -371,8 +374,11 @@ Start-Sleep -Seconds 2
 $ClearBook = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest cat files/adb-book-result.txt 2>&1
 $ClearBookText = ($ClearBook | Out-String)
 $ClearBookText | Out-File (Join-Path $EvidenceDir "clear-book-result.txt") -Encoding utf8
-if ($ClearBookText -notmatch "accepted=true") {
-    throw "Same-signature Book clear gate failed. See clear-book-result.txt."
+if ($ClearBookText -notmatch "accepted=true" -or
+    $ClearBookText -notmatch "sdk=true" -or
+    $ClearBookText -notmatch "preflight=READY" -or
+    $ClearBookText -notmatch "status=ACCEPTED") {
+    throw "Same-signature Book SDK clear/preflight gate failed. See clear-book-result.txt."
 }
 
 Invoke-Checked $Adb $CompanionActivityArgs
