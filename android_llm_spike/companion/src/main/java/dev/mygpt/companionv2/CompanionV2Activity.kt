@@ -35,6 +35,7 @@ import dev.mygpt.voicespike.SherpaStreamingAsrEngine
 import dev.mygpt.voicespike.SherpaZhEnModelInstaller
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
@@ -73,6 +74,9 @@ class CompanionV2Activity : AndroidApplication() {
     @Volatile private var foreground = false
     @Volatile private var ttsEnabled = false
     @Volatile private var conversationPrimed = false
+    @Volatile private var modelLoaded = false
+    @Volatile private var generating = false
+    private var generationJob: Job? = null
     @Volatile private var ttsEpoch = 0L
     private var ttsModel: SherpaMeloTtsModelInstaller.Installed? = null
     private var ttsEngine: SherpaMeloTtsEngine? = null
@@ -269,7 +273,7 @@ class CompanionV2Activity : AndroidApplication() {
 
     private fun importSkin(uri: Uri) {
         characterState.text = "角色：正在校验…"
-        scope.launch {
+        generationJob = scope.launch {
             runCatching {
                 withContext(Dispatchers.IO) {
                     contentResolver.openInputStream(uri).use { stream ->
@@ -305,17 +309,23 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun importModel(uri: Uri) {
+        if (generating) {
+            modelState.text = "模型：正在生成，请稍后再换模型"
+            return
+        }
         stopRecording(null)
-        llm?.close()
-        llm = null
+        stopTtsPlayback(null)
         conversationPrimed = false
+        modelLoaded = false
         modelState.text = "模型：正在校验并导入…"
         loadModelButton.isEnabled = false
         sendButton.isEnabled = false
         updateVoiceControls()
+
         scope.launch {
             runCatching {
                 withContext(Dispatchers.IO) {
+                    runCatching { llm?.unload() }
                     contentResolver.openInputStream(uri).use { stream ->
                         requireNotNull(stream) { "无法打开模型" }
                         GgufModelInstaller.install(
@@ -335,9 +345,11 @@ class CompanionV2Activity : AndroidApplication() {
                     + " · " + (installed.sizeBytes / (1024L * 1024L)) + " MiB"
                     + " · " + installed.sha256.take(12) + "…"
                 loadModelButton.isEnabled = true
+                updateVoiceControls()
             }.onFailure { error ->
                 modelState.text = "模型导入失败 · " + error.javaClass.simpleName
                 loadModelButton.isEnabled = modelFile != null
+                updateVoiceControls()
             }
         }
     }
@@ -388,7 +400,7 @@ class CompanionV2Activity : AndroidApplication() {
 
     private fun updateVoiceControls() {
         if (!::voiceButton.isInitialized) return
-        voiceButton.isEnabled = recording || (asrModel != null && llm != null)
+        voiceButton.isEnabled = recording || (asrModel != null && modelLoaded)
         voiceButton.text = if (recording) "停止语音" else "语音说一句"
     }
 
@@ -401,7 +413,7 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun startVoice() {
-        if (llm == null) {
+        if (!modelLoaded || llm == null) {
             voiceState.text = "语音：请先加载本地 GGUF"
             return
         }
@@ -570,29 +582,49 @@ class CompanionV2Activity : AndroidApplication() {
 
     private fun loadModel() {
         val file = modelFile ?: return
+        if (generating) {
+            modelState.text = "模型：正在生成，请稍后再重载"
+            return
+        }
+
+        stopRecording(null)
+        stopTtsPlayback(null)
         modelState.text = "模型：正在加载…"
         loadModelButton.isEnabled = false
         sendButton.isEnabled = false
+        modelLoaded = false
+        updateVoiceControls()
+
+        val local = llm ?: LlamaCppCompanionEngine(this@CompanionV2Activity)
+        llm = local
+
         scope.launch {
             runCatching {
-                val next = LlamaCppCompanionEngine(this@CompanionV2Activity)
                 withContext(Dispatchers.IO) {
-                    next.load(file, systemPrompt())
+                    // cleanUp() resets both a previously loaded model and an
+                    // upstream Error state. It throws in Initialized state, so
+                    // that no-op case is intentionally ignored.
+                    runCatching { local.unload() }
+                    try {
+                        local.load(file, systemPrompt())
+                    } catch (error: Throwable) {
+                        runCatching { local.unload() }
+                        throw error
+                    }
                 }
-                next
-            }.onSuccess { next ->
-                llm?.close()
-                llm = next
+                local
+            }.onSuccess {
+                modelLoaded = true
                 conversationPrimed = false
                 modelState.text = "模型：已加载 · 全本地"
                 loadModelButton.isEnabled = true
                 sendButton.isEnabled = true
                 updateVoiceControls()
             }.onFailure { error ->
-                llm?.close()
-                llm = null
+                modelLoaded = false
                 modelState.text = "模型加载失败 · " + error.javaClass.simpleName
                 loadModelButton.isEnabled = true
+                sendButton.isEnabled = false
                 updateVoiceControls()
             }
         }
@@ -730,13 +762,17 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun clearRecentConversation() {
+        if (generating) {
+            memoryState.text = "正在生成，请稍后清空最近对话"
+            return
+        }
         scope.launch {
             val removed = withContext(Dispatchers.IO) {
                 conversationStore.clear(PERSONA_ID)
             }
             conversationPrimed = false
             memoryState.text = "最近对话已清空 · " + removed + " 条"
-            if (llm != null) {
+            if (modelLoaded && llm != null) {
                 loadModel()
             }
         }
@@ -885,15 +921,16 @@ class CompanionV2Activity : AndroidApplication() {
     private fun sendText(text: String) {
         refreshBookContextStatus()
         val local = llm ?: return
-        if (text.isBlank()) return
+        if (!modelLoaded || generating || text.isBlank()) return
         stopRecording(null)
 
         input.isEnabled = false
         sendButton.isEnabled = false
+        generating = true
         reply.text = "生成中…"
         characterState.text = "角色：思考中"
 
-        scope.launch {
+        generationJob = scope.launch {
             runCatching {
                 withContext(Dispatchers.IO) {
                     val recalled = memoryStore.search(PERSONA_ID, text, 6)
@@ -926,6 +963,8 @@ class CompanionV2Activity : AndroidApplication() {
                     parsed
                 }
             }.onSuccess { parsed ->
+                generating = false
+                generationJob = null
                 val visible = parsed.visibleText.trim()
                 reply.text = if (visible.isEmpty()) {
                     "模型没有返回可见文本。"
@@ -940,10 +979,12 @@ class CompanionV2Activity : AndroidApplication() {
                 sendButton.isEnabled = true
                 updateVoiceControls()
             }.onFailure { error ->
+                generating = false
+                generationJob = null
                 reply.text = "生成失败 · " + error.javaClass.simpleName
                 characterRuntime.playIdle()
                 input.isEnabled = true
-                sendButton.isEnabled = llm != null
+                sendButton.isEnabled = modelLoaded
                 updateVoiceControls()
             }
         }
@@ -977,6 +1018,10 @@ class CompanionV2Activity : AndroidApplication() {
 
     override fun onStop() {
         foreground = false
+        generationJob?.cancel()
+        generationJob = null
+        generating = false
+        sendButton.isEnabled = modelLoaded
         stopRecording("语音：已停止（离开前台）")
         stopTtsPlayback("语音回复：已停止（离开前台）")
         super.onStop()
@@ -984,9 +1029,12 @@ class CompanionV2Activity : AndroidApplication() {
 
     override fun onDestroy() {
         stopRecording(null)
+        generationJob?.cancel()
+        generationJob = null
         scope.cancel()
         llm?.close()
         llm = null
+        modelLoaded = false
         memoryStore.close()
         conversationStore.close()
         ttsEngine?.close()

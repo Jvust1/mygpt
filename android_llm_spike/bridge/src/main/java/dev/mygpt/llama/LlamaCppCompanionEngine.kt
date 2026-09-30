@@ -75,7 +75,15 @@ class LlamaCppCompanionEngine internal constructor(
         engine.cleanUp()
     }
 
+    /**
+     * Release the currently loaded model without destroying llama.cpp's
+     * process-wide singleton. Upstream AiChat keeps a static singleton reference;
+     * destroying it inside an Activity lifecycle would make later Activity
+     * recreation reuse an already-destroyed engine.
+     *
+     * Process termination is left to Android/OS cleanup.
+     */
     override fun close() {
-        engine.destroy()
+        runCatching { engine.cleanUp() }
     }
 }

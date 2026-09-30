@@ -35,3 +35,15 @@ The upstream MIT license is reproduced in `third_party/llama.cpp/LICENSE`.
 - MyGPT adds an app-private installer around the GGUF probe: bounded streaming
   copy, SHA-256 addressing, temporary-file cleanup, duplicate detection and
   post-copy format verification. This installer is MyGPT integration code.
+
+
+Lifecycle note:
+- the pinned Android `AiChat` runtime keeps a process-wide static
+  `InferenceEngineImpl` singleton;
+- MyGPT therefore treats Activity-level `close()` as best-effort model unload,
+  not `engine.destroy()`;
+- model replacement and conversation reset reuse the same process engine through
+  `cleanUp() -> loadModel() -> setSystemPrompt()`;
+- Android process termination remains responsible for final native process
+  teardown, avoiding reuse of an already-destroyed singleton after Activity
+  recreation.
