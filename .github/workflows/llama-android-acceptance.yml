@@ -6,11 +6,13 @@ on:
     paths:
       - '.gitmodules'
       - 'third_party/llama.cpp/**'
+      - 'android_llm_spike/**'
       - '.github/workflows/llama-android-acceptance.yml'
   pull_request:
     paths:
       - '.gitmodules'
       - 'third_party/llama.cpp/**'
+      - 'android_llm_spike/**'
       - '.github/workflows/llama-android-acceptance.yml'
 
 permissions:
@@ -56,38 +58,44 @@ jobs:
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "ndk;29.0.13113456" "cmake;3.31.6"
 
-      - name: Build pinned upstream Android inference library
+      - name: Build pinned llama.cpp JNI and MyGPT bridge
         shell: bash
-        working-directory: third_party/llama.cpp/upstream/examples/llama.android
         env:
           ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13113456
         run: |
           set -euo pipefail
-          chmod +x ./gradlew
-          ./gradlew :lib:assembleRelease --no-daemon --stacktrace
+          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             --no-daemon --stacktrace
 
-      - name: Verify release AAR
+      - name: Verify upstream JNI and MyGPT bridge AARs
         shell: bash
         run: |
           set -euo pipefail
-          aar="third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
-          test -f "$aar"
+          llama_aar="third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
+          bridge_aar="android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
+          test -f "$llama_aar"
+          test -f "$bridge_aar"
           python - <<'PY'
           import zipfile
-          aar = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
-          with zipfile.ZipFile(aar) as z:
+          llama = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
+          bridge = "android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
+          with zipfile.ZipFile(llama) as z:
+              names=set(z.namelist())
+              native=[n for n in names if n.endswith("/libai-chat.so")]
+              if "classes.jar" not in names or not native:
+                  raise SystemExit("llama AAR missing classes.jar or libai-chat.so")
+              print("llama AAR PASS:", native)
+          with zipfile.ZipFile(bridge) as z:
               names=set(z.namelist())
               if "classes.jar" not in names:
-                  raise SystemExit("missing classes.jar")
-              native=[n for n in names if n.endswith("/libai-chat.so")]
-              if not native:
-                  raise SystemExit("missing libai-chat.so")
-              print("AAR PASS:", native)
+                  raise SystemExit("bridge AAR missing classes.jar")
+              print("MyGPT bridge AAR PASS")
           PY
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: mygpt-llama-android-lib
-          path: third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar
+          name: mygpt-llama-android-bridge
+          path: |
+            third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar
+            android_llm_spike/bridge/build/outputs/aar/bridge-release.aar
           if-no-files-found: error
           retention-days: 3
