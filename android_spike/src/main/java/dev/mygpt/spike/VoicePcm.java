@@ -6,10 +6,10 @@ package dev.mygpt.spike;
  * The 16-bit PCM normalization rule is adapted from sherpa-onnx's Apache-2.0
  * Android Java demo. See third_party/sherpa-onnx/NOTICE.md.
  */
-final class VoicePcm {
+public final class VoicePcm {
     private VoicePcm() {}
 
-    static float[] normalizePcm16(short[] input, int count) {
+    public static float[] normalizePcm16(short[] input, int count) {
         if (input == null) {
             throw new IllegalArgumentException("input is required");
         }
