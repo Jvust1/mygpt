@@ -2,7 +2,7 @@ name: AIRI companion brain focused acceptance
 
 on:
   push:
-    branches: [feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930]
+    branches: [feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, fix/voice-activation-test-20260930]
     paths:
       - 'brain/mygpt_brain/conversation.py'
       - 'brain/mygpt_brain/memory_store.py'
