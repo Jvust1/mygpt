@@ -103,5 +103,6 @@ async def test_persistence_failure_does_not_append_exchange_to_memory():
     with pytest.raises(RuntimeError,match="disk failed"):
         await runtime.send({"request_id":"r1","session_id":"s1","persona_id":"p1","text":"one"},now=NOW)
     messages=runtime.session_messages("s1")
-    assert len(messages)==1
-    assert messages[0].role=="system"
+    # The initial persona is staged with the transaction, so a failed first
+    # commit cannot make the next successful exchange omit durable authority.
+    assert messages == []

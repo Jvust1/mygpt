@@ -13,8 +13,50 @@ from mygpt_brain.companion_chat import (
 )
 from mygpt_brain.companion_service import CLIENT_HEADER, create_companion_server
 from mygpt_brain.session_store import ChatSessionStore
+from mygpt_brain.providers import OllamaResponder
+from mygpt_brain.airi_act import ACT_PRESENTATION_INSTRUCTION
 
 NOW = datetime(2026, 9, 29, 16, 10, tzinfo=timezone.utc)
+
+
+def test_ollama_act_roundtrip_separates_voice_and_emotion_before_durable_replay(tmp_path, monkeypatch):
+    """Real companion HTTP + actual Ollama adapter; model endpoint is stubbed."""
+    calls = []
+    class Response:
+        status = 200
+        def __enter__(self): return self
+        def __exit__(self, *_): return False
+        def read(self, _limit):
+            return json.dumps({"message": {"content": '继续学这节。<|ACT:{"emotion":"happy"}|>'}}).encode()
+    def model_endpoint(req, timeout):
+        calls.append(json.loads(req.data))
+        assert req.full_url == "http://127.0.0.1:11434/api/chat"
+        return Response()
+    monkeypatch.setattr("mygpt_brain.providers.urllib_request.urlopen", model_endpoint)
+    body = dict(request_id="airi-http", session_id="s1", persona_id="mygpt-3714430278", text="继续学习")
+    runtime, store = make_runtime(tmp_path, responder=OllamaResponder("synthetic-test-model"))
+    try:
+        with create_companion_server(runtime) as server:
+            status, value = call(server, "POST", "/api/v1/chat", token=server.token, body=body)
+            assert status == 200
+            assert value["assistant_message"]["content"] == "继续学这节。"
+            assert value["presentation_emotion"] == "happy"
+        assert calls[0]["messages"][1] == {"role": "system", "content": ACT_PRESENTATION_INSTRUCTION}
+        assert all("<|ACT" not in m.content for m in store.load_messages("s1"))
+        assert runtime.memory_store.recent(namespace=runtime.persona.persona_id) == []
+    finally:
+        store.close()
+    # Reopen SQLite and the HTTP service: no second model call or raw marker.
+    restored, store = make_runtime(tmp_path, responder=OllamaResponder("synthetic-test-model"))
+    try:
+        with create_companion_server(restored) as server:
+            status, replay = call(server, "POST", "/api/v1/chat", token=server.token, body=body)
+            assert status == 200 and replay["replayed"]
+            assert replay["presentation_emotion"] == "happy"
+            assert replay["assistant_message"]["content"] == "继续学这节。"
+            assert len(calls) == 1
+    finally:
+        store.close()
 
 
 def call(server, method, path, *, token=None, body=None, client=True, content_type="application/json"):
