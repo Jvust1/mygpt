@@ -1,0 +1,44 @@
+# scikit-learn lexical memory source attribution
+
+Upstream: https://github.com/scikit-learn/scikit-learn
+
+- Eligibility checked 2026-09-30 UTC: **67,434 GitHub stars**, not archived
+- License: **BSD-3-Clause**, complete upstream `COPYING` retained as `LICENSE`
+- Copyright (c) 2007-2026 The scikit-learn developers.
+- Immutable source commit: `bbf8863a869f118a1a42422d8cc67ec6c07f2fe0`
+- `sklearn/feature_extraction/text.py`: Git blob `0c1d18b83dddd3a09869dc6b0004a60fc93dd20f`
+- `sklearn/metrics/pairwise.py`: Git blob `73482e85642e8a51db04215a3bedaf784d5d25df`
+- `COPYING`: Git blob `3d7ee432c15b685eaa654b6abe8f8e3ea8126a8d`
+
+## Adapted source and live use
+
+`brain/mygpt_brain/lexical_memory.py` directly ports
+`CountVectorizer._char_wb_ngrams`, `TfidfTransformer.fit/transform`'s smoothed IDF
+and sublinear term frequency, L2 normalization, and `cosine_similarity`'s
+normalized dot-product computation. The existing `MemoryStore.search` invokes
+this code on every lexical recall through `CompanionChatRuntime.send`, including
+the existing native HTTP and voice paths. This is not an unused optional adapter.
+
+MyGPT fixes the configuration to character word-boundary n-grams of length 2–3,
+smoothed IDF, sublinear TF and L2 normalization. Python sparse dictionaries replace
+NumPy/SciPy arrays. A MyGPT lexical preprocessor removes punctuation-only evidence;
+zero-vocabulary candidates return zeros instead of sklearn's empty-vocabulary
+exception. Candidate documents fit the vocabulary/IDF; full user queries are
+transformed without refitting, matching the upstream contract. No persistent
+index or new model dependency is introduced into the phone-oriented runtime.
+
+The existing SQL keyword selector supplies at most 64 namespace-scoped records
+across at most eight 500-character windows. Scoring accepts the full 4000-character
+chat input and does not truncate the provider prompt. Recency and memory ID break
+score ties. Memory edit/delete audit behavior and lower-authority prompt placement
+are unchanged. This is bounded lexical reranking, not semantic search or exhaustive
+corpus retrieval; a relevant record outside the candidate budget can be missed.
+
+`scikit-learn==1.9.1` is a **test-only** optional dependency, used as a real SDK
+oracle against fixed and deterministic randomized corpora. It is not imported
+by the runtime and does not change the hash-locked production/Brain dependencies.
+
+Source links:
+- https://github.com/scikit-learn/scikit-learn/blob/bbf8863a869f118a1a42422d8cc67ec6c07f2fe0/sklearn/feature_extraction/text.py
+- https://github.com/scikit-learn/scikit-learn/blob/bbf8863a869f118a1a42422d8cc67ec6c07f2fe0/sklearn/metrics/pairwise.py
+- https://github.com/scikit-learn/scikit-learn/blob/bbf8863a869f118a1a42422d8cc67ec6c07f2fe0/COPYING

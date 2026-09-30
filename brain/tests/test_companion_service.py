@@ -490,3 +490,36 @@ def test_expiry_before_success_delivery_admission_suppresses_completed_reply(tmp
             assert store.get_receipt("pending") is not None
     finally:
         store.close()
+
+
+@pytest.mark.parametrize("size", [600, 4000])
+def test_full_length_chat_retrieves_memory_and_preserves_native_prompt(tmp_path, size):
+    from mygpt_brain.memory_store import MemoryRecord
+    observed = []
+    async def responder(prompt):
+        observed.append(prompt)
+        return "用这个例子继续学习。"
+    runtime, store = make_runtime(tmp_path, responder=responder)
+    text = "z" * (size - 4) + "拓扑学习"
+    memory = MemoryRecord(memory_id="long-target", namespace=runtime.persona.persona_id,
+        kind="preference", text="拓扑学习时先举例", tags=["拓扑"], source="user_explicit",
+        created_at=NOW, updated_at=NOW)
+    runtime.memory_store.put(memory)
+    body = dict(request_id="long-query", session_id="s-long", persona_id=runtime.persona.persona_id, text=text)
+    try:
+        with create_companion_server(runtime) as server:
+            status, reply = call(server, "POST", "/api/v1/chat", token=server.token, body=body)
+            assert status == 200
+            assert reply["recalled_memory_ids"] == ["long-target"]
+            assert observed[0].provider_messages()[-1].content == text
+            assert observed[0].memories == (memory,)
+            recalled = [m for m in observed[0].provider_messages() if "LOCAL_RECALLED_MEMORY" in m.content]
+            assert len(recalled) == 1 and recalled[0].role == "user"
+            assert [m.content for m in store.load_messages("s-long") if m.role == "user"] == [text]
+            status, replay = call(server, "POST", "/api/v1/chat", token=server.token, body=body)
+            assert status == 200 and replay["replayed"]
+            assert len(observed) == 1
+        assert runtime.memory_store.get("long-target") == memory
+        assert len(runtime.memory_store.history("long-target")) == 1
+    finally:
+        store.close()

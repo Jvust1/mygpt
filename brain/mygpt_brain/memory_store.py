@@ -20,6 +20,7 @@ from typing import Annotated, Literal
 from pydantic import AwareDatetime, Field, field_validator
 
 from .core import Contract, Identifier
+from .lexical_memory import MAX_CANDIDATES, MAX_QUERY_CHARS, normalize_memory_text, tfidf_memory_scores
 
 MemoryKind = Literal[
     "preference",
@@ -355,7 +356,43 @@ class MemoryStore:
         namespace: str = "default",
         limit: int = 8,
     ) -> list[MemoryRecord]:
-        """Simple dependency-free retrieval for the first local prototype."""
+        """Bounded candidate lookup plus scikit-learn-derived lexical relevance.
+
+        The chat contract accepts 4000 characters; keep all of that user text
+        for the provider. Only candidate lookup is split into <=500-char windows.
+        At most eight windows and 64 namespace-scoped records reach the scorer.
+        """
+        if not isinstance(query, str) or not query.strip():
+            return []
+        if len(query) > MAX_QUERY_CHARS:
+            raise ValueError("query too long")
+        if type(limit) is not int or not 1 <= limit <= 20:
+            raise ValueError("limit must be in 1..20")
+        if len(normalize_memory_text(query)) < 2:
+            return []
+        windows = [query[start:start + 500] for start in range(0, len(query), 500)]
+        per_window = min(20, MAX_CANDIDATES // len(windows))
+        candidates: dict[str, MemoryRecord] = {}
+        with self._lock:
+            for window in windows:
+                projection = normalize_memory_text(window)[:500]
+                for record in self._keyword_candidates(projection, namespace=namespace, limit=per_window):
+                    candidates[record.memory_id] = record
+        records = list(candidates.values())
+        documents = [record.text + " " + " ".join(record.tags) for record in records]
+        scores = tfidf_memory_scores(query, documents)
+        ranked = [(score, record) for score, record in zip(scores, records) if score > 0.0]
+        ranked.sort(key=lambda item: (-item[0], -item[1].updated_at.timestamp(), item[1].memory_id))
+        return [record for _score, record in ranked[:limit]]
+
+    def _keyword_candidates(
+        self,
+        query: str,
+        *,
+        namespace: str = "default",
+        limit: int = 8,
+    ) -> list[MemoryRecord]:
+        """Existing bounded SQL candidate selector; not the final ranking."""
         if not isinstance(query, str) or not query.strip():
             return []
         if len(query) > 500:
@@ -378,7 +415,7 @@ class MemoryStore:
                 break
         tokens = tokens[:12]
         if not tokens:
-            return self.recent(namespace=namespace, limit=min(limit, 8))
+            return []
 
         clauses = []
         params: list[object] = [namespace]
