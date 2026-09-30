@@ -74,11 +74,21 @@ public final class VoiceSpikeActivity extends Activity {
         page.addView(transcript);
 
         File root = new File(getFilesDir(), "asr-models");
-        model = SherpaZhEnModelInstaller.existing(root);
-        if (model != null) {
-            status.setText("模型已恢复 · 可开始识别");
-            startButton.setEnabled(true);
-        }
+        status.setText("正在校验本地 sherpa 模型指纹…");
+        new Thread(() -> {
+            SherpaZhEnModelInstaller.Installed restored =
+                    SherpaZhEnModelInstaller.existing(root);
+            model = restored;
+            main.post(() -> {
+                if (restored != null) {
+                    status.setText("模型已恢复并验证 · 可开始识别");
+                    startButton.setEnabled(true);
+                } else {
+                    status.setText("尚未导入模型或模型指纹校验失败");
+                    startButton.setEnabled(false);
+                }
+            });
+        }, "mygpt-asr-model-restore").start();
     }
 
     private void chooseModel() {

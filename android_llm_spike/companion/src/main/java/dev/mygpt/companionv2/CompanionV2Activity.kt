@@ -516,11 +516,20 @@ class CompanionV2Activity : AndroidApplication(),
     }
 
     private fun restoreAsrModel() {
-        asrModel = SherpaZhEnModelInstaller.existing(File(filesDir, "asr-models"))
-        if (asrModel != null) {
-            voiceState.text = "语音：已恢复本地 sherpa 模型"
+        voiceState.text = "语音：正在校验本地 sherpa 模型指纹…"
+        voiceButton.isEnabled = false
+        scope.launch {
+            val restored = withContext(Dispatchers.IO) {
+                SherpaZhEnModelInstaller.existing(File(filesDir, "asr-models"))
+            }
+            asrModel = restored
+            voiceState.text = if (restored != null) {
+                "语音：已恢复并验证本地 sherpa 模型"
+            } else {
+                "语音：尚未导入或模型指纹校验失败"
+            }
+            updateVoiceControls()
         }
-        updateVoiceControls()
     }
 
     private fun updateVoiceControls() {
@@ -913,11 +922,20 @@ class CompanionV2Activity : AndroidApplication(),
     }
 
     private fun restoreTtsModel() {
-        ttsModel = SherpaMeloTtsModelInstaller.existing(File(filesDir, "tts-models"))
-        if (ttsModel != null) {
-            ttsState.text = "语音回复：已恢复 Melo 中英模型"
+        ttsState.text = "语音回复：正在校验本地 Melo TTS 指纹…"
+        ttsToggleButton.isEnabled = false
+        scope.launch {
+            val restored = withContext(Dispatchers.IO) {
+                SherpaMeloTtsModelInstaller.existing(File(filesDir, "tts-models"))
+            }
+            ttsModel = restored
+            ttsState.text = if (restored != null) {
+                "语音回复：已恢复并验证 Melo 中英模型"
+            } else {
+                "语音回复：尚未导入或模型指纹校验失败"
+            }
+            updateTtsControls()
         }
-        updateTtsControls()
     }
 
     private fun updateTtsControls() {
@@ -1200,6 +1218,10 @@ class CompanionV2Activity : AndroidApplication(),
 
     private fun sendText(text: String) {
         refreshBookContextStatus()
+        if (text.length > CompanionPromptBudget.MAX_USER_CHARS) {
+            reply.text = "当前消息过长 · 上限 " + CompanionPromptBudget.MAX_USER_CHARS + " 字符"
+            return
+        }
         val local = llm ?: return
         if (!modelLoaded || generating || benchmarking || text.isBlank()) return
         stopRecording(null)
