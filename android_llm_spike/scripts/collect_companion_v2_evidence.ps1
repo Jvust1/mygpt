@@ -13,6 +13,7 @@ $RepoRoot = (Resolve-Path (Join-Path $ProjectDir "..")).Path
 
 $SourceHead = (& git -C $RepoRoot rev-parse HEAD).Trim()
 $SourceBranch = (& git -C $RepoRoot rev-parse --abbrev-ref HEAD).Trim()
+
 $SdkRoot = $env:ANDROID_HOME
 if ([string]::IsNullOrWhiteSpace($SdkRoot)) {
     $SdkRoot = $env:ANDROID_SDK_ROOT
@@ -58,11 +59,47 @@ $SourceHead | Out-File (Join-Path $OutputDirectory "source-head.txt") -Encoding 
 $SourceBranch | Out-File (Join-Path $OutputDirectory "source-branch.txt") -Encoding utf8
 & git -C $RepoRoot status --porcelain --untracked-files=no |
     Out-File (Join-Path $OutputDirectory "source-dirty.txt") -Encoding utf8
-& $Adb -s $DeviceSerial shell dumpsys package dev.mygpt.companionv2 |
+
+$DeviceInfo = @(
+    "serial=$DeviceSerial",
+    "model=" + ((& $Adb -s $DeviceSerial shell getprop ro.product.model).Trim()),
+    "device=" + ((& $Adb -s $DeviceSerial shell getprop ro.product.device).Trim()),
+    "android_release=" + ((& $Adb -s $DeviceSerial shell getprop ro.build.version.release).Trim()),
+    "sdk=" + ((& $Adb -s $DeviceSerial shell getprop ro.build.version.sdk).Trim()),
+    "abi=" + ((& $Adb -s $DeviceSerial shell getprop ro.product.cpu.abi).Trim())
+)
+$DeviceInfo | Out-File (Join-Path $OutputDirectory "device-info.txt") -Encoding utf8
+
+$CompanionDump = & $Adb -s $DeviceSerial shell dumpsys package dev.mygpt.companionv2
+$CompanionDumpText = ($CompanionDump | Out-String)
+$CompanionDump |
     Out-File (Join-Path $OutputDirectory "dumpsys-companion-package.txt") -Encoding utf8
 
-& $Adb -s $DeviceSerial shell dumpsys package dev.mygpt.bookcontexttest |
+$SenderDump = & $Adb -s $DeviceSerial shell dumpsys package dev.mygpt.bookcontexttest
+$SenderDump |
     Out-File (Join-Path $OutputDirectory "dumpsys-book-sender-package.txt") -Encoding utf8
+
+$PermissionFailures = @()
+foreach ($BadPermission in @(
+    "android.permission.INTERNET",
+    "android.permission.SYSTEM_ALERT_WINDOW",
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.WRITE_EXTERNAL_STORAGE",
+    "android.permission.MANAGE_EXTERNAL_STORAGE"
+)) {
+    if ($CompanionDumpText -match [regex]::Escape($BadPermission)) {
+        $PermissionFailures += $BadPermission
+    }
+}
+
+if ($PermissionFailures.Count -gt 0) {
+    ("FAIL unexpected permissions: " + ($PermissionFailures -join ", ")) |
+        Out-File (Join-Path $OutputDirectory "permission-boundary-check.txt") -Encoding utf8
+    throw "Unexpected Companion V2 permission(s): $($PermissionFailures -join ', ')"
+}
+
+"PASS: no INTERNET / SYSTEM_ALERT_WINDOW / broad storage permission detected" |
+    Out-File (Join-Path $OutputDirectory "permission-boundary-check.txt") -Encoding utf8
 
 & $Adb -s $DeviceSerial shell dumpsys meminfo dev.mygpt.companionv2 |
     Out-File (Join-Path $OutputDirectory "meminfo-current.txt") -Encoding utf8
@@ -80,44 +117,55 @@ if (-not [string]::IsNullOrWhiteSpace($Pid)) {
 }
 
 $Benchmark = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/benchmark-last.txt 2>&1
-if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace(($Benchmark | Out-String))) {
+$BenchmarkExit = $LASTEXITCODE
+if ($BenchmarkExit -eq 0 -and -not [string]::IsNullOrWhiteSpace(($Benchmark | Out-String))) {
     $Benchmark | Out-File (Join-Path $OutputDirectory "benchmark-last.txt") -Encoding utf8
+    $BenchmarkStatus = "present"
     Write-Host "Benchmark report captured." -ForegroundColor Green
 }
 else {
     $Benchmark | Out-File (Join-Path $OutputDirectory "benchmark-capture-error.txt") -Encoding utf8
+    $BenchmarkStatus = "missing"
     Write-Host "No benchmark report captured yet. Run the in-app benchmark first." -ForegroundColor Yellow
 }
 
 $BookResult = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest cat files/adb-book-result.txt 2>&1
-$BookResult | Out-File (Join-Path $OutputDirectory "book-sender-last-result.txt") -Encoding utf8
+$BookResultExit = $LASTEXITCODE
+$BookResultText = ($BookResult | Out-String)
+if ($BookResultExit -eq 0) {
+    $BookResult | Out-File (Join-Path $OutputDirectory "book-sender-last-result.txt") -Encoding utf8
+}
+else {
+    $BookResult | Out-File (Join-Path $OutputDirectory "book-sender-result-error.txt") -Encoding utf8
+}
+
+if ($BookResultText -match "accepted=true") {
+    $BookGateStatus = "PASS"
+}
+else {
+    $BookGateStatus = "UNKNOWN_OR_NOT_RUN"
+}
 
 $PrivateListing = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 sh -c "find files -type f -print" 2>&1
+if ($LASTEXITCODE -ne 0) {
+    $PrivateListing |
+        Out-File (Join-Path $OutputDirectory "app-private-files-error.txt") -Encoding utf8
+    throw "Unable to inspect Companion V2 app-private files."
+}
+
 $PrivateListingText = ($PrivateListing | Out-String)
 $PrivateListing | Out-File (Join-Path $OutputDirectory "app-private-files.txt") -Encoding utf8
 
-$AudioLeakPattern = '\.(wav|pcm|raw|mp3|m4a|aac|ogg)$Packages = & $Adb -s $DeviceSerial shell pm list packages dev.mygpt
-$Packages | Out-File (Join-Path $OutputDirectory "mygpt-packages.txt") -Encoding utf8
-
-$Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$RemoteScreenshot = "/sdcard/mygpt-companion-v2-" + $Timestamp + ".png"
-$LocalScreenshot = Join-Path $OutputDirectory "companion-current.png"
-& $Adb -s $DeviceSerial shell screencap -p $RemoteScreenshot | Out-Null
-if ($LASTEXITCODE -eq 0) {
-    & $Adb -s $DeviceSerial pull $RemoteScreenshot $LocalScreenshot | Out-Null
-    & $Adb -s $DeviceSerial shell rm -f $RemoteScreenshot | Out-Null
-}
-
-Write-Host "Evidence collected: $OutputDirectory" -ForegroundColor Green
-Write-Host "Add your PASS/FAIL notes before archiving the evidence directory."
-
+$AudioLeakPattern = '\.(wav|pcm|raw|mp3|m4a|aac|ogg)$'
 if ($PrivateListingText -match $AudioLeakPattern) {
     ("FAIL: persisted audio-like file detected" + [Environment]::NewLine + $PrivateListingText) |
         Out-File (Join-Path $OutputDirectory "audio-persistence-check.txt") -Encoding utf8
     throw "Unexpected persisted audio-like file found in Companion V2 private files."
 }
+
 "PASS: no persisted wav/pcm/raw/mp3/m4a/aac/ogg file found" |
     Out-File (Join-Path $OutputDirectory "audio-persistence-check.txt") -Encoding utf8
+
 $Packages = & $Adb -s $DeviceSerial shell pm list packages dev.mygpt
 $Packages | Out-File (Join-Path $OutputDirectory "mygpt-packages.txt") -Encoding utf8
 
@@ -130,5 +178,21 @@ if ($LASTEXITCODE -eq 0) {
     & $Adb -s $DeviceSerial shell rm -f $RemoteScreenshot | Out-Null
 }
 
+$Summary = @(
+    "schema=mygpt.companion-v2-evidence.v1",
+    "source_head=$SourceHead",
+    "source_branch=$SourceBranch",
+    "device_serial=$DeviceSerial",
+    "book_gate=$BookGateStatus",
+    "benchmark=$BenchmarkStatus",
+    "permission_boundary=PASS",
+    "audio_persistence=PASS"
+)
+$Summary | Out-File (Join-Path $OutputDirectory "evidence-summary.txt") -Encoding utf8
+
 Write-Host "Evidence collected: $OutputDirectory" -ForegroundColor Green
-Write-Host "Add your PASS/FAIL notes before archiving the evidence directory."
+Write-Host "permission_boundary=PASS" -ForegroundColor Green
+Write-Host "audio_persistence=PASS" -ForegroundColor Green
+Write-Host "book_gate=$BookGateStatus"
+Write-Host "benchmark=$BenchmarkStatus"
+Write-Host "Add your remaining visual/voice/model PASS/FAIL notes before archiving the evidence directory."
