@@ -41,6 +41,7 @@ public final class SherpaMeloTtsModelInstaller {
         public final File dateFst;
         public final File phoneFst;
         public final File numberFst;
+        public final File fingerprintManifest;
 
         Installed(File directory) {
             this.directory = directory;
@@ -50,6 +51,8 @@ public final class SherpaMeloTtsModelInstaller {
             this.dateFst = new File(directory, "date.fst");
             this.phoneFst = new File(directory, "phone.fst");
             this.numberFst = new File(directory, "number.fst");
+            this.fingerprintManifest =
+                    new File(directory, ModelFingerprintManifest.FILE_NAME);
         }
 
         public boolean isComplete() {
@@ -58,7 +61,8 @@ public final class SherpaMeloTtsModelInstaller {
                     && lexicon.isFile()
                     && dateFst.isFile()
                     && phoneFst.isFile()
-                    && numberFst.isFile();
+                    && numberFst.isFile()
+                    && fingerprintManifest.isFile();
         }
 
         public String ruleFsts() {
@@ -115,8 +119,30 @@ public final class SherpaMeloTtsModelInstaller {
                 throw new IOException("TTS model archive missing required files: " + missing);
             }
 
+            Installed stagedBeforeManifest = new Installed(temp);
+            if (!stagedBeforeManifest.model.isFile()
+                    || !stagedBeforeManifest.tokens.isFile()
+                    || !stagedBeforeManifest.lexicon.isFile()
+                    || !stagedBeforeManifest.dateFst.isFile()
+                    || !stagedBeforeManifest.phoneFst.isFile()
+                    || !stagedBeforeManifest.numberFst.isFile()) {
+                throw new IOException("TTS model install incomplete");
+            }
+
+            ModelFingerprintManifest.write(
+                    temp,
+                    "sherpa-vits-melo-tts-zh-en",
+                    "sherpa-onnx-v1.13.8",
+                    "model.onnx",
+                    "tokens.txt",
+                    "lexicon.txt",
+                    "date.fst",
+                    "phone.fst",
+                    "number.fst"
+            );
+
             Installed staged = new Installed(temp);
-            if (!staged.isComplete()) throw new IOException("TTS model install incomplete");
+            if (!staged.isComplete()) throw new IOException("TTS model manifest incomplete");
 
             deleteRecursively(target);
             if (!temp.renameTo(target)) {

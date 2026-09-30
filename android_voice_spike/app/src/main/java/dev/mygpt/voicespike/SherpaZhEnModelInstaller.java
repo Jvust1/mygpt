@@ -39,6 +39,7 @@ public final class SherpaZhEnModelInstaller {
         public final File decoder;
         public final File joiner;
         public final File tokens;
+        public final File fingerprintManifest;
 
         Installed(File directory) {
             this.directory = directory;
@@ -46,10 +47,16 @@ public final class SherpaZhEnModelInstaller {
             this.decoder = new File(directory, DECODER);
             this.joiner = new File(directory, JOINER);
             this.tokens = new File(directory, TOKENS);
+            this.fingerprintManifest =
+                    new File(directory, ModelFingerprintManifest.FILE_NAME);
         }
 
         public boolean isComplete() {
-            return encoder.isFile() && decoder.isFile() && joiner.isFile() && tokens.isFile();
+            return encoder.isFile()
+                    && decoder.isFile()
+                    && joiner.isFile()
+                    && tokens.isFile()
+                    && fingerprintManifest.isFile();
         }
     }
 
@@ -98,8 +105,26 @@ public final class SherpaZhEnModelInstaller {
                 throw new IOException("ASR model archive missing required files: " + missing(seenRequired));
             }
 
+            Installed stagedBeforeManifest = new Installed(temp);
+            if (!stagedBeforeManifest.encoder.isFile()
+                    || !stagedBeforeManifest.decoder.isFile()
+                    || !stagedBeforeManifest.joiner.isFile()
+                    || !stagedBeforeManifest.tokens.isFile()) {
+                throw new IOException("ASR model install incomplete");
+            }
+
+            ModelFingerprintManifest.write(
+                    temp,
+                    "sherpa-streaming-zipformer-zh-en",
+                    "sherpa-onnx-v1.13.8",
+                    ENCODER,
+                    DECODER,
+                    JOINER,
+                    TOKENS
+            );
+
             Installed staged = new Installed(temp);
-            if (!staged.isComplete()) throw new IOException("ASR model install incomplete");
+            if (!staged.isComplete()) throw new IOException("ASR model manifest incomplete");
 
             deleteRecursively(target);
             if (!temp.renameTo(target)) {

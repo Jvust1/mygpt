@@ -167,6 +167,26 @@ else {
     $BookGateStatus = "UNKNOWN_OR_NOT_RUN"
 }
 
+$AsrManifest = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/asr-models/sherpa-zh-en-streaming/mygpt-model-manifest.txt 2>&1
+if ($LASTEXITCODE -eq 0 -and (($AsrManifest | Out-String) -match "schema=mygpt.model-fingerprint.v1")) {
+    $AsrManifestStatus = "present"
+    $AsrManifest | Out-File (Join-Path $OutputDirectory "asr-model-manifest.txt") -Encoding utf8
+}
+else {
+    $AsrManifestStatus = "missing"
+    $AsrManifest | Out-File (Join-Path $OutputDirectory "asr-model-manifest-error.txt") -Encoding utf8
+}
+
+$TtsManifest = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/tts-models/sherpa-melo-zh-en-tts/mygpt-model-manifest.txt 2>&1
+if ($LASTEXITCODE -eq 0 -and (($TtsManifest | Out-String) -match "schema=mygpt.model-fingerprint.v1")) {
+    $TtsManifestStatus = "present"
+    $TtsManifest | Out-File (Join-Path $OutputDirectory "tts-model-manifest.txt") -Encoding utf8
+}
+else {
+    $TtsManifestStatus = "missing"
+    $TtsManifest | Out-File (Join-Path $OutputDirectory "tts-model-manifest-error.txt") -Encoding utf8
+}
+
 $PrivateListing = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 sh -c "find files -type f -print" 2>&1
 if ($LASTEXITCODE -ne 0) {
     $PrivateListing |
@@ -208,6 +228,8 @@ $Summary = @(
     "supervision=$SupervisionStatus",
     "pip_gate=$PipGateStatus",
     "benchmark=$BenchmarkStatus",
+    "asr_model_manifest=$AsrManifestStatus",
+    "tts_model_manifest=$TtsManifestStatus",
     "permission_boundary=PASS",
     "audio_persistence=PASS"
 )
@@ -220,4 +242,6 @@ Write-Host "book_gate=$BookGateStatus"
 Write-Host "supervision=$SupervisionStatus"
 Write-Host "pip_gate=$PipGateStatus"
 Write-Host "benchmark=$BenchmarkStatus"
+Write-Host "asr_model_manifest=$AsrManifestStatus"
+Write-Host "tts_model_manifest=$TtsManifestStatus"
 Write-Host "Add your remaining visual/voice/model PASS/FAIL notes before archiving the evidence directory."
