@@ -54,6 +54,7 @@ jobs:
             android_spike/src/main/java/dev/mygpt/spike/BookContextSnapshot.java \
             android_spike/src/main/java/dev/mygpt/spike/BookContextMailbox.java \
             android_spike/src/main/java/dev/mygpt/spike/StudySupervisorRuntime.java \
+            android_spike/src/main/java/dev/mygpt/spike/CompanionPromptBudget.java \
             android_llm_spike/book-client-sdk/src/main/java/dev/mygpt/bookbridge/BookCompanionContract.java \
             android_llm_spike/book-client-sdk/src/main/java/dev/mygpt/bookbridge/BookContextPayload.java \
             android_llm_spike/book-client-sdk/src/main/java/dev/mygpt/bookbridge/BookCompanionSession.java \
@@ -68,6 +69,7 @@ jobs:
             android_spike/src/test/java/dev/mygpt/spike/GgufModelInstallerSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/BookContextMailboxSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/StudySupervisorRuntimeSmoke.java \
+            android_spike/src/test/java/dev/mygpt/spike/CompanionPromptBudgetSmoke.java \
             android_llm_spike/book-client-sdk/src/test/java/dev/mygpt/bookbridge/BookClientSdkSmoke.java
           java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.SpinePackageLayoutSmoke
@@ -80,6 +82,7 @@ jobs:
           java -cp android_spike/build/classes dev.mygpt.spike.GgufModelInstallerSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.BookContextMailboxSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.StudySupervisorRuntimeSmoke
+          java -cp android_spike/build/classes dev.mygpt.spike.CompanionPromptBudgetSmoke
           java -cp android_spike/build/classes dev.mygpt.bookbridge.BookClientSdkSmoke
 
   android-debug-host:

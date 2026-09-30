@@ -116,6 +116,16 @@ if (-not [string]::IsNullOrWhiteSpace($Pid)) {
         Out-File (Join-Path $OutputDirectory "logcat-companion-current.txt") -Encoding utf8
 }
 
+$PromptBudget = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/prompt-budget-last.txt 2>&1
+if ($LASTEXITCODE -eq 0 -and (($PromptBudget | Out-String) -match "schema=mygpt.prompt-budget.v1")) {
+    $PromptBudgetStatus = "present"
+    $PromptBudget | Out-File (Join-Path $OutputDirectory "prompt-budget-last.txt") -Encoding utf8
+}
+else {
+    $PromptBudgetStatus = "missing"
+    $PromptBudget | Out-File (Join-Path $OutputDirectory "prompt-budget-error.txt") -Encoding utf8
+}
+
 $Benchmark = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/benchmark-last.txt 2>&1
 $BenchmarkExit = $LASTEXITCODE
 if ($BenchmarkExit -eq 0 -and -not [string]::IsNullOrWhiteSpace(($Benchmark | Out-String))) {
@@ -228,6 +238,7 @@ $Summary = @(
     "supervision=$SupervisionStatus",
     "pip_gate=$PipGateStatus",
     "benchmark=$BenchmarkStatus",
+    "prompt_budget=$PromptBudgetStatus",
     "asr_model_manifest=$AsrManifestStatus",
     "tts_model_manifest=$TtsManifestStatus",
     "permission_boundary=PASS",
@@ -242,6 +253,7 @@ Write-Host "book_gate=$BookGateStatus"
 Write-Host "supervision=$SupervisionStatus"
 Write-Host "pip_gate=$PipGateStatus"
 Write-Host "benchmark=$BenchmarkStatus"
+Write-Host "prompt_budget=$PromptBudgetStatus"
 Write-Host "asr_model_manifest=$AsrManifestStatus"
 Write-Host "tts_model_manifest=$TtsManifestStatus"
 Write-Host "Add your remaining visual/voice/model PASS/FAIL notes before archiving the evidence directory."
