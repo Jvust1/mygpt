@@ -2,8 +2,10 @@ package dev.mygpt.companionv2
 
 import android.Manifest
 import android.app.Activity
+import android.app.PictureInPictureParams
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Color
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -13,6 +15,7 @@ import android.os.Bundle
 import android.os.Debug
 import android.os.PowerManager
 import android.os.SystemClock
+import android.util.Rational
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
@@ -50,6 +53,9 @@ import java.util.concurrent.TimeUnit
 class CompanionV2Activity : AndroidApplication() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
+    private lateinit var page: LinearLayout
+    private lateinit var renderShell: FrameLayout
+    private lateinit var pipButton: Button
     private lateinit var renderer: SpineSkinApplication
     private lateinit var characterRuntime: SpineCharacterRuntime
     private lateinit var characterState: TextView
@@ -96,7 +102,7 @@ class CompanionV2Activity : AndroidApplication() {
             setBackgroundColor(Color.rgb(246, 247, 243))
             isFillViewport = true
         }
-        val page = LinearLayout(this).apply {
+        page = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(18), dp(16), dp(28))
         }
@@ -110,7 +116,7 @@ class CompanionV2Activity : AndroidApplication() {
         characterState.setPadding(0, dp(12), 0, dp(8))
         page.addView(characterState)
 
-        val renderShell = FrameLayout(this).apply {
+        renderShell = FrameLayout(this).apply {
             setBackgroundColor(Color.rgb(239, 243, 238))
         }
         page.addView(renderShell, LinearLayout.LayoutParams(
@@ -135,6 +141,8 @@ class CompanionV2Activity : AndroidApplication() {
         ))
         characterRuntime = SpineCharacterRuntime(renderer, characterState)
 
+        pipButton = button("进入陪伴小窗") { enterCompanionPip() }
+        page.addView(pipButton)
         page.addView(button("选择 3714430278.zip") { chooseSkin() })
 
         modelState = label("模型：尚未导入 GGUF", 13)
@@ -211,6 +219,53 @@ class CompanionV2Activity : AndroidApplication() {
         restoreAsrModel()
         restoreTtsModel()
         restoreSkin()
+    }
+
+    private fun enterCompanionPip() {
+        if (isInPictureInPictureMode) return
+
+        val params = PictureInPictureParams.Builder()
+            .setAspectRatio(Rational(1, 1))
+            .setSeamlessResizeEnabled(true)
+            .setAutoEnterEnabled(false)
+            .build()
+
+        val entered = enterPictureInPictureMode(params)
+        if (!entered) {
+            characterState.text = "角色：系统未进入 PiP 小窗"
+        }
+    }
+
+    private fun applyPipUi(inPip: Boolean) {
+        if (!::page.isInitialized || !::renderShell.isInitialized) return
+
+        for (index in 0 until page.childCount) {
+            val child = page.getChildAt(index)
+            child.visibility = if (!inPip || child === renderShell) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        }
+
+        if (inPip) {
+            page.setPadding(0, 0, 0, 0)
+            renderShell.setBackgroundColor(Color.TRANSPARENT)
+        } else {
+            page.setPadding(dp(16), dp(18), dp(16), dp(28))
+            renderShell.setBackgroundColor(Color.rgb(239, 243, 238))
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration,
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        applyPipUi(isInPictureInPictureMode)
+        if (!isInPictureInPictureMode) {
+            refreshBookContextStatus()
+        }
     }
 
     private fun chooseSkin() {
@@ -1166,14 +1221,16 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     override fun onStop() {
-        foreground = false
-        generationJob?.cancel()
-        generationJob = null
-        generating = false
-        sendButton.isEnabled = modelLoaded && !benchmarking
-        benchmarkButton.isEnabled = modelLoaded && !benchmarking
-        stopRecording("语音：已停止（离开前台）")
-        stopTtsPlayback("语音回复：已停止（离开前台）")
+        if (!isInPictureInPictureMode) {
+            foreground = false
+            generationJob?.cancel()
+            generationJob = null
+            generating = false
+            sendButton.isEnabled = modelLoaded && !benchmarking
+            benchmarkButton.isEnabled = modelLoaded && !benchmarking
+            stopRecording("语音：已停止（离开前台）")
+            stopTtsPlayback("语音回复：已停止（离开前台）")
+        }
         super.onStop()
     }
 
