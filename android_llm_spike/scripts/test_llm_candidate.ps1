@@ -34,6 +34,33 @@ foreach ($Entry in $Candidates.GetEnumerator()) {
 if ($null -eq $Spec) { throw "Model is not a fixed benchmark candidate: $Sha" }
 if ([int64]$Item.Length -ne [int64]$Spec.Bytes) { throw "Candidate byte length mismatch." }
 
+# Ensure no previous llama mmap/native context is alive while swapping candidates.
+Invoke-AdbChecked @("-s",$DeviceSerial,"shell","am","force-stop","dev.mygpt.companionv2")
+
+# Peak staging uses /data/local/tmp plus app-private inbox; keep a large safety margin.
+$DfText = (& $AdbPath -s $DeviceSerial shell df -k /data | Out-String)
+$DfLines = @($DfText -split "\r?\n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+$DataLine = $DfLines | Where-Object { $_ -match "/data\s*$" } | Select-Object -Last 1
+if ($null -eq $DataLine -and $DfLines.Count -ge 2) { $DataLine = $DfLines[-1] }
+if ($null -eq $DataLine) { throw "Unable to parse /data free space." }
+$Columns = @($DataLine.Trim() -split "\s+")
+if ($Columns.Count -lt 4) { throw "Unexpected df output: $DataLine" }
+$AvailableKb = [int64]$Columns[3]
+$AvailableBytes = $AvailableKb * 1024L
+$SafetyBytes = 768L * 1024L * 1024L
+$RequiredBytes = ([int64]$Item.Length * 2L) + $SafetyBytes
+@(
+    "candidate=$CandidateId",
+    "available_bytes=$AvailableBytes",
+    "required_peak_bytes=$RequiredBytes"
+) | Out-File (Join-Path $OutputDirectory ("llm-space-"+$CandidateId+".txt")) -Encoding utf8
+if ($AvailableBytes -lt $RequiredBytes) {
+    throw "Insufficient /data free space. available=$AvailableBytes required=$RequiredBytes"
+}
+
+# Remove a stale inbox before staging the new candidate.
+& $AdbPath -s $DeviceSerial shell run-as dev.mygpt.companionv2 rm -f files/acceptance-inbox/model.gguf 2>$null
+
 $RemoteTemp = "/data/local/tmp/mygpt-acceptance-" + $Sha.Substring(0,16) + ".gguf"
 try {
     Invoke-AdbChecked @("-s",$DeviceSerial,"push",$Item.FullName,$RemoteTemp)
@@ -51,6 +78,7 @@ $Result=& $AdbPath -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat fi
 $ResultText=($Result | Out-String)
 $Result | Out-File (Join-Path $OutputDirectory ("llm-import-result-"+$CandidateId+".txt")) -Encoding utf8
 if ($ResultText -notmatch "accepted=true" -or $ResultText -notmatch ("candidate="+$CandidateId)) { throw "Debug model import failed." }
+if ($ResultText -match "old_candidate_cleanup=FAILED") { throw "Old benchmark candidate cleanup failed." }
 
 Invoke-AdbChecked @("-s",$DeviceSerial,"shell","am","force-stop","dev.mygpt.companionv2")
 Invoke-AdbChecked @("-s",$DeviceSerial,"shell","am","start","-W","-n","dev.mygpt.companionv2/.CompanionV2Activity")

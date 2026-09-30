@@ -48,15 +48,19 @@ public final class DebugModelImportReceiver extends BroadcastReceiver {
                 throw new IOException("candidate byte length mismatch");
             }
 
+            File modelsDir = new File(context.getFilesDir(), "models");
+            SharedPreferences prefs =
+                    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            String oldPath = prefs.getString(PREF_MODEL_PATH, null);
+            String oldHash = prefs.getString(PREF_MODEL_SHA256, null);
+
             GgufModelInstaller.InstalledModel installed =
                     GgufModelInstaller.adoptFile(
                             inbox,
-                            new File(context.getFilesDir(), "models"),
+                            modelsDir,
                             MAX_MODEL_BYTES
                     );
 
-            SharedPreferences prefs =
-                    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
             if (!prefs.edit()
                     .putString(PREF_MODEL_PATH, installed.file.getAbsolutePath())
                     .putString(PREF_MODEL_SHA256, installed.sha256)
@@ -64,13 +68,21 @@ public final class DebugModelImportReceiver extends BroadcastReceiver {
                 throw new IOException("failed to persist model identity");
             }
 
+            String oldCleanup = cleanupOldKnownCandidate(
+                    modelsDir,
+                    oldPath,
+                    oldHash,
+                    installed.file
+            );
+
             detail = "candidate=" + candidate.id
                     + "\nlabel=" + candidate.label
                     + "\nsha256=" + installed.sha256
                     + "\nbytes=" + installed.sizeBytes
                     + "\nupstream_commit=" + candidate.upstreamCommit
                     + "\ngguf_version=" + installed.header.version
-                    + "\ntensor_count=" + installed.header.tensorCount;
+                    + "\ntensor_count=" + installed.header.tensorCount
+                    + "\nold_candidate_cleanup=" + oldCleanup;
             accepted = true;
         } catch (Throwable error) {
             detail = "error=" + error.getClass().getSimpleName();
@@ -85,6 +97,33 @@ public final class DebugModelImportReceiver extends BroadcastReceiver {
 
         if (isOrderedBroadcast()) {
             setResultCode(accepted ? Activity.RESULT_OK : Activity.RESULT_CANCELED);
+        }
+    }
+
+    private static String cleanupOldKnownCandidate(
+            File modelsDir,
+            String oldPath,
+            String oldHash,
+            File keep
+    ) {
+        if (oldPath == null || oldHash == null) return "NOT_APPLICABLE";
+        if (LlmBenchmarkCandidateCatalog.bySha256(oldHash) == null) {
+            return "CUSTOM_PRESERVED";
+        }
+
+        try {
+            File oldFile = new File(oldPath).getCanonicalFile();
+            File keepFile = keep.getCanonicalFile();
+            File canonicalModels = modelsDir.getCanonicalFile();
+
+            if (oldFile.equals(keepFile)) return "SAME_MODEL";
+            if (!canonicalModels.equals(oldFile.getParentFile())) {
+                return "OUTSIDE_MODEL_DIR_PRESERVED";
+            }
+            if (!oldFile.exists()) return "OLD_FILE_ALREADY_ABSENT";
+            return oldFile.delete() ? "PASS" : "FAILED";
+        } catch (IOException error) {
+            return "FAILED";
         }
     }
 
