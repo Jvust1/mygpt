@@ -19,7 +19,9 @@ structures from the following AIRI files:
   - character card field organization for persona, scenario, greetings, tags and
     sample conversation behavior;
 - `packages/stage-ui-spine/src/constants/emotions.ts`
-  - renderer-neutral emotion vocabulary used across character renderers.
+  - renderer-neutral emotion vocabulary used across character renderers;
+- `packages/stage-ui/src/composables/queues.ts`
+  - bounded `<|ACT:{...}|>` emotion-control marker parsing/normalization semantics.
 
 Local derived/adapted files:
 
@@ -27,6 +29,7 @@ Local derived/adapted files:
 - `brain/mygpt_brain/session_store.py`
 - `brain/mygpt_brain/character_card.py`
 - `android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java`
+- `android_spike/src/main/java/dev/mygpt/spike/AiriActEmotionParser.java`
 
 Material changes in MyGPT:
 
