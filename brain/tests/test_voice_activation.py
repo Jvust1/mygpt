@@ -14,7 +14,7 @@ class WakeModel:
 
 
 async def responder(prompt):
-    last = prompt.window.messages[-1]
+    last = prompt.window.history[-1]
     return "收到：" + last.content
 
 
