@@ -8,14 +8,14 @@ on:
       - 'third_party/llama.cpp/**'
       - 'third_party/sherpa-onnx/**'
       - 'android_voice_spike/**'
-      - 'third_party/sherpa-onnx/**'
-      - 'android_voice_spike/**'
       - 'android_llm_spike/**'
       - '.github/workflows/llama-android-acceptance.yml'
   pull_request:
     paths:
       - '.gitmodules'
       - 'third_party/llama.cpp/**'
+      - 'third_party/sherpa-onnx/**'
+      - 'android_voice_spike/**'
       - 'android_llm_spike/**'
       - '.github/workflows/llama-android-acceptance.yml'
 
@@ -44,25 +44,26 @@ jobs:
         with:
           gradle-version: '8.14.3'
 
-      - name: Verify pinned llama.cpp source
+      - name: Verify pinned upstreams
         shell: bash
         run: |
           set -euo pipefail
-          test -f third_party/llama.cpp/upstream/LICENSE
-          test -f third_party/llama.cpp/upstream/examples/llama.android/lib/src/main/cpp/ai_chat.cpp
-          test -f third_party/llama.cpp/upstream/examples/llama.android/lib/src/main/java/com/arm/aichat/InferenceEngine.kt
-          actual="$(git -C third_party/llama.cpp/upstream rev-parse HEAD)"
-          test "$actual" = "ba0ba54d93b25faf1e149f4ccedd3e9d84798563"
-          echo "llama.cpp pin PASS: $actual"
+          llama="$(git -C third_party/llama.cpp/upstream rev-parse HEAD)"
+          sherpa="$(git -C third_party/sherpa-onnx/upstream rev-parse HEAD)"
+          test "$llama" = "ba0ba54d93b25faf1e149f4ccedd3e9d84798563"
+          test "$sherpa" = "040afe360a38e25daaa325ce8889abf93ea02609"
+          grep -q 'v1.13.8' third_party/sherpa-onnx/RUNTIME_PIN.md
+          grep -q '11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf' third_party/sherpa-onnx/RUNTIME_PIN.md
+          echo "upstream pins PASS: llama=$llama sherpa=$sherpa"
 
-      - name: Install upstream Android native toolchain
+      - name: Install llama.cpp Android native toolchain
         shell: bash
         run: |
           set -euo pipefail
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "ndk;29.0.13113456" "cmake;3.31.6"
 
-      - name: Build pinned llama.cpp JNI and MyGPT bridge
+      - name: Build local LLM and Companion V2
         shell: bash
         env:
           ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13113456
@@ -70,7 +71,7 @@ jobs:
           set -euo pipefail
           gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             :companion:assembleDebug             --no-daemon --stacktrace
 
-      - name: Verify upstream JNI and MyGPT bridge AARs
+      - name: Verify AAR and APK native payloads
         shell: bash
         run: |
           set -euo pipefail
@@ -84,26 +85,33 @@ jobs:
           test -f "$companion_apk"
           python - <<'PY'
           import zipfile
+
           llama = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
           bridge = "android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
+          app = "android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
+          companion = "android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
+
           with zipfile.ZipFile(llama) as z:
               names=set(z.namelist())
               native=[n for n in names if n.endswith("/libai-chat.so")]
               if "classes.jar" not in names or not native:
                   raise SystemExit("llama AAR missing classes.jar or libai-chat.so")
               print("llama AAR PASS:", native)
+
           with zipfile.ZipFile(bridge) as z:
               names=set(z.namelist())
               if "classes.jar" not in names:
                   raise SystemExit("bridge AAR missing classes.jar")
               print("MyGPT bridge AAR PASS")
-          with zipfile.ZipFile("android_llm_spike/app/build/outputs/apk/debug/app-debug.apk") as z:
+
+          with zipfile.ZipFile(app) as z:
               names=set(z.namelist())
               native=[n for n in names if n.endswith("/libai-chat.so")]
               if "classes.dex" not in names or not native:
                   raise SystemExit("local LLM APK missing classes.dex or libai-chat.so")
               print("MyGPT local LLM APK PASS:", native)
-          with zipfile.ZipFile("android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk") as z:
+
+          with zipfile.ZipFile(companion) as z:
               names=set(z.namelist())
               llama_native=[n for n in names if n.endswith("/libai-chat.so")]
               gdx_native=[n for n in names if n.endswith("/libgdx.so")]
@@ -117,7 +125,7 @@ jobs:
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: mygpt-llama-android-bridge
+          name: mygpt-local-companion-v2
           path: |
             third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar
             android_llm_spike/bridge/build/outputs/aar/bridge-release.aar

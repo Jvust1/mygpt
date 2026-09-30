@@ -59,6 +59,7 @@ class CompanionV2Activity : AndroidApplication() {
     private var recorder: AudioRecord? = null
     private var voiceThread: Thread? = null
     @Volatile private var recording = false
+    @Volatile private var foreground = false
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
@@ -239,9 +240,13 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private fun importModel(uri: Uri) {
+        stopRecording(null)
+        llm?.close()
+        llm = null
         modelState.text = "模型：正在校验并导入…"
         loadModelButton.isEnabled = false
         sendButton.isEnabled = false
+        updateVoiceControls()
         scope.launch {
             runCatching {
                 withContext(Dispatchers.IO) {
@@ -375,6 +380,13 @@ class CompanionV2Activity : AndroidApplication() {
                     Pair(localAsr, localRecorder)
                 }
             }.onSuccess { pair ->
+                if (!foreground) {
+                    pair.second.release()
+                    pair.first.close()
+                    voiceState.text = "语音：初始化已取消（应用不在前台）"
+                    updateVoiceControls()
+                    return@onSuccess
+                }
                 asrEngine?.close()
                 asrEngine = pair.first
                 recorder = pair.second
@@ -417,7 +429,14 @@ class CompanionV2Activity : AndroidApplication() {
             val localRecorder = recorder ?: break
             val localAsr = asrEngine ?: break
             val count = localRecorder.read(buffer, 0, buffer.size)
-            if (count <= 0) continue
+            if (count == 0) continue
+            if (count < 0) {
+                recording = false
+                runOnUiThread {
+                    stopRecording("语音采集失败 · AudioRecord " + count)
+                }
+                return
+            }
 
             try {
                 val result = localAsr.accept(VoicePcm.normalizePcm16(buffer, count))
@@ -573,7 +592,13 @@ class CompanionV2Activity : AndroidApplication() {
         question, curious, neutral。最多输出一个标记。
         """.trimIndent()
 
+    override fun onStart() {
+        super.onStart()
+        foreground = true
+    }
+
     override fun onStop() {
+        foreground = false
         stopRecording("语音：已停止（离开前台）")
         super.onStop()
     }
