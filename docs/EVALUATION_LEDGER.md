@@ -1,3 +1,30 @@
+## E019 — shared persona + supervision agency automation (2026-09-30)
+
+**Status:** CODE_READY / DEVICE_GATE_AUTOMATED / DEVICE_NOT_RUN
+
+**Exact head:** `907208ac0db090635fcf1fc342223ad51f97fdaa`
+
+### Added
+- single shared Character Card for Python + Android;
+- Android card schema/card/skin validation;
+- deterministic, non-LLM supervision messages;
+- lower-authority STUDY_SUPERVISION_STATE_JSON on later chats;
+- ADB same-signature study lifecycle sender;
+- physical local-button opt-in automation;
+- persisted supervision PASS marker for evidence collection.
+
+### Core agency assertion
+For the same signed PRACTICE_REPEATED_ERROR event:
+- before MyGPT-local user opt-in => QUIET;
+- after the device test physically taps MyGPT's local supervision button => GENTLE_CHECK_IN.
+
+Book cannot set the opt-in flag.
+
+### Validation limit
+This is code + automated gate preparation. The current head has not built/run on Xiaomi 14 yet. Hosted Actions still execute zero steps.
+
+---
+
 ## E018 — PiP + signed Book quiet-supervision device gate (2026-09-30)
 
 **Status:** CODE_READY / AUTOMATED_LOCAL_GATE_READY / REMOTE_RUNNER_UNAVAILABLE / DEVICE_NOT_RUN

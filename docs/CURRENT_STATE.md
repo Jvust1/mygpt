@@ -1,3 +1,19 @@
+## 2026-09-30 · shared persona + deterministic supervision presentation · PR #15
+
+Exact head: `907208ac0db090635fcf1fc342223ad51f97fdaa`.
+
+Additional hardening after the PiP/supervision checkpoint:
+
+- Python Brain and Android Companion V2 now consume the **same authoritative** `brain/personas/3714430278.json` AIRI-style Character Card. Android validates the bundled asset and derives identity/personality/scenario/consistency/examples from it; only Android authority/freshness rules remain platform-local.
+- Accepted signed supervision events do **not** automatically call the LLM. Companion V2 renders deterministic low-pressure local copy for QUIET/PAUSED/NEEDS_INPUT/GENTLE_CHECK_IN and sends current supervision state to later chat only as `STUDY_SUPERVISION_STATE_JSON` application data.
+- The same-signature test sender now has automated study lifecycle actions, and the Xiaomi 14 supervision script verifies user agency: repeated error is QUIET before local opt-in and GENTLE_CHECK_IN only after ADB physically taps the MyGPT-local supervision control.
+- Device automation scrolls back to a stable Book status position after supervision checks; Book status and supervision controls expose ASCII accessibility markers for PowerShell/UIAutomator evidence.
+- The final evidence collector records the persisted test-only supervision PASS marker in addition to permission/audio/benchmark/Book evidence.
+
+Hosted Actions remain non-evidence at this head because jobs receive no runner and execute zero steps. PR #15 remains Draft.
+
+---
+
 ## 2026-09-30 · Companion V2 PiP + signed Book quiet-supervision checkpoint · PR #15
 
 Exact head: `4d26563d8c03453f27c9a31186a484004d6d1535`.

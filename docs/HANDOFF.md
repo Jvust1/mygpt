@@ -1,3 +1,22 @@
+## Latest handoff · PR #15 · exact head 907208ac0db090635fcf1fc342223ad51f97fdaa
+
+The current branch has a unified 3714430278 persona source and an automated
+quiet-supervision agency gate. Do not duplicate the persona in Android or weaken
+the signature permission.
+
+Next command on Windows:
+
+`powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\build_and_install_companion_v2.ps1`
+
+The script invokes the supervision gate automatically. After manual skin/model/
+voice/PiP checks and the in-app llama benchmark, run:
+
+`powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\collect_companion_v2_evidence.ps1`
+
+Do not merge until the exact-head local/device evidence exists.
+
+---
+
 ## Latest handoff · PR #15 · PiP + quiet-first supervision gate ready
 
 Current exact head: `4d26563d8c03453f27c9a31186a484004d6d1535`.

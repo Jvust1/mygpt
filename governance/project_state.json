@@ -113,7 +113,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Run android_llm_spike/scripts/build_and_install_companion_v2.ps1 on Windows against the exact head. The script now builds/installs Companion V2 + same-signature Book sender and automatically validates shell-negative Book access, signed context delivery/clear, and the quiet-first supervision agency gate. Then import 3714430278 + GGUF + sherpa models, run the llama benchmark, validate PiP/voice/TTS/memory on Xiaomi 14, and collect final evidence.",
+  "next_step": "Build exact head 907208ac0db090635fcf1fc342223ad51f97fdaa on Windows using android_llm_spike/scripts/build_and_install_companion_v2.ps1. Let the script run Book signature/context and quiet-first supervision agency gates on Xiaomi 14. Then import 3714430278, GGUF, sherpa ASR and optional Melo TTS; test PiP, local chat/voice/memory and run the llama benchmark. Finish with collect_companion_v2_evidence.ps1 before any merge.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -905,7 +905,7 @@
     "branch": "feat/airi-chat-memory-brain-20260929",
     "draft_pr": 15,
     "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-    "exact_head": "4d26563d8c03453f27c9a31186a484004d6d1535",
+    "exact_head": "907208ac0db090635fcf1fc342223ad51f97fdaa",
     "target": "All-local Android companion: Book-aware chat + 3714430278 + on-device LLM + ASR/TTS + explicit memory",
     "android": {
       "module": "android_llm_spike/companion",
@@ -1041,7 +1041,8 @@
       ],
       "exact_head_remote_ci": {
         "status": "NOT_EXECUTED_RUNNER_PROVISIONING_FAILURE",
-        "exact_head": "4d26563d8c03453f27c9a31186a484004d6d1535",
+        "exact_head": "907208ac0db090635fcf1fc342223ad51f97fdaa",
+        "note": "GitHub Status reports Actions operational; private-repo hosted jobs still receive runner_id=0 and execute zero steps.",
         "runs": [
           {
             "id": 36665189835,
@@ -1164,7 +1165,8 @@
         "Book context clear + unavailable UI marker"
       ],
       "device": "Xiaomi 14",
-      "status": "READY_TO_EXECUTE_NOT_RUN"
+      "status": "READY_TO_EXECUTE_NOT_RUN",
+      "supervision_gate_persisted_marker": "Book test sender files/adb-supervision-gate.txt"
     },
     "cross_app_companion": {
       "mode": "ANDROID_NATIVE_PICTURE_IN_PICTURE",
@@ -1221,7 +1223,24 @@
       ],
       "device_acceptance_script": "android_llm_spike/scripts/test_companion_supervision.ps1",
       "agency_gate": "same repeated-error signal must stay QUIET before local opt-in and become GENTLE_CHECK_IN only after ADB taps the MyGPT-local supervision button",
-      "device_test": "NOT_RUN"
+      "device_test": "NOT_RUN",
+      "presentation": {
+        "llm_autocall_on_signal": false,
+        "deterministic_local_messages": true,
+        "current_state_prompt_block": "STUDY_SUPERVISION_STATE_JSON",
+        "prompt_authority": "application data only",
+        "agency_test": "same repeated-error event must remain QUIET before MyGPT-local opt-in, then GENTLE_CHECK_IN after opt-in"
+      }
+    },
+    "persona": {
+      "authority_file": "brain/personas/3714430278.json",
+      "schema": "mygpt.character-card.v1",
+      "card_id": "mygpt-3714430278",
+      "visual_skin_id": "3714430278",
+      "python_consumer": "brain/mygpt_brain/character_card.py",
+      "android_consumer": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/AndroidCharacterCard.kt",
+      "android_asset": "assets/3714430278.json",
+      "duplicate_persona_copy": false
     }
   }
 }
