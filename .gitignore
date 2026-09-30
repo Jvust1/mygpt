@@ -1,3 +1,6 @@
 node_modules/
 test-output/
 .DS_Store
+
+# Generated host-JVM acceptance classes, never source artifacts.
+android_spike/build/
