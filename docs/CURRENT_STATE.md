@@ -1,3 +1,21 @@
+## 2026-09-30 · pre-device hardening checkpoint · PR #15
+
+Exact head: `4efd70b716ab35f94af7556ee7ed5149e77d60a9`.
+
+The code path is now hardened specifically for long-running Xiaomi 14 use before the first exact-head device build:
+
+- **Prompt budget:** `CompanionPromptBudget` caps the pre-JNI user-turn prompt at 5600 characters. It always preserves the complete current user message (<=4000 chars), then prioritizes current signed Book data, supervision state, relevant explicit memory, and finally recent conversation. Book text/memory/history are rendered in bounded data blocks; no content is written to the budget evidence report.
+- **Sherpa model integrity:** ASR/TTS imports create deterministic core-file SHA-256 manifests. Restore recomputes and verifies them; legacy app-private installs without a manifest receive a one-time migration. Large hashing now runs off the Android UI thread.
+- **Signed-state TTL:** a 1-second in-memory ticker runs only while Companion is foregrounded or visibly in PiP. Book expiry becomes unavailable; supervision expiry clears session/opt-in and returns the character to QUIET. There is no network polling, service, wake lock or screen inspection.
+- **PiP privacy:** entering PiP explicitly stops microphone capture.
+- **Interrupted llama recovery:** cancellation/native generation failure is treated as potentially inconsistent KV state. The interrupted exchange is not persisted; the local model is reloaded and only completed visible conversation is re-primed.
+
+Validation remains deliberately unresolved at this head. Latest hosted runs `36667831029`, `36667831060`, and `36667831014` all have `runner_id=0` and 0 executed steps. They are infrastructure failures, not code results. Independent execution also could not clone GitHub because the execution environment DNS could not resolve github.com.
+
+Next real gate: exact-head Windows build + Xiaomi 14 evidence. PR #15 remains Draft and main remains untouched.
+
+---
+
 ## 2026-09-30 · Book client SDK producer gap closed in mygpt · PR #15
 
 Exact head: `2e687fd348edfe1e787cb6634f272df69c05e0cf`.

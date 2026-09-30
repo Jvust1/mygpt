@@ -1,3 +1,35 @@
+## E021 — Companion V2 pre-device hardening checkpoint (2026-09-30)
+
+**Exact head:** `4efd70b716ab35f94af7556ee7ed5149e77d60a9`  
+**Status:** CODE_HARDENED / EXACT_HEAD_NOT_EXECUTED / XIAOMI14_PENDING
+
+### New hardening
+- 5600-character deterministic pre-JNI prompt budget;
+- current user message never silently truncated by MyGPT;
+- Book/memory/history priority and bounded JSON/data rendering;
+- content-free prompt-budget evidence report;
+- ASR/TTS core-file SHA-256 fingerprint generation + restore verification;
+- one-time fingerprint migration for older app-private model installs;
+- large sherpa restore hashes moved off main thread;
+- signed Book/supervision TTL ticker while foreground/PiP;
+- microphone stopped before PiP entry;
+- interrupted llama generation marks native session dirty and reloads before reuse.
+
+### Exact-head remote evidence
+- run 36667831029: Companion V2, runner_id=0, 0 steps.
+- run 36667831060: sherpa voice, runner_id=0, 0 steps.
+- run 36667831014: Android boundary, both jobs runner_id=0, 0 steps.
+
+No checkout/compiler/Gradle/test code executed.
+
+### Independent execution attempt
+A direct exact-commit clone was attempted in the isolated execution environment but failed at DNS resolution for github.com. No local test result is claimed.
+
+### Still required
+Windows exact-head build, APK/AAR generation, same-signature SDK gates, PiP gate, GGUF benchmark, ASR/TTS model restore verification, prompt-budget report, memory/chat behavior and Xiaomi 14 thermal/reopen evidence.
+
+---
+
 ## E020 — reusable Book producer SDK checkpoint (2026-09-30)
 
 **Exact head:** `2e687fd348edfe1e787cb6634f272df69c05e0cf`

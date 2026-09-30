@@ -1,3 +1,22 @@
+## Latest handoff · pre-device hardening complete · 2026-09-30
+
+Current exact head: `4efd70b716ab35f94af7556ee7ed5149e77d60a9`; Draft PR #15; main untouched.
+
+Before adding more product features, run the existing Windows/Xiaomi 14 path. Current code now includes prompt budgeting, verified sherpa fingerprints, off-main model restore verification, active signed-state expiry, PiP microphone stop, and interrupted-llama session recovery.
+
+Use:
+`android_llm_spike/scripts/build_and_install_companion_v2.ps1`
+
+After 3714430278 is loaded, run:
+`android_llm_spike/scripts/test_companion_pip.ps1`
+
+Then import a candidate GGUF + sherpa ASR/TTS, run the in-app benchmark and local chat/voice/memory checks, then:
+`android_llm_spike/scripts/collect_companion_v2_evidence.ps1`
+
+Do not claim the current head builds yet: hosted jobs still receive no runner and execute zero steps. Do not merge PR #15.
+
+---
+
 ## Latest handoff · Book client SDK ready · 2026-09-30
 
 Current branch/head: `feat/airi-chat-memory-brain-20260929` @ `2e687fd348edfe1e787cb6634f272df69c05e0cf`; Draft PR #15; main untouched.

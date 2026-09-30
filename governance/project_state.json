@@ -4,8 +4,8 @@
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/airi-chat-memory-brain-20260929",
-  "phase": "COMPANION_V2_BOOK_CLIENT_SDK_XIAOMI14_GATE",
-  "status": "DRAFT_BOOK_SDK_READY_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
+  "phase": "COMPANION_V2_PRE_DEVICE_HARDENING_XIAOMI14_GATE",
+  "status": "DRAFT_HARDENED_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -84,14 +84,16 @@
     "User-installed Book APK identity and real browser/Android end-to-end transport remain unverified.",
     "User Windows device acceptance, Android Studio APK/physical-device validation and production multi-user transport remain unimplemented.",
     "Real provider teaching quality remains disabled/unverified.",
-    "GitHub hosted Actions currently fail before runner allocation (runner_id=0, zero steps), so exact-head Companion V2/voice builds have not executed.",
-    "Companion V2 local llama/sherpa/TTS stack has not yet been built or installed on Xiaomi 14.",
     "Real Book APK signing identity must match Companion V2 before the signature-protected producer contract can replace the synthetic test sender.",
     "On-device GGUF choice remains benchmark-gated; no default model is accepted before Xiaomi 14 measurements.",
-    "Current exact-head GitHub hosted Actions still receive runner_id=0 and execute zero steps.",
     "PiP, signed Book supervision, local LLM/ASR/TTS and automated Windows gates are code-ready but have not run on Xiaomi 14.",
     "Real Book APK has not yet adopted the same-signature context/study producer contract.",
-    "Book client SDK is code-ready in mygpt, but Jvust/Book has not yet adopted the AAR and its APK signing identity has not been verified against Companion V2."
+    "Book client SDK is code-ready in mygpt, but Jvust/Book has not yet adopted the AAR and its APK signing identity has not been verified against Companion V2.",
+    "Exact-head Windows build has not yet executed.",
+    "Companion V2 / llama / sherpa / prompt-budget current code has not yet run on Xiaomi 14.",
+    "Jvust/Book has not yet adopted book-client-sdk-release.aar or proven a matching signing identity.",
+    "No default GGUF is accepted before Xiaomi 14 latency/RAM/thermal measurements.",
+    "GitHub hosted Actions still fail before runner allocation (runner_id=0, zero steps)."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -113,7 +115,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Build exact head 2e687fd348edfe1e787cb6634f272df69c05e0cf on Windows with android_llm_spike/scripts/build_and_install_companion_v2.ps1. This now builds/records book-client-sdk-release.aar and the same-signature synthetic sender exercises BookCompanionClient for context and study events. Run the automated Book/supervision gates on Xiaomi 14, then import 3714430278 + GGUF + sherpa ASR + optional Melo TTS, test PiP/local chat/voice/memory and collect evidence. Only after that should Jvust/Book adopt the AAR under a matching signing identity.",
+  "next_step": "Build exact head 4efd70b716ab35f94af7556ee7ed5149e77d60a9 on Windows with android_llm_spike/scripts/build_and_install_companion_v2.ps1, then run the automated Book/supervision gates. Import 3714430278 and run test_companion_pip.ps1. Import a benchmark candidate GGUF plus sherpa ASR/TTS packages, verify prompt-budget/fingerprint reports, run local chat/voice/memory and collect final evidence. Do not merge before Xiaomi 14 evidence exists.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -905,7 +907,7 @@
     "branch": "feat/airi-chat-memory-brain-20260929",
     "draft_pr": 15,
     "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-    "exact_head": "2e687fd348edfe1e787cb6634f272df69c05e0cf",
+    "exact_head": "4efd70b716ab35f94af7556ee7ed5149e77d60a9",
     "target": "All-local Android companion: Book-aware chat + 3714430278 + on-device LLM + ASR/TTS + explicit memory",
     "android": {
       "module": "android_llm_spike/companion",
@@ -1041,23 +1043,23 @@
       ],
       "exact_head_remote_ci": {
         "status": "NOT_EXECUTED_RUNNER_PROVISIONING_FAILURE",
-        "exact_head": "2e687fd348edfe1e787cb6634f272df69c05e0cf",
+        "exact_head": "4efd70b716ab35f94af7556ee7ed5149e77d60a9",
         "runs": [
           {
-            "id": 36666041328,
+            "id": 36667831029,
             "workflow": "Companion V2 local AI Android acceptance",
             "runner_id": 0,
             "steps": 0
           },
           {
-            "id": 36666041371,
-            "workflow": "Android companion boundary spike",
+            "id": 36667831060,
+            "workflow": "sherpa-onnx Android voice acceptance",
             "runner_id": 0,
             "steps": 0
           },
           {
-            "id": 36666041273,
-            "workflow": "sherpa-onnx Android voice acceptance",
+            "id": 36667831014,
+            "workflow": "Android companion boundary spike",
             "runner_id": 0,
             "steps": 0
           }
@@ -1247,6 +1249,48 @@
       "android_consumer": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/AndroidCharacterCard.kt",
       "android_asset": "assets/3714430278.json",
       "duplicate_persona_copy": false
+    },
+    "status": "PRE_DEVICE_HARDENED_REMOTE_RUNNER_BLOCKED",
+    "prompt_budget": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "implementation": "android_spike/src/main/java/dev/mygpt/spike/CompanionPromptBudget.java",
+      "max_prompt_chars": 5600,
+      "max_current_user_chars": 4000,
+      "priority": [
+        "complete current user message",
+        "fresh signed Book metadata + bounded current Book text",
+        "current supervision state",
+        "relevant explicit long-term memory",
+        "recent visible conversation only with remaining budget"
+      ],
+      "evidence_file": "files/prompt-budget-last.txt",
+      "evidence_contains_source_text": false,
+      "native_reason": "Avoid pinned llama.cpp oversized-single-prompt truncation while retaining upstream 8192-token context shifting."
+    },
+    "model_integrity": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "manifest": "mygpt-model-manifest.txt",
+      "algorithm": "SHA-256",
+      "fresh_import_verify": true,
+      "restore_verify": true,
+      "legacy_install_migration": true,
+      "restore_thread": "Dispatchers.IO / dedicated Voice Spike worker",
+      "main_thread_hashing": false
+    },
+    "signed_state_expiry": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "tick_ms": 1000,
+      "scope": "foreground or visible PiP only",
+      "network_polling": false,
+      "background_service": false,
+      "supervision_expiry_effect": "clear active session + local opt-in + QUIET",
+      "book_expiry_effect": "BOOK_CONTEXT_UNAVAILABLE"
+    },
+    "interrupted_generation_recovery": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "reason": "Cancelled generation may leave native KV containing user/partial tokens without a committed assistant chat message.",
+      "recovery": "mark native session dirty -> unload/reload on foreground -> re-prime only completed LocalConversationStore turns",
+      "interrupted_exchange_persisted": false
     }
   },
   "book_client_sdk": {
@@ -1277,5 +1321,50 @@
     "real_book_repo_modified": false,
     "real_book_adopted": false,
     "device_test": "NOT_RUN"
+  },
+  "pre_device_hardening": {
+    "exact_head": "4efd70b716ab35f94af7556ee7ed5149e77d60a9",
+    "prompt_budget": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "implementation": "android_spike/src/main/java/dev/mygpt/spike/CompanionPromptBudget.java",
+      "max_prompt_chars": 5600,
+      "max_current_user_chars": 4000,
+      "priority": [
+        "complete current user message",
+        "fresh signed Book metadata + bounded current Book text",
+        "current supervision state",
+        "relevant explicit long-term memory",
+        "recent visible conversation only with remaining budget"
+      ],
+      "evidence_file": "files/prompt-budget-last.txt",
+      "evidence_contains_source_text": false,
+      "native_reason": "Avoid pinned llama.cpp oversized-single-prompt truncation while retaining upstream 8192-token context shifting."
+    },
+    "sherpa_model_integrity": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "manifest": "mygpt-model-manifest.txt",
+      "algorithm": "SHA-256",
+      "fresh_import_verify": true,
+      "restore_verify": true,
+      "legacy_install_migration": true,
+      "restore_thread": "Dispatchers.IO / dedicated Voice Spike worker",
+      "main_thread_hashing": false
+    },
+    "signed_state_expiry": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "tick_ms": 1000,
+      "scope": "foreground or visible PiP only",
+      "network_polling": false,
+      "background_service": false,
+      "supervision_expiry_effect": "clear active session + local opt-in + QUIET",
+      "book_expiry_effect": "BOOK_CONTEXT_UNAVAILABLE"
+    },
+    "interrupted_llama_recovery": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "reason": "Cancelled generation may leave native KV containing user/partial tokens without a committed assistant chat message.",
+      "recovery": "mark native session dirty -> unload/reload on foreground -> re-prime only completed LocalConversationStore turns",
+      "interrupted_exchange_persisted": false
+    },
+    "explicit_pip_microphone_rule": "Entering PiP stops microphone capture before the system PiP transition."
   }
 }
