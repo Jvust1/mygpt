@@ -140,6 +140,16 @@ else {
 }
 $SupervisionStatus = if ($SupervisionGateText -eq "PASS") { "PASS" } else { "UNKNOWN_OR_NOT_RUN" }
 
+$PipGate = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/adb-pip-gate.txt 2>&1
+if ($LASTEXITCODE -eq 0 -and (($PipGate | Out-String) -match "PASS")) {
+    $PipGateStatus = "PASS"
+    $PipGate | Out-File (Join-Path $OutputDirectory "pip-gate.txt") -Encoding utf8
+}
+else {
+    $PipGateStatus = "UNKNOWN_OR_NOT_RUN"
+    $PipGate | Out-File (Join-Path $OutputDirectory "pip-gate-error.txt") -Encoding utf8
+}
+
 $BookResult = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest cat files/adb-book-result.txt 2>&1
 $BookResultExit = $LASTEXITCODE
 $BookResultText = ($BookResult | Out-String)

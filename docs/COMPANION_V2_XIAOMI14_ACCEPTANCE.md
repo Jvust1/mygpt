@@ -158,3 +158,30 @@ After running the in-app benchmark and manual Book/voice/memory gates, run:
 powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\collect_companion_v2_evidence.ps1
 
 The collector writes current package state, meminfo, thermal state, activity state, process logcat, the app-private benchmark report when present, an app-private file listing, and a current screenshot into a gitignored device_evidence directory.
+
+
+## Automated PiP gate after skin import
+
+After importing/restoring `3714430278.zip`, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\test_companion_pip.ps1 \
+  -AdbPath "$env:ANDROID_HOME\platform-tools\adb.exe" \
+  -DeviceSerial <serial> \
+  -OutputDirectory <the build script evidence directory>
+```
+
+The gate:
+1. finds the explicit PiP button by `content-desc=ENTER_COMPANION_PIP`;
+2. requires the button to be enabled, which means the skin is ready;
+3. enters native Android PiP;
+4. verifies a pinned/PiP activity state in `dumpsys activity`;
+5. opens the Book test sender behind the PiP;
+6. verifies Companion remains pinned;
+7. saves `pip-over-book.png`;
+8. writes `adb-pip-gate.txt=PASS` inside Companion V2.
+
+The final evidence collector reads this marker as `pip_gate=PASS`.
+
+This validates the permission-free cross-app surface only; it does not replace
+visual inspection of animation continuity or the real Book APK gate.

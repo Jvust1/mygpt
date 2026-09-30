@@ -397,6 +397,7 @@ Write-Host ""
 Write-Host "Automated gates completed: signatures + Book context + quiet-first supervision + clear." -ForegroundColor Green
 Write-Host "Remaining manual/device gates:" -ForegroundColor Yellow
 Write-Host "1. Import decrypted 3714430278.zip."
+Write-Host "   Then run: powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\test_companion_pip.ps1 -AdbPath \"$Adb\" -DeviceSerial \"$DeviceSerial\" -OutputDirectory \"$EvidenceDir\""
 Write-Host "2. Import a compatible GGUF and load the local model."
 Write-Host "3. Run the in-app llama benchmark."
 Write-Host "4. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
