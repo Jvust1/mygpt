@@ -27,7 +27,8 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install the existing exact test-only oracle pin
-        run: python -m pip install --only-binary=:all: scikit-learn==1.9.1
+        run: |
+          python -m pip install --only-binary=:all: scikit-learn==1.9.1
       - name: Compare every fixture to real sklearn and verify production call site
         run: |
           python android_spike/tools/lexical_sklearn_oracle.py
