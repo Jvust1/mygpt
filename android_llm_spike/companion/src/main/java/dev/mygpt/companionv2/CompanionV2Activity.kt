@@ -177,7 +177,9 @@ class CompanionV2Activity : AndroidApplication(),
         }
         page.addView(benchmarkButton)
 
-        bookState = label("Book：等待同签名 Book App 上下文", 13)
+        bookState = label("Book：等待同签名 Book App 上下文", 13).apply {
+            contentDescription = "BOOK_CONTEXT_STATUS"
+        }
         bookState.setPadding(0, dp(16), 0, dp(8))
         page.addView(bookState)
 

@@ -119,6 +119,22 @@ function Send-StudyCommand {
     Write-Host ("Supervision " + $Label + " PASS: " + $ExpectedCue + " optIn=" + $ExpectedOptIn) -ForegroundColor Green
 }
 
+function Scroll-ToTop {
+    $Size = Get-ScreenSize
+    $X = [int]($Size[0] / 2)
+    $SwipeStart = [int]($Size[1] * 0.28)
+    $SwipeEnd = [int]($Size[1] * 0.82)
+
+    for ($i = 0; $i -lt 10; $i++) {
+        Invoke-AdbChecked @(
+            "-s", $DeviceSerial,
+            "shell", "input", "swipe",
+            "$X", "$SwipeStart", "$X", "$SwipeEnd", "220"
+        )
+        Start-Sleep -Milliseconds 100
+    }
+}
+
 function Click-SupervisionOptIn {
     $FindArgs = @{
         Pattern = 'content-desc="TOGGLE_STUDY_SUPERVISION"'
@@ -212,6 +228,9 @@ Run-Step "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_HELP_V1" "help" "ACCE
 Run-Step "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_PAUSE_V1" "pause" "ACCEPTED_SESSION_PAUSED" "PAUSED" "true"
 Run-Step "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_RESUME_V1" "resume" "ACCEPTED_SESSION_RESUMED" "QUIET" "true"
 Run-Step "dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_END_V1" "end" "ACCEPTED_SESSION_ENDED" "QUIET" "false"
+
+Scroll-ToTop
+Start-Sleep -Milliseconds 500
 
 "PASS" | Out-File (Join-Path $OutputDirectory "supervision-gate.txt") -Encoding utf8
 
