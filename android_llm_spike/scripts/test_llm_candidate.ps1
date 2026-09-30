@@ -65,7 +65,13 @@ $RemoteTemp = "/data/local/tmp/mygpt-acceptance-" + $Sha.Substring(0,16) + ".ggu
 try {
     Invoke-AdbChecked @("-s",$DeviceSerial,"push",$Item.FullName,$RemoteTemp)
     Invoke-AdbChecked @("-s",$DeviceSerial,"shell","run-as","dev.mygpt.companionv2","mkdir","-p","files/acceptance-inbox")
-    Invoke-AdbChecked @("-s",$DeviceSerial,"shell","run-as","dev.mygpt.companionv2","cp",$RemoteTemp,"files/acceptance-inbox/model.gguf")
+    $PipeCommand = "cat " + $RemoteTemp + " | run-as dev.mygpt.companionv2 sh -c 'cat > files/acceptance-inbox/model.gguf'"
+    Invoke-AdbChecked @("-s",$DeviceSerial,"shell","sh","-c",$PipeCommand)
+    $RemoteBytes = (& $AdbPath -s $DeviceSerial shell stat -c %s $RemoteTemp | Out-String).Trim()
+    $PrivateBytes = (& $AdbPath -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 stat -c %s files/acceptance-inbox/model.gguf | Out-String).Trim()
+    if ([int64]$RemoteBytes -ne [int64]$Item.Length -or [int64]$PrivateBytes -ne [int64]$Item.Length) {
+        throw "ADB staged GGUF byte length mismatch. local=$($Item.Length) remote=$RemoteBytes private=$PrivateBytes"
+    }
 } finally {
     & $AdbPath -s $DeviceSerial shell rm -f $RemoteTemp | Out-Null
 }
