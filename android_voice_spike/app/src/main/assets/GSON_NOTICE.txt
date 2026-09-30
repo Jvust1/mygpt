@@ -1,0 +1,9 @@
+Gson 2.14.0 — https://github.com/google/gson
+Copyright 2008 Google Inc.
+JsonReader copyright (C) 2010 Google Inc.
+Licensed under Apache License 2.0; full terms are in GSON_LICENSE.txt.
+
+MyGPT uses only the strict streaming JsonReader API for bounded AIRI presentation
+payloads. It does not use reflective POJO serialization/deserialization.
+Source release commit: 3ff35d6269894901ab8006258395aafc4b9765cd
+Jar SHA-256: 2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f

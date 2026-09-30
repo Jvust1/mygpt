@@ -31,6 +31,8 @@ android {
 }
 
 dependencies {
+    // Strict streaming ACT decoding; shared Java parser uses no POJO reflection.
+    implementation("com.google.code.gson:gson:2.14.0")
     implementation(project(":bridge"))
     implementation(libs.androidx.activity)
     implementation(libs.androidx.appcompat)
