@@ -123,6 +123,29 @@ def merge_loaded_session_messages(
     return [*stored, *extras]
 
 
+def _keep_recent_history_turns(
+    items: Sequence[ChatMessage], recent_turn_limit: int,
+) -> list[ChatMessage]:
+    """Port AIRI's keepRecentHistoryItems reverse scan, keeping reactions paired.
+
+    Upstream compaction.ts at b40e3e87b149ea5fb75d4944440493829e601411,
+    Git blob 59a76a9877086f66b5abc09b0f22802e4e27df7d.
+    Copyright 2024-PRESENT Neko Ayaka, MIT; see third_party/airi/LICENSE.
+    MyGPT user rows map to upstream turn items; assistant rows are reactions.
+    The caller supplies a positive count derived from its existing row budget.
+    """
+    kept_items: list[ChatMessage] = []
+    turn_count = 0
+    for item in reversed(items):
+        kept_items.append(item)
+        if item.role == "user":
+            turn_count += 1
+        if turn_count >= recent_turn_limit:
+            break
+    kept_items.reverse()
+    return kept_items
+
+
 def compact_conversation(
     messages: Sequence[ChatMessage],
     *,
@@ -130,7 +153,11 @@ def compact_conversation(
 ) -> ConversationWindow:
     """Keep explicit authority boundaries while bounding long-running history.
 
-    AIRI inspired the "keep recent turns and compact older history" rule. mygpt
+    The legacy recent_turn_limit option remains a maximum conversational-row
+    budget. Trimming uses AIRI's paired-history scan and may retain fewer rows
+    to avoid an orphan assistant reaction at the boundary. Untrimmed history,
+    including an intentional leading assistant greeting, remains unchanged.
+    mygpt
     intentionally does not auto-summarize old raw chat here: semantic memory is
     a separate, explicit local subsystem. The compacted IDs let a later
     summarizer/memory gate decide what may be retained.
@@ -157,8 +184,14 @@ def compact_conversation(
         kept = conversational
         removed: list[ChatMessage] = []
     else:
-        kept = conversational[-recent_turn_limit:]
-        removed = conversational[:-recent_turn_limit]
+        # Keep the existing maximum-message budget, but never begin a trimmed
+        # window with the reaction to a user turn that has been removed. AIRI
+        # scans backwards until the desired number of complete turn/reaction
+        # groups is kept. Counting users inside the row budget ensures that
+        # paired retention can only shrink, never enlarge, that budget.
+        turn_count = sum(item.role == "user" for item in conversational[-recent_turn_limit:])
+        kept = _keep_recent_history_turns(conversational, turn_count) if turn_count else []
+        removed = conversational[:len(conversational) - len(kept)]
 
     return ConversationWindow(
         instructions=instructions,
