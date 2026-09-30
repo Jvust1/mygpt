@@ -465,6 +465,7 @@ class CompanionV2Activity : AndroidApplication(),
         stopRecording(null)
         stopTtsPlayback(null)
         generationEpoch += 1L
+        modelLoading = true
         conversationPrimed = false
         modelLoaded = false
         modelState.text = "模型：正在校验并导入…"
@@ -487,6 +488,7 @@ class CompanionV2Activity : AndroidApplication(),
                     }
                 }
             }.onSuccess { installed ->
+                modelLoading = false
                 modelFile = installed.file
                 getSharedPreferences(PREFS, MODE_PRIVATE).edit()
                     .putString(PREF_MODEL_PATH, installed.file.absolutePath)
@@ -499,6 +501,7 @@ class CompanionV2Activity : AndroidApplication(),
                 loadModelButton.isEnabled = true
                 updateVoiceControls()
             }.onFailure { error ->
+                modelLoading = false
                 modelState.text = "模型导入失败 · " + error.javaClass.simpleName
                 loadModelButton.isEnabled = modelFile != null
                 updateVoiceControls()
