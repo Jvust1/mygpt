@@ -1,3 +1,14 @@
+## 2026-09-30 · Android lexical memory uses the fused scorer
+
+Companion V2's existing SQLite memory search now invokes the Java-8 port of the
+pinned scikit-learn char-word-boundary TF-IDF/cosine scorer. Full queries replace
+the old first-16-token substring ranking while namespace scope, recent-100
+candidate bounds, explicit-only writes and user-level prompt placement remain.
+Actual sklearn/Java parity covers 109 cases; the shared Java runner has 19 entrypoints.
+See [implementation and acceptance limits](ANDROID_LEXICAL_MEMORY_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · fused source recovery
 
 The source-only recovery builder now supports the current Android and upstream

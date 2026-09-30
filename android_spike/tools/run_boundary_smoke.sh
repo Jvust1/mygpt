@@ -9,6 +9,7 @@ if test "${GITHUB_ACTIONS:-false}" = true && test "${MYGPT_JAVA_SOURCE_TARGET_ON
   exit 2
 fi
 python android_spike/tools/verify_gson_artifact.py "$GSON_JAR"
+python android_spike/tools/verify_lexical_integration.py
 mkdir -p android_spike/build/classes
 if test "${MYGPT_JAVA_SOURCE_TARGET_ONLY:-0}" = 1; then
   # Explicit local fallback for stripped JRE images that contain jdk.compiler
@@ -33,6 +34,7 @@ fi
   android_spike/src/main/java/dev/mygpt/spike/SerializedLocalLlmEngine.java \
   android_spike/src/main/java/dev/mygpt/spike/FloatDragPolicy.java \
   android_spike/src/main/java/dev/mygpt/spike/AiriActEmotionParser.java \
+  android_spike/src/main/java/dev/mygpt/spike/LexicalMemoryScorer.java \
   android_spike/src/main/java/dev/mygpt/spike/OnDeviceCompanionBrain.java \
   android_spike/src/main/java/dev/mygpt/spike/GgufModelProbe.java \
   android_spike/src/main/java/dev/mygpt/spike/GgufModelInstaller.java \
@@ -55,6 +57,7 @@ fi
   android_spike/src/test/java/dev/mygpt/spike/FloatDragPolicySmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/OnDeviceCompanionBrainSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/AiriActGoldenSmoke.java \
+  android_spike/src/test/java/dev/mygpt/spike/LexicalMemoryScorerSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/GgufModelProbeSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/GgufModelInstallerSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/BookContextMailboxSmoke.java \
@@ -83,3 +86,5 @@ java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.bookbridge.B
 java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.voicespike.ModelFingerprintManifestSmoke
 java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.voicespike.SherpaModelIdentitySmoke
 java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.voicespike.AudioFloatResamplerSmoke
+
+java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.spike.LexicalMemoryScorerSmoke android_spike/src/test/resources/lexical-memory-golden.json
