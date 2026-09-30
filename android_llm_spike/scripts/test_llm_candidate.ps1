@@ -161,17 +161,57 @@ for($i=0;$i -lt 900;$i++){
 }
 $QualityPath=Join-Path $OutputDirectory ("llm-quality-"+$CandidateId+".json")
 $QualityText | Out-File $QualityPath -Encoding utf8
-if($QualityText -notmatch '"schema"\s*:\s*"mygpt\.llm-quality-sample\.v1"'){
-    throw "LLM fixed quality suite did not produce a valid report."
+try {
+    $QualityJson = $QualityText | ConvertFrom-Json
 }
-if($QualityText -notmatch ('"candidate_id"\s*:\s*"'+[regex]::Escape($CandidateId)+'"')){
+catch {
+    throw "LLM fixed quality suite did not produce valid JSON."
+}
+
+if ($QualityJson.schema -ne "mygpt.llm-quality-sample.v1") {
+    throw "LLM quality report schema mismatch."
+}
+if ($QualityJson.candidate_id -ne $CandidateId) {
     throw "LLM quality report candidate identity mismatch."
 }
-if($QualityText -notmatch ('"model_sha256"\s*:\s*"'+[regex]::Escape($Sha)+'"')){
+if ($QualityJson.model_sha256 -ne $Sha) {
     throw "LLM quality report SHA identity mismatch."
 }
-if($QualityText -notmatch '"completed"\s*:\s*true'){
+if ($QualityJson.completed -ne $true) {
     throw "LLM fixed quality suite timed out or remained incomplete."
+}
+
+$QualityCases = @($QualityJson.cases)
+$ExpectedCaseIds = @(
+    "companion_minimum_step",
+    "teach_banach_from_book",
+    "book_authority_boundary",
+    "memory_authority_boundary",
+    "signed_help_signal"
+)
+if ($QualityCases.Count -ne $ExpectedCaseIds.Count -or
+    [int]$QualityJson.completed_cases -ne $ExpectedCaseIds.Count -or
+    [int]$QualityJson.case_count -ne $ExpectedCaseIds.Count) {
+    throw "LLM fixed quality suite case count mismatch."
+}
+
+$ObservedCaseIds = @($QualityCases | ForEach-Object { [string]$_.id })
+foreach ($ExpectedCaseId in $ExpectedCaseIds) {
+    if ($ObservedCaseIds -notcontains $ExpectedCaseId) {
+        throw "LLM fixed quality suite missing case: $ExpectedCaseId"
+    }
+}
+
+$CaseFailures = @(
+    $QualityCases | Where-Object {
+        $null -ne $_.error -or
+        [int]$_.response_chars -le 0 -or
+        [string]::IsNullOrWhiteSpace([string]$_.visible_reply)
+    }
+)
+if ($CaseFailures.Count -gt 0) {
+    $FailedIds = @($CaseFailures | ForEach-Object { [string]$_.id })
+    throw ("LLM fixed quality suite execution failure(s): " + ($FailedIds -join ", "))
 }
 
 $GateFile="adb-llm-gate-"+$CandidateId+".txt"

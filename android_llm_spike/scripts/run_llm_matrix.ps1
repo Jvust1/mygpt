@@ -49,7 +49,26 @@ foreach($Candidate in $Candidates){
     $Passed.Add($Candidate)
 }
 
-$QualityFiles=@(Get-ChildItem -LiteralPath $OutputDirectory -Filter "llm-quality-*.json" -File -ErrorAction SilentlyContinue)
+$QualitySampleCount = 0
+foreach ($Candidate in $Passed) {
+    $QualityPath = Join-Path $OutputDirectory ("llm-quality-" + $Candidate + ".json")
+    if (-not (Test-Path -LiteralPath $QualityPath -PathType Leaf)) {
+        throw "Missing quality sample for passed candidate: $Candidate"
+    }
+    try {
+        $QualityJson = Get-Content -LiteralPath $QualityPath -Raw | ConvertFrom-Json
+    }
+    catch {
+        throw "Invalid quality JSON for passed candidate: $Candidate"
+    }
+    if ($QualityJson.schema -ne "mygpt.llm-quality-sample.v1" -or
+        $QualityJson.candidate_id -ne $Candidate -or
+        $QualityJson.completed -ne $true -or
+        @($QualityJson.cases).Count -ne 5) {
+        throw "Quality sample identity/completion mismatch: $Candidate"
+    }
+    $QualitySampleCount++
+}
 
 $Summary=@(
     "schema=mygpt.llm-benchmark-matrix.v2",
@@ -57,7 +76,7 @@ $Summary=@(
     "candidate_directory=$CandidateDirectory",
     "pass_count=$($Passed.Count)",
     "passed=$($Passed -join ',')",
-    "quality_sample_count=$($QualityFiles.Count)",
+    "quality_sample_count=$QualitySampleCount",
     "automatic_quality_ranking=DISABLED"
 )
 $Summary | Out-File (Join-Path $OutputDirectory "llm-matrix-summary.txt") -Encoding utf8

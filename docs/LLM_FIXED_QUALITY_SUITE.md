@@ -46,3 +46,20 @@ Recorded fields:
 These are raw human-comparison samples. Default-model selection remains
 benchmark-gated and should combine these outputs with latency, RAM and thermal
 measurements.
+
+
+## Execution gate versus quality judgment
+
+The Windows candidate gate requires the fixed suite itself to execute cleanly:
+- exact schema/candidate/SHA match;
+- exactly 5 expected case IDs;
+- 5/5 completed cases;
+- no case-level runtime error;
+- each case has a non-empty visible reply.
+
+This is **not** a quality score. A weak, verbose or unhelpful reply can still
+pass execution. Human comparison of the captured text remains required.
+
+The final Companion evidence collector pulls all valid
+`llm-quality-speed/balanced/quality.json` files and reports
+`quality_matrix_count`.

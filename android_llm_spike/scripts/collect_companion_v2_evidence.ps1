@@ -173,6 +173,29 @@ if ($LASTEXITCODE -eq 0) {
     $LastImport | Out-File (Join-Path $OutputDirectory "adb-model-import-result.txt") -Encoding utf8
 }
 
+$QualityCandidates = @("speed", "balanced", "quality")
+$QualityMatrixCount = 0
+foreach ($CandidateId in $QualityCandidates) {
+    $RemoteName = "files/llm-quality-" + $CandidateId + ".json"
+    $Value = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat $RemoteName 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        $Text = ($Value | Out-String)
+        try {
+            $Json = $Text | ConvertFrom-Json
+            if ($Json.schema -eq "mygpt.llm-quality-sample.v1" -and
+                $Json.candidate_id -eq $CandidateId -and
+                $Json.completed -eq $true -and
+                @($Json.cases).Count -eq 5) {
+                $Value | Out-File (Join-Path $OutputDirectory ("llm-quality-" + $CandidateId + ".json")) -Encoding utf8
+                $QualityMatrixCount++
+            }
+        }
+        catch {
+            $Text | Out-File (Join-Path $OutputDirectory ("llm-quality-" + $CandidateId + "-invalid.txt")) -Encoding utf8
+        }
+    }
+}
+
 $BenchmarkCandidates = @(
     @{ Id = "speed"; Prefix = "57d1997790d1744f"; Output = "benchmark-speed.txt" },
     @{ Id = "balanced"; Prefix = "d2387ca2dbfee2ff"; Output = "benchmark-balanced.txt" },
@@ -326,6 +349,7 @@ $Summary = @(
     "pip_gate=$PipGateStatus",
     "benchmark=$BenchmarkStatus",
     "benchmark_matrix_count=$BenchmarkMatrixCount",
+    "quality_matrix_count=$QualityMatrixCount",
     "llm_gate_speed=$($LlmGateStatus['speed'])",
     "llm_gate_balanced=$($LlmGateStatus['balanced'])",
     "llm_gate_quality=$($LlmGateStatus['quality'])",
@@ -349,6 +373,7 @@ Write-Host "supervision=$SupervisionStatus"
 Write-Host "pip_gate=$PipGateStatus"
 Write-Host "benchmark=$BenchmarkStatus"
 Write-Host "benchmark_matrix_count=$BenchmarkMatrixCount"
+Write-Host "quality_matrix_count=$QualityMatrixCount"
 Write-Host "llm_gate_speed=$($LlmGateStatus['speed'])"
 Write-Host "llm_gate_balanced=$($LlmGateStatus['balanced'])"
 Write-Host "llm_gate_quality=$($LlmGateStatus['quality'])"
