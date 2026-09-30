@@ -147,6 +147,32 @@ else {
     $PromptBudget | Out-File (Join-Path $OutputDirectory "prompt-budget-error.txt") -Encoding utf8
 }
 
+$LlmGateCandidates = @(
+    @{ Id = "speed"; Gate = "adb-llm-gate-speed.txt" },
+    @{ Id = "balanced"; Gate = "adb-llm-gate-balanced.txt" },
+    @{ Id = "quality"; Gate = "adb-llm-gate-quality.txt" }
+)
+$LlmGatePassCount = 0
+$LlmGateStatus = @{}
+foreach ($Entry in $LlmGateCandidates) {
+    $Value = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat ("files/" + $Entry.Gate) 2>&1
+    $Text = ($Value | Out-String).Trim()
+    if ($LASTEXITCODE -eq 0 -and $Text -eq "PASS") {
+        $LlmGateStatus[$Entry.Id] = "PASS"
+        $LlmGatePassCount++
+        $Value | Out-File (Join-Path $OutputDirectory $Entry.Gate) -Encoding utf8
+    }
+    else {
+        $LlmGateStatus[$Entry.Id] = "UNKNOWN_OR_NOT_RUN"
+        $Value | Out-File (Join-Path $OutputDirectory ("error-" + $Entry.Gate)) -Encoding utf8
+    }
+}
+
+$LastImport = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/adb-model-import-result.txt 2>&1
+if ($LASTEXITCODE -eq 0) {
+    $LastImport | Out-File (Join-Path $OutputDirectory "adb-model-import-result.txt") -Encoding utf8
+}
+
 $BenchmarkCandidates = @(
     @{ Id = "speed"; Prefix = "57d1997790d1744f"; Output = "benchmark-speed.txt" },
     @{ Id = "balanced"; Prefix = "d2387ca2dbfee2ff"; Output = "benchmark-balanced.txt" },
@@ -279,6 +305,10 @@ $Summary = @(
     "pip_gate=$PipGateStatus",
     "benchmark=$BenchmarkStatus",
     "benchmark_matrix_count=$BenchmarkMatrixCount",
+    "llm_gate_speed=$($LlmGateStatus['speed'])",
+    "llm_gate_balanced=$($LlmGateStatus['balanced'])",
+    "llm_gate_quality=$($LlmGateStatus['quality'])",
+    "llm_gate_pass_count=$LlmGatePassCount",
     "prompt_budget=$PromptBudgetStatus",
     "asr_model_manifest=$AsrManifestStatus",
     "tts_model_manifest=$TtsManifestStatus",
@@ -296,6 +326,10 @@ Write-Host "supervision=$SupervisionStatus"
 Write-Host "pip_gate=$PipGateStatus"
 Write-Host "benchmark=$BenchmarkStatus"
 Write-Host "benchmark_matrix_count=$BenchmarkMatrixCount"
+Write-Host "llm_gate_speed=$($LlmGateStatus['speed'])"
+Write-Host "llm_gate_balanced=$($LlmGateStatus['balanced'])"
+Write-Host "llm_gate_quality=$($LlmGateStatus['quality'])"
+Write-Host "llm_gate_pass_count=$LlmGatePassCount"
 Write-Host "prompt_budget=$PromptBudgetStatus"
 Write-Host "asr_model_manifest=$AsrManifestStatus"
 Write-Host "tts_model_manifest=$TtsManifestStatus"
