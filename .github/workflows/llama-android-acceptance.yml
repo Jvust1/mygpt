@@ -159,6 +159,8 @@ jobs:
                   )
               if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
                   raise SystemExit("Companion V2 missing Spine runtime license notice")
+              if "assets/3714430278.json" not in names:
+                  raise SystemExit("Companion V2 missing shared 3714430278 Character Card")
               print("Companion V2 APK PASS:", llama, gdx, sherpa)
 
           with zipfile.ZipFile(sender_apk) as z:
