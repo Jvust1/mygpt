@@ -8,11 +8,13 @@ MyGPT directly adapts the Android inference lifecycle/concurrency design from:
 
 - `examples/llama.android/lib/src/main/java/com/arm/aichat/InferenceEngine.kt`
 - `examples/llama.android/lib/src/main/java/com/arm/aichat/internal/InferenceEngineImpl.kt`
+- `examples/llama.android/lib/src/main/java/com/arm/aichat/internal/gguf/GgufMetadataReaderImpl.kt`
 
 Local derived/modified files:
 
 - `android_spike/src/main/java/dev/mygpt/spike/LocalLlmEngine.java`
 - `android_spike/src/main/java/dev/mygpt/spike/SerializedLocalLlmEngine.java`
+- `android_spike/src/main/java/dev/mygpt/spike/GgufModelProbe.java`
 
 Material changes in MyGPT:
 
