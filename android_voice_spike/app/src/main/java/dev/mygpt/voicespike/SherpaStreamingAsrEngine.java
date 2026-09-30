@@ -66,18 +66,31 @@ public final class SherpaStreamingAsrEngine implements AutoCloseable {
     }
 
     public synchronized Result accept(float[] samples) {
+        return accept(samples, SAMPLE_RATE);
+    }
+
+    /**
+     * Feed mono float PCM at its native sample rate.
+     *
+     * sherpa-onnx OnlineStream performs internal resampling when this rate
+     * differs from the model feature sample rate.
+     */
+    public synchronized Result accept(float[] samples, int sampleRate) {
         requireOpen();
         if (samples == null || samples.length == 0) return new Result("", false);
+        if (sampleRate < 1000 || sampleRate > 384000) {
+            throw new IllegalArgumentException("sampleRate out of range");
+        }
 
-        stream.acceptWaveform(samples, SAMPLE_RATE);
+        stream.acceptWaveform(samples, sampleRate);
         while (recognizer.isReady(stream)) recognizer.decode(stream);
 
         boolean endpoint = recognizer.isEndpoint(stream);
         String text = recognizer.getResult(stream).getText();
 
         if (endpoint) {
-            float[] tail = new float[(int) (0.8f * SAMPLE_RATE)];
-            stream.acceptWaveform(tail, SAMPLE_RATE);
+            float[] tail = new float[(int) (0.8f * sampleRate)];
+            stream.acceptWaveform(tail, sampleRate);
             while (recognizer.isReady(stream)) recognizer.decode(stream);
             text = recognizer.getResult(stream).getText();
             recognizer.reset(stream);

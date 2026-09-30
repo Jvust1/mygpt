@@ -6,7 +6,6 @@ import android.os.SystemClock
 import android.widget.TextView
 import com.k2fsa.sherpa.onnx.GeneratedAudio
 import com.k2fsa.sherpa.onnx.OfflineTts
-import dev.mygpt.voicespike.AudioFloatResampler
 import dev.mygpt.voicespike.SherpaMeloTtsFactory
 import dev.mygpt.voicespike.SherpaMeloTtsModelInstaller
 import dev.mygpt.voicespike.SherpaStreamingAsrEngine
@@ -76,24 +75,18 @@ class DebugVoiceLoopbackActivity : Activity() {
             require(sourceRate > 0) { "invalid TTS sample rate" }
             require(samples.isNotEmpty()) { "TTS produced no samples" }
 
-            val resampled = AudioFloatResampler.resample(
-                samples,
-                sourceRate,
-                SherpaStreamingAsrEngine.SAMPLE_RATE,
-            )
-            require(resampled.isNotEmpty()) { "resampler produced no samples" }
-
             val asrStart = SystemClock.elapsedRealtime()
             asr = SherpaStreamingAsrEngine(asrModel, 2)
 
             var transcript = ""
             var endpoint = false
+            val chunkSamples = maxOf(1, sourceRate / 10)
 
             var offset = 0
-            while (offset < resampled.size) {
-                val size = minOf(CHUNK_SAMPLES, resampled.size - offset)
-                val chunk = resampled.copyOfRange(offset, offset + size)
-                val result = asr.accept(chunk)
+            while (offset < samples.size) {
+                val size = minOf(chunkSamples, samples.size - offset)
+                val chunk = samples.copyOfRange(offset, offset + size)
+                val result = asr.accept(chunk, sourceRate)
                 if (result.text.isNotBlank()) {
                     transcript = result.text.trim()
                 }
@@ -108,9 +101,9 @@ class DebugVoiceLoopbackActivity : Activity() {
             }
 
             if (!endpoint) {
-                val silence = FloatArray(CHUNK_SAMPLES)
+                val silence = FloatArray(chunkSamples)
                 for (index in 0 until MAX_SILENCE_CHUNKS) {
-                    val result = asr.accept(silence)
+                    val result = asr.accept(silence, sourceRate)
                     if (result.text.isNotBlank()) {
                         transcript = result.text.trim()
                     }
@@ -130,8 +123,10 @@ class DebugVoiceLoopbackActivity : Activity() {
             report.put("tts_sample_rate", sourceRate)
             report.put("tts_samples", samples.size)
             report.put("tts_wall_ms", ttsMs)
-            report.put("asr_input_sample_rate", SherpaStreamingAsrEngine.SAMPLE_RATE)
-            report.put("asr_input_samples", resampled.size)
+            report.put("asr_input_sample_rate", sourceRate)
+            report.put("asr_model_sample_rate", SherpaStreamingAsrEngine.SAMPLE_RATE)
+            report.put("asr_internal_resample", sourceRate != SherpaStreamingAsrEngine.SAMPLE_RATE)
+            report.put("asr_input_samples", samples.size)
             report.put("asr_wall_ms", asrMs)
             report.put("asr_endpoint", endpoint)
             report.put("transcript", transcript)
@@ -174,7 +169,6 @@ class DebugVoiceLoopbackActivity : Activity() {
     companion object {
         private const val PHRASE = "你好，今天一起学习。"
         private const val RESULT_FILE = "voice-loopback-result.json"
-        private const val CHUNK_SAMPLES = 1600
         private const val MAX_SILENCE_CHUNKS = 30
     }
 }
