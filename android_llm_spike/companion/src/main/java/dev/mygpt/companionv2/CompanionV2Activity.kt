@@ -44,6 +44,7 @@ import dev.mygpt.voicespike.SherpaMeloTtsEngine
 import dev.mygpt.voicespike.SherpaMeloTtsModelInstaller
 import dev.mygpt.voicespike.SherpaStreamingAsrEngine
 import dev.mygpt.voicespike.SherpaZhEnModelInstaller
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -110,6 +111,7 @@ class CompanionV2Activity : AndroidApplication(),
     @Volatile private var ttsEnabled = false
     @Volatile private var conversationPrimed = false
     @Volatile private var modelLoaded = false
+    @Volatile private var modelNeedsRecovery = false
     @Volatile private var generating = false
     @Volatile private var benchmarking = false
     private var generationJob: Job? = null
@@ -781,6 +783,7 @@ class CompanionV2Activity : AndroidApplication(),
                 local
             }.onSuccess {
                 modelLoaded = true
+                modelNeedsRecovery = false
                 conversationPrimed = false
                 modelState.text = "模型：已加载 · 全本地"
                 loadModelButton.isEnabled = true
@@ -789,6 +792,7 @@ class CompanionV2Activity : AndroidApplication(),
                 updateVoiceControls()
             }.onFailure { error ->
                 modelLoaded = false
+                modelNeedsRecovery = false
                 modelState.text = "模型加载失败 · " + error.javaClass.simpleName
                 loadModelButton.isEnabled = true
                 sendButton.isEnabled = false
@@ -1312,10 +1316,27 @@ class CompanionV2Activity : AndroidApplication(),
             }.onFailure { error ->
                 generating = false
                 generationJob = null
-                reply.text = "生成失败 · " + error.javaClass.simpleName
+
+                val preJniValidation = error is IllegalArgumentException
+                if (!preJniValidation) {
+                    modelNeedsRecovery = true
+                    modelLoaded = false
+                    conversationPrimed = false
+                }
+
+                reply.text = if (error is CancellationException) {
+                    "生成已中断 · 返回前台后会恢复本地模型会话"
+                } else if (preJniValidation) {
+                    "生成前校验失败 · " + (error.message ?: error.javaClass.simpleName)
+                } else {
+                    "生成失败 · " + error.javaClass.simpleName + " · 需要重载模型会话"
+                }
+
                 characterRuntime.playIdle()
                 input.isEnabled = true
+                loadModelButton.isEnabled = modelFile != null
                 sendButton.isEnabled = modelLoaded
+                benchmarkButton.isEnabled = modelLoaded
                 updateVoiceControls()
             }
         }
@@ -1345,6 +1366,11 @@ class CompanionV2Activity : AndroidApplication(),
         StudySupervisorRuntime.shared().addListener(this)
         refreshBookContextStatus()
         startExpiryTicker()
+
+        if (modelNeedsRecovery && modelFile != null && !generating && !benchmarking) {
+            modelState.text = "模型：正在恢复中断的本地会话…"
+            loadModel()
+        }
     }
 
     override fun onStop() {
@@ -1353,6 +1379,11 @@ class CompanionV2Activity : AndroidApplication(),
             StudySupervisorRuntime.shared().removeListener(this)
             stopExpiryTicker()
             foreground = false
+            if (generating) {
+                modelNeedsRecovery = true
+                modelLoaded = false
+                conversationPrimed = false
+            }
             generationJob?.cancel()
             generationJob = null
             generating = false
@@ -1409,6 +1440,8 @@ class CompanionV2Activity : AndroidApplication(),
         private const val PREF_MODEL_PATH = "gguf_path"
         private const val PREF_MODEL_SHA256 = "gguf_sha256"
         private const val BENCHMARK_REPORT_FILE = "benchmark-last.txt"
+        private const val PROMPT_BUDGET_REPORT_FILE = "prompt-budget-last.txt"
         private const val MAX_MODEL_BYTES = 16L * 1024L * 1024L * 1024L
+        private const val EXPIRY_TICK_MS = 1000L
     }
 }
