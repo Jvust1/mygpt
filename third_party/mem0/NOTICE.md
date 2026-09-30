@@ -23,3 +23,12 @@ Material changes in MyGPT:
 - retrieval remains dependency-free keyword/CJK matching for the current prototype.
 
 The upstream Apache-2.0 license is reproduced in `third_party/mem0/LICENSE`.
+
+
+Additional Android derived implementation:
+- `android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt`
+
+The Android store keeps the same explicit add/search/get/update/delete/history
+lifecycle. It also adds a `purge()` privacy path that removes both active memory
+and its audit history when the user explicitly asks to forget/erase a memory.
+Chat turns are not automatically written to this store.
