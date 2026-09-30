@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import java.util.Locale
+import dev.mygpt.spike.LexicalMemoryScorer
 import java.util.UUID
 
 /**
@@ -256,17 +256,13 @@ class LocalCompanionMemoryStore(context: Context) :
         require(limit in 1..20) { "limit must be in 1..20" }
         if (query.length > 4000) throw IllegalArgumentException("memory query too long")
 
-        val tokens = queryTokens(query)
-        if (tokens.isEmpty()) return emptyList()
-
-        data class Ranked(val memory: Memory, val score: Int)
-        return recent(namespace, 100)
-            .map { memory ->
-                val haystack = memory.text.lowercase(Locale.ROOT)
-                val score = tokens.count { haystack.contains(it) }
-                Ranked(memory, score)
-            }
-            .filter { it.score > 0 }
+        // The real companion search uses the full query, not the first 16 tokens.
+        // SQL remains namespace-scoped and bounded before any text is ranked.
+        val candidates = recent(namespace, LexicalMemoryScorer.MAX_CANDIDATES)
+        val scores = LexicalMemoryScorer.score(query, candidates.map { it.text })
+        data class Ranked(val memory: Memory, val score: Double)
+        return candidates.mapIndexed { index, memory -> Ranked(memory, scores[index]) }
+            .filter { it.score > 0.0 }
             .sortedWith(
                 compareByDescending<Ranked> { it.score }
                     .thenByDescending { it.memory.updatedAtMs }
@@ -389,28 +385,6 @@ class LocalCompanionMemoryStore(context: Context) :
         }
         return normalized
     }
-
-    private fun queryTokens(query: String): List<String> {
-        val lowered = query.lowercase(Locale.ROOT)
-        val result = LinkedHashSet<String>()
-
-        lowered.split(Regex("\\s+")).forEach { raw ->
-            val token = raw.filter { it.isLetterOrDigit() || isCjk(it) }
-            if (token.length >= 2) result += token
-        }
-
-        val cjk = lowered.filter { isCjk(it) }
-        if (cjk.length >= 2) {
-            for (index in 0 until cjk.length - 1) {
-                result += cjk.substring(index, index + 2)
-                if (result.size >= 16) break
-            }
-        }
-        return result.take(16)
-    }
-
-    private fun isCjk(ch: Char): Boolean =
-        ch.code in 0x4E00..0x9FFF
 
     companion object {
         private const val DB_NAME = "mygpt-companion-memory.sqlite3"

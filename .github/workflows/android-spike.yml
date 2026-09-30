@@ -15,6 +15,8 @@ on:
       - 'android_voice_spike/app/src/test/java/dev/mygpt/voicespike/AudioFloatResamplerSmoke.java'
       - 'android_voice_spike/app/src/test/java/dev/mygpt/voicespike/ModelFingerprintManifestSmoke.java'
       - 'third_party/gson/**'
+      - 'third_party/scikit-learn/**'
+      - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt'
       - '.github/workflows/android-spike.yml'
   pull_request:
     paths:
@@ -27,6 +29,8 @@ on:
       - 'android_voice_spike/app/src/main/java/dev/mygpt/voicespike/AudioFloatResampler.java'
       - 'android_voice_spike/app/src/test/java/dev/mygpt/voicespike/AudioFloatResamplerSmoke.java'
       - 'third_party/gson/**'
+      - 'third_party/scikit-learn/**'
+      - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt'
       - '.github/workflows/android-spike.yml'
 
 permissions:
