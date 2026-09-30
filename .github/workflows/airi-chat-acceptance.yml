@@ -2,7 +2,7 @@ name: AIRI companion brain focused acceptance
 
 on:
   push:
-    branches: [feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, fix/voice-activation-test-20260930, feat/pipecat-turn-control-20260930]
+    branches: [feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, fix/voice-activation-test-20260930, feat/pipecat-turn-control-20260930, feat/livekit-turn-fusion-20261001]
     paths:
       - 'brain/mygpt_brain/conversation.py'
       - 'brain/mygpt_brain/memory_store.py'
@@ -15,6 +15,7 @@ on:
       - 'brain/mygpt_brain/vad.py'
       - 'brain/mygpt_brain/voice_activation.py'
       - 'brain/mygpt_brain/turn_control.py'
+      - 'brain/mygpt_brain/livekit_bridge.py'
       - 'brain/personas/**'
       - 'brain/tests/test_conversation.py'
       - 'brain/tests/test_memory_store.py'
@@ -26,6 +27,7 @@ on:
       - 'brain/tests/test_vad.py'
       - 'brain/tests/test_voice_activation.py'
       - 'brain/tests/test_turn_control.py'
+      - 'brain/tests/test_livekit_bridge.py'
       - 'brain/tests/test_companion_service.py'
       - 'brain/scripts/serve_companion_ollama.py'
       - '.github/workflows/airi-chat-acceptance.yml'

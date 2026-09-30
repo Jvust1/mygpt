@@ -10,17 +10,20 @@ from __future__ import annotations
 
 from typing import Any
 
+from .turn_control import TurnLease, VoiceTurnController
+
 
 class LiveKitAgentBridge:
     """Wrap AgentSession.start()/say() behind a narrow mygpt transport boundary."""
 
-    def __init__(self, session: Any) -> None:
+    def __init__(self, session: Any, *, turn_controller: VoiceTurnController | None = None) -> None:
         if not callable(getattr(session, "start", None)):
             raise TypeError("session must provide async start()")
         if not callable(getattr(session, "say", None)):
             raise TypeError("session must provide say()")
         self._session = session
         self._started = False
+        self._turn_controller = turn_controller
 
     @property
     def started(self) -> bool:
@@ -44,6 +47,27 @@ class LiveKitAgentBridge:
             return await result
         return result
 
+    async def say_for_turn(
+        self,
+        text: str,
+        lease: TurnLease,
+        *,
+        allow_interruptions: bool = True,
+    ) -> Any | None:
+        if self._turn_controller is None:
+            raise RuntimeError("turn_controller is not configured")
+        if not self._turn_controller.is_current(lease):
+            return None
+        if not self._turn_controller.begin_assistant_turn(lease):
+            return None
+        try:
+            result = await self.say(text, allow_interruptions=allow_interruptions)
+            if not self._turn_controller.is_current(lease):
+                return None
+            return result
+        finally:
+            self._turn_controller.finish_assistant_turn(lease)
+
     async def say_when_ready(
         self,
         voice_gate: Any,
@@ -60,7 +84,11 @@ class LiveKitAgentBridge:
         return True
 
 
-def create_livekit_agent_bridge(**session_kwargs: Any) -> LiveKitAgentBridge:
+def create_livekit_agent_bridge(
+    *,
+    turn_controller: VoiceTurnController | None = None,
+    **session_kwargs: Any,
+) -> LiveKitAgentBridge:
     """Create AgentSession lazily; no LiveKit model package is required."""
     try:
         from livekit.agents import AgentSession
@@ -68,4 +96,7 @@ def create_livekit_agent_bridge(**session_kwargs: Any) -> LiveKitAgentBridge:
         raise RuntimeError(
             "LiveKit Agents is optional; install brain[livekit] before enabling realtime transport"
         ) from exc
-    return LiveKitAgentBridge(AgentSession(**session_kwargs))
+    return LiveKitAgentBridge(
+        AgentSession(**session_kwargs),
+        turn_controller=turn_controller,
+    )
