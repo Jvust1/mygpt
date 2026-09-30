@@ -2,7 +2,7 @@ name: AIRI companion brain focused acceptance
 
 on:
   push:
-    branches: [feat/airi-paired-history-fusion-dot-20260930, feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, fix/voice-activation-test-20260930, feat/pipecat-turn-control-20260930, feat/livekit-turn-fusion-20261001, feat/airi-runtime-fusion-dot-20260930]
+    branches: [feat/pipecat-speech-text-fusion-dot-20260930, feat/airi-paired-history-fusion-dot-20260930, feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, fix/voice-activation-test-20260930, feat/pipecat-turn-control-20260930, feat/livekit-turn-fusion-20261001, feat/airi-runtime-fusion-dot-20260930]
     paths:
       - 'brain/mygpt_brain/conversation.py'
       - 'brain/mygpt_brain/memory_store.py'

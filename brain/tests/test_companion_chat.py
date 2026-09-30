@@ -176,3 +176,62 @@ async def test_paired_history_survives_sqlite_restart_without_deleting_history(t
         replay = await runtime.send(body, now=NOW)
         assert replay.replayed and replay.compacted_message_ids == result.compacted_message_ids
         assert len(seen) == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("fail_after_cancel", [False, True])
+async def test_direct_runtime_preserves_caller_cancel_when_provider_uncancels(tmp_path, fail_after_cancel):
+    import asyncio
+    from mygpt_brain.session_store import ChatSessionStore
+    entered = asyncio.Event()
+    async def responder(_):
+        entered.set()
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            asyncio.current_task().uncancel()
+            if fail_after_cancel:
+                raise RuntimeError("obsolete provider failure")
+            return "obsolete response"
+    persona = CompanionPersona(persona_id="p", display_name="P", visual_skin_id="skin", instructions="Trusted.")
+    with ChatSessionStore(tmp_path / "cancel.sqlite3") as store:
+        runtime = CompanionChatRuntime(persona=persona, responder=responder, session_store=store)
+        task = asyncio.create_task(runtime.send(dict(request_id="cancel", session_id="s", persona_id="p", text="question")))
+        await entered.wait()
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+        assert task.cancelled()
+        assert store.get_receipt("cancel") is None
+        assert store.load_messages("s") == runtime.session_messages("s") == []
+        async def recover(_): return "fresh response"
+        runtime.responder = recover
+        result = await runtime.send(dict(request_id="cancel", session_id="s", persona_id="p", text="question"))
+        assert not result.replayed and result.assistant_message.content == "fresh response"
+        assert [m.role for m in store.load_messages("s")] == ["system", "user", "assistant"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["return_after_uncancel", "raise_after_uncancel", "block_loop"])
+async def test_provider_cannot_commit_after_response_deadline(tmp_path, mode):
+    import asyncio
+    import time
+    from mygpt_brain.session_store import ChatSessionStore
+    async def responder(_):
+        if mode == "block_loop":
+            time.sleep(0.03)
+            return "late synchronous response"
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            asyncio.current_task().uncancel()
+            if mode == "raise_after_uncancel":
+                raise RuntimeError("late provider failure")
+            return "late response"
+    persona = CompanionPersona(persona_id="p", display_name="P", visual_skin_id="skin", instructions="Trusted.")
+    with ChatSessionStore(tmp_path / "deadline.sqlite3") as store:
+        runtime = CompanionChatRuntime(persona=persona, responder=responder, session_store=store, request_timeout_seconds=0.01)
+        with pytest.raises(RuntimeError, match="chat responder timeout"):
+            await runtime.send(dict(request_id="late", session_id="s", persona_id="p", text="question"))
+        assert store.get_receipt("late") is None
+        assert store.load_messages("s") == runtime.session_messages("s") == []
