@@ -1,4 +1,4 @@
-name: llama.cpp Android library acceptance
+name: Companion V2 local AI Android acceptance
 
 on:
   push:
@@ -7,30 +7,31 @@ on:
       - '.gitmodules'
       - 'third_party/llama.cpp/**'
       - 'third_party/sherpa-onnx/**'
-      - 'android_voice_spike/**'
+      - 'third_party/commons-compress/**'
       - 'android_llm_spike/**'
-      - 'android_spike/src/main/java/dev/mygpt/spike/BookContextSnapshot.java'
-      - 'android_spike/src/main/java/dev/mygpt/spike/BookContextMailbox.java'
-      - 'android_spike/src/main/java/dev/mygpt/spike/BookContextSnapshot.java'
-      - 'android_spike/src/main/java/dev/mygpt/spike/BookContextMailbox.java'
+      - 'android_voice_spike/**'
+      - 'android_spike/**'
       - '.github/workflows/llama-android-acceptance.yml'
   pull_request:
     paths:
       - '.gitmodules'
       - 'third_party/llama.cpp/**'
       - 'third_party/sherpa-onnx/**'
-      - 'android_voice_spike/**'
+      - 'third_party/commons-compress/**'
       - 'android_llm_spike/**'
+      - 'android_voice_spike/**'
+      - 'android_spike/**'
       - '.github/workflows/llama-android-acceptance.yml'
 
 permissions:
   contents: read
 
 jobs:
-  llama-android-lib:
+  companion-v2:
     if: github.repository == 'Jvust/mygpt'
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 50
+
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
@@ -48,17 +49,44 @@ jobs:
         with:
           gradle-version: '8.14.3'
 
-      - name: Verify pinned upstreams
+      - name: Verify pinned upstream identities
         shell: bash
         run: |
           set -euo pipefail
+
           llama="$(git -C third_party/llama.cpp/upstream rev-parse HEAD)"
           sherpa="$(git -C third_party/sherpa-onnx/upstream rev-parse HEAD)"
+
           test "$llama" = "ba0ba54d93b25faf1e149f4ccedd3e9d84798563"
           test "$sherpa" = "040afe360a38e25daaa325ce8889abf93ea02609"
+
           grep -q 'v1.13.8' third_party/sherpa-onnx/RUNTIME_PIN.md
-          grep -q '11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf' third_party/sherpa-onnx/RUNTIME_PIN.md
-          echo "upstream pins PASS: llama=$llama sherpa=$sherpa"
+          grep -q '11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf'             third_party/sherpa-onnx/RUNTIME_PIN.md
+          grep -q '1.28.0' third_party/commons-compress/NOTICE.md
+
+          echo "llama pin:  $llama"
+          echo "sherpa pin: $sherpa"
+
+      - name: Verify Companion V2 permission boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          manifest="android_llm_spike/companion/src/main/AndroidManifest.xml"
+          sender="android_llm_spike/book-sender-test/src/main/AndroidManifest.xml"
+
+          grep -q 'android.permission.RECORD_AUDIO' "$manifest"
+          grep -q 'android:protectionLevel="signature"' "$manifest"
+          grep -q 'dev.mygpt.companionv2.permission.BOOK_CONTEXT' "$manifest"
+          grep -q 'dev.mygpt.companionv2.permission.BOOK_CONTEXT' "$sender"
+
+          ! grep -q 'android.permission.INTERNET' "$manifest"
+          ! grep -q 'android.permission.SYSTEM_ALERT_WINDOW' "$manifest"
+          ! grep -q 'READ_EXTERNAL_STORAGE' "$manifest"
+          ! grep -q 'WRITE_EXTERNAL_STORAGE' "$manifest"
+          ! grep -q 'MANAGE_EXTERNAL_STORAGE' "$manifest"
+
+          echo "Companion V2 manifest boundary PASS"
 
       - name: Install llama.cpp Android native toolchain
         shell: bash
@@ -67,77 +95,81 @@ jobs:
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "ndk;29.0.13113456" "cmake;3.31.6"
 
-      - name: Build local LLM and Companion V2
+      - name: Build llama JNI, bridge, local chat, Companion V2 and Book sender
         shell: bash
         env:
           ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13113456
         run: |
           set -euo pipefail
-          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             :companion:assembleDebug             --no-daemon --stacktrace
+          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             :companion:assembleDebug             :book-sender-test:assembleDebug             --no-daemon             --stacktrace
 
-      - name: Verify AAR and APK native payloads
+      - name: Verify AAR and APK payloads
         shell: bash
         run: |
           set -euo pipefail
+
           llama_aar="third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
           bridge_aar="android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
-          apk="android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
+          local_apk="android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
           companion_apk="android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
-          book_sender_apk="android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
+          sender_apk="android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
+
           test -f "$llama_aar"
           test -f "$bridge_aar"
-          test -f "$apk"
+          test -f "$local_apk"
           test -f "$companion_apk"
-          test -f "$book_sender_apk"
+          test -f "$sender_apk"
+
           python - <<'PY'
           import zipfile
 
-          llama = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
-          bridge = "android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
-          app = "android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
-          companion = "android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
+          llama_aar = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
+          bridge_aar = "android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
+          local_apk = "android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
+          companion_apk = "android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
+          sender_apk = "android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
 
-          with zipfile.ZipFile(llama) as z:
-              names=set(z.namelist())
-              native=[n for n in names if n.endswith("/libai-chat.so")]
+          with zipfile.ZipFile(llama_aar) as z:
+              names = set(z.namelist())
+              native = [n for n in names if n.endswith("/libai-chat.so")]
               if "classes.jar" not in names or not native:
                   raise SystemExit("llama AAR missing classes.jar or libai-chat.so")
               print("llama AAR PASS:", native)
 
-          with zipfile.ZipFile(bridge) as z:
-              names=set(z.namelist())
-              if "classes.jar" not in names:
-                  raise SystemExit("bridge AAR missing classes.jar")
+          with zipfile.ZipFile(bridge_aar) as z:
+              if "classes.jar" not in set(z.namelist()):
+                  raise SystemExit("MyGPT bridge AAR missing classes.jar")
               print("MyGPT bridge AAR PASS")
 
-          with zipfile.ZipFile(app) as z:
-              names=set(z.namelist())
-              native=[n for n in names if n.endswith("/libai-chat.so")]
+          with zipfile.ZipFile(local_apk) as z:
+              names = set(z.namelist())
+              native = [n for n in names if n.endswith("/libai-chat.so")]
               if "classes.dex" not in names or not native:
                   raise SystemExit("local LLM APK missing classes.dex or libai-chat.so")
-              print("MyGPT local LLM APK PASS:", native)
+              print("local LLM APK PASS:", native)
 
-          book_sender = "android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
-          with zipfile.ZipFile(companion) as z:
-              names=set(z.namelist())
-              llama_native=[n for n in names if n.endswith("/libai-chat.so")]
-              gdx_native=[n for n in names if n.endswith("/libgdx.so")]
-              sherpa_native=[n for n in names if n.endswith("/libsherpa-onnx-jni.so")]
-              if "classes.dex" not in names or not llama_native or not gdx_native or not sherpa_native:
-                  raise SystemExit("Companion V2 APK missing classes.dex, llama, gdx or sherpa native payload")
+          with zipfile.ZipFile(companion_apk) as z:
+              names = set(z.namelist())
+              llama = [n for n in names if n.endswith("/libai-chat.so")]
+              gdx = [n for n in names if n.endswith("/libgdx.so")]
+              sherpa = [n for n in names if n.endswith("/libsherpa-onnx-jni.so")]
+              if "classes.dex" not in names or not llama or not gdx or not sherpa:
+                  raise SystemExit(
+                      "Companion V2 missing classes.dex, llama, gdx, or sherpa JNI"
+                  )
               if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
-                  raise SystemExit("Companion V2 APK missing Spine license notice")
-              print("Companion V2 APK PASS:", llama_native, gdx_native, sherpa_native)
-          with zipfile.ZipFile(book_sender) as z:
-              names=set(z.namelist())
-              if "classes.dex" not in names:
+                  raise SystemExit("Companion V2 missing Spine runtime license notice")
+              print("Companion V2 APK PASS:", llama, gdx, sherpa)
+
+          with zipfile.ZipFile(sender_apk) as z:
+              if "classes.dex" not in set(z.namelist()):
                   raise SystemExit("Book context sender APK missing classes.dex")
               print("Book context sender APK PASS")
           PY
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: mygpt-local-companion-v2
+          name: mygpt-companion-v2-local-stack
           path: |
             third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar
             android_llm_spike/bridge/build/outputs/aar/bridge-release.aar
