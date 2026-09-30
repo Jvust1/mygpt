@@ -87,8 +87,11 @@ jobs:
 
           grep -q 'DebugModelImportReceiver' "$debug_manifest"
           grep -q 'IMPORT_ACCEPTANCE_MODEL_V1' "$debug_manifest"
+          grep -q 'DebugVoiceModelImportActivity' "$debug_manifest"
+
           ! grep -q 'DebugModelImportReceiver' "$manifest"
           ! grep -q 'IMPORT_ACCEPTANCE_MODEL_V1' "$manifest"
+          ! grep -q 'DebugVoiceModelImportActivity' "$manifest"
 
           echo "Companion V2 source permission/debug boundary PASS"
 
@@ -194,13 +197,18 @@ jobs:
 
           receiver_marker = b"DebugModelImportReceiver"
           action_marker = b"dev.mygpt.companionv2.debug.IMPORT_ACCEPTANCE_MODEL_V1"
+          voice_activity_marker = b"DebugVoiceModelImportActivity"
 
-          if receiver_marker not in debug_dex or action_marker not in debug_dex:
-              raise SystemExit("debug APK missing expected acceptance receiver/action")
+          if (receiver_marker not in debug_dex
+                  or action_marker not in debug_dex
+                  or voice_activity_marker not in debug_dex):
+              raise SystemExit("debug APK missing expected acceptance-only importer")
 
-          if receiver_marker in release_dex or action_marker in release_dex:
+          if (receiver_marker in release_dex
+                  or action_marker in release_dex
+                  or voice_activity_marker in release_dex):
               raise SystemExit(
-                  "SECURITY FAILURE: debug acceptance receiver/action leaked into release APK"
+                  "SECURITY FAILURE: debug acceptance importer leaked into release APK"
               )
 
           with zipfile.ZipFile(sender_apk) as z:

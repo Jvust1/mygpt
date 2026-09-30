@@ -209,7 +209,9 @@ class CompanionV2Activity : AndroidApplication(),
         bookState.setPadding(0, dp(16), 0, dp(8))
         page.addView(bookState)
 
-        voiceState = label("语音：尚未导入 sherpa 模型", 13)
+        voiceState = label("语音：尚未导入 sherpa 模型", 13).apply {
+            contentDescription = "ASR_MODEL_STATUS"
+        }
         voiceState.setPadding(0, dp(16), 0, dp(8))
         page.addView(voiceState)
         page.addView(button("选择 sherpa 中英模型包") { chooseAsrModel() })
@@ -219,7 +221,9 @@ class CompanionV2Activity : AndroidApplication(),
         }
         page.addView(voiceButton)
 
-        ttsState = label("语音回复：尚未导入 Melo TTS 模型", 13)
+        ttsState = label("语音回复：尚未导入 Melo TTS 模型", 13).apply {
+            contentDescription = "TTS_MODEL_STATUS"
+        }
         ttsState.setPadding(0, dp(16), 0, dp(8))
         page.addView(ttsState)
         page.addView(button("选择 Melo 中英 TTS 模型包") { chooseTtsModel() })
@@ -568,9 +572,11 @@ class CompanionV2Activity : AndroidApplication(),
             }.onSuccess { installed ->
                 asrModel = installed
                 voiceState.text = "语音：模型已就绪 · 16kHz streaming zh/en"
+                voiceState.contentDescription = "ASR_MODEL_READY"
                 updateVoiceControls()
             }.onFailure { error ->
                 voiceState.text = "语音模型导入失败 · " + error.javaClass.simpleName
+                voiceState.contentDescription = "ASR_MODEL_UNAVAILABLE"
                 updateVoiceControls()
             }
         }
@@ -585,8 +591,10 @@ class CompanionV2Activity : AndroidApplication(),
             }
             asrModel = restored
             voiceState.text = if (restored != null) {
+                voiceState.contentDescription = "ASR_MODEL_READY"
                 "语音：已恢复并验证本地 sherpa 模型"
             } else {
+                voiceState.contentDescription = "ASR_MODEL_UNAVAILABLE"
                 "语音：尚未导入或模型指纹校验失败"
             }
             updateVoiceControls()
@@ -987,9 +995,11 @@ class CompanionV2Activity : AndroidApplication(),
             }.onSuccess { installed ->
                 ttsModel = installed
                 ttsState.text = "语音回复：Melo 中英模型已就绪"
+                ttsState.contentDescription = "TTS_MODEL_READY"
                 updateTtsControls()
             }.onFailure { error ->
                 ttsState.text = "TTS 模型导入失败 · " + error.javaClass.simpleName
+                ttsState.contentDescription = "TTS_MODEL_UNAVAILABLE"
                 updateTtsControls()
             }
         }
@@ -1004,8 +1014,10 @@ class CompanionV2Activity : AndroidApplication(),
             }
             ttsModel = restored
             ttsState.text = if (restored != null) {
+                ttsState.contentDescription = "TTS_MODEL_READY"
                 "语音回复：已恢复并验证 Melo 中英模型"
             } else {
+                ttsState.contentDescription = "TTS_MODEL_UNAVAILABLE"
                 "语音回复：尚未导入或模型指纹校验失败"
             }
             updateTtsControls()
