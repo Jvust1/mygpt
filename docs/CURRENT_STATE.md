@@ -1,3 +1,14 @@
+## 2026-09-30 · Unicode memory candidates reach the scorer
+
+The Python SQLite candidate path now shares the pinned sklearn Unicode
+lowercasing step with final scoring. Explicit uppercase accented/Greek/Cyrillic
+text or tags no longer fail before scoring. A private per-connection function
+keeps the existing schema, raw records, namespace/window budgets and explicit
+memory lifecycle unchanged. Strict Brain 705 and combined upstream/story 45 pass.
+See [semantics and evidence](UNICODE_MEMORY_RECALL_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · Android history retains question/reaction groups
 
 The actual Android prompt composer now uses the pinned AIRI reverse scan to fit

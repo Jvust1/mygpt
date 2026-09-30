@@ -47,3 +47,10 @@ def test_tokenizer_and_scores_match_deterministic_randomized_corpus():
         fitted = oracle.fit_transform(documents)
         expected = cosine_similarity(oracle.transform([query]), fitted)[0].tolist()
         assert tfidf_memory_scores(query, documents) == pytest.approx(expected, abs=1e-12)
+
+
+@pytest.mark.parametrize('text', ['CAFÉ', 'CAFE\u0301', 'İI', 'Straße', 'ΟΣ', 'АЛГЕБРА', 'ΜΆΘΗΜΑ', 'PAY РАУ'])
+def test_sql_candidate_preprocessor_matches_actual_sklearn_lowercase(text):
+    from sklearn.feature_extraction.text import _preprocess
+    from mygpt_brain.lexical_memory import lowercase_lexical_text
+    assert lowercase_lexical_text(text) == _preprocess(text, lower=True)

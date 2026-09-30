@@ -64,3 +64,18 @@ shared boundary runner. No Python, sklearn, Gson reflection or new dependency
 is introduced into Android scoring. Full license and short notice assets are
 provided to all four modules that compile the shared source (three direct asset
 sets, with Companion V2 inheriting the Android spike assets).
+
+## Unicode SQL candidate preprocessing (2026-09-30)
+
+The existing Python `MemoryStore` registers the private, deterministic SQLite
+function `mygpt_lexical_lower` on each connection. It calls the same source-derived
+`lowercase_lexical_text` as final lexical preprocessing, matching pinned sklearn
+`_preprocess(lower=True)` (`doc.lower()`, without an accent function). SQLite's
+built-in ASCII-only `lower` is not overridden. This fixes non-ASCII uppercase
+text/tag candidates being excluded before the scorer can examine them.
+
+There is no schema migration, persistent normalized copy/index, dependency or
+raw-text rewrite. This is Unicode lowercasing, not casefold, NFC/NFKC conversion
+or accent removal. Existing punctuation/word rules, parameterized SQL, namespace
+scope, query windows and candidate limits remain unchanged. Actual sklearn
+preprocessing parity and SQLite reopen/update/runtime-prompt tests cover the path.

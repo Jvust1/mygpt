@@ -1,7 +1,7 @@
 """Bounded character TF-IDF ranking ported from scikit-learn.
 
 Sources at bbf8863a869f118a1a42422d8cc67ec6c07f2fe0:
-feature_extraction/text.py: _char_wb_ngrams, TfidfTransformer.fit/transform;
+feature_extraction/text.py: _preprocess, _char_wb_ngrams, TfidfTransformer.fit/transform;
 metrics/pairwise.py: cosine_similarity.
 Copyright (c) 2007-2026 The scikit-learn developers. BSD-3-Clause.
 See third_party/scikit-learn/LICENSE and NOTICE.md.
@@ -23,9 +23,21 @@ _WORDS = re.compile(r"[^\W_]+", re.UNICODE)
 _WHITE_SPACES = re.compile(r"\s\s+")
 
 
+def lowercase_lexical_text(text: str) -> str:
+    """sklearn _preprocess(lower=True), shared by SQL candidates and scoring.
+
+    SQLite's built-in lower() only handles ASCII. Keep the same Unicode
+    lowercase behavior at both retrieval stages; this is not accent stripping
+    or the stronger Unicode casefold operation.
+    """
+    if not isinstance(text, str):
+        raise ValueError("lexical text must be a string")
+    return text.lower()
+
+
 def normalize_memory_text(text: str) -> str:
     """Keep lexical evidence; punctuation alone must not recall private memory."""
-    return " ".join(_WORDS.findall(text.lower()))
+    return " ".join(_WORDS.findall(lowercase_lexical_text(text)))
 
 
 def char_wb_ngrams(text_document: str) -> list[str]:
