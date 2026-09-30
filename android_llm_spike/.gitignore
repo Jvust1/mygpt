@@ -1,0 +1,5 @@
+device_evidence/
+.gradle/
+build/
+**/build/
+local.properties
