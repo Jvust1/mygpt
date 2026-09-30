@@ -15,6 +15,7 @@ Local derived/modified files:
 - `android_spike/src/main/java/dev/mygpt/spike/LocalLlmEngine.java`
 - `android_spike/src/main/java/dev/mygpt/spike/SerializedLocalLlmEngine.java`
 - `android_spike/src/main/java/dev/mygpt/spike/GgufModelProbe.java`
+- `android_spike/src/main/java/dev/mygpt/spike/GgufModelInstaller.java`
 
 Material changes in MyGPT:
 
@@ -30,3 +31,7 @@ Material changes in MyGPT:
   justifies shipping llama.cpp native code.
 
 The upstream MIT license is reproduced in `third_party/llama.cpp/LICENSE`.
+
+- MyGPT adds an app-private installer around the GGUF probe: bounded streaming
+  copy, SHA-256 addressing, temporary-file cleanup, duplicate detection and
+  post-copy format verification. This installer is MyGPT integration code.
