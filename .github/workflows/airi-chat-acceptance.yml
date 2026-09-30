@@ -14,6 +14,7 @@ on:
       - 'brain/mygpt_brain/wakeword.py'
       - 'brain/mygpt_brain/vad.py'
       - 'brain/mygpt_brain/voice_activation.py'
+      - 'brain/mygpt_brain/turn_control.py'
       - 'brain/personas/**'
       - 'brain/tests/test_conversation.py'
       - 'brain/tests/test_memory_store.py'
@@ -24,6 +25,7 @@ on:
       - 'brain/tests/test_wakeword.py'
       - 'brain/tests/test_vad.py'
       - 'brain/tests/test_voice_activation.py'
+      - 'brain/tests/test_turn_control.py'
       - 'brain/tests/test_companion_service.py'
       - 'brain/scripts/serve_companion_ollama.py'
       - '.github/workflows/airi-chat-acceptance.yml'
@@ -57,7 +59,8 @@ jobs:
             tests/test_character_card.py \
             tests/test_wakeword.py \
             tests/test_vad.py \
-            tests/test_voice_activation.py
+            tests/test_voice_activation.py \
+            tests/test_turn_control.py
       - name: Compile new runtime modules
         working-directory: brain
         run: python -m compileall -q mygpt_brain scripts/chat_local_ollama.py scripts/serve_companion_ollama.py
