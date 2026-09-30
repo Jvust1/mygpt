@@ -1,3 +1,25 @@
+## Latest handoff · PR #15 · PiP + quiet-first supervision gate ready
+
+Current exact head: `4d26563d8c03453f27c9a31186a484004d6d1535`.
+
+Do not wait for hosted Actions; they still fail before runner allocation. Run:
+
+`android_llm_spike/scripts/build_and_install_companion_v2.ps1`
+
+The Windows script now automatically checks same-signature Book context and invokes:
+
+`android_llm_spike/scripts/test_companion_supervision.ps1`
+
+That supervision gate proves Book cannot independently turn on proactive supervision: the same signed repeated-error event remains QUIET before the MyGPT-local opt-in tap and becomes GENTLE_CHECK_IN only after that tap.
+
+After installing/importing the real skin/models, validate PiP above Book, run the local llama benchmark, test ASR/TTS/memory, then run:
+
+`android_llm_spike/scripts/collect_companion_v2_evidence.ps1`
+
+Main remains untouched; PR #15 remains Draft; Book/Live repositories are not modified.
+
+---
+
 ## Latest handoff · PR #15 · local-device gate ready
 
 Current head: `5b932e6f1bbe1ca7db645802475d50b322c32ec4`.

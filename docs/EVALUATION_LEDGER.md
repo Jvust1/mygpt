@@ -1,3 +1,38 @@
+## E018 — PiP + signed Book quiet-supervision device gate (2026-09-30)
+
+**Status:** CODE_READY / AUTOMATED_LOCAL_GATE_READY / REMOTE_RUNNER_UNAVAILABLE / DEVICE_NOT_RUN
+
+**Exact head:** `4d26563d8c03453f27c9a31186a484004d6d1535`
+
+### New executable acceptance surfaces
+- PiP character mode with no overlay permission.
+- signature-protected live Book context updates.
+- signature-protected explicit study events.
+- user-local per-session supervision opt-in.
+- 10-minute repeated-error gentle-check cooldown.
+- same-signature synthetic sender actions for study lifecycle.
+- Windows supervision script that checks:
+  1. adb-shell study event is not accepted;
+  2. SESSION_STARTED => QUIET, opt-in false;
+  3. repeated error before local opt-in => QUIET;
+  4. ADB UI automation taps the MyGPT-local supervision button;
+  5. repeated error after opt-in => GENTLE_CHECK_IN;
+  6. HELP => NEEDS_INPUT;
+  7. PAUSE => PAUSED;
+  8. RESUME => QUIET;
+  9. END => QUIET and opt-in false.
+
+### Remote evidence
+Current exact-head hosted jobs never executed repository code:
+- 36665189835: Companion V2, runner_id=0, 0 steps.
+- 36665189915: Android boundary, both jobs runner_id=0, 0 steps.
+- 36665189892: sherpa voice, runner_id=0, 0 steps.
+
+### Still required
+Run the Windows exact-head/device path, then collect Xiaomi 14 evidence for PiP, 3714430278, GGUF load/benchmark/chat, ASR/TTS, memory, Book context and supervision.
+
+---
+
 ## E017 — Companion V2 signed Book/local-device acceptance path (2026-09-30)
 
 **Status:** CODE_READY_FOR_LOCAL_BUILD / REMOTE_RUNNER_UNAVAILABLE / DEVICE_NOT_RUN

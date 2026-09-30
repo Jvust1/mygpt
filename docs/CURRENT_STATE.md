@@ -1,3 +1,23 @@
+## 2026-09-30 · Companion V2 PiP + signed Book quiet-supervision checkpoint · PR #15
+
+Exact head: `4d26563d8c03453f27c9a31186a484004d6d1535`.
+
+New since the prior local-device checkpoint:
+
+- **Android native PiP companion mode**: explicit button, 1:1 render-only character surface, skin-ready gate, no auto-enter, no SYSTEM_ALERT_WINDOW/Accessibility/screen-capture requirement. This is the first cross-App 3714430278 companion surface intended to sit above Book.
+- **live in-process Book updates**: the process-memory Book mailbox now notifies Companion V2 immediately when same-signature context changes/clears, including while PiP remains visible.
+- **signed Book study-event receiver**: Book may explicitly send start/context/pause/resume/end/help/repeated-error/revoke events; it cannot inject source_ref/body into the supervisor.
+- **quiet-first supervision**: repeated practice errors produce no prompt until the user explicitly turns on supervision inside MyGPT for the current session. Opt-in resets on end/revoke/new session; gentle prompts have a 10-minute cooldown.
+- **same-signature automated study sender** plus Xiaomi 14 script: the device gate proves shell-origin study events are rejected, sender-origin events are accepted, and the same repeated-error signal stays QUIET before a real local button tap but becomes GENTLE_CHECK_IN after that tap.
+- Windows acceptance now records exact source identity, requires JDK17/Android 36 native toolchain, verifies APK signing and runs automated Book context + supervision gates before manual model/voice/PiP testing.
+- Final evidence collection records permission boundary, audio non-persistence, benchmark presence and supervision gate status.
+
+Remote CI remains unavailable, not failing assertions. Exact-head runs `36665189835`, `36665189915` and `36665189892` all show `runner_id=0` and zero steps.
+
+Real Book/Live repositories remain untouched; real Book producer integration is still pending.
+
+---
+
 ## 2026-09-30 · Book signed bridge + durable conversation + local acceptance path · PR #15
 
 Exact head: `5b932e6f1bbe1ca7db645802475d50b322c32ec4`.

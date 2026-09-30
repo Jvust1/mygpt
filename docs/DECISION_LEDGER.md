@@ -108,3 +108,9 @@ The pinned llama.cpp Android AiChat implementation retains a process-wide static
 
 ## D036 — default on-device GGUF is benchmark-gated
 MyGPT does not name a default Xiaomi 14 GGUF before device evidence exists. Candidate models must be compared using the local llama benchmark plus real-chat first-token latency, sustained memory/thermal behavior, crash/OOM behavior and reply quality. Benchmark reports stay app-private unless the user explicitly collects the local evidence directory.
+
+## D037 — native PiP is the first cross-app companion surface
+Companion V2 uses Android Picture-in-Picture as the first cross-application 3714430278 surface. PiP requires explicit user entry, shows only the character render shell, does not auto-enter, and does not require SYSTEM_ALERT_WINDOW, Accessibility, screen capture or a background overlay service. System-overlay approaches remain a later separately permission-gated option.
+
+## D038 — supervision is explicit Book signal + local MyGPT consent
+MyGPT does not infer attention, motivation or failure from inactivity, screen observation or time spent. Supervision cues are driven only by same-signature explicit Book study events plus MyGPT-local per-session user consent. Book cannot enable supervision. PRACTICE_REPEATED_ERROR stays QUIET without opt-in and can yield GENTLE_CHECK_IN only after local opt-in and the cooldown gate. End/revoke clears consent.
