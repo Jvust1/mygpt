@@ -1,3 +1,19 @@
+## Latest handoff · verified 3714430278 auto-bundle path · 2026-09-30
+
+Branch/head: `feat/airi-chat-memory-brain-20260929` @ `90e5a8dc2528951fa664412a8ae66ec45a018e01`; Draft PR #15; main untouched.
+
+Use `android_llm_spike/scripts/build_and_install_companion_v2.ps1`. If Google Drive Desktop exposes the verified `Live/skin/workshop/3714430278/3714430278.zip`, the script should find it automatically. You can also pass `-SkinZip` or `MYGPT_SKIN_ZIP`.
+
+A skin is never bundled by filename alone: exact 12,342,220-byte size and fixed SHA-256 are required before copying, and the APK entry is SHA-verified again after build. The binary stays outside Git.
+
+With a bundled skin, Companion V2 auto-installs it at first launch and the Windows acceptance route automatically exercises PiP above the Book test sender. If no local verified ZIP is available, the APK remains valid and exposes the manual picker.
+
+Next unresolved device inputs are a benchmark candidate **chat** GGUF and sherpa ASR/optional TTS model packages. Do not use the Drive Qwen-Image GGUF as the conversation brain.
+
+Do not merge PR #15 before Xiaomi 14 evidence.
+
+---
+
 ## Latest handoff · pre-device hardening complete · 2026-09-30
 
 Current exact head: `4efd70b716ab35f94af7556ee7ed5149e77d60a9`; Draft PR #15; main untouched.

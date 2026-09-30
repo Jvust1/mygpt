@@ -1,3 +1,25 @@
+## 2026-09-30 · verified 3714430278 self-contained local build path · PR #15
+
+Exact head: `90e5a8dc2528951fa664412a8ae66ec45a018e01`.
+
+The primary skin no longer has to be manually selected on a Windows/Xiaomi 14 acceptance build.
+
+The authenticated Drive source was verified as:
+- Drive file id: `1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt`
+- hierarchy: `My Drive/Live/skin/workshop/3714430278/3714430278.zip`
+- bytes: `12342220`
+- SHA-256: `eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+
+The ZIP is **not committed to Git**. The Windows build optionally discovers it from an explicit `-SkinZip`, `MYGPT_SKIN_ZIP`, or allowlisted Google Drive Desktop paths. It is copied only into the module build directory after exact size+SHA verification. The built APK is then reopened and `assets/3714430278.zip` is independently SHA-verified again.
+
+At runtime Companion V2 validates any already-installed app-private 3714430278 first; otherwise it attempts to install the bundled asset through the same production `SpinePackageLayout.install()` gates. An unbundled build retains the manual SAF picker.
+
+When a verified skin is bundled, the Windows acceptance route automatically runs the PiP-over-Book gate. Final evidence now stays in the same build evidence directory.
+
+Remaining large external inputs are the chat GGUF and sherpa ASR/optional TTS. Drive search found image-oriented Qwen-Image GGUF but no accepted conversational default, and no matching sherpa model packages; these remain benchmark/import gates rather than guessed defaults.
+
+---
+
 ## 2026-09-30 · pre-device hardening checkpoint · PR #15
 
 Exact head: `4efd70b716ab35f94af7556ee7ed5149e77d60a9`.

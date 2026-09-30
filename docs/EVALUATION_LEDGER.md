@@ -1,3 +1,30 @@
+## E021 — verified private-skin build injection checkpoint (2026-09-30)
+
+**Exact head:** `90e5a8dc2528951fa664412a8ae66ec45a018e01`
+
+**Drive source verified**
+- file id `1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt`
+- 12,342,220 bytes
+- SHA-256 `eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f`
+- exact match to `SpinePackageLayout.EXPECTED_ARCHIVE_SHA256`.
+
+**Implemented**
+- no skin binary added to Git;
+- optional Windows private build-input discovery;
+- stale generated asset removed before each build;
+- exact input size/SHA gate;
+- optional generated APK asset;
+- post-build APK entry SHA gate;
+- first-run bundled skin auto-install through production package validation;
+- manual SAF fallback remains;
+- bundled Windows path automatically invokes PiP acceptance;
+- one evidence directory carries build + later device evidence.
+
+**Not accepted yet**
+No exact-head Windows build or Xiaomi 14 run has executed. Hosted Actions remain a runner-allocation blocker and provide no code result.
+
+---
+
 ## E021 — Companion V2 pre-device hardening checkpoint (2026-09-30)
 
 **Exact head:** `4efd70b716ab35f94af7556ee7ed5149e77d60a9`  

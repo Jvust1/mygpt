@@ -4,8 +4,8 @@
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/airi-chat-memory-brain-20260929",
-  "phase": "COMPANION_V2_PRE_DEVICE_HARDENING_XIAOMI14_GATE",
-  "status": "DRAFT_HARDENED_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
+  "phase": "COMPANION_V2_SELFCONTAINED_SKIN_XIAOMI14_GATE",
+  "status": "DRAFT_VERIFIED_SKIN_AUTOBUNDLE_READY_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -93,7 +93,9 @@
     "Companion V2 / llama / sherpa / prompt-budget current code has not yet run on Xiaomi 14.",
     "Jvust/Book has not yet adopted book-client-sdk-release.aar or proven a matching signing identity.",
     "No default GGUF is accepted before Xiaomi 14 latency/RAM/thermal measurements.",
-    "GitHub hosted Actions still fail before runner allocation (runner_id=0, zero steps)."
+    "GitHub hosted Actions still fail before runner allocation (runner_id=0, zero steps).",
+    "Suitable conversational GGUF remains benchmark-gated; current Drive GGUF search found image-model GGUF but no accepted chat default.",
+    "Required sherpa zh/en ASR and optional Melo TTS model packages are not yet present in the searched Drive model vault and remain external inputs."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -115,7 +117,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Build exact head 4efd70b716ab35f94af7556ee7ed5149e77d60a9 on Windows with android_llm_spike/scripts/build_and_install_companion_v2.ps1, then run the automated Book/supervision gates. Import 3714430278 and run test_companion_pip.ps1. Import a benchmark candidate GGUF plus sherpa ASR/TTS packages, verify prompt-budget/fingerprint reports, run local chat/voice/memory and collect final evidence. Do not merge before Xiaomi 14 evidence exists.",
+  "next_step": "Build exact head 90e5a8dc2528951fa664412a8ae66ec45a018e01 on Windows using android_llm_spike/scripts/build_and_install_companion_v2.ps1. The script can auto-discover the verified Drive Desktop skin at My Drive/Live/skin/workshop/3714430278/3714430278.zip, or accept -SkinZip / MYGPT_SKIN_ZIP, and will inject it only after exact size/SHA verification. If bundled, Companion V2 auto-installs 3714430278 and the Windows route automatically runs the PiP-over-Book gate. Then benchmark a real chat GGUF and import sherpa ASR/optional TTS; reuse the same evidence directory for collect_companion_v2_evidence.ps1. Do not merge before Xiaomi 14 evidence exists.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -907,7 +909,7 @@
     "branch": "feat/airi-chat-memory-brain-20260929",
     "draft_pr": 15,
     "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-    "exact_head": "4efd70b716ab35f94af7556ee7ed5149e77d60a9",
+    "exact_head": "90e5a8dc2528951fa664412a8ae66ec45a018e01",
     "target": "All-local Android companion: Book-aware chat + 3714430278 + on-device LLM + ASR/TTS + explicit memory",
     "android": {
       "module": "android_llm_spike/companion",
@@ -979,7 +981,7 @@
       }
     ],
     "model_inputs": {
-      "skin": "3714430278.zip (app-private validated Spine package)",
+      "skin": "3714430278.zip: verified Drive private source, optional build-time bundle + runtime auto-install, manual SAF fallback",
       "llm": "user-selected GGUF; header-probed, bounded copy, SHA-256 addressed",
       "asr": "external sherpa streaming zh/en model archive",
       "tts": "external vits-melo-tts-zh_en model archive",
@@ -988,7 +990,11 @@
         "TAR.BZ2",
         "TAR.GZ"
       ],
-      "weights_committed_to_git": false
+      "weights_committed_to_git": false,
+      "skin_drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+      "skin_size_bytes": 12342220,
+      "skin_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+      "skin_binary_committed_to_git": false
     },
     "memory": {
       "android_store": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt",
@@ -1170,10 +1176,16 @@
         "quiet-first supervision shell-negative + sender-positive + local-user opt-in agency gate",
         "Book context clear + unavailable UI marker",
         "book-client-sdk AAR build + SHA-256 evidence",
-        "synthetic same-signature sender uses BookCompanionClient SDK for context/study events"
+        "synthetic same-signature sender uses BookCompanionClient SDK for context/study events",
+        "verified local Drive 3714430278 auto-discovery or explicit -SkinZip",
+        "skin exact size/SHA verification before APK injection",
+        "bundled APK skin entry SHA-256 re-verification",
+        "runtime bundled skin auto-install through SpinePackageLayout",
+        "automatic PiP-over-Book gate when skin is bundled",
+        "single evidence directory reused by final collector"
       ],
       "device": "Xiaomi 14",
-      "status": "READY_TO_EXECUTE_WITH_BOOK_SDK_NOT_RUN",
+      "status": "READY_TO_EXECUTE_SELFCONTAINED_SKIN_OPTION_NOT_RUN",
       "supervision_gate_persisted_marker": "Book test sender files/adb-supervision-gate.txt"
     },
     "cross_app_companion": {
@@ -1366,5 +1378,29 @@
       "interrupted_exchange_persisted": false
     },
     "explicit_pip_microphone_rule": "Entering PiP stops microphone capture before the system PiP transition."
+  },
+  "verified_primary_skin_bundle": {
+    "skin_id": "3714430278",
+    "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+    "drive_hierarchy": "My Drive/Live/skin/workshop/3714430278/3714430278.zip",
+    "size_bytes": 12342220,
+    "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+    "source_binary_committed_to_git": false,
+    "windows_build_discovery": [
+      "-SkinZip",
+      "MYGPT_SKIN_ZIP",
+      "allowlisted Google Drive Desktop paths"
+    ],
+    "build_generated_asset": "companion/build/generated/bundled-skin-assets/3714430278.zip",
+    "apk_asset": "assets/3714430278.zip",
+    "build_gates": [
+      "source bytes exact size",
+      "source SHA-256 exact",
+      "APK entry exists only when selected",
+      "APK entry exact size",
+      "APK entry SHA-256 exact"
+    ],
+    "runtime_policy": "validate existing app-private skin first; otherwise install bundled asset through production SpinePackageLayout; manual SAF fallback if unbundled",
+    "device_test": "NOT_RUN"
   }
 }
