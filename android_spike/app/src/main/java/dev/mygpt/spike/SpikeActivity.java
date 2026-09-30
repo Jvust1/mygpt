@@ -34,8 +34,12 @@ import java.io.InputStream;
  */
 public final class SpikeActivity extends AndroidApplication {
     private static final int OPEN_SKIN_REQUEST = 3714;
+    private static final int OPEN_MODEL_REQUEST = 3715;
+    private static final long MAX_GGUF_IMPORT_BYTES = 16L * 1024L * 1024L * 1024L;
     private static final String PREFS = "mygpt_spike";
     private static final String PREF_SKIN_URI = "skin_3714430278_uri";
+    private static final String PREF_MODEL_PATH = "local_gguf_path";
+    private static final String PREF_MODEL_SHA256 = "local_gguf_sha256";
 
     private static final int BG = Color.rgb(246, 247, 243);
     private static final int SURFACE = Color.rgb(255, 255, 252);
@@ -51,6 +55,7 @@ public final class SpikeActivity extends AndroidApplication {
     private CompanionCoordinator coordinator;
     private TextView character;
     private TextView status;
+    private TextView modelStatus;
     private Switch optIn;
     private SpineSkinApplication spineApp;
     private SpineCharacterRuntime characterRuntime;
@@ -280,6 +285,34 @@ public final class SpikeActivity extends AndroidApplication {
         skinParams.setMargins(dp(14), dp(8), dp(14), dp(14));
         roleCard.addView(skinButton, skinParams);
 
+        TextView sectionModel = sectionTitle("本地模型");
+        page.addView(sectionModel, topMargin(22));
+
+        LinearLayout modelCard = card(SURFACE, 20);
+        page.addView(modelCard, topMargin(10));
+
+        LinearLayout modelText = new LinearLayout(this);
+        modelText.setOrientation(LinearLayout.VERTICAL);
+        modelText.setPadding(dp(16), dp(14), dp(16), dp(6));
+        modelCard.addView(modelText);
+        modelText.addView(label("GGUF · 手机本地推理候选", 15, INK, true));
+        TextView modelHint = label(
+                "只导入到 App 私有目录并校验格式/哈希；当前版本尚未接入 llama.cpp JNI 推理。",
+                12, MUTED, false);
+        modelHint.setPadding(0, dp(3), 0, 0);
+        modelText.addView(modelHint);
+
+        modelStatus = label("尚未导入本地模型", 12, PRIMARY, false);
+        modelStatus.setPadding(dp(16), dp(6), dp(16), dp(4));
+        modelCard.addView(modelStatus);
+
+        Button modelButton = actionButton("选择本地 GGUF 模型", ButtonStyle.OUTLINE,
+                this::openModelPackage);
+        LinearLayout.LayoutParams modelParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(50));
+        modelParams.setMargins(dp(14), dp(8), dp(14), dp(14));
+        modelCard.addView(modelButton, modelParams);
+
         LinearLayout previewNote = card(WARM_SOFT, 16);
         LinearLayout.LayoutParams previewParams = topMargin(18);
         page.addView(previewNote, previewParams);
@@ -295,6 +328,7 @@ public final class SpikeActivity extends AndroidApplication {
         previewNote.addView(previewBody);
 
         loadBundledOrInstalledSkin();
+        restoreInstalledModelStatus();
     }
 
     private void buildHeader(LinearLayout page) {
@@ -372,18 +406,92 @@ public final class SpikeActivity extends AndroidApplication {
         startActivityForResult(intent, OPEN_SKIN_REQUEST);
     }
 
+    private void openModelPackage() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                new String[]{"application/octet-stream", "application/x-gguf"});
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(intent, OPEN_MODEL_REQUEST);
+    }
+
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != OPEN_SKIN_REQUEST || resultCode != RESULT_OK || data == null
-                || data.getData() == null) return;
+        if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
         Uri uri = data.getData();
-        try {
-            int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            getContentResolver().takePersistableUriPermission(uri, flags);
-        } catch (SecurityException ignored) {
+
+        if (requestCode == OPEN_SKIN_REQUEST) {
+            try {
+                int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                getContentResolver().takePersistableUriPermission(uri, flags);
+            } catch (SecurityException ignored) {
+            }
+            loadSkin(uri, true);
+            return;
         }
-        loadSkin(uri, true);
+        if (requestCode == OPEN_MODEL_REQUEST) {
+            importGgufModel(uri);
+        }
+    }
+
+    private void restoreInstalledModelStatus() {
+        String path = getSharedPreferences(PREFS, MODE_PRIVATE)
+                .getString(PREF_MODEL_PATH, null);
+        String hash = getSharedPreferences(PREFS, MODE_PRIVATE)
+                .getString(PREF_MODEL_SHA256, null);
+        if (path == null || hash == null) return;
+        File file = new File(path);
+        new Thread(() -> {
+            try {
+                GgufModelProbe.Header header = GgufModelProbe.probe(file);
+                String summary = "已导入 · GGUF v" + header.version
+                        + " · tensors " + header.tensorCount
+                        + " · SHA-256 " + hash.substring(0, Math.min(12, hash.length())) + "…";
+                runOnUiThread(() -> {
+                    if (modelStatus != null) modelStatus.setText(summary);
+                });
+            } catch (Throwable error) {
+                getSharedPreferences(PREFS, MODE_PRIVATE).edit()
+                        .remove(PREF_MODEL_PATH)
+                        .remove(PREF_MODEL_SHA256)
+                        .apply();
+                runOnUiThread(() -> {
+                    if (modelStatus != null) modelStatus.setText("已保存的模型不可用，请重新导入");
+                });
+            }
+        }, "mygpt-model-status").start();
+    }
+
+    private void importGgufModel(Uri uri) {
+        if (modelStatus != null) modelStatus.setText("正在校验并导入 GGUF…");
+        new Thread(() -> {
+            try (InputStream input = getContentResolver().openInputStream(uri)) {
+                if (input == null) throw new IllegalStateException("无法打开所选模型");
+                File modelDir = new File(getFilesDir(), "models");
+                GgufModelInstaller.InstalledModel installed =
+                        GgufModelInstaller.install(input, modelDir, MAX_GGUF_IMPORT_BYTES);
+                getSharedPreferences(PREFS, MODE_PRIVATE).edit()
+                        .putString(PREF_MODEL_PATH, installed.file.getAbsolutePath())
+                        .putString(PREF_MODEL_SHA256, installed.sha256)
+                        .apply();
+                String summary = "已导入 · GGUF v" + installed.header.version
+                        + " · tensors " + installed.header.tensorCount
+                        + " · " + (installed.sizeBytes / (1024L * 1024L)) + " MiB"
+                        + " · SHA-256 " + installed.sha256.substring(0, 12) + "…";
+                runOnUiThread(() -> {
+                    if (modelStatus != null) modelStatus.setText(summary);
+                });
+            } catch (Throwable error) {
+                runOnUiThread(() -> {
+                    if (modelStatus != null) {
+                        modelStatus.setText("模型导入失败 · "
+                                + error.getClass().getSimpleName() + " · " + safeMessage(error));
+                    }
+                });
+            }
+        }, "mygpt-gguf-import").start();
     }
 
     private void loadSkin(Uri uri, boolean remember) {
