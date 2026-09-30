@@ -58,6 +58,7 @@ fi
   android_spike/src/test/java/dev/mygpt/spike/OnDeviceCompanionBrainSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/AiriActGoldenSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/LexicalMemoryScorerSmoke.java \
+  android_spike/src/test/java/dev/mygpt/spike/AiriHistoryBudgetSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/GgufModelProbeSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/GgufModelInstallerSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/BookContextMailboxSmoke.java \
@@ -88,3 +89,5 @@ java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.voicespike.S
 java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.voicespike.AudioFloatResamplerSmoke
 
 java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.spike.LexicalMemoryScorerSmoke android_spike/src/test/resources/lexical-memory-golden.json
+
+java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.spike.AiriHistoryBudgetSmoke android_spike/src/test/resources/airi-history-golden.json

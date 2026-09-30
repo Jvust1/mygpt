@@ -99,3 +99,25 @@ full MIT license remains adjacent in this directory. Python tests compare the
 port and budget mapping against the actual source on randomized paired histories.
 
 Eligibility rechecked 2026-09-30 20:14 UTC: **49,890 stars**, MIT, not archived.
+
+
+## Android paired-history budgeting (2026-09-30)
+
+`CompanionPromptBudget.recentHistoryStart` directly ports the reverse scan from
+`keepRecentHistoryItems` in the unchanged pinned `compaction.ts` (Git blob
+`59a76a9877086f66b5abc09b0f22802e4e27df7d`). The existing Android composer invokes
+this scan while selecting recent user turns with their following assistant
+reactions; it no longer spends the entire history budget on an orphan reply.
+
+Android adaptation uses list indices, omits assistant-only legacy prefixes, and
+fits/truncates each complete positional group under the existing character cap.
+It may omit a group if even its minimum representation cannot fit. Current user
+text and durable history are untouched. Valid surrogate pairs stay intact when
+history/memory snippets are clipped. This does not add semantic summarization or
+validate arbitrary reply-to graphs. Full MIT attribution already reaches every
+shared-source Android consumer through direct/inherited AIRI asset notices.
+
+`android_spike/tools/airi_history_oracle.mjs` executes the unchanged upstream
+TypeScript with Node 24 type stripping, without npm, to verify 128 deterministic
+Android suffix-selection fixtures. The actual Java prompt composer additionally
+runs bounded-history/authority/Unicode projection regressions.
