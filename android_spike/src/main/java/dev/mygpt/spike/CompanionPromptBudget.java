@@ -384,28 +384,82 @@ public final class CompanionPromptBudget {
             return new BlockResult("", 0);
         }
 
-        List<String> newestFirst = new ArrayList<>();
+        List<String> newestGroups = new ArrayList<>();
         int used = prefix.length() + suffix.length();
-
-        for (int i = history.size() - 1; i >= 0; i--) {
-            HistoryTurn turn = history.get(i);
-            int comma = newestFirst.isEmpty() ? 0 : 1;
-            int remaining = maxChars - used - comma;
-            String item = fitJsonItem(turn.role, turn.text, remaining, 520);
-            if (item == null) break;
-            newestFirst.add(item);
-            used += comma + item.length();
+        int included = 0;
+        int end = history.size();
+        while (end > 0) {
+            int start = recentHistoryStart(history, end, 1);
+            // Android has only user/assistant rows. A legacy assistant-only
+            // prefix has no corresponding question and is not a usable group.
+            if (start < 0) break;
+            int comma = newestGroups.isEmpty() ? 0 : 1;
+            String group = fitHistoryGroup(history, start, end, maxChars - used - comma);
+            if (group == null) break;
+            newestGroups.add(group);
+            used += comma + group.length();
+            included += end - start;
+            end = start;
         }
+        if (newestGroups.isEmpty()) return new BlockResult("", 0);
+        Collections.reverse(newestGroups);
+        return new BlockResult(prefix + join(newestGroups) + suffix, included);
+    }
 
-        if (newestFirst.isEmpty()) {
-            return new BlockResult("", 0);
+    /**
+     * AIRI keepRecentHistoryItems reverse scan: count user turns, retain their
+     * following reactions as one suffix. Port from compaction.ts at
+     * b40e3e87b149ea5fb75d4944440493829e601411 (blob 59a76a9877086f66b5abc09b0f22802e4e27df7d).
+     * Copyright (c) 2024-PRESENT Neko Ayaka. MIT; see third_party/airi/LICENSE.
+     * Android adaptation returns an index and rejects an orphan-only prefix.
+     */
+    static int recentHistoryStart(List<HistoryTurn> history, int end, int recentTurnLimit) {
+        if (history == null || end < 0 || end > history.size() || recentTurnLimit <= 0)
+            throw new IllegalArgumentException("invalid recent history window");
+        int turns = 0;
+        int oldestUser = -1;
+        for (int index = end - 1; index >= 0; index--) {
+            if ("user".equals(history.get(index).role)) {
+                oldestUser = index;
+                turns++;
+                if (turns >= recentTurnLimit) return index;
+            }
         }
+        return oldestUser;
+    }
 
-        Collections.reverse(newestFirst);
-        return new BlockResult(
-                prefix + join(newestFirst) + suffix,
-                newestFirst.size()
-        );
+    /** Fit an entire positional user/reaction group, never a lone reply. */
+    private static String fitHistoryGroup(List<HistoryTurn> history, int start, int end, int maxChars) {
+        int low = 2; // enough UTF-16 space for a supplementary first code point
+        int high = 520;
+        String best = null;
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            StringBuilder candidate = new StringBuilder();
+            for (int index = start; index < end; index++) {
+                if (index > start) candidate.append(',');
+                HistoryTurn turn = history.get(index);
+                int length = safePrefixLength(turn.text, Math.min(turn.text.length(), mid));
+                candidate.append("{\"type\":\"").append(json(turn.role))
+                        .append("\",\"text\":\"").append(json(turn.text.substring(0, length)))
+                        .append("\",\"truncated\":").append(length < turn.text.length()).append('}');
+                if (candidate.length() > maxChars) break;
+            }
+            if (candidate.length() <= maxChars) {
+                best = candidate.toString();
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return best;
+    }
+
+    private static int safePrefixLength(String text, int length) {
+        if (length > 0 && length < text.length()
+                && Character.isHighSurrogate(text.charAt(length - 1))
+                && Character.isLowSurrogate(text.charAt(length))) return length - 1;
+        return length;
     }
 
     private static String fitJsonItem(
@@ -422,11 +476,12 @@ public final class CompanionPromptBudget {
 
         while (low <= high) {
             int mid = low + (high - low) / 2;
-            String body = text.substring(0, mid);
+            int length = safePrefixLength(text, mid);
+            String body = text.substring(0, length);
             String candidate =
                     "{\"type\":\"" + json(label) + "\",\"text\":\""
                     + json(body) + "\",\"truncated\":"
-                    + (mid < text.length())
+                    + (length < text.length())
                     + "}";
             if (candidate.length() <= maxRenderedChars) {
                 best = candidate;

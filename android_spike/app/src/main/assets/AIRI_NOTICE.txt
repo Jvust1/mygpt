@@ -3,3 +3,8 @@ Copyright (c) 2024-PRESENT Neko Ayaka. MIT license; see AIRI_LICENSE.txt.
 Emotion-control parsing/normalization is adapted from queues.ts at
 b40e3e87b149ea5fb75d4944440493829e601411, with MyGPT's bounded quote-aware scanner
 and strict JSON boundary. These hints do not execute actions or grant permissions.
+
+Android history budgeting also ports keepRecentHistoryItems from compaction.ts
+at the same AIRI commit (blob 59a76a9877086f66b5abc09b0f22802e4e27df7d).
+It retains positional user/assistant groups under the existing prompt budget,
+with local bounded text clipping and omission of orphan-only legacy prefixes.

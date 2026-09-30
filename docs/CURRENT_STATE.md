@@ -1,3 +1,14 @@
+## 2026-09-30 · Android history retains question/reaction groups
+
+The actual Android prompt composer now uses the pinned AIRI reverse scan to fit
+whole positional user/assistant groups. A reproduced 1024-character-budget case
+no longer sends an orphan assistant reply. Full current user text and hard prompt
+limits remain intact; clipped history/memory text preserves valid surrogate pairs.
+Actual AIRI fixtures and Java budget projections exercise the existing runtime
+path. See [source adaptation and limits](ANDROID_AIRI_HISTORY_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · Android lexical memory uses the fused scorer
 
 Companion V2's existing SQLite memory search now invokes the Java-8 port of the
