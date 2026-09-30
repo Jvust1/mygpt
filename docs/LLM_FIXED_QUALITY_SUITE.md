@@ -63,3 +63,8 @@ pass execution. Human comparison of the captured text remains required.
 The final Companion evidence collector pulls all valid
 `llm-quality-speed/balanced/quality.json` files and reports
 `quality_matrix_count`.
+
+
+## Side-by-side report
+
+After selected matrix candidates finish, `run_llm_matrix.ps1` generates `llm-quality-comparison.md`. For each fixed case it shows candidate/model, wall time, AIRI emotion, and the full visible reply. The report deliberately contains no score, rank, or winner; read it together with RAM/thermal/latency evidence.

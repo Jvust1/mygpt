@@ -50,6 +50,7 @@ foreach($Candidate in $Candidates){
 }
 
 $QualitySampleCount = 0
+$QualityByCandidate = [ordered]@{}
 foreach ($Candidate in $Passed) {
     $QualityPath = Join-Path $OutputDirectory ("llm-quality-" + $Candidate + ".json")
     if (-not (Test-Path -LiteralPath $QualityPath -PathType Leaf)) {
@@ -67,8 +68,75 @@ foreach ($Candidate in $Passed) {
         @($QualityJson.cases).Count -ne 5) {
         throw "Quality sample identity/completion mismatch: $Candidate"
     }
+    $QualityByCandidate[$Candidate] = $QualityJson
     $QualitySampleCount++
 }
+
+function Convert-ToMarkdownCell {
+    param([object]$Value)
+    $Text = [string]$Value
+    $Text = $Text -replace '\\', '\\\\'
+    $Text = $Text -replace '\|', '\\|'
+    $Text = $Text -replace "\r?\n", "<br>"
+    return $Text.Trim()
+}
+
+$CaseOrder = @(
+    "companion_minimum_step",
+    "teach_banach_from_book",
+    "book_authority_boundary",
+    "memory_authority_boundary",
+    "signed_help_signal"
+)
+
+$ReportLines = New-Object System.Collections.Generic.List[string]
+$ReportLines.Add("# MyGPT Xiaomi 14 LLM quality comparison")
+$ReportLines.Add("")
+$ReportLines.Add("> Raw fixed-suite comparison only. No automatic score, rank, or winner.")
+$ReportLines.Add("")
+$ReportLines.Add("Device serial: " + $DeviceSerial)
+$ReportLines.Add("")
+$ReportLines.Add("Candidates: " + ($Passed -join ", "))
+$ReportLines.Add("")
+
+foreach ($CaseId in $CaseOrder) {
+    $ReferenceCase = $null
+    foreach ($Candidate in $Passed) {
+        $Match = @($QualityByCandidate[$Candidate].cases | Where-Object { $_.id -eq $CaseId })
+        if ($Match.Count -eq 1) { $ReferenceCase = $Match[0]; break }
+    }
+    if ($null -eq $ReferenceCase) { throw "Quality comparison case missing: $CaseId" }
+
+    $ReportLines.Add("## " + $CaseId)
+    $ReportLines.Add("")
+    $ReportLines.Add("Focus: " + (Convert-ToMarkdownCell $ReferenceCase.focus))
+    $ReportLines.Add("")
+    $ReportLines.Add("| Candidate | Model | Wall ms | Emotion | Visible reply |")
+    $ReportLines.Add("| --- | --- | ---: | --- | --- |")
+
+    foreach ($Candidate in $Passed) {
+        $Json = $QualityByCandidate[$Candidate]
+        $Match = @($Json.cases | Where-Object { $_.id -eq $CaseId })
+        if ($Match.Count -ne 1) { throw "Quality comparison mismatch: $Candidate / $CaseId" }
+        $Case = $Match[0]
+        $ReportLines.Add(
+            "| " + (Convert-ToMarkdownCell $Candidate)
+            + " | " + (Convert-ToMarkdownCell $Json.candidate_label)
+            + " | " + [string]$Case.wall_ms
+            + " | " + (Convert-ToMarkdownCell $Case.emotion)
+            + " | " + (Convert-ToMarkdownCell $Case.visible_reply)
+            + " |"
+        )
+    }
+    $ReportLines.Add("")
+}
+
+$ReportLines.Add("## Notes")
+$ReportLines.Add("")
+$ReportLines.Add("- automatic_quality_ranking=DISABLED")
+$ReportLines.Add("- Compare wording, authority-boundary behavior, Book grounding, companion tone, latency/RAM/thermal together.")
+$ReportLines.Add("- Do not choose a default solely from parameter count or this text sample.")
+$ReportLines | Out-File (Join-Path $OutputDirectory "llm-quality-comparison.md") -Encoding utf8
 
 $Summary=@(
     "schema=mygpt.llm-benchmark-matrix.v2",
