@@ -20,3 +20,5 @@ project(":llama-lib").projectDir =
 include(":bridge")
 
 include(":app")
+
+include(":companion")
