@@ -1,3 +1,14 @@
+## 2026-09-30 · coherent companion fusion acceptance
+
+The existing stack now has integrated voice→memory→Ollama-adapter→emotion→TTS→
+SQLite-restart/native-replay and Book-native-context stories. Full strict Brain
+passes 686/0/0; actual-upstream/story gates pass 37/0/0; the shared Java runner
+passes 18 entrypoints and 327 parity cases. One top-stack workflow reuses the
+Java 8/17 gate with the Python/oracle checks. Model replies/audio generation and
+Book inputs remain synthetic; no APK/device acceptance is implied. See [candidate scope and reproduction](COMPANION_FUSION_CANDIDATE_20260930.md).
+
+---
+
 ## 2026-09-30 · Android AIRI boundary compiles with strict Gson
 
 The shared Android ACT parser's inherited 22 syntax errors are repaired. Actual
