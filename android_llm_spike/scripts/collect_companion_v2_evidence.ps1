@@ -265,6 +265,19 @@ else {
     $BookGateStatus = "UNKNOWN_OR_NOT_RUN"
 }
 
+$VoiceLoopbackGate = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/adb-voice-loopback-gate.txt 2>&1
+$VoiceLoopbackGateText = ($VoiceLoopbackGate | Out-String).Trim()
+if ($LASTEXITCODE -eq 0 -and $VoiceLoopbackGateText -eq "PASS") {
+    $VoiceLoopbackStatus = "PASS"
+    $VoiceLoopbackGate | Out-File (Join-Path $OutputDirectory "voice-loopback-gate.txt") -Encoding utf8
+    $VoiceLoopbackResult = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/voice-loopback-result.json 2>&1
+    $VoiceLoopbackResult | Out-File (Join-Path $OutputDirectory "voice-loopback-result.json") -Encoding utf8
+}
+else {
+    $VoiceLoopbackStatus = "UNKNOWN_OR_NOT_RUN"
+    $VoiceLoopbackGate | Out-File (Join-Path $OutputDirectory "voice-loopback-gate-error.txt") -Encoding utf8
+}
+
 $AsrGateValue = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/adb-voice-model-gate-asr.txt 2>&1
 $AsrGateStatus = if ($LASTEXITCODE -eq 0 -and (($AsrGateValue | Out-String).Trim() -eq "PASS")) {
     "PASS"
@@ -355,6 +368,7 @@ $Summary = @(
     "llm_gate_quality=$($LlmGateStatus['quality'])",
     "llm_gate_pass_count=$LlmGatePassCount",
     "prompt_budget=$PromptBudgetStatus",
+    "voice_loopback=$VoiceLoopbackStatus",
     "asr_model_gate=$AsrGateStatus",
     "tts_model_gate=$TtsGateStatus",
     "asr_model_manifest=$AsrManifestStatus",
@@ -379,6 +393,7 @@ Write-Host "llm_gate_balanced=$($LlmGateStatus['balanced'])"
 Write-Host "llm_gate_quality=$($LlmGateStatus['quality'])"
 Write-Host "llm_gate_pass_count=$LlmGatePassCount"
 Write-Host "prompt_budget=$PromptBudgetStatus"
+Write-Host "voice_loopback=$VoiceLoopbackStatus"
 Write-Host "asr_model_gate=$AsrGateStatus"
 Write-Host "tts_model_gate=$TtsGateStatus"
 Write-Host "asr_model_manifest=$AsrManifestStatus"

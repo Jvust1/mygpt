@@ -341,15 +341,21 @@ $ReleaseDexAscii = Get-ApkDexAscii $CompanionReleaseApk
 $DebugReceiverMarker = "DebugModelImportReceiver"
 $DebugActionMarker = "dev.mygpt.companionv2.debug.IMPORT_ACCEPTANCE_MODEL_V1"
 $DebugVoiceMarker = "DebugVoiceModelImportActivity"
+$DebugQualityMarker = "DebugLlmQualityEvalActivity"
+$DebugLoopbackMarker = "DebugVoiceLoopbackActivity"
 
 if (-not $DebugDexAscii.Contains($DebugReceiverMarker) -or
     -not $DebugDexAscii.Contains($DebugActionMarker) -or
-    -not $DebugDexAscii.Contains($DebugVoiceMarker)) {
+    -not $DebugDexAscii.Contains($DebugVoiceMarker) -or
+    -not $DebugDexAscii.Contains($DebugQualityMarker) -or
+    -not $DebugDexAscii.Contains($DebugLoopbackMarker)) {
     throw "Debug Companion APK is missing an acceptance-only importer."
 }
 if ($ReleaseDexAscii.Contains($DebugReceiverMarker) -or
     $ReleaseDexAscii.Contains($DebugActionMarker) -or
-    $ReleaseDexAscii.Contains($DebugVoiceMarker)) {
+    $ReleaseDexAscii.Contains($DebugVoiceMarker) -or
+    $ReleaseDexAscii.Contains($DebugQualityMarker) -or
+    $ReleaseDexAscii.Contains($DebugLoopbackMarker)) {
     throw "SECURITY FAILURE: debug acceptance importer leaked into release Companion APK."
 }
 Write-Host "Debug/release acceptance receiver isolation PASS" -ForegroundColor Green
@@ -418,9 +424,13 @@ Get-FileHash $CompanionReleaseApk -Algorithm SHA256 |
     "debug_receiver_present=True",
     "debug_action_present=True",
     "debug_voice_import_activity_present=True",
+    "debug_llm_quality_activity_present=True",
+    "debug_voice_loopback_activity_present=True",
     "release_receiver_present=False",
     "release_action_present=False",
-    "release_voice_import_activity_present=False"
+    "release_voice_import_activity_present=False",
+    "release_llm_quality_activity_present=False",
+    "release_voice_loopback_activity_present=False"
 ) | Out-File (Join-Path $EvidenceDir "debug-release-isolation.txt") -Encoding utf8
 Get-FileHash $SenderApk -Algorithm SHA256 |
     Format-List | Out-File (Join-Path $EvidenceDir "book-sender-sha256.txt") -Encoding utf8
@@ -708,6 +718,19 @@ if (-not [string]::IsNullOrWhiteSpace($TtsModelPath)) {
     if ($LASTEXITCODE -ne 0) { throw "TTS model acceptance failed." }
 }
 
+if (-not [string]::IsNullOrWhiteSpace($AsrModelPath) -and
+    -not [string]::IsNullOrWhiteSpace($TtsModelPath)) {
+    Write-Host "Automatic sherpa TTS->ASR native loopback gate..." -ForegroundColor Cyan
+    $LoopbackScript = Join-Path $ScriptDir "test_sherpa_loopback.ps1"
+    if (-not (Test-Path $LoopbackScript)) {
+        throw "Sherpa loopback acceptance script missing: $LoopbackScript"
+    }
+    & $LoopbackScript -AdbPath $Adb -DeviceSerial $DeviceSerial -OutputDirectory $EvidenceDir
+    if ($LASTEXITCODE -ne 0) {
+        throw "Sherpa native TTS->ASR loopback gate failed."
+    }
+}
+
 Write-Host ""
 Write-Host "Build/install/signature checks complete." -ForegroundColor Green
 Write-Host "Evidence directory: $EvidenceDir" -ForegroundColor Green
@@ -742,7 +765,13 @@ if ($SherpaModels -or -not [string]::IsNullOrWhiteSpace($TtsModelPath)) {
 } else {
     Write-Host "4. Optional TTS: download/import with download_sherpa_model.ps1 + test_sherpa_model.ps1."
 }
-Write-Host "5. Test typed chat, live microphone ASR, TTS playback, emotion-driven Spine motion, memory commands and clear-chat."
+if (-not [string]::IsNullOrWhiteSpace($AsrModelPath) -and
+    -not [string]::IsNullOrWhiteSpace($TtsModelPath)) {
+    Write-Host "5. TTS->ASR native in-memory loopback was executed automatically."
+} else {
+    Write-Host "5. Run test_sherpa_loopback.ps1 after both ASR and TTS models are imported."
+}
+Write-Host "6. Test live microphone ASR, audible TTS playback, typed chat, emotion-driven Spine motion, memory commands and clear-chat."
 
 
 Write-Host "After manual testing, run the final evidence collector:" -ForegroundColor Cyan
