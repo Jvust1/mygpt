@@ -55,6 +55,27 @@ $OutputDirectory = (Resolve-Path $OutputDirectory).Path
 
 Write-Host "Collecting Companion V2 evidence from $DeviceSerial" -ForegroundColor Cyan
 
+$BundledSkinEvidencePath = Join-Path $OutputDirectory "bundled-skin-evidence.txt"
+if (Test-Path $BundledSkinEvidencePath) {
+    $BundledSkinEvidenceText = Get-Content $BundledSkinEvidencePath -Raw
+    if ($BundledSkinEvidenceText -match "bundled=True" -and
+        $BundledSkinEvidenceText -match "apk_entry_status=PASS" -and
+        $BundledSkinEvidenceText -match "sha256=eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f") {
+        $BundledSkinStatus = "PASS"
+    }
+    elseif ($BundledSkinEvidenceText -match "bundled=False" -and
+            $BundledSkinEvidenceText -match "apk_entry_status=NOT_BUNDLED") {
+        $BundledSkinStatus = "NOT_BUNDLED"
+    }
+    else {
+        $BundledSkinStatus = "INVALID_EVIDENCE"
+        throw "Bundled skin evidence exists but is internally inconsistent."
+    }
+}
+else {
+    $BundledSkinStatus = "UNKNOWN"
+}
+
 $SourceHead | Out-File (Join-Path $OutputDirectory "source-head.txt") -Encoding utf8
 $SourceBranch | Out-File (Join-Path $OutputDirectory "source-branch.txt") -Encoding utf8
 & git -C $RepoRoot status --porcelain --untracked-files=no |
@@ -237,6 +258,7 @@ $Summary = @(
     "source_head=$SourceHead",
     "source_branch=$SourceBranch",
     "device_serial=$DeviceSerial",
+    "bundled_skin=$BundledSkinStatus",
     "book_gate=$BookGateStatus",
     "supervision=$SupervisionStatus",
     "pip_gate=$PipGateStatus",
@@ -252,6 +274,7 @@ $Summary | Out-File (Join-Path $OutputDirectory "evidence-summary.txt") -Encodin
 Write-Host "Evidence collected: $OutputDirectory" -ForegroundColor Green
 Write-Host "permission_boundary=PASS" -ForegroundColor Green
 Write-Host "audio_persistence=PASS" -ForegroundColor Green
+Write-Host "bundled_skin=$BundledSkinStatus"
 Write-Host "book_gate=$BookGateStatus"
 Write-Host "supervision=$SupervisionStatus"
 Write-Host "pip_gate=$PipGateStatus"

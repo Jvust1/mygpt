@@ -151,6 +151,7 @@ else {
         $Root = $Drive.Root
         foreach ($Relative in @(
             "My Drive\Skin\3714430278\3714430278.zip",
+            "My Drive\Live\skin\workshop\3714430278\3714430278.zip",
             "My Drive\Live\Skin\3714430278\3714430278.zip",
             "My Drive\3714430278\3714430278.zip",
             "Google Drive\My Drive\Skin\3714430278\3714430278.zip"
@@ -160,7 +161,9 @@ else {
     }
 
     foreach ($Relative in @(
+        "My Drive\Live\skin\workshop\3714430278\3714430278.zip",
         "My Drive\Skin\3714430278\3714430278.zip",
+        "Google Drive\My Drive\Live\skin\workshop\3714430278\3714430278.zip",
         "Google Drive\My Drive\Skin\3714430278\3714430278.zip"
     )) {
         $CandidatePaths.Add((Join-Path $env:USERPROFILE $Relative))
@@ -558,4 +561,4 @@ Write-Host "6. Test typed chat, voice, emotion-driven Spine motion, memory comma
 
 
 Write-Host "After manual testing, run the final evidence collector:" -ForegroundColor Cyan
-Write-Host "powershell -ExecutionPolicy Bypass -File .\\android_llm_spike\\scripts\\collect_companion_v2_evidence.ps1"
+Write-Host ('powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\collect_companion_v2_evidence.ps1 -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
