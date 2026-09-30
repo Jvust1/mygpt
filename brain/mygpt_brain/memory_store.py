@@ -20,7 +20,10 @@ from typing import Annotated, Literal
 from pydantic import AwareDatetime, Field, field_validator
 
 from .core import Contract, Identifier
-from .lexical_memory import MAX_CANDIDATES, MAX_QUERY_CHARS, normalize_memory_text, tfidf_memory_scores
+from .lexical_memory import (
+    MAX_CANDIDATES, MAX_QUERY_CHARS, lowercase_lexical_text,
+    normalize_memory_text, tfidf_memory_scores,
+)
 
 MemoryKind = Literal[
     "preference",
@@ -93,6 +96,10 @@ class MemoryStore:
         self._lock = threading.RLock()
         self._db = sqlite3.connect(self.path, check_same_thread=False)
         self._db.row_factory = sqlite3.Row
+        # Use the same pinned sklearn preprocessing in candidate SQL and the
+        # final scorer. Register per connection, including reopened databases;
+        # no data rewrite, persistent index or global SQLite override is needed.
+        self._db.create_function("mygpt_lexical_lower", 1, lowercase_lexical_text, deterministic=True)
         self._init_schema()
 
     def _init_schema(self) -> None:
@@ -401,7 +408,7 @@ class MemoryStore:
             raise ValueError("limit must be in 1..20")
 
         tokens: list[str] = []
-        lowered = query.lower()
+        lowered = lowercase_lexical_text(query)
         for raw in lowered.split():
             token = "".join(ch for ch in raw if ch.isalnum() or "\u4e00" <= ch <= "\u9fff")
             if len(token) >= 2 and token not in tokens:
@@ -420,7 +427,7 @@ class MemoryStore:
         clauses = []
         params: list[object] = [namespace]
         for token in tokens:
-            clauses.append("(lower(text) LIKE ? ESCAPE '\\' OR lower(tags) LIKE ? ESCAPE '\\')")
+            clauses.append("(mygpt_lexical_lower(text) LIKE ? ESCAPE '\\' OR mygpt_lexical_lower(tags) LIKE ? ESCAPE '\\')")
             pattern = "%" + token.replace("%", "\\%").replace("_", "\\_") + "%"
             params.extend((pattern, pattern))
         params.append(limit)
