@@ -5,7 +5,8 @@ param(
     [switch]$SkipSubmoduleUpdate,
     [switch]$SkipSdkInstall,
     [switch]$AllowDirty,
-    [string]$SkinZip = ""
+    [string]$SkinZip = "",
+    [string]$LlmCandidatePath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -541,6 +542,20 @@ if ($BundledSkin) {
     }
 }
 
+if (-not [string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
+    if (-not (Test-Path -LiteralPath $LlmCandidatePath -PathType Leaf)) {
+        throw "LLM candidate path not found: $LlmCandidatePath"
+    }
+    Write-Host "Automatic local LLM candidate gate..." -ForegroundColor Cyan
+    $LlmGateScript = Join-Path $ScriptDir "test_llm_candidate.ps1"
+    if (-not (Test-Path $LlmGateScript)) {
+        throw "LLM acceptance script missing: $LlmGateScript"
+    }
+    & $LlmGateScript -ModelPath $LlmCandidatePath -AdbPath $Adb -DeviceSerial $DeviceSerial -OutputDirectory $EvidenceDir
+    if ($LASTEXITCODE -ne 0) {
+        throw "LLM candidate acceptance script failed."
+    }
+}
 Write-Host ""
 Write-Host "Build/install/signature checks complete." -ForegroundColor Green
 Write-Host "Evidence directory: $EvidenceDir" -ForegroundColor Green
@@ -553,8 +568,12 @@ if ($BundledSkin) {
     Write-Host "1. Import decrypted 3714430278.zip manually."
     Write-Host ('   Then run: powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\test_companion_pip.ps1 -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
 }
-Write-Host "2. Import a compatible GGUF and load the local model."
-Write-Host "3. Run the in-app llama benchmark."
+if ([string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
+    Write-Host "2. Download/select a fixed GGUF candidate, then run:"
+    Write-Host ('   powershell -ExecutionPolicy Bypass -File .\\android_llm_spike\\scripts\\test_llm_candidate.ps1 -ModelPath "<verified.gguf>" -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
+} else {
+    Write-Host "2. GGUF import/load/benchmark was automated from: $LlmCandidatePath"
+}
 Write-Host "4. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
 Write-Host "5. Optional TTS: import vits-melo-tts-zh_en.tar.bz2 and enable local speech replies."
 Write-Host "6. Test typed chat, voice, emotion-driven Spine motion, memory commands and clear-chat."
