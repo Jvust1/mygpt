@@ -42,6 +42,10 @@ public final class BookContextMailboxSmoke {
         require(block.contains("\\\"title\\\""), "json title escaped");
         require(block.contains("\\\\"), "json slash escaped");
         require(block.startsWith("[BOOK_SIGNED_CONTEXT_JSON"), "data marker");
+        require(block.contains("\"status\":\"fresh\""), "fresh status");
+        require(block.contains("\"sequence\":2"), "sequence included");
+        require(BookContextSnapshot.unavailableDataBlock()
+                .contains("\"status\":\"unavailable\""), "unavailable marker");
 
         require(mailbox.current(now + 70_000) == null, "expiry");
 

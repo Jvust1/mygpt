@@ -118,3 +118,19 @@ This contract does not:
 Code contract only. Companion V2 and Book have not yet been jointly signed and
 device-tested. GitHub hosted Actions are currently failing before runner
 allocation, so exact-head Android execution remains pending.
+
+
+## Freshness inside llama.cpp multi-turn history
+
+llama.cpp's Android runtime retains KV/chat history across turns. Therefore
+Companion V2 sends a Book state block on **every** user turn:
+
+- fresh context: `"status":"fresh"`, including session, sequence,
+  captured/expires timestamps and source identity;
+- no current context: `{"status":"unavailable"}`.
+
+The system prompt instructs the local model that only the current turn's
+`status=fresh` block may be treated as current Book context. Earlier Book
+blocks remain historical conversation data only. This prevents an expired or
+cleared context from silently remaining the current study source merely because
+llama.cpp retains prior KV state.
