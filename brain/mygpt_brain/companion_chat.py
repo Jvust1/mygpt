@@ -143,6 +143,10 @@ class ChatPrompt:
 ChatResponder = Callable[[ChatPrompt], Awaitable[str | CompanionReply]]
 
 
+class SupersededChatTurn(RuntimeError):
+    """A realtime owner invalidated this turn before it could be committed."""
+
+
 class CompanionChatRuntime:
     """Bounded in-memory session runtime with explicit SQLite-backed memories."""
 
@@ -189,6 +193,7 @@ class CompanionChatRuntime:
         value: CompanionChatRequest | dict,
         *,
         now: datetime | None = None,
+        is_current: Callable[[], bool] | None = None,
     ) -> CompanionChatResult:
         request = CompanionChatRequest.model_validate(value)
         if request.persona_id != self.persona.persona_id:
@@ -197,6 +202,8 @@ class CompanionChatRuntime:
         fingerprint = self._fingerprint(request)
 
         async with self._lock:
+            if is_current is not None and not is_current():
+                raise SupersededChatTurn("companion turn superseded")
             cached = self._requests.get(request.request_id)
             if cached is not None:
                 old_fingerprint, old_result = cached
@@ -266,6 +273,19 @@ class CompanionChatRuntime:
                 )
             except TimeoutError:
                 raise RuntimeError("chat responder timeout") from None
+            finally:
+                # A provider can swallow cancellation and either return or
+                # raise another error. Both must preserve the owning task's
+                # cancellation, rather than keep a realtime queue alive until
+                # the transport timeout or emit an obsolete error downstream.
+                owner = asyncio.current_task()
+                if owner is not None and owner.cancelling():
+                    raise asyncio.CancelledError
+            # A transport interruption can arrive while the provider is running,
+            # including providers that finish after receiving cancellation.
+            # Check again before creating or persisting any assistant exchange.
+            if is_current is not None and not is_current():
+                raise SupersededChatTurn("companion turn superseded")
             if isinstance(raw_reply, str):
                 try:
                     presentation = parse_act_reply(raw_reply)
