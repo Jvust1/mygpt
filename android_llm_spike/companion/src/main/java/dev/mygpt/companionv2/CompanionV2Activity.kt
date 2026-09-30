@@ -335,6 +335,7 @@ class CompanionV2Activity : AndroidApplication() {
         modelState.text = "模型：正在校验并导入…"
         loadModelButton.isEnabled = false
         sendButton.isEnabled = false
+        benchmarkButton.isEnabled = false
         updateVoiceControls()
 
         scope.launch {
@@ -617,6 +618,7 @@ class CompanionV2Activity : AndroidApplication() {
         modelState.text = "模型：正在加载…"
         loadModelButton.isEnabled = false
         sendButton.isEnabled = false
+        benchmarkButton.isEnabled = false
         modelLoaded = false
         updateVoiceControls()
 
@@ -658,7 +660,7 @@ class CompanionV2Activity : AndroidApplication() {
     }
 
     private data class DeviceSnapshot(
-        val pssKb: Int,
+        val pssKb: Long,
         val nativeHeapBytes: Long,
         val javaUsedBytes: Long,
         val thermalStatus: Int,
