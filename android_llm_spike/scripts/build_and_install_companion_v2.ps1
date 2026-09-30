@@ -3,7 +3,8 @@ param(
     [string]$DeviceSerial = "",
     [switch]$SkipInstall,
     [switch]$SkipSubmoduleUpdate,
-    [switch]$SkipSdkInstall
+    [switch]$SkipSdkInstall,
+    [switch]$AllowDirty
 )
 
 $ErrorActionPreference = "Stop"
@@ -36,6 +37,29 @@ Write-Host "Project: $ProjectDir" -ForegroundColor Cyan
 
 Require-Command "git"
 Require-Command "java"
+
+$SourceHead = (& git -C $RepoRoot rev-parse HEAD).Trim()
+$SourceBranch = (& git -C $RepoRoot rev-parse --abbrev-ref HEAD).Trim()
+$DirtyLines = @(& git -C $RepoRoot status --porcelain --untracked-files=no)
+
+if ($DirtyLines.Count -gt 0 -and -not $AllowDirty) {
+    throw "Tracked worktree changes detected. Commit/stash them or pass -AllowDirty for an intentionally non-reproducible build."
+}
+
+$JavaVersionOutput = (& java -version 2>&1 | Out-String)
+$JavaMajor = $null
+if ($JavaVersionOutput -match 'version\s+"(?<major>\d+)') {
+    $JavaMajor = [int]$Matches["major"]
+}
+elseif ($JavaVersionOutput -match 'openjdk\s+(?<major>\d+)') {
+    $JavaMajor = [int]$Matches["major"]
+}
+if ($null -eq $JavaMajor -or $JavaMajor -lt 17) {
+    throw "JDK 17+ is required. Detected: $JavaVersionOutput"
+}
+
+Write-Host "Source:  $SourceBranch @ $SourceHead" -ForegroundColor Cyan
+Write-Host "Java:    major $JavaMajor" -ForegroundColor Cyan
 
 if (-not $SkipSubmoduleUpdate) {
     Write-Host "Updating pinned submodules..." -ForegroundColor Cyan
@@ -82,9 +106,17 @@ if (-not $SdkManager) {
 }
 
 if (-not $SkipSdkInstall) {
-    Write-Host "Ensuring NDK 29.0.13113456 and CMake 3.31.6..." -ForegroundColor Cyan
-    Invoke-Checked $SdkManager @("ndk;29.0.13113456", "cmake;3.31.6")
+    Write-Host "Ensuring Android 36, build-tools 36.0.0, platform-tools, NDK and CMake..." -ForegroundColor Cyan
+    Invoke-Checked $SdkManager @(
+        "platform-tools",
+        "platforms;android-36",
+        "build-tools;36.0.0",
+        "ndk;29.0.13113456",
+        "cmake;3.31.6"
+    )
 }
+
+$env:ANDROID_NDK_HOME = Join-Path $SdkRoot "ndk\29.0.13113456"
 
 $Gradlew = Join-Path $ProjectDir "gradlew.bat"
 if (-not (Test-Path $Gradlew)) {
@@ -120,9 +152,15 @@ foreach ($Path in @($CompanionApk, $SenderApk, $LocalLlmApk, $BridgeAar)) {
     }
 }
 
-$BuildTools = Get-ChildItem (Join-Path $SdkRoot "build-tools") -Directory |
-    Sort-Object Name -Descending |
-    Select-Object -First 1
+$PreferredBuildTools = Join-Path $SdkRoot "build-tools\36.0.0"
+if (Test-Path $PreferredBuildTools) {
+    $BuildTools = Get-Item $PreferredBuildTools
+}
+else {
+    $BuildTools = Get-ChildItem (Join-Path $SdkRoot "build-tools") -Directory |
+        Sort-Object Name -Descending |
+        Select-Object -First 1
+}
 if (-not $BuildTools) {
     throw "Android build-tools not found."
 }
@@ -150,6 +188,14 @@ Write-Host $CompanionCertLine.Trim()
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $EvidenceDir = Join-Path $ProjectDir ("device_evidence\" + $Timestamp)
 New-Item -ItemType Directory -Path $EvidenceDir -Force | Out-Null
+
+$SourceHead | Out-File (Join-Path $EvidenceDir "source-head.txt") -Encoding utf8
+$SourceBranch | Out-File (Join-Path $EvidenceDir "source-branch.txt") -Encoding utf8
+$DirtyLines | Out-File (Join-Path $EvidenceDir "source-dirty.txt") -Encoding utf8
+$JavaVersionOutput | Out-File (Join-Path $EvidenceDir "java-version.txt") -Encoding utf8
+$SdkRoot | Out-File (Join-Path $EvidenceDir "android-sdk-root.txt") -Encoding utf8
+$LlamaHead | Out-File (Join-Path $EvidenceDir "llama-pin.txt") -Encoding utf8
+$SherpaHead | Out-File (Join-Path $EvidenceDir "sherpa-pin.txt") -Encoding utf8
 
 Get-FileHash $CompanionApk -Algorithm SHA256 |
     Format-List | Out-File (Join-Path $EvidenceDir "companion-sha256.txt") -Encoding utf8
@@ -216,30 +262,132 @@ if (-not [string]::IsNullOrWhiteSpace($Pid)) {
 & $Adb -s $DeviceSerial shell dumpsys thermalservice |
     Out-File (Join-Path $EvidenceDir "thermal-before-models.txt") -Encoding utf8
 
+
+$NowMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+$ExpiresMs = $NowMs + 120000
+$DummySha = ("a" * 64)
+
 $NegativeArgs = @(
     "-s", $DeviceSerial,
     "shell", "am", "broadcast",
+    "-n", "dev.mygpt.companionv2/.BookContextReceiver",
     "-a", "dev.mygpt.companionv2.action.BOOK_CONTEXT_V1",
-    "-p", "dev.mygpt.companionv2",
     "--es", "session_id", "shell-test",
-    "--el", "sequence", "1"
+    "--el", "sequence", "1",
+    "--es", "course_id", "functional-analysis-test",
+    "--es", "book_id", "synthetic-book",
+    "--es", "book_version", "test@v1",
+    "--es", "section_id", "ch1-s1",
+    "--es", "source_id", "shell-source",
+    "--es", "source_sha256", $DummySha,
+    "--es", "mode", "learn",
+    "--el", "captured_at_ms", "$NowMs",
+    "--el", "expires_at_ms", "$ExpiresMs",
+    "--es", "title", "Shell negative test",
+    "--es", "text", "Valid-shaped synthetic context from adb shell; must not be accepted."
 )
 $NegativeBroadcast = & $Adb @NegativeArgs 2>&1
-$NegativeBroadcast |
-    Out-File (Join-Path $EvidenceDir "negative-shell-book-broadcast.txt") -Encoding utf8
+$NegativeText = ($NegativeBroadcast | Out-String)
+$NegativeText | Out-File (Join-Path $EvidenceDir "negative-shell-book-broadcast.txt") -Encoding utf8
+
+if ($NegativeText -match "result=-1") {
+    throw "SECURITY FAILURE: adb shell Book context was accepted by Companion V2."
+}
+Write-Host "Book shell-origin negative gate did not return RESULT_OK." -ForegroundColor Green
+
+$SenderActivityArgs = @(
+    "-s", $DeviceSerial,
+    "shell", "am", "start", "-W",
+    "-n", "dev.mygpt.bookcontexttest/.BookContextTestActivity"
+)
+Invoke-Checked $Adb $SenderActivityArgs
+
+& $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest rm -f files/adb-book-result.txt 2>$null
+
+$PositiveCommandArgs = @(
+    "-s", $DeviceSerial,
+    "shell", "am", "broadcast",
+    "-n", "dev.mygpt.bookcontexttest/.BookContextTestCommandReceiver",
+    "-a", "dev.mygpt.bookcontexttest.action.AUTOMATED_SEND_CONTEXT_V1"
+)
+$PositiveCommand = & $Adb @PositiveCommandArgs 2>&1
+$PositiveCommand | Out-File (Join-Path $EvidenceDir "positive-book-command.txt") -Encoding utf8
+Start-Sleep -Seconds 2
+
+$PositiveBook = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest cat files/adb-book-result.txt 2>&1
+$PositiveBookText = ($PositiveBook | Out-String)
+$PositiveBookText | Out-File (Join-Path $EvidenceDir "positive-book-result.txt") -Encoding utf8
+if ($PositiveBookText -notmatch "accepted=true") {
+    throw "Same-signature Book context gate failed. See positive-book-result.txt."
+}
+Write-Host "Same-signature Book context delivery PASS." -ForegroundColor Green
+
+$CompanionActivityArgs = @(
+    "-s", $DeviceSerial,
+    "shell", "am", "start", "-W",
+    "-n", "dev.mygpt.companionv2/.CompanionV2Activity"
+)
+Invoke-Checked $Adb $CompanionActivityArgs
+Start-Sleep -Seconds 1
+
+$PositiveUiRemote = "/sdcard/mygpt-book-positive.xml"
+$PositiveUiLocal = Join-Path $EvidenceDir "book-positive-ui.xml"
+Invoke-Checked $Adb @("-s", $DeviceSerial, "shell", "uiautomator", "dump", $PositiveUiRemote)
+Invoke-Checked $Adb @("-s", $DeviceSerial, "pull", $PositiveUiRemote, $PositiveUiLocal)
+& $Adb -s $DeviceSerial shell rm -f $PositiveUiRemote | Out-Null
+
+$PositiveUiText = Get-Content $PositiveUiLocal -Raw
+if ($PositiveUiText -notmatch "synthetic-book") {
+    throw "Companion UI did not expose the accepted synthetic Book context."
+}
+Write-Host "Companion Book status UI PASS." -ForegroundColor Green
+
+Invoke-Checked $Adb $SenderActivityArgs
+
+$ClearCommandArgs = @(
+    "-s", $DeviceSerial,
+    "shell", "am", "broadcast",
+    "-n", "dev.mygpt.bookcontexttest/.BookContextTestCommandReceiver",
+    "-a", "dev.mygpt.bookcontexttest.action.AUTOMATED_CLEAR_CONTEXT_V1"
+)
+$ClearCommand = & $Adb @ClearCommandArgs 2>&1
+$ClearCommand | Out-File (Join-Path $EvidenceDir "clear-book-command.txt") -Encoding utf8
+Start-Sleep -Seconds 2
+
+$ClearBook = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.bookcontexttest cat files/adb-book-result.txt 2>&1
+$ClearBookText = ($ClearBook | Out-String)
+$ClearBookText | Out-File (Join-Path $EvidenceDir "clear-book-result.txt") -Encoding utf8
+if ($ClearBookText -notmatch "accepted=true") {
+    throw "Same-signature Book clear gate failed. See clear-book-result.txt."
+}
+
+Invoke-Checked $Adb $CompanionActivityArgs
+Start-Sleep -Seconds 1
+
+$ClearUiRemote = "/sdcard/mygpt-book-clear.xml"
+$ClearUiLocal = Join-Path $EvidenceDir "book-clear-ui.xml"
+Invoke-Checked $Adb @("-s", $DeviceSerial, "shell", "uiautomator", "dump", $ClearUiRemote)
+Invoke-Checked $Adb @("-s", $DeviceSerial, "pull", $ClearUiRemote, $ClearUiLocal)
+& $Adb -s $DeviceSerial shell rm -f $ClearUiRemote | Out-Null
+
+$ClearUiText = Get-Content $ClearUiLocal -Raw
+if ($ClearUiText -notmatch "无新鲜签名上下文") {
+    throw "Companion UI did not show the cleared Book context state."
+}
+Write-Host "Same-signature Book clear + UI gate PASS." -ForegroundColor Green
 
 Write-Host ""
 Write-Host "Build/install/signature checks complete." -ForegroundColor Green
 Write-Host "Evidence directory: $EvidenceDir" -ForegroundColor Green
 Write-Host ""
-Write-Host "Manual device gates:" -ForegroundColor Yellow
-Write-Host "1. Open Book Context Test Sender -> new session -> send fresh Book context."
-Write-Host "2. Return to Companion V2; Book status should show synthetic-book + section."
-Write-Host "3. Import decrypted 3714430278.zip."
-Write-Host "4. Import a compatible GGUF and load the local model."
-Write-Host "5. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
-Write-Host "6. Optional TTS: import vits-melo-tts-zh_en.tar.bz2 and enable local speech replies."
-Write-Host "7. Test typed chat, voice, emotion-driven Spine motion, memory commands and clear-chat."
+Write-Host "Automated gates completed: signatures + shell-negative Book + same-signature Book context + clear." -ForegroundColor Green
+Write-Host "Remaining manual/device gates:" -ForegroundColor Yellow
+Write-Host "1. Import decrypted 3714430278.zip."
+Write-Host "2. Import a compatible GGUF and load the local model."
+Write-Host "3. Run the in-app llama benchmark."
+Write-Host "4. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
+Write-Host "5. Optional TTS: import vits-melo-tts-zh_en.tar.bz2 and enable local speech replies."
+Write-Host "6. Test typed chat, voice, emotion-driven Spine motion, memory commands and clear-chat."
 
 
 Write-Host "After manual testing, run the final evidence collector:" -ForegroundColor Cyan
