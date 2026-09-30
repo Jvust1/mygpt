@@ -149,3 +149,12 @@ Do not merge PR #15 merely because a local build succeeds.
 The accepted evidence package should include exact git head, APK hashes, signer
 digest, package/permission dumps, model identities, Book positive/negative
 results, memory/thermal snapshots, failures, screenshots and logs.
+
+
+## Final evidence collection
+
+After running the in-app benchmark and manual Book/voice/memory gates, run:
+
+powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\collect_companion_v2_evidence.ps1
+
+The collector writes current package state, meminfo, thermal state, activity state, process logcat, the app-private benchmark report when present, an app-private file listing, and a current screenshot into a gitignored device_evidence directory.

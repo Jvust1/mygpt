@@ -240,3 +240,7 @@ Write-Host "4. Import a compatible GGUF and load the local model."
 Write-Host "5. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
 Write-Host "6. Optional TTS: import vits-melo-tts-zh_en.tar.bz2 and enable local speech replies."
 Write-Host "7. Test typed chat, voice, emotion-driven Spine motion, memory commands and clear-chat."
+
+
+Write-Host "After manual testing, run the final evidence collector:" -ForegroundColor Cyan
+Write-Host "powershell -ExecutionPolicy Bypass -File .\\android_llm_spike\\scripts\\collect_companion_v2_evidence.ps1"
