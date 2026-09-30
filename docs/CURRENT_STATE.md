@@ -1,3 +1,13 @@
+## 2026-09-30 · scikit-learn recall closes the long-question gap
+
+The existing companion memory search now directly uses a bounded scikit-learn
+TF-IDF/cosine port. Valid 600–4000-character questions reach the model unchanged;
+namespace-scoped candidates are ranked by lexical evidence rather than recency
+alone. Strict Brain passes 643/0/0 on Python 3.12/3.13, and nine real upstream
+oracle tests pass. See [source, behavior and limits](LEXICAL_MEMORY_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · native HTTP authorization owns in-flight requests
 
 The actual native API now applies Pipecat-derived owned-request cancellation to

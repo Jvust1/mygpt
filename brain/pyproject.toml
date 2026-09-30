@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 dependencies = ["pydantic==2.13.4", "httpx==0.28.1"]
 
 [project.optional-dependencies]
+lexical-test = ["scikit-learn==1.9.1"]
 agents = ["openai-agents"]
 mem0 = ["mem0ai"]
 livekit = ["livekit-agents"]
