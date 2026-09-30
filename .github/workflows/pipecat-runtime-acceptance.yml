@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/pipecat-interruption-fusion-dot-20260930
+      - feat/ollama-async-fusion-dot-20260930
       - feat/airi-chat-memory-brain-20260929
     paths:
       - 'brain/mygpt_brain/**'
