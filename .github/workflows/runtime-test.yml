@@ -1,0 +1,22 @@
+name: Test mygpt runtime
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - feat/vendor-airi-20260930
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --ignore-scripts
+      - run: npm test
