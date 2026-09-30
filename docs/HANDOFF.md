@@ -1,3 +1,19 @@
+## Latest handoff · Xiaomi 14 full matrix + native voice loopback ready · 2026-09-30
+
+Implementation checkpoint: `9920d53800ad1aec741630300283d385825fd986`; Draft PR #15; main untouched.
+
+Do not add more default-model guesses. Run the existing Windows acceptance route. For the broadest automatic gate, use the verified 3714430278 local source plus `-LlmMatrix -SherpaModels`. That path now exercises signed Book/supervision/PiP, three fixed GGUF performance runs, five fixed Chinese output samples per candidate, sherpa import/integrity, and an in-memory TTS->ASR native loopback. The final collector gathers all of those into one evidence directory.
+
+Important corrections:
+- prompt hard turn limit is 5200 chars; combined system+turn character guard is 7200;
+- LLM qualitative execution PASS does not mean “best model”;
+- synthetic voice loopback PASS does not replace live microphone or audible TTS testing;
+- GitHub hosted red runs are still zero-step runner-provisioning failures.
+
+Do not merge until Xiaomi 14 evidence exists.
+
+---
+
 ## Latest handoff · verified 3714430278 auto-bundle path · 2026-09-30
 
 Branch/head: `feat/airi-chat-memory-brain-20260929` @ `90e5a8dc2528951fa664412a8ae66ec45a018e01`; Draft PR #15; main untouched.

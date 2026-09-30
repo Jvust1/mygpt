@@ -1,3 +1,31 @@
+## E021 — fixed LLM quality samples + sherpa native loopback code-ready (2026-09-30)
+
+**Implementation checkpoint:** `9920d53800ad1aec741630300283d385825fd986`
+
+### Added evidence paths
+- fixed 5-case Chinese LLM sample suite per pinned candidate;
+- strict execution gate (5/5 cases, no runtime error, non-empty visible reply);
+- no automatic quality score/rank/winner;
+- side-by-side `llm-quality-comparison.md`;
+- coupled system/user-turn character budget (7200 combined, 5200 hard turn max);
+- sherpa core-file fingerprint verify-on-restore;
+- in-memory Melo TTS -> 16 kHz resample -> streaming ASR native loopback;
+- final collector cross-checks loopback PASS JSON and audio non-persistence.
+
+### Not accepted yet
+No current-head Android artifact or device gate has executed. Hosted jobs still fail before checkout/runner allocation (runner_id=0, zero steps). The loopback gate, GGUF matrix and qualitative outputs are **code-ready, not PASS**.
+
+Physical-device gates still required:
+- exact-head Windows build;
+- Xiaomi 14 local GGUF inference/benchmark;
+- live microphone ASR;
+- audible TTS playback;
+- 3714430278/PiP visual continuity;
+- human comparison of the three candidate outputs;
+- real Jvust/Book AAR adoption/signing.
+
+---
+
 ## E021 — verified private-skin build injection checkpoint (2026-09-30)
 
 **Exact head:** `90e5a8dc2528951fa664412a8ae66ec45a018e01`

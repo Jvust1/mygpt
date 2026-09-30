@@ -4,8 +4,8 @@
   "repository": "Jvust/mygpt",
   "default_branch": "main",
   "active_branch": "feat/airi-chat-memory-brain-20260929",
-  "phase": "COMPANION_V2_SELFCONTAINED_SKIN_XIAOMI14_GATE",
-  "status": "DRAFT_VERIFIED_SKIN_AUTOBUNDLE_READY_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
+  "phase": "COMPANION_V2_XIAOMI14_LLM_QUALITY_VOICE_LOOPBACK_GATE",
+  "status": "DRAFT_AUTOMATED_MATRIX_AND_NATIVE_LOOPBACK_READY_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -94,8 +94,9 @@
     "Jvust/Book has not yet adopted book-client-sdk-release.aar or proven a matching signing identity.",
     "No default GGUF is accepted before Xiaomi 14 latency/RAM/thermal measurements.",
     "GitHub hosted Actions still fail before runner allocation (runner_id=0, zero steps).",
-    "Suitable conversational GGUF remains benchmark-gated; current Drive GGUF search found image-model GGUF but no accepted chat default.",
-    "Required sherpa zh/en ASR and optional Melo TTS model packages are not yet present in the searched Drive model vault and remain external inputs."
+    "Exact-head Windows/Xiaomi 14 acceptance has not yet executed; hosted Actions still fail before runner allocation.",
+    "Default GGUF remains a human/device decision after Xiaomi 14 performance + fixed qualitative evidence; no automatic quality winner is allowed.",
+    "Real microphone capture and audible TTS playback still require physical-device experience validation even after the synthetic native loopback passes."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -117,7 +118,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Build exact head 90e5a8dc2528951fa664412a8ae66ec45a018e01 on Windows using android_llm_spike/scripts/build_and_install_companion_v2.ps1. The script can auto-discover the verified Drive Desktop skin at My Drive/Live/skin/workshop/3714430278/3714430278.zip, or accept -SkinZip / MYGPT_SKIN_ZIP, and will inject it only after exact size/SHA verification. If bundled, Companion V2 auto-installs 3714430278 and the Windows route automatically runs the PiP-over-Book gate. Then benchmark a real chat GGUF and import sherpa ASR/optional TTS; reuse the same evidence directory for collect_companion_v2_evidence.ps1. Do not merge before Xiaomi 14 evidence exists.",
+  "next_step": "On Windows, build the current PR #15 code with android_llm_spike/scripts/build_and_install_companion_v2.ps1. For the most complete device gate use the verified 3714430278 local bundle path plus -LlmMatrix and -SherpaModels. This reuses one evidence directory for same-signature Book/Supervision/PiP, three fixed GGUF benchmarks + 5-case Chinese qualitative samples, sherpa ASR/TTS identity/import, and the in-memory Melo-TTS -> 16k -> streaming-ASR native loopback. Then perform the remaining live microphone/audible TTS/visual interaction checks on Xiaomi 14 and run collect_companion_v2_evidence.ps1. Do not merge before exact-device evidence exists.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -909,7 +910,7 @@
     "branch": "feat/airi-chat-memory-brain-20260929",
     "draft_pr": 15,
     "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-    "exact_head": "90e5a8dc2528951fa664412a8ae66ec45a018e01",
+    "exact_head": "9920d53800ad1aec741630300283d385825fd986",
     "target": "All-local Android companion: Book-aware chat + 3714430278 + on-device LLM + ASR/TTS + explicit memory",
     "android": {
       "module": "android_llm_spike/companion",
@@ -1049,23 +1050,23 @@
       ],
       "exact_head_remote_ci": {
         "status": "NOT_EXECUTED_RUNNER_PROVISIONING_FAILURE",
-        "exact_head": "4efd70b716ab35f94af7556ee7ed5149e77d60a9",
+        "exact_head": "9920d53800ad1aec741630300283d385825fd986",
         "runs": [
           {
-            "id": 36667831029,
-            "workflow": "Companion V2 local AI Android acceptance",
+            "id": 36681413185,
+            "workflow": "Android companion boundary spike",
             "runner_id": 0,
             "steps": 0
           },
           {
-            "id": 36667831060,
+            "id": 36681413136,
             "workflow": "sherpa-onnx Android voice acceptance",
             "runner_id": 0,
             "steps": 0
           },
           {
-            "id": 36667831014,
-            "workflow": "Android companion boundary spike",
+            "id": 36681413222,
+            "workflow": "Companion V2 local AI Android acceptance",
             "runner_id": 0,
             "steps": 0
           }
@@ -1182,10 +1183,15 @@
         "bundled APK skin entry SHA-256 re-verification",
         "runtime bundled skin auto-install through SpinePackageLayout",
         "automatic PiP-over-Book gate when skin is bundled",
-        "single evidence directory reused by final collector"
+        "single evidence directory reused by final collector",
+        "three-candidate GGUF performance matrix",
+        "five-case fixed Chinese companion/teaching sample collection per GGUF",
+        "side-by-side human quality comparison with automatic ranking disabled",
+        "sherpa ASR/TTS model identity + fingerprint verification",
+        "in-memory Melo TTS -> 16 kHz -> streaming ASR native loopback"
       ],
       "device": "Xiaomi 14",
-      "status": "READY_TO_EXECUTE_SELFCONTAINED_SKIN_OPTION_NOT_RUN",
+      "status": "READY_TO_EXECUTE_FULL_MATRIX_NOT_RUN",
       "supervision_gate_persisted_marker": "Book test sender files/adb-supervision-gate.txt"
     },
     "cross_app_companion": {
@@ -1262,32 +1268,37 @@
       "android_asset": "assets/3714430278.json",
       "duplicate_persona_copy": false
     },
-    "status": "PRE_DEVICE_HARDENED_REMOTE_RUNNER_BLOCKED",
+    "status": "PRE_DEVICE_MATRIX_AND_NATIVE_VOICE_LOOPBACK_READY",
     "prompt_budget": {
       "status": "CODE_READY_NOT_EXECUTED",
       "implementation": "android_spike/src/main/java/dev/mygpt/spike/CompanionPromptBudget.java",
-      "max_prompt_chars": 5600,
+      "hard_user_turn_chars": 5200,
       "max_current_user_chars": 4000,
+      "combined_system_plus_turn_chars": 7200,
+      "current_3714430278_system_prompt_chars": 1506,
+      "dynamic_rule": "min(5200, 7200 - rendered system prompt chars)",
       "priority": [
         "complete current user message",
         "fresh signed Book metadata + bounded current Book text",
         "current supervision state",
         "relevant explicit long-term memory",
-        "recent visible conversation only with remaining budget"
+        "recent visible conversation with remaining budget"
       ],
       "evidence_file": "files/prompt-budget-last.txt",
       "evidence_contains_source_text": false,
-      "native_reason": "Avoid pinned llama.cpp oversized-single-prompt truncation while retaining upstream 8192-token context shifting."
+      "token_claim": false
     },
     "model_integrity": {
       "status": "CODE_READY_NOT_EXECUTED",
-      "manifest": "mygpt-model-manifest.txt",
-      "algorithm": "SHA-256",
-      "fresh_import_verify": true,
-      "restore_verify": true,
-      "legacy_install_migration": true,
-      "restore_thread": "Dispatchers.IO / dedicated Voice Spike worker",
-      "main_thread_hashing": false
+      "gguf": "header probe + bounded app-private copy + SHA-256 identity",
+      "sherpa": "deterministic core-file SHA-256 manifest",
+      "sherpa_restore_verify": true,
+      "sherpa_legacy_manifest_migration": true,
+      "large_hashing_thread": "off Android UI thread",
+      "evidence": [
+        "asr-model-manifest.txt",
+        "tts-model-manifest.txt"
+      ]
     },
     "signed_state_expiry": {
       "status": "CODE_READY_NOT_EXECUTED",
@@ -1303,6 +1314,43 @@
       "reason": "Cancelled generation may leave native KV containing user/partial tokens without a committed assistant chat message.",
       "recovery": "mark native session dirty -> unload/reload on foreground -> re-prime only completed LocalConversationStore turns",
       "interrupted_exchange_persisted": false
+    },
+    "llm_candidate_gate": {
+      "default_model": "NONE_BEFORE_DEVICE_EVIDENCE",
+      "candidates": [
+        "speed",
+        "balanced",
+        "quality"
+      ],
+      "performance_matrix": "android_llm_spike/scripts/run_llm_matrix.ps1",
+      "fixed_quality_suite": "zh-companion-teaching-v1",
+      "fixed_quality_cases": [
+        "companion_minimum_step",
+        "teach_banach_from_book",
+        "book_authority_boundary",
+        "memory_authority_boundary",
+        "signed_help_signal"
+      ],
+      "quality_execution_requirement": "5/5 cases execute without runtime error and produce non-empty visible replies",
+      "automatic_quality_score": false,
+      "automatic_quality_ranking": false,
+      "side_by_side_report": "llm-quality-comparison.md",
+      "selection": "HUMAN_DEVICE_DECISION_PENDING"
+    },
+    "voice_native_gate": {
+      "asr": "sherpa streaming zh/en",
+      "tts": "Melo zh/en OfflineTts",
+      "loopback_script": "android_llm_spike/scripts/test_sherpa_loopback.ps1",
+      "debug_activity": "android_llm_spike/companion/src/debug/java/dev/mygpt/companionv2/DebugVoiceLoopbackActivity.kt",
+      "phrase": "你好，今天一起学习。",
+      "path": "OfflineTts -> float PCM memory -> linear resample to 16 kHz -> SherpaStreamingAsrEngine",
+      "speaker_used": false,
+      "microphone_used": false,
+      "audio_persisted": false,
+      "pass_requirement": "TTS samples > 0 and ASR transcript non-empty",
+      "device_status": "NOT_RUN",
+      "real_microphone_gate": "PENDING",
+      "audible_tts_gate": "PENDING"
     }
   },
   "book_client_sdk": {

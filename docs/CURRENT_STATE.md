@@ -1,3 +1,22 @@
+## 2026-09-30 · LLM quality matrix + sherpa native loopback checkpoint · PR #15
+
+Implementation checkpoint: `9920d53800ad1aec741630300283d385825fd986` (this governance-only commit follows it).
+
+The Xiaomi 14 gate now covers more than file/import checks:
+
+- **LLM matrix:** speed / balanced / quality fixed GGUF identities run the same local benchmark.
+- **Fixed Chinese qualitative suite:** every candidate runs the same five synthetic companion/Book/authority cases with the exact production Character Card, shared system prompt, and prompt budget. A candidate gate requires all 5 cases to execute and return visible text, but **no automatic score/rank/winner is produced**.
+- **Human comparison:** `run_llm_matrix.ps1` writes `llm-quality-comparison.md`, grouping the three candidates side-by-side by case with wall time, AIRI emotion and visible reply.
+- **Prompt budget:** current hard user-turn ceiling is **5200 chars**, not the older 5600 value. The production shared system prompt is coupled through a conservative 7200-character combined guard; current 3714430278 system prompt measured 1506 chars, so the turn stays capped at 5200. This is a character guard, not a tokenizer claim.
+- **Sherpa integrity:** imported core ASR/TTS files are fingerprinted and re-verified on restore; large hashing runs off the UI thread.
+- **Native voice execution:** when both fixed sherpa packages are present, a debug-only gate synthesizes `你好，今天一起学习。` through production Melo config, keeps PCM in memory, resamples to 16 kHz, feeds the production streaming ASR, and requires a non-empty transcript. No microphone/speaker/audio file is used by this gate.
+
+Latest hosted runs `36681413185`, `36681413136`, and `36681413222` again have runner_id=0 and zero executed steps. They remain infrastructure failures and provide no code result.
+
+The remaining decisive gate is the Windows/Xiaomi 14 path. Real microphone input, audible TTS, visual Spine/PiP behavior and final model choice remain physical-device decisions.
+
+---
+
 ## 2026-09-30 · verified 3714430278 self-contained local build path · PR #15
 
 Exact head: `90e5a8dc2528951fa664412a8ae66ec45a018e01`.
