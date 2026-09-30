@@ -134,9 +134,9 @@ public final class CompanionPromptBudget {
             List<HistoryTurn> history,
             int maxPromptChars
     ) {
-        if (maxPromptChars < 1024 || maxPromptChars > maxPromptChars) {
+        if (maxPromptChars < 1024 || maxPromptChars > MAX_PROMPT_CHARS) {
             throw new IllegalArgumentException(
-                    "maxPromptChars must be in 1024.." + maxPromptChars);
+                    "maxPromptChars must be in 1024.." + MAX_PROMPT_CHARS);
         }
         String user = checkedUser(userText);
         if (supervisionBlock == null

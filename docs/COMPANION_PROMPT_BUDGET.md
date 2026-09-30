@@ -10,8 +10,7 @@ The remaining risk is an oversized **single user turn** containing:
 - recent conversation re-prime data;
 - current user message.
 
-`CompanionPromptBudget` now applies a conservative **5200-character** pre-JNI
-budget. This is intentionally described as a character guard, not an exact
+`CompanionPromptBudget` now applies a conservative **5200-character** pre-JNI budget. This is intentionally described as a character guard, not an exact
 token counter.
 
 Priority:
@@ -56,10 +55,14 @@ user turn.
 
 - conservative combined pre-generation character ceiling: **7200**;
 - current 3714430278 system prompt: **1506 characters** at this checkpoint;
-- therefore the current user-turn cap remains the existing maximum **5600**;
+- therefore the current user-turn cap remains the existing maximum **5200**;
 - if the persona/runtime system prompt grows in a future build, the user-turn
   budget shrinks automatically rather than silently consuming the output/context
   reserve.
 
 This remains a character guard, not a tokenizer claim. The pinned llama.cpp
 runtime still owns the true 8192-token context and native context shifting.
+
+
+Current hard user-turn ceiling: **5200 characters**. The combined 7200-character
+guard can only shrink that value; it can never raise it.

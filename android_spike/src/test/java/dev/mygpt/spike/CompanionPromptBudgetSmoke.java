@@ -114,7 +114,25 @@ public final class CompanionPromptBudgetSmoke {
         check(dynamic.report().contains("max_prompt_chars=4300"),
                 "dynamic report");
 
+        expectFailure(() -> CompanionPromptBudget.compose(
+                "当前问题",
+                null,
+                supervision,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                CompanionPromptBudget.MAX_PROMPT_CHARS + 1
+        ), "reject budget above hard maximum");
+
         System.out.println("CompanionPromptBudgetSmoke PASS");
+    }
+
+    private static void expectFailure(Runnable action, String label) {
+        try {
+            action.run();
+            throw new AssertionError("expected failure: " + label);
+        } catch (IllegalArgumentException expected) {
+            // pass
+        }
     }
 
     private static int count(String value, String needle) {
