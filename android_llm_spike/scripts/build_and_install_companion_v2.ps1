@@ -130,6 +130,7 @@ $GradleArgs = @(
     ":app:assembleDebug",
     ":companion:assembleDebug",
     ":book-sender-test:assembleDebug",
+    ":book-client-sdk:assembleRelease",
     "--no-daemon",
     "--stacktrace"
 )
@@ -145,8 +146,9 @@ $CompanionApk = Join-Path $ProjectDir "companion\build\outputs\apk\debug\compani
 $SenderApk = Join-Path $ProjectDir "book-sender-test\build\outputs\apk\debug\book-sender-test-debug.apk"
 $LocalLlmApk = Join-Path $ProjectDir "app\build\outputs\apk\debug\app-debug.apk"
 $BridgeAar = Join-Path $ProjectDir "bridge\build\outputs\aar\bridge-release.aar"
+$BookSdkAar = Join-Path $ProjectDir "book-client-sdk\build\outputs\aar\book-client-sdk-release.aar"
 
-foreach ($Path in @($CompanionApk, $SenderApk, $LocalLlmApk, $BridgeAar)) {
+foreach ($Path in @($CompanionApk, $SenderApk, $LocalLlmApk, $BridgeAar, $BookSdkAar)) {
     if (-not (Test-Path $Path)) {
         throw "Expected build artifact missing: $Path"
     }
@@ -201,6 +203,8 @@ Get-FileHash $CompanionApk -Algorithm SHA256 |
     Format-List | Out-File (Join-Path $EvidenceDir "companion-sha256.txt") -Encoding utf8
 Get-FileHash $SenderApk -Algorithm SHA256 |
     Format-List | Out-File (Join-Path $EvidenceDir "book-sender-sha256.txt") -Encoding utf8
+Get-FileHash $BookSdkAar -Algorithm SHA256 |
+    Format-List | Out-File (Join-Path $EvidenceDir "book-client-sdk-sha256.txt") -Encoding utf8
 $CompanionCertLine | Out-File (Join-Path $EvidenceDir "companion-cert.txt") -Encoding utf8
 $SenderCertLine | Out-File (Join-Path $EvidenceDir "book-sender-cert.txt") -Encoding utf8
 

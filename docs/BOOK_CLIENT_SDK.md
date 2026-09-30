@@ -82,3 +82,17 @@ The SDK does not:
 
 Book decides what bounded structured projection to send. MyGPT continues to
 treat it as lower-authority data.
+
+
+## Synthetic device acceptance uses the SDK
+
+The ADB-driven `BookContextTestCommandReceiver` now calls
+`BookCompanionClient` for context, clear and all study events. It no longer
+hand-builds those Companion intents.
+
+Therefore the Xiaomi 14 context/supervision acceptance path exercises the same
+AAR API intended for the future real Book app. Result files include
+`sdk=true`.
+
+The Windows local build also produces and SHA-256 records
+`book-client-sdk-release.aar`.
