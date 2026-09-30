@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 dependencies = ["pydantic==2.13.4"]
 
 [project.optional-dependencies]
+agents = ["openai-agents"]
 mem0 = ["mem0ai"]
 livekit = ["livekit-agents"]
 realtime = ["pipecat-ai"]
