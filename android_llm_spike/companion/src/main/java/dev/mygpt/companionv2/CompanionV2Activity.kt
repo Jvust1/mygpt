@@ -884,10 +884,10 @@ class CompanionV2Activity : AndroidApplication() {
     private fun refreshBookContextStatus() {
         val current = BookContextMailbox.shared().current(System.currentTimeMillis())
         bookState.text = if (current == null) {
-            "Book：无新鲜签名上下文"
+            "Book：无新鲜签名上下文 · BOOK_CONTEXT_UNAVAILABLE"
         } else {
             "Book：" + current.bookId + " · " + current.sectionId
-                + " · " + current.mode.wireValue
+                + " · " + current.mode.wireValue + " · BOOK_CONTEXT_FRESH"
         }
     }
 

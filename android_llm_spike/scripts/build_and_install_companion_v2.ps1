@@ -371,7 +371,7 @@ Invoke-Checked $Adb @("-s", $DeviceSerial, "pull", $ClearUiRemote, $ClearUiLocal
 & $Adb -s $DeviceSerial shell rm -f $ClearUiRemote | Out-Null
 
 $ClearUiText = Get-Content $ClearUiLocal -Raw
-if ($ClearUiText -notmatch "无新鲜签名上下文") {
+if ($ClearUiText -notmatch "BOOK_CONTEXT_UNAVAILABLE") {
     throw "Companion UI did not show the cleared Book context state."
 }
 Write-Host "Same-signature Book clear + UI gate PASS." -ForegroundColor Green
