@@ -36,6 +36,7 @@ import dev.mygpt.spike.CompanionCoordinator
 import dev.mygpt.spike.CompanionPromptBudget
 import dev.mygpt.spike.StudySupervisorRuntime
 import dev.mygpt.spike.GgufModelInstaller
+import dev.mygpt.spike.LlmBenchmarkCandidateCatalog
 import dev.mygpt.spike.SpineCharacterRuntime
 import dev.mygpt.spike.SpinePackageLayout
 import dev.mygpt.spike.SpineSkinApplication
@@ -508,7 +509,10 @@ class CompanionV2Activity : AndroidApplication(),
                     .putString(PREF_MODEL_PATH, installed.file.absolutePath)
                     .putString(PREF_MODEL_SHA256, installed.sha256)
                     .apply()
-                modelState.text = "模型：GGUF v" + installed.header.version
+                val candidateLabel =
+                    LlmBenchmarkCandidateCatalog.labelOrCustom(installed.sha256)
+                modelState.text = "模型：" + candidateLabel
+                    + " · GGUF v" + installed.header.version
                     + " · tensors " + installed.header.tensorCount
                     + " · " + (installed.sizeBytes / (1024L * 1024L)) + " MiB"
                     + " · " + installed.sha256.take(12) + "…"
@@ -533,7 +537,9 @@ class CompanionV2Activity : AndroidApplication(),
             modelState.text = if (hash.isNullOrBlank()) {
                 "模型：已找到 " + file.name
             } else {
-                "模型：已找到 " + file.name + " · SHA-256 " + hash.take(12) + "…"
+                "模型：已找到 "
+                    + LlmBenchmarkCandidateCatalog.labelOrCustom(hash)
+                    + " · SHA-256 " + hash.take(12) + "…"
             }
             loadModelButton.isEnabled = true
         }
@@ -889,8 +895,13 @@ class CompanionV2Activity : AndroidApplication(),
                     val hash = getSharedPreferences(PREFS, MODE_PRIVATE)
                         .getString(PREF_MODEL_SHA256, "unknown") ?: "unknown"
 
+                    val candidateId = LlmBenchmarkCandidateCatalog.idOrCustom(hash)
+                    val candidateLabel =
+                        LlmBenchmarkCandidateCatalog.labelOrCustom(hash)
                     val report = buildString {
                         appendLine("schema=mygpt.android-llm-benchmark.v1")
+                        appendLine("candidate_id=" + candidateId)
+                        appendLine("candidate_label=" + candidateLabel)
                         appendLine("model_file=" + file.name)
                         appendLine("model_sha256=" + hash)
                         appendLine("model_bytes=" + file.length())
@@ -907,6 +918,8 @@ class CompanionV2Activity : AndroidApplication(),
                         appendLine(table.trim())
                     }
                     File(filesDir, BENCHMARK_REPORT_FILE).writeText(report)
+                    val archiveName = "benchmark-" + hash.take(16) + ".txt"
+                    File(filesDir, archiveName).writeText(report)
 
                     Triple(before, after, Pair(elapsedMs, table))
                 }

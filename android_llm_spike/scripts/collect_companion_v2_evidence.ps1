@@ -147,6 +147,21 @@ else {
     $PromptBudget | Out-File (Join-Path $OutputDirectory "prompt-budget-error.txt") -Encoding utf8
 }
 
+$BenchmarkCandidates = @(
+    @{ Id = "speed"; Prefix = "57d1997790d1744f"; Output = "benchmark-speed.txt" },
+    @{ Id = "balanced"; Prefix = "d2387ca2dbfee2ff"; Output = "benchmark-balanced.txt" },
+    @{ Id = "quality"; Prefix = "ab27b9bfa375a178"; Output = "benchmark-quality.txt" }
+)
+$BenchmarkMatrixCount = 0
+foreach ($Entry in $BenchmarkCandidates) {
+    $RemoteName = "files/benchmark-" + $Entry.Prefix + ".txt"
+    $Value = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat $RemoteName 2>&1
+    if ($LASTEXITCODE -eq 0 -and (($Value | Out-String) -match "schema=mygpt.android-llm-benchmark.v1")) {
+        $Value | Out-File (Join-Path $OutputDirectory $Entry.Output) -Encoding utf8
+        $BenchmarkMatrixCount++
+    }
+}
+
 $Benchmark = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/benchmark-last.txt 2>&1
 $BenchmarkExit = $LASTEXITCODE
 if ($BenchmarkExit -eq 0 -and -not [string]::IsNullOrWhiteSpace(($Benchmark | Out-String))) {
@@ -263,6 +278,7 @@ $Summary = @(
     "supervision=$SupervisionStatus",
     "pip_gate=$PipGateStatus",
     "benchmark=$BenchmarkStatus",
+    "benchmark_matrix_count=$BenchmarkMatrixCount",
     "prompt_budget=$PromptBudgetStatus",
     "asr_model_manifest=$AsrManifestStatus",
     "tts_model_manifest=$TtsManifestStatus",
@@ -279,6 +295,7 @@ Write-Host "book_gate=$BookGateStatus"
 Write-Host "supervision=$SupervisionStatus"
 Write-Host "pip_gate=$PipGateStatus"
 Write-Host "benchmark=$BenchmarkStatus"
+Write-Host "benchmark_matrix_count=$BenchmarkMatrixCount"
 Write-Host "prompt_budget=$PromptBudgetStatus"
 Write-Host "asr_model_manifest=$AsrManifestStatus"
 Write-Host "tts_model_manifest=$TtsManifestStatus"

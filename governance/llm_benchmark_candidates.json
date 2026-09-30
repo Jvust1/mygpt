@@ -1,0 +1,48 @@
+{
+  "schema": "mygpt.llm-benchmark-candidates.v1",
+  "updated_date": "2026-09-30",
+  "selection_policy": "BENCHMARK_ONLY_NO_DEFAULT_BEFORE_XIAOMI14_EVIDENCE",
+  "engine": {
+    "repo": "ggml-org/llama.cpp",
+    "pinned_commit": "ba0ba54d93b25faf1e149f4ccedd3e9d84798563",
+    "qwen35_supported": true
+  },
+  "candidates": [
+    {
+      "id": "speed",
+      "label": "Qwen3.5-0.8B-Q4_0",
+      "repo": "ggml-org/Qwen3.5-0.8B-GGUF",
+      "file": "Qwen3.5-0.8B-Q4_0.gguf",
+      "quant": "Q4_0",
+      "approx_size_mb": 563,
+      "sha256": "57d1997790d1744fba5b40a7317df71ea5e2acee28c47e78f0cce39c0703f8cf",
+      "url": "https://huggingface.co/ggml-org/Qwen3.5-0.8B-GGUF/resolve/main/Qwen3.5-0.8B-Q4_0.gguf",
+      "license": "Apache-2.0",
+      "role": "speed baseline"
+    },
+    {
+      "id": "balanced",
+      "label": "Qwen3-1.7B-Q4_K_M",
+      "repo": "ggml-org/Qwen3-1.7B-GGUF",
+      "file": "Qwen3-1.7B-Q4_K_M.gguf",
+      "quant": "Q4_K_M",
+      "approx_size_mb": 1280,
+      "sha256": "d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5",
+      "url": "https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf",
+      "license": "Apache-2.0",
+      "role": "balanced candidate"
+    },
+    {
+      "id": "quality",
+      "label": "Qwen3-4B-Q4_K_M",
+      "repo": "ggml-org/Qwen3-4B-GGUF",
+      "file": "Qwen3-4B-Q4_K_M.gguf",
+      "quant": "Q4_K_M",
+      "approx_size_mb": 2500,
+      "sha256": "ab27b9bfa375a178d6cba48f3ad892b94b7739659dcc7aae8058ce0ffed6b328",
+      "url": "https://huggingface.co/ggml-org/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf",
+      "license": "Apache-2.0",
+      "role": "quality candidate"
+    }
+  ]
+}
