@@ -23,3 +23,5 @@ include(":bridge")
 include(":app")
 
 include(":companion")
+
+include(":book-sender-test")

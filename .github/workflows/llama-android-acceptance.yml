@@ -83,10 +83,12 @@ jobs:
           bridge_aar="android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
           apk="android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
           companion_apk="android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
+          book_sender_apk="android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
           test -f "$llama_aar"
           test -f "$bridge_aar"
           test -f "$apk"
           test -f "$companion_apk"
+          test -f "$book_sender_apk"
           python - <<'PY'
           import zipfile
 
@@ -115,6 +117,7 @@ jobs:
                   raise SystemExit("local LLM APK missing classes.dex or libai-chat.so")
               print("MyGPT local LLM APK PASS:", native)
 
+          book_sender = "android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
           with zipfile.ZipFile(companion) as z:
               names=set(z.namelist())
               llama_native=[n for n in names if n.endswith("/libai-chat.so")]
@@ -125,6 +128,11 @@ jobs:
               if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
                   raise SystemExit("Companion V2 APK missing Spine license notice")
               print("Companion V2 APK PASS:", llama_native, gdx_native, sherpa_native)
+          with zipfile.ZipFile(book_sender) as z:
+              names=set(z.namelist())
+              if "classes.dex" not in names:
+                  raise SystemExit("Book context sender APK missing classes.dex")
+              print("Book context sender APK PASS")
           PY
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -135,5 +143,6 @@ jobs:
             android_llm_spike/bridge/build/outputs/aar/bridge-release.aar
             android_llm_spike/app/build/outputs/apk/debug/app-debug.apk
             android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk
+            android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk
           if-no-files-found: error
           retention-days: 3
