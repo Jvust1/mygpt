@@ -6,8 +6,12 @@ param(
     [switch]$SkipSdkInstall,
     [switch]$AllowDirty,
     [switch]$LlmMatrix,
+    [switch]$SherpaModels,
     [string]$SkinZip = "",
-    [string]$LlmCandidatePath = ""
+    [string]$LlmCandidatePath = "",
+    [string]$AsrModelPath = "",
+    [string]$TtsModelPath = "",
+    [string]$VoiceModelDirectory = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -18,6 +22,17 @@ if ($LlmMatrix -and -not [string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
 }
 if ($SkipInstall -and ($LlmMatrix -or -not [string]::IsNullOrWhiteSpace($LlmCandidatePath))) {
     throw "Device LLM gates require installation; remove -SkipInstall."
+}
+if ($SherpaModels -and (
+        -not [string]::IsNullOrWhiteSpace($AsrModelPath) -or
+        -not [string]::IsNullOrWhiteSpace($TtsModelPath))) {
+    throw "-SherpaModels cannot be combined with -AsrModelPath/-TtsModelPath."
+}
+if ($SkipInstall -and (
+        $SherpaModels -or
+        -not [string]::IsNullOrWhiteSpace($AsrModelPath) -or
+        -not [string]::IsNullOrWhiteSpace($TtsModelPath))) {
+    throw "Device sherpa gates require installation; remove -SkipInstall."
 }
 
 function Invoke-Checked {
@@ -325,14 +340,17 @@ $DebugDexAscii = Get-ApkDexAscii $CompanionApk
 $ReleaseDexAscii = Get-ApkDexAscii $CompanionReleaseApk
 $DebugReceiverMarker = "DebugModelImportReceiver"
 $DebugActionMarker = "dev.mygpt.companionv2.debug.IMPORT_ACCEPTANCE_MODEL_V1"
+$DebugVoiceMarker = "DebugVoiceModelImportActivity"
 
 if (-not $DebugDexAscii.Contains($DebugReceiverMarker) -or
-    -not $DebugDexAscii.Contains($DebugActionMarker)) {
-    throw "Debug Companion APK is missing the acceptance receiver/action."
+    -not $DebugDexAscii.Contains($DebugActionMarker) -or
+    -not $DebugDexAscii.Contains($DebugVoiceMarker)) {
+    throw "Debug Companion APK is missing an acceptance-only importer."
 }
 if ($ReleaseDexAscii.Contains($DebugReceiverMarker) -or
-    $ReleaseDexAscii.Contains($DebugActionMarker)) {
-    throw "SECURITY FAILURE: debug acceptance receiver/action leaked into release Companion APK."
+    $ReleaseDexAscii.Contains($DebugActionMarker) -or
+    $ReleaseDexAscii.Contains($DebugVoiceMarker)) {
+    throw "SECURITY FAILURE: debug acceptance importer leaked into release Companion APK."
 }
 Write-Host "Debug/release acceptance receiver isolation PASS" -ForegroundColor Green
 
@@ -399,8 +417,10 @@ Get-FileHash $CompanionReleaseApk -Algorithm SHA256 |
     "schema=mygpt.debug-release-isolation.v1",
     "debug_receiver_present=True",
     "debug_action_present=True",
+    "debug_voice_import_activity_present=True",
     "release_receiver_present=False",
-    "release_action_present=False"
+    "release_action_present=False",
+    "release_voice_import_activity_present=False"
 ) | Out-File (Join-Path $EvidenceDir "debug-release-isolation.txt") -Encoding utf8
 Get-FileHash $SenderApk -Algorithm SHA256 |
     Format-List | Out-File (Join-Path $EvidenceDir "book-sender-sha256.txt") -Encoding utf8
@@ -634,6 +654,60 @@ elseif (-not [string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
         throw "LLM candidate acceptance script failed."
     }
 }
+if ($SherpaModels) {
+    Write-Host "Automatic sherpa ASR/TTS model gates..." -ForegroundColor Cyan
+
+    if ([string]::IsNullOrWhiteSpace($VoiceModelDirectory)) {
+        $VoiceVault = $null
+        foreach ($Drive in (Get-PSDrive -PSProvider FileSystem)) {
+            $Probe = Join-Path $Drive.Root "My Drive\AI-Model-Vault"
+            if (Test-Path $Probe -PathType Container) {
+                $VoiceVault = $Probe
+                break
+            }
+        }
+        if ($null -ne $VoiceVault) {
+            $VoiceModelDirectory = Join-Path $VoiceVault "mygpt\voice_models"
+        }
+        else {
+            $VoiceModelDirectory = Join-Path $env:LOCALAPPDATA "MyGPT\voice-models"
+        }
+    }
+
+    New-Item -ItemType Directory -Path $VoiceModelDirectory -Force | Out-Null
+    $VoiceModelDirectory = (Resolve-Path $VoiceModelDirectory).Path
+
+    $SherpaDownloadScript = Join-Path $ScriptDir "download_sherpa_model.ps1"
+    if (-not (Test-Path $SherpaDownloadScript)) {
+        throw "Sherpa download script missing: $SherpaDownloadScript"
+    }
+
+    & $SherpaDownloadScript -Kind asr -OutputDirectory $VoiceModelDirectory
+    if ($LASTEXITCODE -ne 0) { throw "ASR archive download failed." }
+
+    & $SherpaDownloadScript -Kind tts -OutputDirectory $VoiceModelDirectory
+    if ($LASTEXITCODE -ne 0) { throw "TTS archive download failed." }
+
+    $AsrModelPath = Join-Path $VoiceModelDirectory "sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2"
+    $TtsModelPath = Join-Path $VoiceModelDirectory "vits-melo-tts-zh_en.tar.bz2"
+}
+
+$SherpaGateScript = Join-Path $ScriptDir "test_sherpa_model.ps1"
+if (-not [string]::IsNullOrWhiteSpace($AsrModelPath)) {
+    if (-not (Test-Path $SherpaGateScript)) {
+        throw "Sherpa acceptance script missing: $SherpaGateScript"
+    }
+    & $SherpaGateScript -Kind asr -ArchivePath $AsrModelPath -AdbPath $Adb -DeviceSerial $DeviceSerial -OutputDirectory $EvidenceDir
+    if ($LASTEXITCODE -ne 0) { throw "ASR model acceptance failed." }
+}
+if (-not [string]::IsNullOrWhiteSpace($TtsModelPath)) {
+    if (-not (Test-Path $SherpaGateScript)) {
+        throw "Sherpa acceptance script missing: $SherpaGateScript"
+    }
+    & $SherpaGateScript -Kind tts -ArchivePath $TtsModelPath -AdbPath $Adb -DeviceSerial $DeviceSerial -OutputDirectory $EvidenceDir
+    if ($LASTEXITCODE -ne 0) { throw "TTS model acceptance failed." }
+}
+
 Write-Host ""
 Write-Host "Build/install/signature checks complete." -ForegroundColor Green
 Write-Host "Evidence directory: $EvidenceDir" -ForegroundColor Green
@@ -658,9 +732,17 @@ else {
     Write-Host "   Or run the complete matrix:"
     Write-Host ('   powershell -ExecutionPolicy Bypass -File .\\android_llm_spike\\scripts\\run_llm_matrix.ps1 -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
 }
-Write-Host "3. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
-Write-Host "4. Optional TTS: import vits-melo-tts-zh_en.tar.bz2 and enable local speech replies."
-Write-Host "5. Test typed chat, voice, emotion-driven Spine motion, memory commands and clear-chat."
+if ($SherpaModels -or -not [string]::IsNullOrWhiteSpace($AsrModelPath)) {
+    Write-Host "3. ASR package was imported and hard-identity verified automatically."
+} else {
+    Write-Host "3. Download/import ASR with download_sherpa_model.ps1 + test_sherpa_model.ps1."
+}
+if ($SherpaModels -or -not [string]::IsNullOrWhiteSpace($TtsModelPath)) {
+    Write-Host "4. TTS package was imported and executable-model identity verified automatically."
+} else {
+    Write-Host "4. Optional TTS: download/import with download_sherpa_model.ps1 + test_sherpa_model.ps1."
+}
+Write-Host "5. Test typed chat, live microphone ASR, TTS playback, emotion-driven Spine motion, memory commands and clear-chat."
 
 
 Write-Host "After manual testing, run the final evidence collector:" -ForegroundColor Cyan

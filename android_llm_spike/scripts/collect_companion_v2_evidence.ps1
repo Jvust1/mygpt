@@ -242,6 +242,27 @@ else {
     $BookGateStatus = "UNKNOWN_OR_NOT_RUN"
 }
 
+$AsrGateValue = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/adb-voice-model-gate-asr.txt 2>&1
+$AsrGateStatus = if ($LASTEXITCODE -eq 0 -and (($AsrGateValue | Out-String).Trim() -eq "PASS")) {
+    "PASS"
+} else {
+    "UNKNOWN_OR_NOT_RUN"
+}
+$AsrGateValue | Out-File (Join-Path $OutputDirectory "asr-model-gate.txt") -Encoding utf8
+
+$TtsGateValue = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/adb-voice-model-gate-tts.txt 2>&1
+$TtsGateStatus = if ($LASTEXITCODE -eq 0 -and (($TtsGateValue | Out-String).Trim() -eq "PASS")) {
+    "PASS"
+} else {
+    "UNKNOWN_OR_NOT_RUN"
+}
+$TtsGateValue | Out-File (Join-Path $OutputDirectory "tts-model-gate.txt") -Encoding utf8
+
+$LastVoiceImport = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/adb-voice-model-import-result.txt 2>&1
+if ($LASTEXITCODE -eq 0) {
+    $LastVoiceImport | Out-File (Join-Path $OutputDirectory "adb-voice-model-import-result.txt") -Encoding utf8
+}
+
 $AsrManifest = & $Adb -s $DeviceSerial exec-out run-as dev.mygpt.companionv2 cat files/asr-models/sherpa-zh-en-streaming/mygpt-model-manifest.txt 2>&1
 if ($LASTEXITCODE -eq 0 -and (($AsrManifest | Out-String) -match "schema=mygpt.model-fingerprint.v1")) {
     $AsrManifestStatus = "present"
@@ -310,6 +331,8 @@ $Summary = @(
     "llm_gate_quality=$($LlmGateStatus['quality'])",
     "llm_gate_pass_count=$LlmGatePassCount",
     "prompt_budget=$PromptBudgetStatus",
+    "asr_model_gate=$AsrGateStatus",
+    "tts_model_gate=$TtsGateStatus",
     "asr_model_manifest=$AsrManifestStatus",
     "tts_model_manifest=$TtsManifestStatus",
     "permission_boundary=PASS",
@@ -331,6 +354,8 @@ Write-Host "llm_gate_balanced=$($LlmGateStatus['balanced'])"
 Write-Host "llm_gate_quality=$($LlmGateStatus['quality'])"
 Write-Host "llm_gate_pass_count=$LlmGatePassCount"
 Write-Host "prompt_budget=$PromptBudgetStatus"
+Write-Host "asr_model_gate=$AsrGateStatus"
+Write-Host "tts_model_gate=$TtsGateStatus"
 Write-Host "asr_model_manifest=$AsrManifestStatus"
 Write-Host "tts_model_manifest=$TtsManifestStatus"
 Write-Host "Add your remaining visual/voice/model PASS/FAIL notes before archiving the evidence directory."
