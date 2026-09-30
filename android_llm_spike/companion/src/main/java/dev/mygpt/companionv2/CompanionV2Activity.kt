@@ -30,6 +30,8 @@ import dev.mygpt.llama.LlamaCppCompanionEngine
 import dev.mygpt.spike.AiriActEmotionParser
 import dev.mygpt.spike.BookContextMailbox
 import dev.mygpt.spike.BookContextSnapshot
+import dev.mygpt.spike.CompanionCoordinator
+import dev.mygpt.spike.StudySupervisorRuntime
 import dev.mygpt.spike.GgufModelInstaller
 import dev.mygpt.spike.SpineCharacterRuntime
 import dev.mygpt.spike.SpinePackageLayout
@@ -50,7 +52,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
+class CompanionV2Activity : AndroidApplication(),
+    BookContextMailbox.Listener,
+    StudySupervisorRuntime.Listener {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private lateinit var page: LinearLayout
@@ -69,6 +73,8 @@ class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
     private lateinit var sendButton: Button
     private lateinit var voiceState: TextView
     private lateinit var voiceButton: Button
+    private lateinit var supervisionState: TextView
+    private lateinit var supervisionButton: Button
     private lateinit var memoryState: TextView
     private lateinit var memoryStore: LocalCompanionMemoryStore
     private lateinit var conversationStore: LocalConversationStore
@@ -190,6 +196,14 @@ class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
             isEnabled = false
         }
         page.addView(ttsToggleButton)
+
+        supervisionState = label("轻监督：等待 Book 学习会话", 13)
+        supervisionState.setPadding(0, dp(16), 0, dp(8))
+        page.addView(supervisionState)
+        supervisionButton = button("开启当前会话轻监督") { toggleSupervision() }.apply {
+            isEnabled = false
+        }
+        page.addView(supervisionButton)
 
         memoryState = label("长期记忆：显式保存，不自动记录聊天", 13)
         memoryState.setPadding(0, dp(16), 0, dp(8))
@@ -367,6 +381,7 @@ class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
                 pipButton.isEnabled = true
                 characterState.text = "角色：已就绪 · Spine " + installed.spineVersion
                 characterRuntime.load(installed.directory)
+                characterRuntime.show(StudySupervisorRuntime.shared().currentCue())
             }.onFailure { error ->
                 skinReady = false
                 pipButton.isEnabled = false
@@ -388,6 +403,7 @@ class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
                 pipButton.isEnabled = true
                 characterState.text = "角色：已恢复 · Spine " + version
                 characterRuntime.load(directory)
+                characterRuntime.show(StudySupervisorRuntime.shared().currentCue())
             }.onFailure {
                 skinReady = false
                 pipButton.isEnabled = false
@@ -953,6 +969,33 @@ class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
         }
     }
 
+    override fun onSupervisionChanged(
+        cue: CompanionCoordinator.Cue,
+        supervisionOptIn: Boolean,
+        status: String,
+    ) {
+        runOnUiThread {
+            supervisionButton.isEnabled = StudySupervisorRuntime.shared().hasActiveSession()
+            supervisionButton.text = if (supervisionOptIn) {
+                "关闭当前会话轻监督"
+            } else {
+                "开启当前会话轻监督"
+            }
+            supervisionState.text = "轻监督：" + status + " · cue=" + cue.name
+            if (skinReady) {
+                characterRuntime.show(cue)
+            }
+        }
+    }
+
+    private fun toggleSupervision() {
+        val runtime = StudySupervisorRuntime.shared()
+        val target = !runtime.isSupervisionOptIn()
+        if (!runtime.setSupervisionOptIn(target)) {
+            supervisionState.text = "轻监督：需要先有 Book 学习会话"
+        }
+    }
+
     override fun onBookContextChanged(current: BookContextSnapshot?) {
         runOnUiThread {
             refreshBookContextStatus()
@@ -1241,12 +1284,14 @@ class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
         super.onStart()
         foreground = true
         BookContextMailbox.shared().addListener(this)
+        StudySupervisorRuntime.shared().addListener(this)
         refreshBookContextStatus()
     }
 
     override fun onStop() {
         if (!isInPictureInPictureMode) {
             BookContextMailbox.shared().removeListener(this)
+            StudySupervisorRuntime.shared().removeListener(this)
             foreground = false
             generationJob?.cancel()
             generationJob = null
@@ -1263,6 +1308,7 @@ class CompanionV2Activity : AndroidApplication(), BookContextMailbox.Listener {
 
     override fun onDestroy() {
         BookContextMailbox.shared().removeListener(this)
+        StudySupervisorRuntime.shared().removeListener(this)
         stopRecording(null)
         generationJob?.cancel()
         generationJob = null

@@ -115,6 +115,11 @@ public final class BookContextSnapshot {
                 + sectionId + ":" + sourceId + ":" + sourceSha256;
     }
 
+    public String coordinatorReference() {
+        return "book-lease://signed/" + bookId + "/" + bookVersion + "/"
+                + sectionId + "/" + sourceId + "/" + sourceSha256;
+    }
+
     /**
      * Render lower-authority model input. JSON string values remain data.
      */

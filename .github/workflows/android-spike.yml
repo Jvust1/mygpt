@@ -51,6 +51,7 @@ jobs:
             android_spike/src/main/java/dev/mygpt/spike/GgufModelInstaller.java \
             android_spike/src/main/java/dev/mygpt/spike/BookContextSnapshot.java \
             android_spike/src/main/java/dev/mygpt/spike/BookContextMailbox.java \
+            android_spike/src/main/java/dev/mygpt/spike/StudySupervisorRuntime.java \
             android_spike/src/test/java/dev/mygpt/spike/CompanionCoordinatorSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/SpinePackageLayoutSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/SkinCapabilityCatalogSmoke.java \
@@ -60,7 +61,8 @@ jobs:
             android_spike/src/test/java/dev/mygpt/spike/OnDeviceCompanionBrainSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/GgufModelProbeSmoke.java \
             android_spike/src/test/java/dev/mygpt/spike/GgufModelInstallerSmoke.java \
-            android_spike/src/test/java/dev/mygpt/spike/BookContextMailboxSmoke.java
+            android_spike/src/test/java/dev/mygpt/spike/BookContextMailboxSmoke.java \
+            android_spike/src/test/java/dev/mygpt/spike/StudySupervisorRuntimeSmoke.java
           java -cp android_spike/build/classes dev.mygpt.spike.CompanionCoordinatorSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.SpinePackageLayoutSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.SkinCapabilityCatalogSmoke
@@ -71,6 +73,7 @@ jobs:
           java -cp android_spike/build/classes dev.mygpt.spike.GgufModelProbeSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.GgufModelInstallerSmoke
           java -cp android_spike/build/classes dev.mygpt.spike.BookContextMailboxSmoke
+          java -cp android_spike/build/classes dev.mygpt.spike.StudySupervisorRuntimeSmoke
 
   android-debug-host:
     if: github.repository == 'Jvust/mygpt'

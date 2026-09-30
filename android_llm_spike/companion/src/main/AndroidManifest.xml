@@ -22,6 +22,15 @@
             </intent-filter>
         </activity>
         <receiver
+            android:name=".BookStudySignalReceiver"
+            android:exported="true"
+            android:permission="dev.mygpt.companionv2.permission.BOOK_CONTEXT">
+            <intent-filter>
+                <action android:name="dev.mygpt.companionv2.action.BOOK_STUDY_EVENT_V1" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".BookContextReceiver"
             android:exported="true"
             android:permission="dev.mygpt.companionv2.permission.BOOK_CONTEXT">
