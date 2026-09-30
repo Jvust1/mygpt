@@ -79,27 +79,28 @@ Invoke-AdbChecked @(
 )
 Start-Sleep -Seconds 1
 
-$Xml = Find-PipButton
-$NodePattern = 'content-desc="ENTER_COMPANION_PIP"[^>]*enabled="(?<enabled>true|false)"[^>]*bounds="\[(?<x1>\d+),(?<y1>\d+)\]\[(?<x2>\d+),(?<y2>\d+)\]"'
-if ($Xml -notmatch $NodePattern) {
-    # Some Android builds order attributes differently. Parse the full node instead.
-    if ($Xml -notmatch '<node[^>]*content-desc="ENTER_COMPANION_PIP"[^>]*/>') {
+$NodePattern = '<node[^>]*content-desc="ENTER_COMPANION_PIP"[^>]*/>'
+$EnabledNode = $null
+
+for ($Attempt = 0; $Attempt -lt 20; $Attempt++) {
+    $Xml = Find-PipButton
+    if ($Xml -notmatch $NodePattern) {
         throw "PiP node could not be parsed."
     }
     $Node = $Matches[0]
-    if ($Node -notmatch 'enabled="(?<enabled>true|false)"') {
-        throw "PiP enabled state missing."
+    if ($Node -match 'enabled="true"') {
+        $EnabledNode = $Node
+        break
     }
-    $Enabled = $Matches["enabled"]
-    if ($Node -notmatch 'bounds="\[(?<x1>\d+),(?<y1>\d+)\]\[(?<x2>\d+),(?<y2>\d+)\]"') {
-        throw "PiP bounds missing."
-    }
-} else {
-    $Enabled = $Matches["enabled"]
+    Start-Sleep -Milliseconds 500
 }
 
-if ($Enabled -ne "true") {
-    throw "PiP button is disabled. Import/restore 3714430278 before running this gate."
+if ($null -eq $EnabledNode) {
+    throw "PiP button stayed disabled. Import/restore 3714430278 before running this gate."
+}
+
+if ($EnabledNode -notmatch 'bounds="\[(?<x1>\d+),(?<y1>\d+)\]\[(?<x2>\d+),(?<y2>\d+)\]"') {
+    throw "PiP bounds missing."
 }
 
 $X1 = [int]$Matches["x1"]

@@ -26,6 +26,9 @@ android {
         java.srcDir("../../android_voice_spike/app/src/main/java")
         assets.srcDir("../../android_spike/app/src/main/assets")
         assets.srcDir("../../brain/personas")
+        // Optional private build input. The Windows acceptance script populates
+        // this build directory only after exact SHA-256 verification.
+        assets.srcDir(layout.buildDirectory.dir("generated/bundled-skin-assets"))
         jniLibs.srcDir(layout.buildDirectory.dir("generated/gdx-jni"))
     }
 

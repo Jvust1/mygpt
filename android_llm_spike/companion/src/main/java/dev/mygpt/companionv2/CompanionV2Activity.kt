@@ -438,21 +438,35 @@ class CompanionV2Activity : AndroidApplication(),
 
     private fun restoreSkin() {
         val directory = File(File(filesDir, "skins"), SpinePackageLayout.SKIN_ID)
-        if (!directory.isDirectory) return
+        characterState.text = "角色：正在检查 3714430278…"
+        pipButton.isEnabled = false
+
         scope.launch {
             runCatching {
                 withContext(Dispatchers.IO) {
-                    SpinePackageLayout.validateInstalled(directory)
+                    if (directory.isDirectory) {
+                        runCatching {
+                            val version = SpinePackageLayout.validateInstalled(directory)
+                            return@withContext Pair(version, "已安装")
+                        }
+                    }
+
+                    assets.open(BUNDLED_SKIN_ASSET).use { stream ->
+                        val installed = SpinePackageLayout.install(stream, directory)
+                        Pair(installed.spineVersion, "内置验收包")
+                    }
                 }
-            }.onSuccess { version ->
+            }.onSuccess { restored ->
                 skinReady = true
                 pipButton.isEnabled = true
-                characterState.text = "角色：已恢复 · Spine " + version
+                characterState.text = "角色：已就绪 · " + restored.second
+                    + " · Spine " + restored.first
                 characterRuntime.load(directory)
                 characterRuntime.show(StudySupervisorRuntime.shared().currentCue())
             }.onFailure {
                 skinReady = false
                 pipButton.isEnabled = false
+                characterState.text = "角色：未找到可用内置包 · 可手动选择 3714430278.zip"
             }
         }
     }

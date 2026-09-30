@@ -4,7 +4,8 @@ param(
     [switch]$SkipInstall,
     [switch]$SkipSubmoduleUpdate,
     [switch]$SkipSdkInstall,
-    [switch]$AllowDirty
+    [switch]$AllowDirty,
+    [string]$SkinZip = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -123,6 +124,87 @@ if (-not (Test-Path $Gradlew)) {
     throw "gradlew.bat missing: $Gradlew"
 }
 
+$ExpectedSkinSha256 = "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f"
+$ExpectedSkinBytes = 12342220L
+$GeneratedSkinDir = Join-Path $ProjectDir "companion\build\generated\bundled-skin-assets"
+$GeneratedSkinAsset = Join-Path $GeneratedSkinDir "3714430278.zip"
+
+# Always remove stale generated private assets before choosing this build's input.
+if (Test-Path $GeneratedSkinDir) {
+    Remove-Item $GeneratedSkinDir -Recurse -Force
+}
+
+$BundledSkin = $false
+$BundledSkinMode = "none"
+$BundledSkinSha256 = ""
+$BundledSkinBytes = 0L
+
+$CandidatePaths = New-Object System.Collections.Generic.List[string]
+if (-not [string]::IsNullOrWhiteSpace($SkinZip)) {
+    $CandidatePaths.Add($SkinZip)
+}
+elseif (-not [string]::IsNullOrWhiteSpace($env:MYGPT_SKIN_ZIP)) {
+    $CandidatePaths.Add($env:MYGPT_SKIN_ZIP)
+}
+else {
+    foreach ($Drive in (Get-PSDrive -PSProvider FileSystem)) {
+        $Root = $Drive.Root
+        foreach ($Relative in @(
+            "My Drive\Skin\3714430278\3714430278.zip",
+            "My Drive\Live\Skin\3714430278\3714430278.zip",
+            "My Drive\3714430278\3714430278.zip",
+            "Google Drive\My Drive\Skin\3714430278\3714430278.zip"
+        )) {
+            $CandidatePaths.Add((Join-Path $Root $Relative))
+        }
+    }
+
+    foreach ($Relative in @(
+        "My Drive\Skin\3714430278\3714430278.zip",
+        "Google Drive\My Drive\Skin\3714430278\3714430278.zip"
+    )) {
+        $CandidatePaths.Add((Join-Path $env:USERPROFILE $Relative))
+    }
+}
+
+$SelectedSkin = $null
+foreach ($Candidate in $CandidatePaths) {
+    if ([string]::IsNullOrWhiteSpace($Candidate) -or -not (Test-Path -LiteralPath $Candidate -PathType Leaf)) {
+        continue
+    }
+
+    $Item = Get-Item -LiteralPath $Candidate
+    $Hash = (Get-FileHash -LiteralPath $Candidate -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($Item.Length -eq $ExpectedSkinBytes -and $Hash -eq $ExpectedSkinSha256) {
+        $SelectedSkin = $Item.FullName
+        $BundledSkinSha256 = $Hash
+        $BundledSkinBytes = $Item.Length
+        break
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($SkinZip) -or
+        -not [string]::IsNullOrWhiteSpace($env:MYGPT_SKIN_ZIP)) {
+        throw "Explicit 3714430278.zip failed size/SHA-256 verification: $Candidate"
+    }
+}
+
+if ($null -ne $SelectedSkin) {
+    New-Item -ItemType Directory -Path $GeneratedSkinDir -Force | Out-Null
+    Copy-Item -LiteralPath $SelectedSkin -Destination $GeneratedSkinAsset -Force
+    $BundledSkin = $true
+    $BundledSkinMode = if (-not [string]::IsNullOrWhiteSpace($SkinZip)) {
+        "explicit"
+    } elseif (-not [string]::IsNullOrWhiteSpace($env:MYGPT_SKIN_ZIP)) {
+        "environment"
+    } else {
+        "auto-local-drive"
+    }
+    Write-Host "3714430278 bundled input PASS · $BundledSkinMode · $BundledSkinSha256" -ForegroundColor Green
+}
+else {
+    Write-Host "No verified local 3714430278.zip found; building with manual-import fallback." -ForegroundColor Yellow
+}
+
 Write-Host "Building Companion V2 local stack..." -ForegroundColor Cyan
 $GradleArgs = @(
     ":llama-lib:assembleRelease",
@@ -152,6 +234,44 @@ foreach ($Path in @($CompanionApk, $SenderApk, $LocalLlmApk, $BridgeAar, $BookSd
     if (-not (Test-Path $Path)) {
         throw "Expected build artifact missing: $Path"
     }
+}
+
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$ApkZip = [System.IO.Compression.ZipFile]::OpenRead($CompanionApk)
+try {
+    $SkinEntry = $ApkZip.Entries | Where-Object { $_.FullName -eq "assets/3714430278.zip" } | Select-Object -First 1
+    if ($BundledSkin) {
+        if ($null -eq $SkinEntry) {
+            throw "Verified skin was selected but Companion APK is missing assets/3714430278.zip"
+        }
+        if ($SkinEntry.Length -ne $ExpectedSkinBytes) {
+            throw "Bundled skin APK entry has unexpected size: $($SkinEntry.Length)"
+        }
+
+        $Sha = [System.Security.Cryptography.SHA256]::Create()
+        $EntryStream = $SkinEntry.Open()
+        try {
+            $HashBytes = $Sha.ComputeHash($EntryStream)
+        }
+        finally {
+            $EntryStream.Dispose()
+            $Sha.Dispose()
+        }
+        $ApkSkinSha = -join ($HashBytes | ForEach-Object { $_.ToString("x2") })
+        if ($ApkSkinSha -ne $ExpectedSkinSha256) {
+            throw "Bundled skin APK entry SHA-256 mismatch: $ApkSkinSha"
+        }
+        $ApkBundledSkinStatus = "PASS"
+    }
+    else {
+        if ($null -ne $SkinEntry) {
+            throw "Companion APK unexpectedly contains a stale bundled 3714430278.zip"
+        }
+        $ApkBundledSkinStatus = "NOT_BUNDLED"
+    }
+}
+finally {
+    $ApkZip.Dispose()
 }
 
 $PreferredBuildTools = Join-Path $SdkRoot "build-tools\36.0.0"
@@ -198,6 +318,16 @@ $JavaVersionOutput | Out-File (Join-Path $EvidenceDir "java-version.txt") -Encod
 $SdkRoot | Out-File (Join-Path $EvidenceDir "android-sdk-root.txt") -Encoding utf8
 $LlamaHead | Out-File (Join-Path $EvidenceDir "llama-pin.txt") -Encoding utf8
 $SherpaHead | Out-File (Join-Path $EvidenceDir "sherpa-pin.txt") -Encoding utf8
+@(
+    "schema=mygpt.bundled-skin-evidence.v1",
+    "bundled=$BundledSkin",
+    "mode=$BundledSkinMode",
+    "apk_entry_status=$ApkBundledSkinStatus",
+    "bytes=$BundledSkinBytes",
+    "sha256=$BundledSkinSha256",
+    "expected_bytes=$ExpectedSkinBytes",
+    "expected_sha256=$ExpectedSkinSha256"
+) | Out-File (Join-Path $EvidenceDir "bundled-skin-evidence.txt") -Encoding utf8
 
 Get-FileHash $CompanionApk -Algorithm SHA256 |
     Format-List | Out-File (Join-Path $EvidenceDir "companion-sha256.txt") -Encoding utf8
@@ -396,14 +526,30 @@ if ($ClearUiText -notmatch "BOOK_CONTEXT_UNAVAILABLE") {
 }
 Write-Host "Same-signature Book clear + UI gate PASS." -ForegroundColor Green
 
+if ($BundledSkin) {
+    Write-Host "Automatic PiP gate from bundled skin..." -ForegroundColor Cyan
+    $PipScript = Join-Path $ScriptDir "test_companion_pip.ps1"
+    if (-not (Test-Path $PipScript)) {
+        throw "PiP acceptance script missing: $PipScript"
+    }
+    & $PipScript -AdbPath $Adb -DeviceSerial $DeviceSerial -OutputDirectory $EvidenceDir
+    if ($LASTEXITCODE -ne 0) {
+        throw "PiP acceptance script failed."
+    }
+}
+
 Write-Host ""
 Write-Host "Build/install/signature checks complete." -ForegroundColor Green
 Write-Host "Evidence directory: $EvidenceDir" -ForegroundColor Green
 Write-Host ""
 Write-Host "Automated gates completed: signatures + Book context + quiet-first supervision + clear." -ForegroundColor Green
 Write-Host "Remaining manual/device gates:" -ForegroundColor Yellow
-Write-Host "1. Import decrypted 3714430278.zip."
-Write-Host ('   Then run: powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\test_companion_pip.ps1 -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
+if ($BundledSkin) {
+    Write-Host "1. 3714430278 was bundled, auto-installed and PiP-gated by this build."
+} else {
+    Write-Host "1. Import decrypted 3714430278.zip manually."
+    Write-Host ('   Then run: powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\test_companion_pip.ps1 -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
+}
 Write-Host "2. Import a compatible GGUF and load the local model."
 Write-Host "3. Run the in-app llama benchmark."
 Write-Host "4. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
