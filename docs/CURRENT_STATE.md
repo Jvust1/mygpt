@@ -1,3 +1,13 @@
+## 2026-09-30 · native HTTP authorization owns in-flight requests
+
+The actual native API now applies Pipecat-derived owned-request cancellation to
+revoke/expiry. A shared authorization completion guard serializes synchronous
+commit and success-response admission against revoke, closing the late-response
+and cross-thread check/write gaps. Strict Brain passes 623/0/0 on Python 3.12/3.13.
+See [admission semantics and evidence](NATIVE_HTTP_REVOKE_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · Pipecat task ownership completes wake/ASR path
 
 The existing wake/ASR entry now directly uses Pipecat-derived cancellation

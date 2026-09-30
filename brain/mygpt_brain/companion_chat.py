@@ -6,11 +6,12 @@ memory. Model/provider access is injected; no cloud provider is selected here.
 from __future__ import annotations
 
 import asyncio
+from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
 import json
-from typing import Annotated, Awaitable, Callable, Literal
+from typing import Annotated, Awaitable, Callable, ContextManager, Literal
 
 from pydantic import Field
 
@@ -194,6 +195,7 @@ class CompanionChatRuntime:
         *,
         now: datetime | None = None,
         is_current: Callable[[], bool] | None = None,
+        completion_guard: Callable[[], ContextManager[None]] | None = None,
     ) -> CompanionChatResult:
         request = CompanionChatRequest.model_validate(value)
         if request.persona_id != self.persona.persona_id:
@@ -333,19 +335,25 @@ class CompanionChatRuntime:
                 ),
                 presentation_emotion=reply.emotion,
             )
-            if self.session_store is not None:
-                durable_messages = [user, assistant]
-                if created_system:
-                    durable_messages.insert(0, messages[0])
-                self.session_store.commit_exchange(
-                    persona_id=self.persona.persona_id,
-                    messages=durable_messages,
-                    request_id=request.request_id,
-                    fingerprint=fingerprint,
-                    result=result.model_dump(mode="json"),
-                    completed_at=clock,
-                )
-            messages.extend((user, assistant))
-            self._sessions[request.session_id] = messages
-            self._requests[request.request_id] = (fingerprint, result)
+            # Native HTTP revocation runs on another thread. Its authorization
+            # lease must cover this whole synchronous completion, not just an
+            # adjacent boolean check. No await occurs while the guard is held.
+            with completion_guard() if completion_guard is not None else nullcontext():
+                if is_current is not None and not is_current():
+                    raise SupersededChatTurn("companion turn superseded before commit")
+                if self.session_store is not None:
+                    durable_messages = [user, assistant]
+                    if created_system:
+                        durable_messages.insert(0, messages[0])
+                    self.session_store.commit_exchange(
+                        persona_id=self.persona.persona_id,
+                        messages=durable_messages,
+                        request_id=request.request_id,
+                        fingerprint=fingerprint,
+                        result=result.model_dump(mode="json"),
+                        completed_at=clock,
+                    )
+                messages.extend((user, assistant))
+                self._sessions[request.session_id] = messages
+                self._requests[request.request_id] = (fingerprint, result)
             return result
