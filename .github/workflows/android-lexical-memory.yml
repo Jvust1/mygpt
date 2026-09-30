@@ -34,3 +34,9 @@ jobs:
           python android_spike/tools/lexical_sklearn_oracle.py
           python android_spike/tools/verify_lexical_integration.py
           python -m unittest tests.test_android_lexical_integration -v
+
+  android-java-boundaries:
+    if: github.repository == 'Jvust1/mygpt'
+    uses: ./.github/workflows/android-spike.yml
+    permissions:
+      contents: read
