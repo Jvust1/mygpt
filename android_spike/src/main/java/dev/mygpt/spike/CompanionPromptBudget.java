@@ -255,11 +255,11 @@ public final class CompanionPromptBudget {
     private static String renderBook(BookContextSnapshot context, int textChars) {
         String title = context.title.substring(
                 0,
-                Math.min(context.title.length(), MAX_BOOK_TITLE_CHARS)
+                safePrefixLength(context.title, Math.min(context.title.length(), MAX_BOOK_TITLE_CHARS))
         );
         String body = context.text.substring(
                 0,
-                Math.min(context.text.length(), Math.max(0, textChars))
+                safePrefixLength(context.text, Math.min(context.text.length(), Math.max(0, textChars)))
         );
 
         boolean titleTruncated = title.length() < context.title.length();
