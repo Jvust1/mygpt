@@ -1,8 +1,13 @@
 package dev.mygpt.companionv2
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.media.AudioFormat
+import android.media.AudioRecord
+import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
@@ -21,6 +26,9 @@ import dev.mygpt.spike.GgufModelInstaller
 import dev.mygpt.spike.SpineCharacterRuntime
 import dev.mygpt.spike.SpinePackageLayout
 import dev.mygpt.spike.SpineSkinApplication
+import dev.mygpt.spike.VoicePcm
+import dev.mygpt.voicespike.SherpaStreamingAsrEngine
+import dev.mygpt.voicespike.SherpaZhEnModelInstaller
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -41,9 +49,16 @@ class CompanionV2Activity : AndroidApplication() {
     private lateinit var input: EditText
     private lateinit var loadModelButton: Button
     private lateinit var sendButton: Button
+    private lateinit var voiceState: TextView
+    private lateinit var voiceButton: Button
 
     private var modelFile: File? = null
     private var llm: LlamaCppCompanionEngine? = null
+    private var asrModel: SherpaZhEnModelInstaller.Installed? = null
+    private var asrEngine: SherpaStreamingAsrEngine? = null
+    private var recorder: AudioRecord? = null
+    private var voiceThread: Thread? = null
+    @Volatile private var recording = false
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
@@ -103,6 +118,16 @@ class CompanionV2Activity : AndroidApplication() {
         }
         page.addView(loadModelButton)
 
+        voiceState = label("语音：尚未导入 sherpa 模型", 13)
+        voiceState.setPadding(0, dp(16), 0, dp(8))
+        page.addView(voiceState)
+        page.addView(button("选择 sherpa 中英模型 ZIP") { chooseAsrModel() })
+
+        voiceButton = button("语音说一句") { toggleVoice() }.apply {
+            isEnabled = false
+        }
+        page.addView(voiceButton)
+
         input = EditText(this).apply {
             hint = "和 MyGPT 说点什么"
             minLines = 3
@@ -124,6 +149,7 @@ class CompanionV2Activity : AndroidApplication() {
         page.addView(reply)
 
         restoreModel()
+        restoreAsrModel()
         restoreSkin()
     }
 
@@ -151,6 +177,18 @@ class CompanionV2Activity : AndroidApplication() {
         startActivityForResult(intent, REQUEST_MODEL)
     }
 
+    private fun chooseAsrModel() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                "application/zip", "application/x-zip", "application/octet-stream"
+            ))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivityForResult(intent, REQUEST_ASR_MODEL)
+    }
+
     @Deprecated("isolated spike keeps the simple result API")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -159,6 +197,7 @@ class CompanionV2Activity : AndroidApplication() {
         when (requestCode) {
             REQUEST_SKIN -> importSkin(uri)
             REQUEST_MODEL -> importModel(uri)
+            REQUEST_ASR_MODEL -> importAsrModel(uri)
         }
     }
 
@@ -243,6 +282,207 @@ class CompanionV2Activity : AndroidApplication() {
         }
     }
 
+    private fun importAsrModel(uri: Uri) {
+        voiceState.text = "语音：正在导入 sherpa 模型…"
+        voiceButton.isEnabled = false
+        scope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    contentResolver.openInputStream(uri).use { stream ->
+                        requireNotNull(stream) { "无法打开 sherpa 模型包" }
+                        SherpaZhEnModelInstaller.install(
+                            stream,
+                            File(filesDir, "asr-models")
+                        )
+                    }
+                }
+            }.onSuccess { installed ->
+                asrModel = installed
+                voiceState.text = "语音：模型已就绪 · 16kHz streaming zh/en"
+                updateVoiceControls()
+            }.onFailure { error ->
+                voiceState.text = "语音模型导入失败 · " + error.javaClass.simpleName
+                updateVoiceControls()
+            }
+        }
+    }
+
+    private fun restoreAsrModel() {
+        asrModel = SherpaZhEnModelInstaller.existing(File(filesDir, "asr-models"))
+        if (asrModel != null) {
+            voiceState.text = "语音：已恢复本地 sherpa 模型"
+        }
+        updateVoiceControls()
+    }
+
+    private fun updateVoiceControls() {
+        if (!::voiceButton.isInitialized) return
+        voiceButton.isEnabled = recording || (asrModel != null && llm != null)
+        voiceButton.text = if (recording) "停止语音" else "语音说一句"
+    }
+
+    private fun toggleVoice() {
+        if (recording) {
+            stopRecording("语音：已手动停止")
+            return
+        }
+        startVoice()
+    }
+
+    private fun startVoice() {
+        if (llm == null) {
+            voiceState.text = "语音：请先加载本地 GGUF"
+            return
+        }
+        val selected = asrModel
+        if (selected == null) {
+            voiceState.text = "语音：请先导入 sherpa 模型"
+            return
+        }
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_MIC)
+            return
+        }
+
+        voiceState.text = "语音：正在初始化…"
+        voiceButton.isEnabled = false
+        scope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    val localAsr = SherpaStreamingAsrEngine(selected, 2)
+                    val minBytes = AudioRecord.getMinBufferSize(
+                        SherpaStreamingAsrEngine.SAMPLE_RATE,
+                        AudioFormat.CHANNEL_IN_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT
+                    )
+                    if (minBytes <= 0) {
+                        localAsr.close()
+                        error("invalid AudioRecord buffer")
+                    }
+                    val localRecorder = AudioRecord(
+                        MediaRecorder.AudioSource.MIC,
+                        SherpaStreamingAsrEngine.SAMPLE_RATE,
+                        AudioFormat.CHANNEL_IN_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT,
+                        maxOf(minBytes * 2, 3200)
+                    )
+                    if (localRecorder.state != AudioRecord.STATE_INITIALIZED) {
+                        localRecorder.release()
+                        localAsr.close()
+                        error("AudioRecord init failed")
+                    }
+                    Pair(localAsr, localRecorder)
+                }
+            }.onSuccess { pair ->
+                asrEngine?.close()
+                asrEngine = pair.first
+                recorder = pair.second
+                recording = true
+                try {
+                    pair.second.startRecording()
+                    voiceThread = Thread({ captureVoiceLoop() }, "mygpt-companion-mic")
+                    voiceThread?.start()
+                    voiceState.text = "语音：请说一句 · 音频不落盘"
+                    updateVoiceControls()
+                } catch (error: Throwable) {
+                    stopRecording("语音启动失败 · " + error.javaClass.simpleName)
+                }
+            }.onFailure { error ->
+                voiceState.text = "语音启动失败 · " + error.javaClass.simpleName
+                updateVoiceControls()
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != REQUEST_MIC) return
+        if (grantResults.isNotEmpty()
+            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startVoice()
+        } else {
+            voiceState.text = "语音：麦克风未授权，不会录音"
+            updateVoiceControls()
+        }
+    }
+
+    private fun captureVoiceLoop() {
+        val buffer = ShortArray(1600)
+        while (recording) {
+            val localRecorder = recorder ?: break
+            val localAsr = asrEngine ?: break
+            val count = localRecorder.read(buffer, 0, buffer.size)
+            if (count <= 0) continue
+
+            try {
+                val result = localAsr.accept(VoicePcm.normalizePcm16(buffer, count))
+                val text = result.text.trim()
+                if (text.isNotEmpty()) {
+                    runOnUiThread {
+                        voiceState.text = if (result.endpoint) {
+                            "语音：已识别 · " + text
+                        } else {
+                            "语音：识别中 · " + text
+                        }
+                    }
+                }
+                if (result.endpoint && text.isNotEmpty()) {
+                    recording = false
+                    runOnUiThread {
+                        stopRecording("语音：已识别，正在交给 MyGPT")
+                        input.setText(text)
+                        sendText(text)
+                    }
+                    return
+                }
+            } catch (error: Throwable) {
+                recording = false
+                runOnUiThread {
+                    stopRecording("语音识别失败 · " + error.javaClass.simpleName)
+                }
+                return
+            }
+        }
+    }
+
+    private fun stopRecording(message: String? = null) {
+        recording = false
+
+        val localRecorder = recorder
+        recorder = null
+        if (localRecorder != null) {
+            try {
+                localRecorder.stop()
+            } catch (_: Throwable) {
+            }
+            localRecorder.release()
+        }
+
+        val thread = voiceThread
+        voiceThread = null
+        if (thread != null && thread !== Thread.currentThread()) {
+            try {
+                thread.join(1000)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+            }
+        }
+
+        val localAsr = asrEngine
+        asrEngine = null
+        localAsr?.close()
+
+        if (message != null && ::voiceState.isInitialized) {
+            voiceState.text = message
+        }
+        updateVoiceControls()
+    }
+
     private fun loadModel() {
         val file = modelFile ?: return
         modelState.text = "模型：正在加载…"
@@ -261,19 +501,27 @@ class CompanionV2Activity : AndroidApplication() {
                 modelState.text = "模型：已加载 · 全本地"
                 loadModelButton.isEnabled = true
                 sendButton.isEnabled = true
+                updateVoiceControls()
             }.onFailure { error ->
                 llm?.close()
                 llm = null
                 modelState.text = "模型加载失败 · " + error.javaClass.simpleName
                 loadModelButton.isEnabled = true
+                updateVoiceControls()
             }
         }
     }
 
     private fun send() {
-        val local = llm ?: return
         val text = input.text?.toString()?.trim().orEmpty()
         if (text.isEmpty()) return
+        sendText(text)
+    }
+
+    private fun sendText(text: String) {
+        val local = llm ?: return
+        if (text.isBlank()) return
+        stopRecording(null)
 
         input.isEnabled = false
         sendButton.isEnabled = false
@@ -302,11 +550,13 @@ class CompanionV2Activity : AndroidApplication() {
                 input.setText("")
                 input.isEnabled = true
                 sendButton.isEnabled = true
+                updateVoiceControls()
             }.onFailure { error ->
                 reply.text = "生成失败 · " + error.javaClass.simpleName
                 characterRuntime.playIdle()
                 input.isEnabled = true
                 sendButton.isEnabled = llm != null
+                updateVoiceControls()
             }
         }
     }
@@ -323,7 +573,13 @@ class CompanionV2Activity : AndroidApplication() {
         question, curious, neutral。最多输出一个标记。
         """.trimIndent()
 
+    override fun onStop() {
+        stopRecording("语音：已停止（离开前台）")
+        super.onStop()
+    }
+
     override fun onDestroy() {
+        stopRecording(null)
         scope.cancel()
         llm?.close()
         llm = null
@@ -347,6 +603,8 @@ class CompanionV2Activity : AndroidApplication() {
     companion object {
         private const val REQUEST_SKIN = 9301
         private const val REQUEST_MODEL = 9302
+        private const val REQUEST_ASR_MODEL = 9303
+        private const val REQUEST_MIC = 9304
         private const val PREFS = "mygpt_companion_v2"
         private const val PREF_MODEL_PATH = "gguf_path"
         private const val MAX_MODEL_BYTES = 16L * 1024L * 1024L * 1024L

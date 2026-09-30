@@ -23,6 +23,7 @@ android {
     sourceSets.getByName("main").apply {
         java.srcDir("../../android_spike/src/main/java")
         java.srcDir("../../android_spike/app/src/main/java")
+        java.srcDir("../../android_voice_spike/app/src/main/java")
         assets.srcDir("../../android_spike/app/src/main/assets")
         jniLibs.srcDir(layout.buildDirectory.dir("generated/gdx-jni"))
     }
@@ -38,6 +39,7 @@ android {
 dependencies {
     implementation(project(":bridge"))
     implementation(libs.androidx.core.ktx)
+    implementation("com.github.k2-fsa.sherpa-onnx:sherpa-onnx:v1.13.8")
     implementation("com.esotericsoftware.spine:spine-libgdx:$spineVersion")
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")

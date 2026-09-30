@@ -6,6 +6,10 @@ on:
     paths:
       - '.gitmodules'
       - 'third_party/llama.cpp/**'
+      - 'third_party/sherpa-onnx/**'
+      - 'android_voice_spike/**'
+      - 'third_party/sherpa-onnx/**'
+      - 'android_voice_spike/**'
       - 'android_llm_spike/**'
       - '.github/workflows/llama-android-acceptance.yml'
   pull_request:
@@ -103,11 +107,12 @@ jobs:
               names=set(z.namelist())
               llama_native=[n for n in names if n.endswith("/libai-chat.so")]
               gdx_native=[n for n in names if n.endswith("/libgdx.so")]
-              if "classes.dex" not in names or not llama_native or not gdx_native:
-                  raise SystemExit("Companion V2 APK missing classes.dex, llama or gdx native payload")
+              sherpa_native=[n for n in names if n.endswith("/libsherpa-onnx-jni.so")]
+              if "classes.dex" not in names or not llama_native or not gdx_native or not sherpa_native:
+                  raise SystemExit("Companion V2 APK missing classes.dex, llama, gdx or sherpa native payload")
               if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
                   raise SystemExit("Companion V2 APK missing Spine license notice")
-              print("Companion V2 APK PASS:", llama_native, gdx_native)
+              print("Companion V2 APK PASS:", llama_native, gdx_native, sherpa_native)
           PY
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
