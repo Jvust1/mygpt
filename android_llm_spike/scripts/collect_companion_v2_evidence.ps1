@@ -206,6 +206,7 @@ $Summary = @(
     "device_serial=$DeviceSerial",
     "book_gate=$BookGateStatus",
     "supervision=$SupervisionStatus",
+    "pip_gate=$PipGateStatus",
     "benchmark=$BenchmarkStatus",
     "permission_boundary=PASS",
     "audio_persistence=PASS"
@@ -217,5 +218,6 @@ Write-Host "permission_boundary=PASS" -ForegroundColor Green
 Write-Host "audio_persistence=PASS" -ForegroundColor Green
 Write-Host "book_gate=$BookGateStatus"
 Write-Host "supervision=$SupervisionStatus"
+Write-Host "pip_gate=$PipGateStatus"
 Write-Host "benchmark=$BenchmarkStatus"
 Write-Host "Add your remaining visual/voice/model PASS/FAIL notes before archiving the evidence directory."
