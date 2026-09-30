@@ -32,12 +32,14 @@ class VoiceActivationRuntime:
         gate: OpenWakeWordGate,
         transcriber: Transcriber,
         companion: CompanionChatRuntime,
+        speech_detector: Any | None = None,
     ) -> None:
         if not callable(transcriber):
             raise TypeError("transcriber must be async-callable")
         self.gate = gate
         self.transcriber = transcriber
         self.companion = companion
+        self.speech_detector = speech_detector
 
     async def process(
         self,
@@ -46,10 +48,18 @@ class VoiceActivationRuntime:
         utterance_audio: bytes,
         request_id: str,
         session_id: str,
+        speech_frames: list[Any] | None = None,
     ) -> VoiceActivationResult:
         wake = self.gate.process(wake_frame)
         if not wake.triggered:
             return VoiceActivationResult(wakeword=wake)
+
+        if self.speech_detector is not None and speech_frames is not None:
+            has_speech = getattr(self.speech_detector, "has_speech", None)
+            if not callable(has_speech):
+                raise TypeError("speech_detector must provide has_speech(frames)")
+            if not has_speech(speech_frames):
+                return VoiceActivationResult(wakeword=wake)
 
         if not isinstance(utterance_audio, (bytes, bytearray)) or not utterance_audio:
             raise ValueError("utterance_audio must contain local PCM/audio bytes")
