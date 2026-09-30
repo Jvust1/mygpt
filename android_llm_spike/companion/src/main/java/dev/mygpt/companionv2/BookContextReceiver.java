@@ -26,7 +26,10 @@ public final class BookContextReceiver extends BroadcastReceiver {
         int result = 0;
         try {
             String action = intent == null ? null : intent.getAction();
-            Bundle extras = intent == null ? null : intent.getExtras();
+            if (intent == null || !isExplicitToThisPackage(context, intent)) {
+                throw new IllegalArgumentException("Book broadcast must target MyGPT explicitly");
+            }
+            Bundle extras = intent.getExtras();
             if (extras == null) throw new IllegalArgumentException("missing extras");
 
             if (ACTION_CONTEXT.equals(action)) {
@@ -64,8 +67,17 @@ public final class BookContextReceiver extends BroadcastReceiver {
         }
 
         if (isOrderedBroadcast()) {
-            setResultCode(result == 1 ? RESULT_OK : RESULT_CANCELED);
+            setResultCode(result == 1
+                    ? android.app.Activity.RESULT_OK
+                    : android.app.Activity.RESULT_CANCELED);
         }
+    }
+
+    private static boolean isExplicitToThisPackage(Context context, Intent intent) {
+        String packageName = context.getPackageName();
+        if (packageName.equals(intent.getPackage())) return true;
+        return intent.getComponent() != null
+                && packageName.equals(intent.getComponent().getPackageName());
     }
 
     private static String required(Bundle extras, String key) {

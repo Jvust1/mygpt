@@ -815,7 +815,7 @@ class CompanionV2Activity : AndroidApplication() {
     ): String {
         val prefix = StringBuilder()
         if (bookContext != null) {
-            prefix.append(bookContext.dataBlock()).append("\\n\\n")
+            prefix.append(bookContext.dataBlock()).append("\n\n")
         }
         if (recalled.isEmpty()) {
             return prefix.toString() + "[USER_MESSAGE]\\n" + text
@@ -876,7 +876,7 @@ class CompanionV2Activity : AndroidApplication() {
                 reply.text = if (visible.isEmpty()) {
                     "模型没有返回可见文本。"
                 } else {
-                    visible + "\\n\\n情绪：" + parsed.emotion.wireValue
+                    visible + "\n\n情绪：" + parsed.emotion.wireValue
                         + " · " + String.format("%.2f", parsed.intensity)
                 }
                 characterRuntime.showEmotion(parsed.emotion)

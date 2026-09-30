@@ -9,6 +9,10 @@ on:
       - 'third_party/sherpa-onnx/**'
       - 'android_voice_spike/**'
       - 'android_llm_spike/**'
+      - 'android_spike/src/main/java/dev/mygpt/spike/BookContextSnapshot.java'
+      - 'android_spike/src/main/java/dev/mygpt/spike/BookContextMailbox.java'
+      - 'android_spike/src/main/java/dev/mygpt/spike/BookContextSnapshot.java'
+      - 'android_spike/src/main/java/dev/mygpt/spike/BookContextMailbox.java'
       - '.github/workflows/llama-android-acceptance.yml'
   pull_request:
     paths:
