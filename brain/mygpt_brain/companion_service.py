@@ -4,22 +4,28 @@ This is deliberately separate from local_service.py, whose browser-specific
 cookie/origin policy remains unchanged. The native transport is loopback-only,
 uses a per-process bearer token, and does not expose model/provider/persona
 configuration over HTTP.
+
+Owned request tracking/snapshot cancellation adapts Pipecat TaskManager at
+49dea682fb84bfc515d881d00dfeaaa9e9f1075f. Copyright (c) 2024–2026, Daily.
+BSD-2-Clause; see third_party/pipecat/LICENSE and NOTICE.md.
 """
 from __future__ import annotations
 
 import asyncio
+from contextlib import contextmanager
 from concurrent.futures import TimeoutError as FutureTimeoutError
+from concurrent.futures import CancelledError as FutureCancelledError, Future
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import secrets
 import threading
 import time
-from typing import Any
+from typing import Any, Callable, ContextManager
 
 from pydantic import ValidationError
 
-from .companion_chat import CompanionChatRuntime
+from .companion_chat import CompanionChatRuntime, SupersededChatTurn
 from .json_boundary import BoundaryError, load_object
 
 MAX_BODY = 16384
@@ -36,8 +42,17 @@ class CompanionServiceError(RuntimeError):
 class _RuntimeExecutor:
     """Own one asyncio loop so one runtime/Lock is never reused across loops."""
 
-    def __init__(self, runtime: CompanionChatRuntime) -> None:
+    def __init__(
+        self, runtime: CompanionChatRuntime, *,
+        is_authorized: Callable[[], bool], authorization_remaining: Callable[[], float],
+        completion_guard: Callable[[], ContextManager[None]],
+    ) -> None:
         self.runtime = runtime
+        self._is_authorized = is_authorized
+        self._authorization_remaining = authorization_remaining
+        self._completion_guard = completion_guard
+        self._pending: set[Future] = set()
+        self._pending_lock = threading.Lock()
         self.loop = asyncio.new_event_loop()
         self.started = threading.Event()
         self.closed = False
@@ -73,20 +88,66 @@ class _RuntimeExecutor:
             await asyncio.gather(*tasks, return_exceptions=True)
 
     def chat(self, value: dict[str, Any]) -> dict[str, Any]:
-        if self.closed:
-            raise CompanionServiceError("service_closed", 503)
-        future = asyncio.run_coroutine_threadsafe(self.runtime.send(value), self.loop)
+        if not self._is_authorized():
+            raise CompanionServiceError("authorization_revoked_or_expired", 403)
+        wait_seconds = min(self.timeout_seconds, self._authorization_remaining())
+        if wait_seconds <= 0:
+            raise CompanionServiceError("authorization_revoked_or_expired", 403)
+        with self._pending_lock:
+            if self.closed:
+                raise CompanionServiceError("service_closed", 503)
+            future = asyncio.run_coroutine_threadsafe(
+                self.runtime.send(
+                    value, is_current=self._is_authorized,
+                    completion_guard=self._completion_guard,
+                ), self.loop,
+            )
+            self._pending.add(future)
+        # Attach outside the lock: already-finished futures invoke callbacks
+        # synchronously, and callback removal must never deadlock registration.
+        future.add_done_callback(self._discard_pending)
+        # A revoke may race registration; fail closed even if its snapshot did
+        # not yet contain this future. The runtime has the same precommit guard.
+        if not self._is_authorized():
+            future.cancel()
+        wait_seconds = min(self.timeout_seconds, self._authorization_remaining())
+        if wait_seconds <= 0:
+            future.cancel()
+            raise CompanionServiceError("authorization_revoked_or_expired", 403)
         try:
-            result = future.result(timeout=self.timeout_seconds)
+            result = future.result(timeout=wait_seconds)
         except FutureTimeoutError:
             future.cancel()
+            if not self._is_authorized():
+                raise CompanionServiceError("authorization_revoked_or_expired", 403) from None
             raise CompanionServiceError("request_timeout", 504) from None
+        except (FutureCancelledError, SupersededChatTurn):
+            if not self._is_authorized():
+                raise CompanionServiceError("authorization_revoked_or_expired", 403) from None
+            raise CompanionServiceError("service_closed", 503) from None
+        if not self._is_authorized():
+            raise CompanionServiceError("authorization_revoked_or_expired", 403)
         return result.model_dump(mode="json")
 
+    def _discard_pending(self, future: Future) -> None:
+        with self._pending_lock:
+            self._pending.discard(future)
+
+    def cancel_active(self) -> None:
+        # Pipecat snapshots owned tasks before cancellation because completion
+        # callbacks can mutate the registry. These futures bridge HTTP threads
+        # to the one runtime loop and propagate cancel() to the asyncio task.
+        with self._pending_lock:
+            pending = tuple(self._pending)
+        for future in pending:
+            future.cancel()
+
     def close(self) -> None:
-        if self.closed:
-            return
-        self.closed = True
+        with self._pending_lock:
+            if self.closed:
+                return
+            self.closed = True
+        self.cancel_active()
         if self.loop.is_running():
             try:
                 future = asyncio.run_coroutine_threadsafe(
@@ -121,9 +182,13 @@ class _CompanionLoopbackServer(ThreadingHTTPServer):
         self.authorization_seconds = authorization_seconds
         self.authorization_deadline = time.monotonic() + authorization_seconds
         self._revoked = False
-        self._auth_lock = threading.Lock()
+        self._auth_lock = threading.RLock()
         self._connection_slots = threading.BoundedSemaphore(16)
-        self.executor = _RuntimeExecutor(runtime)
+        self.executor = _RuntimeExecutor(
+            runtime, is_authorized=self.is_authorized,
+            authorization_remaining=self.authorization_remaining,
+            completion_guard=self.completion_guard,
+        )
         try:
             super().__init__(address, handler)
         except BaseException:
@@ -160,6 +225,28 @@ class _CompanionLoopbackServer(ThreadingHTTPServer):
     def revoke(self) -> None:
         with self._auth_lock:
             self._revoked = True
+        # Do not hold auth/pending locks while cancelling: done callbacks may
+        # run synchronously and the runtime's guard reads authorization again.
+        self.executor.cancel_active()
+
+    @contextmanager
+    def completion_guard(self):
+        """Linearize synchronous commit/delivery admission against revoke.
+
+        An already admitted completion finishes before revoke can acknowledge.
+        After revocation wins, no later completion may enter this section.
+        Never hold this guard around provider/ASR awaits.
+        """
+        with self._auth_lock:
+            if not self.is_authorized():
+                raise SupersededChatTurn("authorization revoked or expired")
+            yield
+
+    def authorization_remaining(self) -> float:
+        with self._auth_lock:
+            if self._revoked:
+                return 0.0
+            return max(0.0, self.authorization_deadline - time.monotonic())
 
     def status(self) -> dict[str, Any]:
         return {
@@ -316,7 +403,11 @@ class CompanionServiceHandler(BaseHTTPRequestHandler):
                     result = self.server.executor.chat(value)
                 except BaseException as error:
                     raise self._runtime_error(error) from None
-                self._json(200, result)
+                try:
+                    with self.server.completion_guard():
+                        self._json(200, result)
+                except SupersededChatTurn:
+                    raise CompanionServiceError("authorization_revoked_or_expired", 403) from None
                 return
             if self.path == "/api/v1/revoke":
                 if value != {"schema_version": "mygpt.companion-revoke.v1"}:

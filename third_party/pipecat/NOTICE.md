@@ -29,6 +29,9 @@ BSD-2-Clause, source repository `pipecat-ai/pipecat`.
   - `TaskManager.cancel_task` ownership distinction between a cancelled child
     and a newly cancelled caller is directly adapted into
     `brain/mygpt_brain/voice_activation.py`
+  - owned task registration / completion removal / cancellation snapshots are
+    also adapted into `brain/mygpt_brain/companion_service.py` for the existing
+    threaded native HTTP entry point
 
 Derived/adapted local file: `brain/mygpt_brain/pipecat_bridge.py`.
 Runtime verification uses the separately version-pinned PyPI release
@@ -51,3 +54,18 @@ obsolete child errors without logging source text, preserves external caller
 cancellation across all teardown outcomes, and keeps retiring tasks owned until
 completion. Generation guards run after transcription, before chat commit and
 before caller delivery. No Pipecat SDK import is needed by this local path.
+
+## Native HTTP authorization lifecycle
+
+The existing native HTTP executor now tracks its cross-thread request futures,
+removes them on completion, and cancels a snapshot when local authorization is
+revoked. MyGPT adaptations use a short threading lock rather than Pipecat's
+single-loop task dictionary; callbacks run outside that lock. The same runtime
+generation guard checks authorization before inference/commit, and response
+delivery checks it again. A MyGPT authorization completion guard additionally
+serializes the synchronous SQLite/cache commit and successful HTTP write
+admission with revoke. Already-admitted sections may finish before revoke can
+acknowledge; expiry blocks later admission, rather than retroactively deleting
+completed history. Authorization TTL bounds the future wait. This closes
+the native API's admitted-request gap without replacing its loopback/token/Host
+security boundary or introducing another web framework.
