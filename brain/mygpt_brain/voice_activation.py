@@ -11,6 +11,7 @@ from typing import Any, Awaitable, Callable
 
 from .companion_chat import CompanionChatResult, CompanionChatRuntime
 from .wakeword import OpenWakeWordGate, WakeWordResult
+from .turn_control import VoiceTurnController
 
 
 Transcriber = Callable[[bytes], Awaitable[str]]
@@ -21,6 +22,7 @@ class VoiceActivationResult:
     wakeword: WakeWordResult
     transcript: str = ""
     chat: CompanionChatResult | None = None
+    interrupted_previous: bool = False
 
 
 class VoiceActivationRuntime:
@@ -33,6 +35,7 @@ class VoiceActivationRuntime:
         transcriber: Transcriber,
         companion: CompanionChatRuntime,
         speech_detector: Any | None = None,
+        turn_controller: VoiceTurnController | None = None,
     ) -> None:
         if not callable(transcriber):
             raise TypeError("transcriber must be async-callable")
@@ -40,6 +43,7 @@ class VoiceActivationRuntime:
         self.transcriber = transcriber
         self.companion = companion
         self.speech_detector = speech_detector
+        self.turn_controller = turn_controller
 
     async def process(
         self,
@@ -64,10 +68,13 @@ class VoiceActivationRuntime:
         if not isinstance(utterance_audio, (bytes, bytearray)) or not utterance_audio:
             raise ValueError("utterance_audio must contain local PCM/audio bytes")
 
+        lease = self.turn_controller.begin_user_turn() if self.turn_controller is not None else None
         transcript = (await self.transcriber(bytes(utterance_audio))).strip()
         if not transcript:
             raise RuntimeError("transcriber returned empty transcript")
 
+        if lease is not None:
+            self.turn_controller.begin_assistant_turn(lease)
         chat = await self.companion.send(
             {
                 "schema_version": "mygpt.companion-chat.v1",
@@ -77,8 +84,11 @@ class VoiceActivationRuntime:
                 "text": transcript,
             }
         )
+        if lease is not None:
+            self.turn_controller.finish_assistant_turn(lease)
         return VoiceActivationResult(
             wakeword=wake,
             transcript=transcript,
             chat=chat,
+            interrupted_previous=(lease.interrupted_previous if lease is not None else False),
         )
