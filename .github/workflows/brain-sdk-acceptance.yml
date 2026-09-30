@@ -2,7 +2,7 @@ name: Brain SDK acceptance (no live model)
 
 on:
   push:
-    branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925, feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, feat/ollama-async-fusion-dot-20260930]
+    branches: [feat/book-context-brain-20260922, feat/book-contract-audit-v1, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925, feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, feat/ollama-async-fusion-dot-20260930, feat/pipecat-wake-turn-fusion-dot-20260930]
     paths:
       - 'host/fixtures.js'
       - 'host/examples/selection-demo.json'
