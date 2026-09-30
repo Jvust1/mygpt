@@ -82,6 +82,7 @@ class CompanionV2Activity : AndroidApplication() {
     private var recorder: AudioRecord? = null
     private var voiceThread: Thread? = null
     @Volatile private var recording = false
+    @Volatile private var skinReady = false
     @Volatile private var foreground = false
     @Volatile private var ttsEnabled = false
     @Volatile private var conversationPrimed = false
@@ -141,7 +142,10 @@ class CompanionV2Activity : AndroidApplication() {
         ))
         characterRuntime = SpineCharacterRuntime(renderer, characterState)
 
-        pipButton = button("进入陪伴小窗") { enterCompanionPip() }
+        pipButton = button("进入陪伴小窗") { enterCompanionPip() }.apply {
+            isEnabled = false
+            contentDescription = "ENTER_COMPANION_PIP"
+        }
         page.addView(pipButton)
         page.addView(button("选择 3714430278.zip") { chooseSkin() })
 
@@ -223,6 +227,10 @@ class CompanionV2Activity : AndroidApplication() {
 
     private fun enterCompanionPip() {
         if (isInPictureInPictureMode) return
+        if (!skinReady) {
+            characterState.text = "角色：请先加载 3714430278"
+            return
+        }
 
         val params = PictureInPictureParams.Builder()
             .setAspectRatio(Rational(1, 1))
@@ -355,9 +363,13 @@ class CompanionV2Activity : AndroidApplication() {
                     }
                 }
             }.onSuccess { installed ->
+                skinReady = true
+                pipButton.isEnabled = true
                 characterState.text = "角色：已就绪 · Spine " + installed.spineVersion
                 characterRuntime.load(installed.directory)
             }.onFailure { error ->
+                skinReady = false
+                pipButton.isEnabled = false
                 characterState.text = "角色导入失败 · " + error.javaClass.simpleName
             }
         }
@@ -372,8 +384,13 @@ class CompanionV2Activity : AndroidApplication() {
                     SpinePackageLayout.validateInstalled(directory)
                 }
             }.onSuccess { version ->
+                skinReady = true
+                pipButton.isEnabled = true
                 characterState.text = "角色：已恢复 · Spine " + version
                 characterRuntime.load(directory)
+            }.onFailure {
+                skinReady = false
+                pipButton.isEnabled = false
             }
         }
     }
@@ -1230,6 +1247,8 @@ class CompanionV2Activity : AndroidApplication() {
             benchmarkButton.isEnabled = modelLoaded && !benchmarking
             stopRecording("语音：已停止（离开前台）")
             stopTtsPlayback("语音回复：已停止（离开前台）")
+            ttsEngine?.close()
+            ttsEngine = null
         }
         super.onStop()
     }
