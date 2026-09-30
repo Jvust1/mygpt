@@ -64,7 +64,7 @@ jobs:
           ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13113456
         run: |
           set -euo pipefail
-          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             --no-daemon --stacktrace
+          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             :companion:assembleDebug             --no-daemon --stacktrace
 
       - name: Verify upstream JNI and MyGPT bridge AARs
         shell: bash
@@ -73,9 +73,11 @@ jobs:
           llama_aar="third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
           bridge_aar="android_llm_spike/bridge/build/outputs/aar/bridge-release.aar"
           apk="android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
+          companion_apk="android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
           test -f "$llama_aar"
           test -f "$bridge_aar"
           test -f "$apk"
+          test -f "$companion_apk"
           python - <<'PY'
           import zipfile
           llama = "third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar"
@@ -97,6 +99,15 @@ jobs:
               if "classes.dex" not in names or not native:
                   raise SystemExit("local LLM APK missing classes.dex or libai-chat.so")
               print("MyGPT local LLM APK PASS:", native)
+          with zipfile.ZipFile("android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk") as z:
+              names=set(z.namelist())
+              llama_native=[n for n in names if n.endswith("/libai-chat.so")]
+              gdx_native=[n for n in names if n.endswith("/libgdx.so")]
+              if "classes.dex" not in names or not llama_native or not gdx_native:
+                  raise SystemExit("Companion V2 APK missing classes.dex, llama or gdx native payload")
+              if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
+                  raise SystemExit("Companion V2 APK missing Spine license notice")
+              print("Companion V2 APK PASS:", llama_native, gdx_native)
           PY
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -106,5 +117,6 @@ jobs:
             third_party/llama.cpp/upstream/examples/llama.android/lib/build/outputs/aar/lib-release.aar
             android_llm_spike/bridge/build/outputs/aar/bridge-release.aar
             android_llm_spike/app/build/outputs/apk/debug/app-debug.apk
+            android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk
           if-no-files-found: error
           retention-days: 3
