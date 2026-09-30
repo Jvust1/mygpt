@@ -25,3 +25,5 @@ include(":app")
 include(":companion")
 
 include(":book-sender-test")
+
+include(":book-client-sdk")

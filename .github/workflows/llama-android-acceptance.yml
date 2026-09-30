@@ -101,7 +101,7 @@ jobs:
           ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/29.0.13113456
         run: |
           set -euo pipefail
-          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             :companion:assembleDebug             :book-sender-test:assembleDebug             --no-daemon             --stacktrace
+          gradle -p android_llm_spike             :llama-lib:assembleRelease             :bridge:assembleRelease             :app:assembleDebug             :companion:assembleDebug             :book-sender-test:assembleDebug             :book-client-sdk:assembleRelease             --no-daemon             --stacktrace
 
       - name: Verify AAR and APK payloads
         shell: bash
@@ -113,12 +113,14 @@ jobs:
           local_apk="android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
           companion_apk="android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
           sender_apk="android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
+          book_sdk_aar="android_llm_spike/book-client-sdk/build/outputs/aar/book-client-sdk-release.aar"
 
           test -f "$llama_aar"
           test -f "$bridge_aar"
           test -f "$local_apk"
           test -f "$companion_apk"
           test -f "$sender_apk"
+          test -f "$book_sdk_aar"
 
           python - <<'PY'
           import zipfile
@@ -128,6 +130,7 @@ jobs:
           local_apk = "android_llm_spike/app/build/outputs/apk/debug/app-debug.apk"
           companion_apk = "android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk"
           sender_apk = "android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk"
+          book_sdk_aar = "android_llm_spike/book-client-sdk/build/outputs/aar/book-client-sdk-release.aar"
 
           with zipfile.ZipFile(llama_aar) as z:
               names = set(z.namelist())
@@ -163,6 +166,15 @@ jobs:
                   raise SystemExit("Companion V2 missing shared 3714430278 Character Card")
               print("Companion V2 APK PASS:", llama, gdx, sherpa)
 
+          with zipfile.ZipFile(book_sdk_aar) as z:
+              names = set(z.namelist())
+              if "classes.jar" not in names or "AndroidManifest.xml" not in names:
+                  raise SystemExit("Book client SDK AAR missing classes.jar or manifest")
+              manifest = z.read("AndroidManifest.xml").decode("utf-8", errors="ignore")
+              if "dev.mygpt.companionv2.permission.BOOK_CONTEXT" not in manifest:
+                  raise SystemExit("Book client SDK AAR missing signature-permission request")
+              print("Book client SDK AAR PASS")
+
           with zipfile.ZipFile(sender_apk) as z:
               if "classes.dex" not in set(z.namelist()):
                   raise SystemExit("Book context sender APK missing classes.dex")
@@ -178,5 +190,6 @@ jobs:
             android_llm_spike/app/build/outputs/apk/debug/app-debug.apk
             android_llm_spike/companion/build/outputs/apk/debug/companion-debug.apk
             android_llm_spike/book-sender-test/build/outputs/apk/debug/book-sender-test-debug.apk
+            android_llm_spike/book-client-sdk/build/outputs/aar/book-client-sdk-release.aar
           if-no-files-found: error
           retention-days: 3
