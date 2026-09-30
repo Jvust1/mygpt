@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <receiver
+            android:name=".DebugModelImportReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="dev.mygpt.companionv2.debug.IMPORT_ACCEPTANCE_MODEL_V1" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

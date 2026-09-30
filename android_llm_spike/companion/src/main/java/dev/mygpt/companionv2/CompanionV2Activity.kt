@@ -178,22 +178,28 @@ class CompanionV2Activity : AndroidApplication(),
         page.addView(pipButton)
         page.addView(button("选择 3714430278.zip") { chooseSkin() })
 
-        modelState = label("模型：尚未导入 GGUF", 13)
+        modelState = label("模型：尚未导入 GGUF", 13).apply {
+            contentDescription = "LOCAL_MODEL_STATUS"
+        }
         modelState.setPadding(0, dp(16), 0, dp(8))
         page.addView(modelState)
         page.addView(button("选择 GGUF 模型") { chooseModel() })
 
         loadModelButton = button("加载本地模型") { loadModel() }.apply {
             isEnabled = false
+            contentDescription = "LOAD_LOCAL_MODEL"
         }
         page.addView(loadModelButton)
 
-        benchmarkState = label("基准：加载模型后可运行", 13)
+        benchmarkState = label("基准：加载模型后可运行", 13).apply {
+            contentDescription = "LOCAL_BENCHMARK_STATUS"
+        }
         benchmarkState.setPadding(0, dp(8), 0, dp(4))
         page.addView(benchmarkState)
 
         benchmarkButton = button("运行本机模型基准") { runLocalBenchmark() }.apply {
             isEnabled = false
+            contentDescription = "RUN_LOCAL_BENCHMARK"
         }
         page.addView(benchmarkButton)
 

@@ -37,6 +37,62 @@ public final class GgufModelInstaller {
 
     private GgufModelInstaller() {}
 
+    public static InstalledModel inspectFile(
+            File source,
+            long maxBytes
+    ) throws IOException {
+        if (source == null) throw new IllegalArgumentException("source is required");
+        if (!source.exists() || !source.isFile() || !source.canRead()) {
+            throw new IOException("GGUF source file is not readable");
+        }
+        long size = source.length();
+        if (size < 24 || size > maxBytes) {
+            throw new IOException("GGUF source file size outside allowed range");
+        }
+        GgufModelProbe.Header header = GgufModelProbe.probe(source);
+        String hash = sha256File(source);
+        return new InstalledModel(source, hash, size, header);
+    }
+
+    public static InstalledModel adoptFile(
+            File source,
+            File modelsDir,
+            long maxBytes
+    ) throws IOException {
+        InstalledModel inspected = inspectFile(source, maxBytes);
+        if (modelsDir == null) throw new IllegalArgumentException("modelsDir is required");
+        if (!modelsDir.exists() && !modelsDir.mkdirs()) {
+            throw new IOException("failed to create model directory");
+        }
+        if (!modelsDir.isDirectory()) {
+            throw new IOException("model destination is not a directory");
+        }
+
+        File target = new File(
+                modelsDir,
+                "model-" + inspected.sha256.substring(0, 16) + ".gguf"
+        );
+        if (target.exists()) {
+            if (!target.isFile()
+                    || target.length() != inspected.sizeBytes
+                    || !inspected.sha256.equals(sha256File(target))) {
+                throw new IOException("existing GGUF target conflicts with adopted file");
+            }
+            if (!source.equals(target) && !source.delete()) source.deleteOnExit();
+            return new InstalledModel(
+                    target, inspected.sha256, inspected.sizeBytes, inspected.header
+            );
+        }
+
+        if (!source.renameTo(target)) {
+            copyAndSync(source, target);
+            if (!source.delete()) source.deleteOnExit();
+        }
+        return new InstalledModel(
+                target, inspected.sha256, inspected.sizeBytes, inspected.header
+        );
+    }
+
     public static InstalledModel install(
             InputStream source,
             File modelsDir,
