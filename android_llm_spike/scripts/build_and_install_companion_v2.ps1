@@ -5,12 +5,20 @@ param(
     [switch]$SkipSubmoduleUpdate,
     [switch]$SkipSdkInstall,
     [switch]$AllowDirty,
+    [switch]$LlmMatrix,
     [string]$SkinZip = "",
     [string]$LlmCandidatePath = ""
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+
+if ($LlmMatrix -and -not [string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
+    throw "-LlmMatrix cannot be combined with -LlmCandidatePath."
+}
+if ($SkipInstall -and ($LlmMatrix -or -not [string]::IsNullOrWhiteSpace($LlmCandidatePath))) {
+    throw "Device LLM gates require installation; remove -SkipInstall."
+}
 
 function Invoke-Checked {
     param(
@@ -601,7 +609,18 @@ if ($BundledSkin) {
     }
 }
 
-if (-not [string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
+if ($LlmMatrix) {
+    Write-Host "Automatic three-candidate LLM matrix gate..." -ForegroundColor Cyan
+    $MatrixScript = Join-Path $ScriptDir "run_llm_matrix.ps1"
+    if (-not (Test-Path $MatrixScript)) {
+        throw "LLM matrix script missing: $MatrixScript"
+    }
+    & $MatrixScript -AdbPath $Adb -DeviceSerial $DeviceSerial -OutputDirectory $EvidenceDir
+    if ($LASTEXITCODE -ne 0) {
+        throw "LLM matrix acceptance failed."
+    }
+}
+elseif (-not [string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
     if (-not (Test-Path -LiteralPath $LlmCandidatePath -PathType Leaf)) {
         throw "LLM candidate path not found: $LlmCandidatePath"
     }
@@ -627,15 +646,21 @@ if ($BundledSkin) {
     Write-Host "1. Import decrypted 3714430278.zip manually."
     Write-Host ('   Then run: powershell -ExecutionPolicy Bypass -File .\android_llm_spike\scripts\test_companion_pip.ps1 -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
 }
-if ([string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
-    Write-Host "2. Download/select a fixed GGUF candidate, then run:"
-    Write-Host ('   powershell -ExecutionPolicy Bypass -File .\\android_llm_spike\\scripts\\test_llm_candidate.ps1 -ModelPath "<verified.gguf>" -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
-} else {
+if ($LlmMatrix) {
+    Write-Host "2. speed / balanced / quality GGUF matrix was downloaded/reused and benchmarked automatically."
+}
+elseif (-not [string]::IsNullOrWhiteSpace($LlmCandidatePath)) {
     Write-Host "2. GGUF import/load/benchmark was automated from: $LlmCandidatePath"
 }
-Write-Host "4. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
-Write-Host "5. Optional TTS: import vits-melo-tts-zh_en.tar.bz2 and enable local speech replies."
-Write-Host "6. Test typed chat, voice, emotion-driven Spine motion, memory commands and clear-chat."
+else {
+    Write-Host "2. For one fixed candidate, run:"
+    Write-Host ('   powershell -ExecutionPolicy Bypass -File .\\android_llm_spike\\scripts\\test_llm_candidate.ps1 -ModelPath "<verified.gguf>" -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
+    Write-Host "   Or run the complete matrix:"
+    Write-Host ('   powershell -ExecutionPolicy Bypass -File .\\android_llm_spike\\scripts\\run_llm_matrix.ps1 -AdbPath "' + $Adb + '" -DeviceSerial "' + $DeviceSerial + '" -OutputDirectory "' + $EvidenceDir + '"')
+}
+Write-Host "3. Import ASR package sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2."
+Write-Host "4. Optional TTS: import vits-melo-tts-zh_en.tar.bz2 and enable local speech replies."
+Write-Host "5. Test typed chat, voice, emotion-driven Spine motion, memory commands and clear-chat."
 
 
 Write-Host "After manual testing, run the final evidence collector:" -ForegroundColor Cyan
