@@ -6,9 +6,6 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 
 import com.k2fsa.sherpa.onnx.OfflineTts;
-import com.k2fsa.sherpa.onnx.OfflineTtsConfig;
-import com.k2fsa.sherpa.onnx.OfflineTtsModelConfig;
-import com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,36 +29,7 @@ public final class SherpaMeloTtsEngine implements AutoCloseable {
             SherpaMeloTtsModelInstaller.Installed model,
             int numThreads
     ) {
-        if (model == null || !model.isComplete()) {
-            throw new IllegalArgumentException("complete Melo TTS model is required");
-        }
-        if (numThreads < 1 || numThreads > 8) {
-            throw new IllegalArgumentException("numThreads must be in 1..8");
-        }
-
-        OfflineTtsVitsModelConfig vits =
-                OfflineTtsVitsModelConfig.builder()
-                        .setModel(model.model.getAbsolutePath())
-                        .setTokens(model.tokens.getAbsolutePath())
-                        .setLexicon(model.lexicon.getAbsolutePath())
-                        .build();
-
-        OfflineTtsModelConfig modelConfig =
-                OfflineTtsModelConfig.builder()
-                        .setVits(vits)
-                        .setNumThreads(numThreads)
-                        .setDebug(false)
-                        .setProvider("cpu")
-                        .build();
-
-        OfflineTtsConfig config =
-                OfflineTtsConfig.builder()
-                        .setModel(modelConfig)
-                        .setRuleFsts(model.ruleFsts())
-                        .setMaxNumSentences(1)
-                        .build();
-
-        tts = new OfflineTts(config);
+        tts = SherpaMeloTtsFactory.create(model, numThreads);
 
         int sampleRate = tts.getSampleRate();
         int minBytes = AudioTrack.getMinBufferSize(
