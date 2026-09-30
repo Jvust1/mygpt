@@ -11,6 +11,7 @@ from urllib import request as urllib_request
 from urllib.error import HTTPError, URLError
 
 from .companion_chat import ChatPrompt
+from .airi_act import ACT_PRESENTATION_INSTRUCTION
 
 
 class OllamaResponder:
@@ -35,13 +36,17 @@ class OllamaResponder:
         return await asyncio.to_thread(self._call_sync, prompt)
 
     def _call_sync(self, prompt: ChatPrompt) -> str:
+        messages = [
+            {"role": item.role, "content": item.content}
+            for item in prompt.provider_messages()
+        ]
+        # Provider output is normalized by CompanionChatRuntime before it can
+        # reach the native API, voice bridge, or persisted conversation.
+        messages.insert(1, {"role": "system", "content": ACT_PRESENTATION_INSTRUCTION})
         payload = {
             "model": self.model,
             "stream": False,
-            "messages": [
-                {"role": item.role, "content": item.content}
-                for item in prompt.provider_messages()
-            ],
+            "messages": messages,
         }
         body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         req = urllib_request.Request(

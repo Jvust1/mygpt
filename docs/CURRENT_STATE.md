@@ -1,3 +1,14 @@
+## 2026-09-30 · AIRI ACT Python runtime fusion review candidate
+
+The existing Python/Ollama reply path now directly calls the pinned MIT AIRI ACT
+emotion parser before persistence and native HTTP/Pipecat output. Visible speech
+and renderer-neutral emotion remain separate. Local strict Brain acceptance is
+563 passed / 0 skipped; root Python 44 and JS 66 also pass. This is a separate
+review branch on PR #15's current code, not Android/device completion. See
+[exact scope and reproduction](AIRI_ACT_RUNTIME_FUSION_20260930.md).
+
+---
+
 ## 2026-09-30 · LLM quality matrix + sherpa native loopback checkpoint · PR #15
 
 Implementation checkpoint: `9920d53800ad1aec741630300283d385825fd986` (this governance-only commit follows it).

@@ -2,12 +2,13 @@ name: AIRI companion brain focused acceptance
 
 on:
   push:
-    branches: [feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, fix/voice-activation-test-20260930, feat/pipecat-turn-control-20260930, feat/livekit-turn-fusion-20261001]
+    branches: [feat/airi-chat-memory-brain-20260929, feat/openwakeword-gate-20260930, fix/voice-activation-test-20260930, feat/pipecat-turn-control-20260930, feat/livekit-turn-fusion-20261001, feat/airi-runtime-fusion-dot-20260930]
     paths:
       - 'brain/mygpt_brain/conversation.py'
       - 'brain/mygpt_brain/memory_store.py'
       - 'brain/mygpt_brain/session_store.py'
       - 'brain/mygpt_brain/companion_chat.py'
+      - 'brain/mygpt_brain/airi_act.py'
       - 'brain/mygpt_brain/providers.py'
       - 'brain/mygpt_brain/companion_service.py'
       - 'brain/mygpt_brain/character_card.py'
@@ -21,6 +22,7 @@ on:
       - 'brain/tests/test_memory_store.py'
       - 'brain/tests/test_session_store.py'
       - 'brain/tests/test_companion_chat.py'
+      - 'brain/tests/test_airi_act.py'
       - 'brain/tests/test_providers.py'
       - 'brain/tests/test_character_card.py'
       - 'brain/tests/test_wakeword.py'
@@ -62,7 +64,11 @@ jobs:
             tests/test_wakeword.py \
             tests/test_vad.py \
             tests/test_voice_activation.py \
-            tests/test_turn_control.py
+            tests/test_turn_control.py \
+            tests/test_airi_act.py \
+            tests/test_companion_service.py \
+            tests/test_pipecat_bridge.py \
+            tests/test_livekit_bridge.py
       - name: Compile new runtime modules
         working-directory: brain
         run: python -m compileall -q mygpt_brain scripts/chat_local_ollama.py scripts/serve_companion_ollama.py

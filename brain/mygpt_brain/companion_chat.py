@@ -14,6 +14,7 @@ from typing import Annotated, Awaitable, Callable, Literal
 
 from pydantic import Field
 
+from .airi_act import PresentationEmotion, parse_act_reply
 from .conversation import (
     ChatMessage,
     ConversationWindow,
@@ -23,18 +24,6 @@ from .conversation import (
 from .core import Contract, ContextValue, Identifier
 from .memory_store import MemoryRecord, MemoryStore
 from .session_store import ChatSessionStore
-
-PresentationEmotion = Literal[
-    "happy",
-    "sad",
-    "angry",
-    "think",
-    "surprised",
-    "awkward",
-    "question",
-    "curious",
-    "neutral",
-]
 
 
 class CompanionPersona(Contract):
@@ -238,7 +227,10 @@ class CompanionChatRuntime:
                 self._sessions[request.session_id] = messages
             created_system = False
             if not messages:
-                messages.append(self.persona.system_message(request.session_id, now=clock))
+                # Stage the persona with the exchange. A rejected/failed first
+                # reply must not leave an in-memory-only persona that causes
+                # the next successful SQLite commit to omit system authority.
+                messages = [self.persona.system_message(request.session_id, now=clock)]
                 created_system = True
 
             transient_context: list[ChatMessage] = []
@@ -275,10 +267,22 @@ class CompanionChatRuntime:
             except TimeoutError:
                 raise RuntimeError("chat responder timeout") from None
             if isinstance(raw_reply, str):
-                reply = CompanionReply(text=raw_reply)
+                try:
+                    presentation = parse_act_reply(raw_reply)
+                    reply = CompanionReply(
+                        text=presentation.text,
+                        emotion=presentation.emotion,
+                    )
+                except (ValueError, TypeError):
+                    raise RuntimeError("invalid or empty chat reply") from None
             else:
                 try:
                     reply = CompanionReply.model_validate(raw_reply)
+                    # Structured responders already chose an explicit emotion.
+                    # Keep it authoritative, but never let embedded ACT syntax
+                    # leak into TTS or durable assistant history.
+                    presentation = parse_act_reply(reply.text)
+                    reply = CompanionReply(text=presentation.text, emotion=reply.emotion)
                 except Exception:
                     raise RuntimeError("invalid structured chat reply") from None
             reply_text = reply.text
@@ -322,5 +326,6 @@ class CompanionChatRuntime:
                     completed_at=clock,
                 )
             messages.extend((user, assistant))
+            self._sessions[request.session_id] = messages
             self._requests[request.request_id] = (fingerprint, result)
             return result

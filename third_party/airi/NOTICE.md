@@ -28,6 +28,7 @@ Local derived/adapted files:
 - `brain/mygpt_brain/conversation.py`
 - `brain/mygpt_brain/session_store.py`
 - `brain/mygpt_brain/character_card.py`
+- `brain/mygpt_brain/airi_act.py`
 - `android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java`
 - `android_spike/src/main/java/dev/mygpt/spike/AiriActEmotionParser.java`
 
@@ -48,3 +49,28 @@ Material changes in MyGPT:
   around these boundaries, not AIRI source copies.
 
 The upstream MIT license is reproduced in `third_party/airi/LICENSE`.
+
+## 2026-09-30: ACT parser fused into the actual Python reply path
+
+`airi_act.py` directly ports `parseActEmotion`, `normalizeEmotionName`, and
+`normalizeIntensity` from the pinned `packages/stage-ui/src/composables/queues.ts`
+(Git blob `72e7549144149235ec886f0b7be38dded9d67548`). The vocabulary comes from
+`packages/stage-ui/src/constants/emotions.ts` (blob
+`b8d5f2edaf5fe589e55142ca649eac8222f3eb23`). Copyright and MIT terms are retained.
+The existing LICENSE matches pinned upstream blob
+`1bd715572472cd766a5c1444a467f5f011b14aaa`.
+
+Material port changes: TypeScript to dependency-free Python; bounded whole-reply
+scanning replaces the greedy regex; strict JSON rejects duplicate keys/nonfinite
+numbers; invalid and incomplete ACT envelopes are hidden from speech/history;
+the last valid emotion wins. Only presentation is interpreted. No AIRI action,
+delay, tool execution or remote connection is enabled. The existing v1 API uses
+the emotion name; normalized intensity is not yet part of that API.
+
+`CompanionChatRuntime.send()` invokes the port for every new provider reply before
+persisting or returning it. The Ollama adapter requests this narrow output format.
+Native HTTP and existing Pipecat consumers receive clean text and separate emotion.
+No unrelated AIRI monorepo modules or duplicate vendor directory were imported.
+
+Eligibility checked at 2026-09-30 18:11 UTC via
+https://api.github.com/repos/moeru-ai/airi : 49,887 stars, MIT, not archived.

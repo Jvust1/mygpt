@@ -4,6 +4,7 @@ import pytest
 from mygpt_brain.companion_chat import ChatPrompt, CompanionPersona
 from mygpt_brain.conversation import ChatMessage, compact_conversation
 from mygpt_brain.providers import OllamaResponder
+from mygpt_brain.airi_act import ACT_PRESENTATION_INSTRUCTION
 
 from datetime import datetime, timezone
 
@@ -44,5 +45,6 @@ async def test_ollama_projects_authority_and_parses_response(monkeypatch):
     assert answer=="本地回复"
     assert captured["url"]=="http://127.0.0.1:11434/api/chat"
     assert captured["body"]["messages"][0]=={"role":"system","content":"trusted persona"}
-    assert captured["body"]["messages"][1]["role"]=="user"
-    assert captured["body"]["messages"][1]["content"].startswith("[APPLICATION_CONTEXT_DATA")
+    assert captured["body"]["messages"][1]=={"role":"system","content":ACT_PRESENTATION_INSTRUCTION}
+    assert captured["body"]["messages"][2]["role"]=="user"
+    assert captured["body"]["messages"][2]["content"].startswith("[APPLICATION_CONTEXT_DATA")
