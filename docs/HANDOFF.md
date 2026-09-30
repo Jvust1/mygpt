@@ -1,3 +1,18 @@
+## Latest handoff · 2026-09-30 · PR #15 Companion V2 all-local candidate
+
+Current branch/head: `feat/airi-chat-memory-brain-20260929` @ `a83680c1810242d541941b6c2b1a361c8d00bf71`; Draft PR #15; base `feat/spine-3714430278-runtime-refresh-20260929`; main untouched.
+
+Current candidate is no longer just an AIRI chat experiment. The isolated Companion V2 code now combines:
+`3714430278 Spine + app-private GGUF + llama.cpp JNI + sherpa streaming ASR + optional Melo TTS + explicit Android memory + AIRI ACT emotion`.
+
+Runtime intent is fully local after models/skin are imported. Companion V2 requests only RECORD_AUDIO; it does not request INTERNET, SYSTEM_ALERT_WINDOW or broad storage access. Model weights remain external inputs and are not committed.
+
+Do **not** claim the new APKs/AARs build successfully yet. GitHub hosted Actions still fail before runner allocation; exact-head runs `36659174083`, `36659174123`, and `36659174091` all show runner_id=0 and zero steps. Earlier accepted PR #13 / v0.0.6 skin evidence remains historical and must not be overwritten.
+
+Highest-value next step: execute the exact-head llama/sherpa/Companion V2 builds on a functioning runner, then install on Xiaomi 14 and test model load, typed chat, mic ASR, TTS, memory and 3714430278 reactions. After that, connect real authenticated Book context. Do not auto-merge.
+
+---
+
 ## Latest parallel checkpoint · PR #15 companion runtime expansion
 
 Draft PR #15 is now at `741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5`, stacked on the current PR #13 skin branch. It contains direct, attributed code adoption from AIRI (MIT), Mem0 (Apache-2.0) and sherpa-onnx (Apache-2.0).

@@ -84,3 +84,15 @@ The first Android voice layer is a 16 kHz mono PCM capture foundation adapted fr
 
 ## D028 — brain-to-character emotion uses a renderer-neutral protocol
 MyGPT adopts AIRI's renderer-neutral emotion vocabulary so chat/voice logic does not depend on one skin. A specific skin may play only authored semantically matching animations. For 3714430278, happy/sad/surprised map to smile/sad/surprise; unsupported emotions fall back to idle rather than guessing with unrelated combat/action animations.
+
+## D029 — Android local model stacks stay isolated until device acceptance
+llama.cpp's current Android binding requires a newer Android/Java/native toolchain than the accepted Java-8 Spine host. MyGPT therefore keeps `android_llm_spike` isolated (minSdk 33, Java/Kotlin 17) and pins the complete upstream llama.cpp source as a submodule. The existing Java-8/minSdk24 Spine artifact is not silently upgraded. Merge/consolidation waits for exact-head build and Xiaomi 14 acceptance.
+
+## D030 — voice input/output is explicit, local and model-weight external
+Microphone capture starts only after an explicit user action and RECORD_AUDIO grant. Raw audio is not persisted. ASR/TTS weights are external user-selected model packages stored app-private; sherpa source and runtime identities are recorded separately. TTS is default-off and streams generated samples to AudioTrack without writing audio files.
+
+## D031 — long-term Android memory is explicit and erasable
+Companion V2 does not auto-capture chat transcripts. Relevant explicit memories may be recalled as application data, never system authority. Updates retain audit history. Android additionally exposes a purge path used by explicit forget commands to remove both active memory content and its audit history.
+
+## D032 — official model archives are parsed through a strict allowlist
+MyGPT accepts ZIP, TAR.BZ2 and TAR.GZ model packages through Apache Commons Compress 1.28.0. Archive paths are never materialized directly: ASR/TTS installers select known basenames only, enforce per-file and total decompressed-size limits, and preserve README/LICENSE when present.

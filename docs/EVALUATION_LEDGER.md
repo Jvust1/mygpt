@@ -1,3 +1,40 @@
+## E016 — Companion V2 all-local stack exact-head checkpoint (2026-09-30)
+
+**Status:** CODE_INTEGRATED / EXACT_HEAD_REMOTE_EXECUTION_BLOCKED / DEVICE_PENDING
+
+**Exact head:** `a83680c1810242d541941b6c2b1a361c8d00bf71`
+
+### Integrated code paths
+- `third_party/llama.cpp/upstream` -> pinned full source -> isolated Android JNI bridge -> GGUF local chat.
+- `third_party/sherpa-onnx/upstream` + runtime v1.13.8 -> streaming microphone ASR + Melo local TTS.
+- explicit Android SQLite memory with relevant recall, update, history and purge.
+- AIRI ACT emotion marker -> renderer-neutral emotion -> conservative 3714430278 Spine action.
+- model packages imported through SAF into app-private storage; ZIP/TAR.BZ2/TAR.GZ supported.
+- no network permission is required by the Companion V2 manifest; no system-overlay or broad-storage permission is added.
+
+### Existing accepted/local evidence
+- initial AIRI Python focused candidate: 18 passed / 0 failed (earlier scope).
+- independent Java-8 smokes previously passed for PCM normalization, AIRI emotion/skin mapping and serialized local-LLM lifecycle.
+
+### Exact-head CI evidence
+- llama.cpp Android run `36659174083`: runner_id=0, 0 steps.
+- sherpa voice run `36659174123`: runner_id=0, 0 steps.
+- Android boundary run `36659174091`: both jobs runner_id=0, 0 steps.
+
+These red runs are infrastructure/provisioning failures before checkout or compilation. They provide **no exact-head code test result**.
+
+### Not yet accepted
+- Companion V2 APK build.
+- Voice Spike APK build.
+- llama JNI bridge AAR build at current head.
+- real GGUF inference on Xiaomi 14.
+- real microphone ASR on Xiaomi 14.
+- real Melo TTS playback on Xiaomi 14.
+- combined voice -> LLM -> emotion -> Spine device path.
+- authenticated real Book Android semantic context.
+
+---
+
 ## E015 — PR #15 expanded companion runtime partial validation (2026-09-29)
 
 **Status:** PARTIAL_LOCAL_VALIDATION / GITHUB_RUNNER_INFRA_BLOCKED / DEVICE_AND_LIVE_MODEL_PENDING

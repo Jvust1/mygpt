@@ -1,3 +1,43 @@
+## 2026-09-30 · Companion V2 全本地栈代码集成 checkpoint · PR #15
+
+当前精确 head：`a83680c1810242d541941b6c2b1a361c8d00bf71`。PR #15 仍为 Draft，base 为 `feat/spine-3714430278-runtime-refresh-20260929`，main 未修改。
+
+本轮已把候选从“聊天 Brain + PCM 基础”推进成同一 Android Companion V2 里的全本地链路：
+
+```text
+文字输入 ─────────────────────────────┐
+麦克风 -> sherpa streaming ASR ─────┤
+                                    ↓
+                         显式相关长期记忆召回
+                                    ↓
+                         llama.cpp Android JNI / GGUF
+                                    ↓
+                    可见文本 + AIRI <|ACT:{...}|> 情绪
+                         ↓                     ↓
+                 sherpa Melo TTS         3714430278 Spine
+                 （可选、默认关闭）        （保守动作映射）
+```
+
+关键实现：
+- 完整 `llama.cpp` 上游以 git submodule 固定到 `ba0ba54d...`；独立 `android_llm_spike` 使用上游 JNI，而不是残缺复制。
+- GGUF 通过 SAF 导入 App 私有目录；先校验 GGUF header，再做有界流式复制、SHA-256 地址化和重复检测。
+- Companion V2 同一应用内同时包含 3714430278 Spine、llama JNI、sherpa JNI、显式 Android SQLite 长期记忆。
+- sherpa 源码 submodule 固定 `040afe36...`；运行时二进制明确固定 `v1.13.8 / 11afbd00...`，两种身份不混写。
+- ASR：用户点击语音按钮才申请 `RECORD_AUDIO`；16 kHz mono；raw audio 不落盘；识别 endpoint 后自动送入本地 LLM。
+- TTS：Melo 中英模型外置导入；默认关闭；开启后将去除 ACT 标记后的可见回复直接流式写入 AudioTrack，不保存 wav。
+- 模型导入支持 ZIP / TAR.BZ2 / TAR.GZ；只提取白名单文件，并保留 README/LICENSE（如归档包含）。
+- Android 长期记忆采用 Mem0 风格 add/search/update/delete/history；聊天不自动进入长期记忆；`:forget` 使用 purge 同时删除活动内容与审计历史。
+- AIRI ACT 情绪白名单为 happy/sad/angry/think/surprised/awkward/question/curious/neutral；3714430278 只对 smile/sad/surprise 做精确语义映射，其余回 idle。
+- Companion V2 Manifest 当前仅新增 `RECORD_AUDIO`；没有 INTERNET、SYSTEM_ALERT_WINDOW 或广泛存储权限。
+
+验证边界：
+- 早期 AIRI Python 候选 18/18 本地测试通过；若干纯 Java 8 协议 smoke 曾独立 PASS。
+- **当前精确 head 的 Android/llama/sherpa workflow 没有真正执行代码**：run `36659174083`、`36659174123`、`36659174091` 均为 `runner_id=0`、0 steps。
+- 因此 Companion V2 APK、Voice Spike APK、llama JNI bridge 的 exact-head build 仍是 **NOT EXECUTED**，不能写成 PASS 或代码 FAIL。
+- 小米 14 本地 GGUF/ASR/TTS/Spine 全链实机仍待验收；真实 Book Android producer 仍未连接。
+
+---
+
 ## 2026-09-29 · PR #15 expanded companion runtime checkpoint
 
 PR #15 has advanced from the initial AIRI chat/session candidate into a broader companion runtime stack.

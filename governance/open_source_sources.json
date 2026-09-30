@@ -1,6 +1,6 @@
 {
   "schema_version": "mygpt_open_source_sources_v1",
-  "updated_date": "2026-09-29",
+  "updated_date": "2026-09-30",
   "target": "Book Android + mygpt + Live character companion",
   "code_copied_by_registry": true,
   "policy": {
@@ -15,9 +15,9 @@
     "restricted_or_copyleft": "reference-only until explicit decision"
   },
   "counts": {
-    "total": 52,
+    "total": 53,
     "p0": 19,
-    "p1": 16,
+    "p1": 17,
     "p2": 15,
     "p3": 2
   },
@@ -27,7 +27,7 @@
       "area": "Companion chat/session/character agent runtime",
       "priority": "P0",
       "mode": "CODE_ADAPTED",
-      "why": "Direct companion runtime adoption: authority-aware chat, durable sessions, character cards, and renderer-neutral emotion protocol.",
+      "why": "Authority-aware chat, durable sessions, character cards, renderer-neutral emotion protocol and ACT marker parsing integrated into companion runtime.",
       "url": "https://github.com/moeru-ai/airi",
       "license_status": "MIT_VERIFIED",
       "pinned_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
@@ -35,10 +35,11 @@
       "local_paths": [
         "brain/mygpt_brain/conversation.py",
         "brain/mygpt_brain/session_store.py",
-        "third_party/airi/LICENSE",
-        "third_party/airi/NOTICE.md",
         "brain/mygpt_brain/character_card.py",
-        "android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java"
+        "android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java",
+        "android_spike/src/main/java/dev/mygpt/spike/AiriActEmotionParser.java",
+        "third_party/airi/LICENSE",
+        "third_party/airi/NOTICE.md"
       ]
     },
     {
@@ -292,17 +293,21 @@
       "repo": "ggml-org/llama.cpp",
       "area": "On-device LLM",
       "priority": "P0",
-      "mode": "CODE_ADAPTED_INTERFACE",
-      "why": "Android on-device GGUF engine lifecycle/concurrency contract adapted now; native JNI backend remains benchmark-gated.",
+      "mode": "SOURCE_PINNED_AND_CODE_ADAPTED",
+      "why": "Pinned full upstream submodule plus isolated Android JNI bridge, GGUF validation/import, local chat and Companion V2 integration.",
       "url": "https://github.com/ggml-org/llama.cpp",
       "code_copied": true,
       "license_status": "MIT_VERIFIED",
       "pinned_commit": "ba0ba54d93b25faf1e149f4ccedd3e9d84798563",
       "local_paths": [
+        "third_party/llama.cpp/upstream",
+        "android_llm_spike/bridge",
+        "android_llm_spike/app",
+        "android_llm_spike/companion",
         "android_spike/src/main/java/dev/mygpt/spike/LocalLlmEngine.java",
         "android_spike/src/main/java/dev/mygpt/spike/SerializedLocalLlmEngine.java",
-        "third_party/llama.cpp/LICENSE",
-        "third_party/llama.cpp/NOTICE.md"
+        "android_spike/src/main/java/dev/mygpt/spike/GgufModelProbe.java",
+        "android_spike/src/main/java/dev/mygpt/spike/GgufModelInstaller.java"
       ]
     },
     {
@@ -317,20 +322,22 @@
     },
     {
       "repo": "k2-fsa/sherpa-onnx",
-      "area": "Speech stack",
+      "area": "Offline Android ASR/TTS",
       "priority": "P0",
-      "mode": "CODE_ADAPTED",
-      "why": "Android 16 kHz mono microphone capture/PCM normalization base for future offline ASR; recognizer/model remains separately gated.",
+      "mode": "SOURCE_PINNED_AND_CODE_ADAPTED",
+      "why": "Pinned source submodule; Android microphone/PCM, streaming zh/en ASR, Melo zh/en local TTS and external model import paths integrated into Companion V2.",
       "url": "https://github.com/k2-fsa/sherpa-onnx",
       "code_copied": true,
       "license_status": "APACHE_2_0_VERIFIED",
       "pinned_commit": "040afe360a38e25daaa325ce8889abf93ea02609",
       "local_paths": [
+        "third_party/sherpa-onnx/upstream",
+        "android_voice_spike",
         "android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java",
-        "android_spike/app/src/main/java/dev/mygpt/spike/VoiceCaptureSession.java",
-        "third_party/sherpa-onnx/LICENSE",
-        "third_party/sherpa-onnx/NOTICE.md"
-      ]
+        "android_spike/app/src/main/java/dev/mygpt/spike/VoiceCaptureSession.java"
+      ],
+      "runtime_version": "v1.13.8",
+      "runtime_commit": "11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf"
     },
     {
       "repo": "pytorch/executorch",
@@ -447,13 +454,14 @@
       "area": "Long-term memory",
       "priority": "P1",
       "mode": "CODE_ADAPTED",
-      "why": "Local companion memory lifecycle: explicit add/search/get/update/delete/history with transactional audit history.",
+      "why": "Explicit local memory lifecycle on Python and Android: add/search/get/update/delete/history plus full-erasure purge on Android.",
       "url": "https://github.com/mem0ai/mem0",
       "code_copied": true,
       "license_status": "APACHE_2_0_VERIFIED",
       "pinned_commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
       "local_paths": [
         "brain/mygpt_brain/memory_store.py",
+        "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt",
         "third_party/mem0/LICENSE",
         "third_party/mem0/NOTICE.md"
       ]
@@ -577,6 +585,22 @@
       "url": "https://github.com/guansss/pixi-live2d-display",
       "code_copied": false,
       "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "apache/commons-compress",
+      "area": "Model archive import",
+      "priority": "P1",
+      "mode": "PINNED_DEPENDENCY",
+      "why": "Streaming support for official sherpa model archives in ZIP/TAR.BZ2/TAR.GZ while MyGPT retains strict extraction allowlists and size limits.",
+      "url": "https://github.com/apache/commons-compress",
+      "code_copied": false,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "version": "1.28.0",
+      "local_paths": [
+        "android_voice_spike/app/src/main/java/dev/mygpt/voicespike/ModelArchiveReader.java",
+        "third_party/commons-compress/LICENSE",
+        "third_party/commons-compress/NOTICE.md"
+      ]
     }
   ]
 }

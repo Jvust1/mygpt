@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-29",
+  "updated_date": "2026-09-30",
   "repository": "Jvust/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/spine-3714430278-runtime-refresh-20260929",
-  "phase": "ANDROID_MULTIFORM_V006_INSTALL_FIXED_CI_PASS",
-  "status": "INSTALLABLE_V2_MULTIFORM_APK_READY_DEVICE_PENDING",
+  "active_branch": "feat/airi-chat-memory-brain-20260929",
+  "phase": "COMPANION_V2_LOCAL_AI_VOICE_MEMORY_INTEGRATION",
+  "status": "DRAFT_REMOTE_CI_RUNNER_BLOCKED_DEVICE_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -83,7 +83,10 @@
   "blocking_items": [
     "User-installed Book APK identity and real browser/Android end-to-end transport remain unverified.",
     "User Windows device acceptance, Android Studio APK/physical-device validation and production multi-user transport remain unimplemented.",
-    "Real provider teaching quality remains disabled/unverified."
+    "Real provider teaching quality remains disabled/unverified.",
+    "GitHub hosted Actions currently fail before runner allocation (runner_id=0, zero steps), so exact-head Companion V2/voice builds have not executed.",
+    "Companion V2 local llama/sherpa/TTS stack has not yet been built or installed on Xiaomi 14.",
+    "Real authenticated Book Android producer/context transport remains unconnected."
   ],
   "pending_sync": {
     "blocking_count": 0,
@@ -105,7 +108,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Install the v0.0.6 multi-form fixed APK on Xiaomi 14. Verify Android package installation first, then DEFAULT/AIM/COVER first frames, authored AIM↔COVER transitions, action cycling, background/reopen and automatic bundled-skin loading. After device acceptance, connect genuine Book Android events.",
+  "next_step": "Restore a usable GitHub Actions runner or execute the exact-head Android builds elsewhere; then install Companion V2 on Xiaomi 14 and validate the full local chain: 3714430278 Spine + imported GGUF + llama.cpp JNI + sherpa ASR + Melo TTS + explicit Android memory. After local/device acceptance, connect authenticated real Book Android semantic context.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -404,11 +407,11 @@
     "adopted_into_pr6": false
   },
   "current_pr": {
-    "number": 9,
+    "number": 15,
     "state": "OPEN",
     "draft": true,
     "merged": false,
-    "base_branch": "feat/integrate-pr6-book-bridge-20260925"
+    "base_branch": "feat/spine-3714430278-runtime-refresh-20260929"
   },
   "integration_candidate": {
     "status": "ACCEPTED_COMBINED_CI_REVIEW_PENDING",
@@ -466,7 +469,7 @@
     "drive_id": "1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK",
     "drive_sha256": "eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09"
   },
-  "as_of": "2026-09-29",
+  "as_of": "2026-09-30",
   "desktop_delivery": {
     "state": "NATIVE_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
     "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
@@ -485,10 +488,10 @@
     "user_device_acceptance": false
   },
   "open_source_adoption": {
-    "status": "REGISTRY_PLUS_BOUNDED_CODE_ADOPTION",
+    "status": "REGISTRY_PLUS_MULTI_UPSTREAM_CODE_ADOPTION",
     "registry": "governance/open_source_sources.json",
     "plan": "docs/OPEN_SOURCE_ADOPTION.md",
-    "candidate_count": 52,
+    "candidate_count": 53,
     "code_copied_by_registry": true,
     "immediate_tracks": [
       "Android host architecture and testing",
@@ -892,5 +895,179 @@
       "live_repo_modified": false
     },
     "status": "DRAFT_EXPANDED_LOCAL_PARTIAL_VALIDATION_REMOTE_CI_INFRA_BLOCKED"
+  },
+  "companion_v2_candidate": {
+    "branch": "feat/airi-chat-memory-brain-20260929",
+    "draft_pr": 15,
+    "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+    "exact_head": "a83680c1810242d541941b6c2b1a361c8d00bf71",
+    "target": "All-local Android companion: Book-aware chat + 3714430278 + on-device LLM + ASR/TTS + explicit memory",
+    "android": {
+      "module": "android_llm_spike/companion",
+      "application_id": "dev.mygpt.companionv2",
+      "min_sdk": 33,
+      "target_sdk": 36,
+      "abi": [
+        "arm64-v8a"
+      ],
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "explicitly_absent_permissions": [
+        "android.permission.INTERNET",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "broad storage permissions"
+      ],
+      "storage": "SAF input + app-private installed model/skin directories"
+    },
+    "integrated_chain": [
+      "typed input or explicit microphone capture",
+      "sherpa-onnx streaming zh/en ASR (external model archive)",
+      "explicit relevant local memory recall",
+      "llama.cpp Android JNI local GGUF generation",
+      "AIRI ACT emotion marker parsing",
+      "3714430278 conservative authored Spine emotion mapping",
+      "optional sherpa Melo zh/en local TTS streamed to AudioTrack"
+    ],
+    "upstreams": [
+      {
+        "repo": "moeru-ai/airi",
+        "pin": "b40e3e87b149ea5fb75d4944440493829e601411",
+        "license": "MIT",
+        "role": "chat authority, character card, emotion vocabulary, ACT marker protocol"
+      },
+      {
+        "repo": "mem0ai/mem0",
+        "pin": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+        "license": "Apache-2.0",
+        "role": "explicit update/delete/history memory lifecycle"
+      },
+      {
+        "repo": "ggml-org/llama.cpp",
+        "pin": "ba0ba54d93b25faf1e149f4ccedd3e9d84798563",
+        "license": "MIT",
+        "role": "full source submodule + Android JNI/local GGUF engine"
+      },
+      {
+        "repo": "k2-fsa/sherpa-onnx",
+        "source_pin": "040afe360a38e25daaa325ce8889abf93ea02609",
+        "runtime": "v1.13.8",
+        "runtime_commit": "11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf",
+        "license": "Apache-2.0",
+        "role": "ASR/TTS runtime and Android audio patterns"
+      },
+      {
+        "repo": "princekin-f/EasyFloat",
+        "pin": "1a65226084a46cafc7ebcb27f0a077aebefa9b0e",
+        "license": "Apache-2.0",
+        "role": "permission-free in-app drag/snap core only"
+      },
+      {
+        "repo": "apache/commons-compress",
+        "version": "1.28.0",
+        "license": "Apache-2.0",
+        "role": "ZIP/TAR.BZ2/TAR.GZ model archive streaming dependency"
+      }
+    ],
+    "model_inputs": {
+      "skin": "3714430278.zip (app-private validated Spine package)",
+      "llm": "user-selected GGUF; header-probed, bounded copy, SHA-256 addressed",
+      "asr": "external sherpa streaming zh/en model archive",
+      "tts": "external vits-melo-tts-zh_en model archive",
+      "supported_archive_formats": [
+        "ZIP",
+        "TAR.BZ2",
+        "TAR.GZ"
+      ],
+      "weights_committed_to_git": false
+    },
+    "memory": {
+      "android_store": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt",
+      "automatic_chat_capture": false,
+      "explicit_add": true,
+      "relevant_recall": true,
+      "update": true,
+      "delete_with_audit": true,
+      "purge_full_erasure": true,
+      "history": true,
+      "authority": "recalled memory remains application data, not system instruction"
+    },
+    "voice": {
+      "input_permission": "explicit RECORD_AUDIO request only when user presses voice button",
+      "raw_audio_persisted": false,
+      "asr": "16kHz mono streaming sherpa-onnx",
+      "tts_default_enabled": false,
+      "tts_model_external": true,
+      "tts_audio_persisted": false
+    },
+    "renderer": {
+      "skin_id": "3714430278",
+      "emotion_protocol": [
+        "happy",
+        "sad",
+        "angry",
+        "think",
+        "surprised",
+        "awkward",
+        "question",
+        "curious",
+        "neutral"
+      ],
+      "exact_authored_mapping": {
+        "happy": "smile",
+        "sad": "sad",
+        "surprised": "surprise"
+      },
+      "unsupported_emotion_behavior": "current-form idle fallback",
+      "skin_audio_enabled": false
+    },
+    "code_validation": {
+      "initial_python_airi_candidate": {
+        "passed": 18,
+        "failed": 0,
+        "scope": "earlier focused candidate before later Android expansion"
+      },
+      "independent_java8_smokes": [
+        "PCM normalization PASS",
+        "AIRI emotion/3714430278 mapping PASS",
+        "serialized local LLM lifecycle PASS"
+      ],
+      "exact_head_remote_ci": {
+        "status": "NOT_EXECUTED_RUNNER_PROVISIONING_FAILURE",
+        "runs": [
+          {
+            "id": 36659174083,
+            "workflow": "llama.cpp Android library acceptance",
+            "runner_id": 0,
+            "steps": 0
+          },
+          {
+            "id": 36659174123,
+            "workflow": "sherpa-onnx Android voice acceptance",
+            "runner_id": 0,
+            "steps": 0
+          },
+          {
+            "id": 36659174091,
+            "workflow": "Android companion boundary spike",
+            "runner_id": 0,
+            "steps": 0
+          }
+        ]
+      },
+      "companion_v2_apk_build": "NOT_EXECUTED",
+      "voice_spike_apk_build": "NOT_EXECUTED",
+      "device_test": "NOT_RUN",
+      "live_llm_test_on_android": "NOT_RUN"
+    },
+    "boundaries": {
+      "book_repo_modified": false,
+      "live_repo_modified": false,
+      "main_modified": false,
+      "auto_merge": false,
+      "network_provider_required": false,
+      "computer_required_for_runtime": false,
+      "model_weights_in_repo": false
+    }
   }
 }
