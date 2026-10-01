@@ -1,3 +1,14 @@
+## 2026-10-01 · Android TTS callbacks cannot stop a newer utterance
+
+The existing TTS success/failure path now shares a per-utterance completion lease,
+invalidated by stop/toggle and closed on destroy. A failing JVM reproduction of
+the old unguarded failure branch now passes with the production helper. Both
+callback kinds are guarded, so late completions cannot replace newer status or
+invoke its stop effect. Native AudioTrack/JNI timing remains a separate boundary.
+See [production wiring and evidence](ANDROID_TTS_COMPLETION_RECOVERY_20261001.md).
+
+---
+
 ## 2026-09-30 · fresh voice events and explicit recovery retries
 
 Automatic Pipecat request IDs now include an ephemeral bridge incarnation, fixing

@@ -41,6 +41,7 @@ import dev.mygpt.spike.SpineCharacterRuntime
 import dev.mygpt.spike.SpinePackageLayout
 import dev.mygpt.spike.SpineSkinApplication
 import dev.mygpt.spike.VoicePcm
+import dev.mygpt.spike.VoiceOutputCompletion
 import dev.mygpt.voicespike.SherpaMeloTtsEngine
 import dev.mygpt.voicespike.SherpaMeloTtsModelInstaller
 import dev.mygpt.voicespike.SherpaStreamingAsrEngine
@@ -118,7 +119,7 @@ class CompanionV2Activity : AndroidApplication(),
     @Volatile private var generationEpoch = 0L
     @Volatile private var benchmarking = false
     private var generationJob: Job? = null
-    @Volatile private var ttsEpoch = 0L
+    private val ttsCompletion = VoiceOutputCompletion()
     private var ttsModel: SherpaMeloTtsModelInstaller.Installed? = null
     private var ttsEngine: SherpaMeloTtsEngine? = null
 
@@ -1036,7 +1037,7 @@ class CompanionV2Activity : AndroidApplication(),
             return
         }
         ttsEnabled = !ttsEnabled
-        ttsEpoch += 1L
+        ttsCompletion.invalidate()
         if (!ttsEnabled) {
             stopTtsPlayback("语音回复：已关闭")
         } else {
@@ -1057,7 +1058,7 @@ class CompanionV2Activity : AndroidApplication(),
 
     private fun speakReply(text: String) {
         if (!ttsEnabled || !foreground || text.isBlank()) return
-        val epoch = ttsEpoch
+        val lease = ttsCompletion.beginUtterance()
         val value = text.take(1200)
         ttsState.text = "语音回复：正在本地合成/播放 · 音频不落盘"
 
@@ -1065,23 +1066,27 @@ class CompanionV2Activity : AndroidApplication(),
             runCatching {
                 withContext(Dispatchers.IO) {
                     val engine = getOrCreateTtsEngine()
-                    if (!ttsEnabled || epoch != ttsEpoch || !foreground) return@withContext
+                    if (!ttsEnabled || !ttsCompletion.isCurrent(lease) || !foreground) return@withContext
                     val future = engine.speak(value)
                     future.get(120, TimeUnit.SECONDS)
                 }
             }.onSuccess {
-                if (ttsEnabled && epoch == ttsEpoch) {
-                    ttsState.text = "语音回复：播放完成"
+                ttsCompletion.onSuccess(lease) {
+                    if (ttsEnabled && foreground) {
+                        ttsState.text = "语音回复：播放完成"
+                    }
                 }
             }.onFailure { error ->
-                stopTtsPlayback(null)
-                ttsState.text = "语音回复失败 · " + error.javaClass.simpleName
+                ttsCompletion.onFailure(lease) {
+                    stopTtsPlayback(null)
+                    ttsState.text = "语音回复失败 · " + error.javaClass.simpleName
+                }
             }
         }
     }
 
     private fun stopTtsPlayback(message: String? = null) {
-        ttsEpoch += 1L
+        ttsCompletion.invalidate()
         ttsEngine?.stop()
         if (message != null && ::ttsState.isInitialized) {
             ttsState.text = message
@@ -1446,6 +1451,7 @@ class CompanionV2Activity : AndroidApplication(),
     }
 
     override fun onDestroy() {
+        ttsCompletion.close()
         stopExpiryTicker()
         BookContextMailbox.shared().removeListener(this)
         StudySupervisorRuntime.shared().removeListener(this)

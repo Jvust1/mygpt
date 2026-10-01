@@ -7,6 +7,7 @@ on:
       - feat/sklearn-unicode-recall-dot-20260930
       - fix/book-unicode-budget-dot-20260930
       - fix/pipecat-restart-receipts-dot-20260930
+      - fix/android-tts-completion-dot-20260930
       - feat/airi-chat-memory-brain-20260929
     paths:
       - 'brain/**'

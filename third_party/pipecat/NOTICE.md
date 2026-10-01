@@ -115,3 +115,15 @@ LLM text/formatting/TTS output for completed receipt retrieval. Start/end lifecy
 framing remains based on the same pinned BaseOpenAILLMService pattern. Actual SDK
 queue/TTS plus close/reopen/cancellation tests verify recovery; no exactly-once
 physical-audio delivery or new persisted playback acknowledgment is claimed.
+
+
+## Android completion ownership (2026-10-01)
+
+`android_spike/src/main/java/dev/mygpt/spike/VoiceOutputCompletion.java` carries
+the already-used turn invalidation/lease concept into the actual Companion V2
+TTS completion callbacks. This is MyGPT integration code, not a literal upstream
+class or another dependency. It uses fresh object leases, guards both callback
+kinds, invalidates on stop/toggle and closes on destroy. JVM callback tests and
+production-source wiring checks cover the helper; AudioTrack/JNI admission and
+physical cancellation remain separate boundaries. Full BSD-2-Clause license and
+pin notices are bundled with every Android shared-source consumer.

@@ -16,6 +16,8 @@ on:
       - 'android_voice_spike/app/src/test/java/dev/mygpt/voicespike/ModelFingerprintManifestSmoke.java'
       - 'third_party/gson/**'
       - 'third_party/scikit-learn/**'
+      - 'third_party/pipecat/**'
+      - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/CompanionV2Activity.kt'
       - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt'
       - '.github/workflows/android-spike.yml'
   pull_request:
@@ -30,6 +32,8 @@ on:
       - 'android_voice_spike/app/src/test/java/dev/mygpt/voicespike/AudioFloatResamplerSmoke.java'
       - 'third_party/gson/**'
       - 'third_party/scikit-learn/**'
+      - 'third_party/pipecat/**'
+      - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/CompanionV2Activity.kt'
       - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt'
       - '.github/workflows/android-spike.yml'
 
