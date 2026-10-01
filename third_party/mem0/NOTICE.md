@@ -20,7 +20,8 @@ Material changes in MyGPT:
 - update/delete operations are transactional with an append-only audit table;
 - identity fields (namespace/kind/source/created_at) cannot be silently rewritten;
 - delete removes active memory content while preserving the local audit event;
-- retrieval remains dependency-free keyword/CJK matching for the current prototype.
+- retrieval uses bounded namespace-scoped candidates and the separately
+  attributed dependency-free scikit-learn lexical scorer.
 
 The upstream Apache-2.0 license is reproduced in `third_party/mem0/LICENSE`.
 
@@ -41,3 +42,11 @@ This bounded SQLite store contains only visible user/assistant text and is used
 once to prime recent conversational continuity after a local model reload.
 It does not store Book context blocks, recalled-memory blocks, raw audio, or ACT
 control markers, and it never promotes conversation text into long-term memory.
+
+Local lifecycle hardening (2026-10-01): Python `MemoryStore.update` holds the
+existing reentrant lock across read/validate/write so overlapping operations on
+that instance cannot restore stale tags or resurrect a deleted record. Existing
+SQLite/audit rollback and explicit-write policy remain intact. This does not
+introduce cross-instance/process conflict resolution or import new Mem0 code.
+Queued deletes sample their default timestamp after acquiring the same lock;
+explicit backward-time rejection remains unchanged.

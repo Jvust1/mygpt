@@ -278,22 +278,29 @@ class MemoryStore:
         updated_at: datetime | None = None,
     ) -> MemoryRecord:
         """Update one memory atomically while preserving an audit event."""
-        current = self.get(memory_id)
-        if current is None:
-            raise ValueError("memory_id not found")
-        next_record = current.model_copy(
-            update={
-                "text": text,
-                "tags": current.tags if tags is None else tags,
-                "updated_at": self._checked_time(updated_at),
-            }
-        )
-        return self.put(next_record, allow_update=True)
+        # Keep the read/modify/write lifecycle under the same per-instance
+        # reentrant lock used by get, put and delete. Otherwise a text-only
+        # update can restore stale tags, or resurrect a concurrently deleted
+        # record. put still owns validation and SQLite/audit rollback.
+        with self._lock:
+            current = self.get(memory_id)
+            if current is None:
+                raise ValueError("memory_id not found")
+            next_record = current.model_copy(
+                update={
+                    "text": text,
+                    "tags": current.tags if tags is None else tags,
+                    "updated_at": self._checked_time(updated_at),
+                }
+            )
+            return self.put(next_record, allow_update=True)
 
     def delete(self, memory_id: str, *, deleted_at: datetime | None = None) -> bool:
         """Delete active memory bytes while preserving the edit/delete audit trail."""
-        at = self._checked_time(deleted_at)
         with self._lock, self._db:
+            # A queued default delete must sample after gaining ownership,
+            # not carry an earlier timestamp past an intervening update.
+            at = self._checked_time(deleted_at)
             existing = self._db.execute(
                 "SELECT * FROM memories WHERE memory_id=?", (memory_id,)
             ).fetchone()

@@ -1,3 +1,14 @@
+## 2026-10-01 · explicit memory edits retain update ownership
+
+The existing memory store now holds its reentrant lock across the whole update
+read/validate/write lifecycle. This fixes reproduced lost-tag recall and stale
+update/delete races within one store instance. Both writer orders, audit rollback,
+validation failures, namespace isolation and reopened actual prompt recall are
+covered without changing schema or capturing new memories. See
+[per-instance guarantee and limits](MEMORY_UPDATE_OWNERSHIP_20261001.md).
+
+---
+
 ## 2026-10-01 · native body receipt has a total time budget
 
 The actual native HTTP handler now bounds total JSON-body receipt to five

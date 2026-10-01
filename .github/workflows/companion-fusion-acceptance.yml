@@ -11,6 +11,7 @@ on:
       - chore/fusion-checkpoint-dot-20261001
       - fix/book-context-admission-dot-20261001
       - fix/native-body-deadline-dot-20261001
+      - fix/memory-update-atomic-dot-20261001
       - feat/airi-chat-memory-brain-20260929
     paths:
       - 'brain/**'
