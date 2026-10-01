@@ -248,7 +248,9 @@ class MemoryStore:
                 if record.updated_at < datetime.fromisoformat(existing["updated_at"]):
                     raise ValueError("memory update time cannot move backwards")
                 if existing["text"] == record.text and existing["tags"] == tags_json:
-                    return record
+                    # No write means no new persisted timestamp or recency.
+                    # Return the validated stored row, not the caller's draft.
+                    return self._from_row(existing)
                 self._db.execute(
                     """UPDATE memories
                        SET text=?, tags=?, updated_at=?
