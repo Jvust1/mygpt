@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 import uuid
 
+from pydantic import ValidationError
+
 from mygpt_brain.companion_chat import CompanionChatRequest, CompanionChatRuntime
 from mygpt_brain.character_card import load_character_card
 from mygpt_brain.memory_store import MemoryRecord, MemoryStore
@@ -83,21 +85,29 @@ def main() -> int:
                 for item in rows:
                     print(f"- {item.memory_id}: [{item.kind}] {item.text}")
                 continue
-            if raw.startswith(":remember "):
-                text = raw[len(":remember "):].strip()
+            if raw == ":remember" or raw.startswith(":remember "):
+                text = raw[len(":remember"):].strip()
                 if not text:
                     print("memory text is empty")
                     continue
                 now = datetime.now(timezone.utc)
-                record = MemoryRecord(
-                    memory_id=_memory_id(),
-                    namespace=persona.persona_id,
-                    kind="user_instruction",
-                    text=text,
-                    source="user_explicit",
-                    created_at=now,
-                    updated_at=now,
-                )
+                try:
+                    record = MemoryRecord(
+                        memory_id=_memory_id(),
+                        namespace=persona.persona_id,
+                        kind="user_instruction",
+                        text=text,
+                        source="user_explicit",
+                        created_at=now,
+                        updated_at=now,
+                    )
+                    record.text.encode("utf-8")
+                except (ValidationError, UnicodeError):
+                    # Input errors are recoverable; do not echo rejected text.
+                    print("memory error> text must be valid Unicode with 1..2000 characters")
+                    continue
+                # Keep persistence outside the input-only exception boundary.
+                # Never confirm a failed SQLite write or hide system failures.
                 memory.put(record)
                 print(f"remembered> {record.memory_id}")
                 continue
@@ -143,12 +153,17 @@ def main() -> int:
                     )
                 continue
 
-            request = CompanionChatRequest(
-                request_id="req-" + uuid.uuid4().hex[:24],
-                session_id=session_id,
-                persona_id=persona.persona_id,
-                text=raw,
-            )
+            try:
+                request = CompanionChatRequest(
+                    request_id="req-" + uuid.uuid4().hex[:24],
+                    session_id=session_id,
+                    persona_id=persona.persona_id,
+                    text=raw,
+                )
+                raw.encode("utf-8")
+            except (ValidationError, UnicodeError):
+                print("input error> invalid chat input; check Unicode, 1..4000 characters and session id")
+                continue
             try:
                 result = __import__("asyncio").run(runtime.send(request))
             except RuntimeError as error:
