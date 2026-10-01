@@ -1,3 +1,14 @@
+## 2026-10-01 · invalid CLI input no longer terminates the companion
+
+The actual local Ollama CLI now rejects oversized/invalid-Unicode memory or chat
+input and accepts the next command in the same session. Existing caps and
+explicit memory/delete/audit semantics remain. Real SQLite failures and
+operation-time interrupts still propagate without false success. Fourteen
+production-entrypoint tests use the actual Ollama adapter with synthetic HTTP.
+See [input recovery and limits](CLI_INPUT_RECOVERY_20261001.md).
+
+---
+
 ## 2026-10-01 · no-op memory results match durable state
 
 An unchanged memory write now returns the validated persisted row rather than

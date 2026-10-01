@@ -14,6 +14,7 @@ on:
       - fix/memory-update-atomic-dot-20261001
       - docs/fusion-governance-checkpoint-dot-20261001
       - fix/memory-noop-result-dot-20261001
+      - fix/cli-input-recovery-dot-20261001
       - feat/airi-chat-memory-brain-20260929
     paths:
       - 'brain/**'
