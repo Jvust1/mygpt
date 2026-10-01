@@ -1,3 +1,13 @@
+## 2026-10-01 · invalid wake confidence cannot admit voice work
+
+The existing optional wake boundary now requires finite real confidence in
+`[0, 1]`; booleans, arrays and invalid values cannot trigger ASR/model/history or
+supersede a valid turn. Valid thresholds/cooldown and backend errors retain their
+semantics. This is quiet-first hardening of an existing adapter, explicitly not
+a new qualifying upstream/import. See [contract and evidence](WAKE_CONFIDENCE_BOUNDARY_20261001.md).
+
+---
+
 ## 2026-10-01 · invalid CLI input no longer terminates the companion
 
 The actual local Ollama CLI now rejects oversized/invalid-Unicode memory or chat
