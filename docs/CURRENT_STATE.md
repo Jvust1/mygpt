@@ -1,3 +1,13 @@
+## 2026-10-01 · no-op memory results match durable state
+
+An unchanged memory write now returns the validated persisted row rather than
+an unwritten caller timestamp. Repeated writes preserve audit and recall recency;
+real edits, validation and backward-time policy remain unchanged. Both public
+write paths, normalization, SQLite reopen and actual prompt recall are covered.
+See [no-op output contract and evidence](MEMORY_NOOP_RESULT_20261001.md).
+
+---
+
 ## 2026-10-01 · authoritative review handoff reconciled
 
 Governance now names verified `Jvust1/mygpt` and records the separate draft

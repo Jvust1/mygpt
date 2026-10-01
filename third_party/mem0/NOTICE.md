@@ -50,3 +50,6 @@ SQLite/audit rollback and explicit-write policy remain intact. This does not
 introduce cross-instance/process conflict resolution or import new Mem0 code.
 Queued deletes sample their default timestamp after acquiring the same lock;
 explicit backward-time rejection remains unchanged.
+Idempotent writes now return the validated stored record, without reporting an
+unwritten caller timestamp or changing audit/recency. Existing normalization
+and genuine-change behavior remain unchanged.
