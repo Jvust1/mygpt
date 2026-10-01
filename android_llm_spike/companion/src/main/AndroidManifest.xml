@@ -1,0 +1,43 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <permission
+        android:name="dev.mygpt.companionv2.permission.BOOK_CONTEXT"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application
+        android:allowBackup="false"
+        android:label="MyGPT Companion V2"
+        android:supportsRtl="true">
+        <activity
+            android:name=".CompanionV2Activity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <receiver
+            android:name=".BookStudySignalReceiver"
+            android:exported="true"
+            android:permission="dev.mygpt.companionv2.permission.BOOK_CONTEXT">
+            <intent-filter>
+                <action android:name="dev.mygpt.companionv2.action.BOOK_STUDY_EVENT_V1" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".BookContextReceiver"
+            android:exported="true"
+            android:permission="dev.mygpt.companionv2.permission.BOOK_CONTEXT">
+            <intent-filter>
+                <action android:name="dev.mygpt.companionv2.action.BOOK_CONTEXT_V1" />
+                <action android:name="dev.mygpt.companionv2.action.BOOK_CONTEXT_CLEAR_V1" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

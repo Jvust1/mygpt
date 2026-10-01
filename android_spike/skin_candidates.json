@@ -1,0 +1,35 @@
+{
+  "schema_version": "mygpt_skin_candidates_v1",
+  "updated_date": "2026-09-29",
+  "authority": "Live remains authoritative for skin assets; mygpt stores references and runtime contracts.",
+  "primary": {
+    "skin_id": "3714430278",
+    "role": "primary_dynamic_companion_skin",
+    "runtime_kind": "SPINE_4_1",
+    "runtime_package": "3714430278.zip",
+    "runtime_package_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+    "status": "ANDROID_CI_VERIFIED_DEVICE_PENDING"
+  },
+  "backups": [
+    {
+      "id": "backup_skin_image_01",
+      "role": "backup_static_character_skin_reference",
+      "source": "user_upload",
+      "file_name": "mygpt_backup_skin_01_679CB8C0A379FE2655C951F73CA47FC3.png",
+      "drive_file_id": "1adRumPFELRvB_4d7ORfnvUZRPhUTOLDW",
+      "drive_parent_id": "1F1deaHZp4zYN03GyDHiMSzdHRSB081pj",
+      "sha256": "9d03cf43b5d60a8ae486c17979e72bd294e479fc58732971aaa205df7e3f5cff",
+      "size_bytes": 3056688,
+      "mime_type": "image/png",
+      "runtime_kind": "STATIC_IMAGE",
+      "direct_dynamic_runtime": false,
+      "intended_uses": [
+        "backup companion visual reference",
+        "static portrait fallback",
+        "future dynamic-skin visual source"
+      ],
+      "status": "ARCHIVED_IN_LIVE_DRIVE_REFERENCE_READY",
+      "authority": "Jvust/Live + Live Drive skin library"
+    }
+  ]
+}

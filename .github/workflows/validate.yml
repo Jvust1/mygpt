@@ -27,10 +27,11 @@ jobs:
       - name: Check for accidentally committed secret files
         shell: bash
         run: |
-          if find . -path './.git' -prune -o -type f \(
-            -name '.env' -o \( -name '.env.*' ! -name '.env.example' \) -o
-            -name '*.pem' -o -name '*.key'
-          \) -print -quit | grep -q .; then
+          matches="$(find . -path './.git' -prune -o -type f \( \
+            -name '.env' -o \( -name '.env.*' ! -name '.env.example' \) -o \
+            -name '*.pem' -o -name '*.key' \
+          \) -print -quit)"
+          if [ -n "$matches" ]; then
             echo "Secret-like files detected. Keep credentials out of the repository."
             exit 1
           fi

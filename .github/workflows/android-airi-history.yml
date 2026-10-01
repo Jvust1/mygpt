@@ -1,0 +1,33 @@
+name: Android AIRI paired-history actual source oracle
+on:
+  push:
+    branches:
+      - feat/airi-android-history-dot-20260930
+      - feat/airi-chat-memory-brain-20260929
+    paths:
+      - 'android_spike/**'
+      - 'third_party/airi/**'
+      - '.github/workflows/android-airi-history.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-airi-oracle:
+    if: github.repository == 'Jvust1/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Execute unchanged pinned AIRI source and compare every Android fixture
+        run: node android_spike/tools/airi_history_oracle.mjs
+  android-java-boundaries:
+    if: github.repository == 'Jvust1/mygpt'
+    uses: ./.github/workflows/android-spike.yml
+    permissions:
+      contents: read

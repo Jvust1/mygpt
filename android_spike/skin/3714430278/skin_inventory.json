@@ -1,0 +1,108 @@
+{
+  "schema_version": "mygpt_skin_inventory_v1",
+  "skin_id": "3714430278",
+  "title": "[NIKKE] Mekami Shifty",
+  "runtime": "Spine",
+  "runtime_version": "4.1.20",
+  "archive": {
+    "file": "3714430278.zip",
+    "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+    "size_bytes": 12342220,
+    "entries": 13,
+    "uncompressed_bytes": 12340902
+  },
+  "audio_policy": "DISABLED_AND_OUT_OF_SCOPE",
+  "files": [
+    {
+      "file": "model.json",
+      "size": 1683,
+      "sha256": "da9950af3cb0df0a234421a488ad4e2049660f16f5c1077c618b0b6ba88ea219",
+      "role": "default_config"
+    },
+    {
+      "file": "skeleton.bin",
+      "size": 1477892,
+      "sha256": "990dbb1e9eafddfbc4972dd8431cee4c9ca1532f6448548ee0eaddf1c9e3d66e",
+      "role": "default_skeleton"
+    },
+    {
+      "file": "c610_00.atlas",
+      "size": 11587,
+      "sha256": "de4677f5dc475f0399fa18b4a652f46a6ddea9762aafd5d0a591cd5ce67de8b0",
+      "role": "default_atlas"
+    },
+    {
+      "file": "c610_00.png",
+      "size": 3853438,
+      "sha256": "01dab8b08ad1b848e0788c0df7ae05357c1476704ad5d15f62fb31ec6bc98434",
+      "role": "default_texture"
+    },
+    {
+      "file": "misc_01.bin",
+      "size": 92432,
+      "sha256": "1805d1469f7b697f1fb573cdc9689e839e79a68955aa73250dd974766695068a",
+      "role": "aim_skeleton"
+    },
+    {
+      "file": "misc_02.atlas",
+      "size": 2239,
+      "sha256": "b90c459331813f5b82137a81e9aa770c2724d5d8ba769f13c83abc40b2265057",
+      "role": "aim_atlas"
+    },
+    {
+      "file": "misc_04.png",
+      "size": 2915399,
+      "sha256": "f48a88763db8622cd361ddb14973d352adeff66145012f6e276429cdecf99657",
+      "role": "aim_texture"
+    },
+    {
+      "file": "misc_06.json",
+      "size": 1277,
+      "sha256": "a10230a0a6eecd0f2d633a9557d7751c4eeb2ac4622d69cdbd30ac35d86b3834",
+      "role": "aim_config"
+    },
+    {
+      "file": "misc_08.bin",
+      "size": 324979,
+      "sha256": "bc7166c98f924e87d3ea51f23f761752b5dd8560ad0b80b37f67af0675bb783a",
+      "role": "cover_skeleton"
+    },
+    {
+      "file": "misc_03.atlas",
+      "size": 6415,
+      "sha256": "5114e6f8ba8d327a9fdf884d551a90922c1d4cd35a90f929200a3374a2afbcd7",
+      "role": "cover_atlas"
+    },
+    {
+      "file": "misc_05.png",
+      "size": 3649944,
+      "sha256": "2c87577ebbf430f70b2dd4300f61ab0f8f78a8bde5bc44b8f9ad63d346e4ed52",
+      "role": "cover_texture"
+    },
+    {
+      "file": "misc_07.json",
+      "size": 1197,
+      "sha256": "41a912a970d33cb81831209a1a4cd5956e6a041b8718bbda05040aa01b4a3606",
+      "role": "cover_config"
+    },
+    {
+      "file": "lpk_files.json",
+      "size": 2420,
+      "sha256": "68d674d76f4875289b6b0ff971a2510ca92fe1db61740e6072d67b938d2e8ba2",
+      "role": "decrypted_package_manifest"
+    }
+  ],
+  "runtime_aliases": [
+    {
+      "source": "misc_04.png",
+      "alias": "c610_aim_00.png",
+      "reason": "misc_02.atlas texture name"
+    },
+    {
+      "source": "misc_05.png",
+      "alias": "c610_cover_00.png",
+      "reason": "misc_03.atlas texture name"
+    }
+  ],
+  "unknown_files": []
+}

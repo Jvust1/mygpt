@@ -1,0 +1,220 @@
+{
+  "$defs": {
+    "MathPart": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "math",
+          "title": "Kind",
+          "type": "string"
+        },
+        "latex": {
+          "maxLength": 12000,
+          "minLength": 1,
+          "title": "Latex",
+          "type": "string"
+        },
+        "display": {
+          "title": "Display",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "latex",
+        "display"
+      ],
+      "title": "MathPart",
+      "type": "object"
+    },
+    "ParentSource": {
+      "additionalProperties": false,
+      "properties": {
+        "record_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_parts_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Parts Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "source_parts_sha256"
+      ],
+      "title": "ParentSource",
+      "type": "object"
+    },
+    "SelectedSource": {
+      "additionalProperties": false,
+      "properties": {
+        "course_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$",
+          "title": "Course Id",
+          "type": "string"
+        },
+        "book_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$",
+          "title": "Book Id",
+          "type": "string"
+        },
+        "book_version_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.@-]{0,159}$",
+          "title": "Book Version Id",
+          "type": "string"
+        },
+        "section_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$",
+          "title": "Section Id",
+          "type": "string"
+        },
+        "record_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_kind": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$",
+          "title": "Source Kind",
+          "type": "string"
+        },
+        "layer": {
+          "enum": [
+            "source",
+            "correction",
+            "derived"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "layer_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$",
+          "title": "Layer Id",
+          "type": "string"
+        },
+        "portion": {
+          "enum": [
+            "body",
+            "hint",
+            "solution"
+          ],
+          "title": "Portion",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 2000,
+          "title": "Title",
+          "type": "string"
+        },
+        "parts": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "math": "#/$defs/MathPart",
+                "text": "#/$defs/TextPart"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/TextPart"
+              },
+              {
+                "$ref": "#/$defs/MathPart"
+              }
+            ]
+          },
+          "maxItems": 128,
+          "minItems": 1,
+          "title": "Parts",
+          "type": "array"
+        },
+        "qualification": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Qualification",
+          "type": "string"
+        },
+        "parent_sources": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ParentSource"
+          },
+          "maxItems": 32,
+          "title": "Parent Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "course_id",
+        "book_id",
+        "book_version_id",
+        "section_id",
+        "record_id",
+        "source_kind",
+        "layer",
+        "layer_id",
+        "portion",
+        "title",
+        "parts"
+      ],
+      "title": "SelectedSource",
+      "type": "object"
+    },
+    "TextPart": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "text",
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 12000,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "text"
+      ],
+      "title": "TextPart",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "mygpt.selection-packet.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "trust": {
+      "const": "USER_SUPPLIED_UNVERIFIED",
+      "title": "Trust",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/SelectedSource"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "trust",
+    "source",
+    "source_sha256"
+  ],
+  "title": "SelectionPacket",
+  "type": "object"
+}

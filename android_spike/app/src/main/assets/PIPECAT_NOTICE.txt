@@ -1,0 +1,7 @@
+Android voice completion ownership adapts the existing Pipecat turn-invalidation pattern.
+Upstream: https://github.com/pipecat-ai/pipecat
+Commit: 49dea682fb84bfc515d881d00dfeaaa9e9f1075f
+Copyright (c) 2024-2026, Daily. BSD-2-Clause.
+MyGPT uses a dependency-free Java lease for success/failure completion callbacks.
+It does not import the Python SDK or provide AudioTrack/JNI cancellation guarantees.
+Full license: PIPECAT_LICENSE.txt

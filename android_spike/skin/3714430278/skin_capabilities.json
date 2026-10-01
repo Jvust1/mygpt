@@ -1,0 +1,114 @@
+{
+  "schema_version": "mygpt_skin_capabilities_v1",
+  "skin_id": "3714430278",
+  "audio": {
+    "enabled": false,
+    "loaded": false,
+    "playback": false,
+    "completion_metric": false
+  },
+  "forms": {
+    "default": {
+      "skeleton": "skeleton.bin",
+      "atlas": "c610_00.atlas",
+      "texture": "c610_00.png",
+      "config": "model.json",
+      "idle": "idle",
+      "configured_actions": [
+        "action",
+        "etc",
+        "no",
+        "pain",
+        "sad",
+        "smile",
+        "special",
+        "surprise",
+        "idle"
+      ],
+      "binary_discovered_visual_actions": [
+        "talk_start",
+        "talk_end"
+      ]
+    },
+    "aim": {
+      "skeleton": "misc_01.bin",
+      "atlas": "misc_02.atlas",
+      "texture_source": "misc_04.png",
+      "texture_runtime_alias": "c610_aim_00.png",
+      "config": "misc_06.json",
+      "idle": "aim_idle",
+      "configured_actions": [
+        "aim_fire",
+        "to_cover"
+      ],
+      "binary_discovered_actions": [
+        "aim_hit",
+        "aim_skill_fire",
+        "to_aim",
+        "to_cover"
+      ]
+    },
+    "cover": {
+      "skeleton": "misc_08.bin",
+      "atlas": "misc_03.atlas",
+      "texture_source": "misc_05.png",
+      "texture_runtime_alias": "c610_cover_00.png",
+      "config": "misc_07.json",
+      "idle": "cover_idle",
+      "configured_actions": [
+        "to_aim",
+        "cover_reload"
+      ],
+      "binary_discovered_actions": [
+        "cover_hit",
+        "cover_stun",
+        "to_aim",
+        "to_cover"
+      ]
+    }
+  },
+  "authored_transitions": [
+    {
+      "from": "aim",
+      "to": "cover",
+      "animation": "to_cover",
+      "post_command": "change_cos a577a19ec0666bd04bd8d0a61cfcab2c.bin",
+      "target_config": "misc_07.json"
+    },
+    {
+      "from": "cover",
+      "to": "aim",
+      "animation": "to_aim",
+      "post_command": "change_cos 6e9d962cc9ff8af8063a1354ff9b9540.bin",
+      "target_config": "misc_06.json"
+    }
+  ],
+  "direct_runtime_switches": [
+    {
+      "from": "default",
+      "to": "aim",
+      "reason": "no authored transition edge found in package config"
+    },
+    {
+      "from": "default",
+      "to": "cover",
+      "reason": "no authored transition edge found in package config"
+    },
+    {
+      "from": "aim",
+      "to": "default",
+      "reason": "no authored transition edge found in package config"
+    },
+    {
+      "from": "cover",
+      "to": "default",
+      "reason": "no authored transition edge found in package config"
+    }
+  ],
+  "semantic_mapping": {
+    "quiet": "current form idle",
+    "needs_input": "form reaction",
+    "gentle_check_in": "form primary action",
+    "paused": "freeze current animation"
+  }
+}

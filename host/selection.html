@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>mygpt · 选段接收工作台</title><link rel="icon" href="data:,"><link rel="stylesheet" href="reader.css">
+<script type="module" src="selection.js"></script>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="brain.html">mygpt<span>选段接收</span></a><span class="badge">本机 · 未核验来源</span></header>
+<main>
+<section class="intro"><p class="eyebrow">SELECTED SOURCE → BRAIN</p><h1>只带来你选中的这一段。</h1><p>原文、校正与推导分开标记。文件通过检查，不代表来源内容正确。</p></section>
+<p class="notice" id="connection" role="status">正在检查本机服务…</p>
+<div class="workspace">
+<section class="reading">
+<h2>1. 选择与预览</h2><p>只接收一个不超过 64 KiB 的选段 JSON 包。选择文件本身不会上传。</p>
+<details class="scope"><summary>也可以手动粘贴一段文字</summary>
+<p>手动输入不关联已核验的教材版本。不会自动识别公式、改写内容或发送到模型。</p>
+<label for="manual-title">标题（可选）</label><input id="manual-title" maxlength="160" disabled>
+<label for="manual-text">单段正文（最多 8000 字符）</label><textarea id="manual-text" maxlength="8000" rows="6" style="width:100%;font:inherit" disabled></textarea>
+<button id="prepare-manual" disabled>生成本地预览包</button></details>
+<label for="packet-file">选段文件</label><input id="packet-file" type="file" accept=".json,application/json" disabled>
+<pre id="file-preview" class="source-preview" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:240px;overflow:auto"></pre>
+<label><input id="consent" type="checkbox" disabled> 我已查看文件，确认仅将这一个选段交给本机服务；不含密码、私信或私人笔记。</label>
+<div class="actions"><button id="import" class="primary" disabled>在本机接收并校验</button><button id="clear">清空本页</button></div>
+<p id="import-message" role="status"></p>
+<details class="scope"><summary>来源与隐私边界</summary>
+<p>所有导入均标为 USER_SUPPLIED_UNVERIFIED，不能证明来自正在运行的 Book。导入时间只是本机接收时间，不是阅读活动证明。</p>
+<p>正文仅在当前本机进程的有界内存中保留，不写入数据库或上传云端。条目 120 秒后失效，在下一次服务访问时清理；撤销或关闭服务会立即清除。最多同时保留 16 个条目。</p>
+<p>回复仍由程序式 TestModel 返回固定检查说明，不是实际 AI 讲解。复制提问按钮只写入本机剪贴板，不会替你发送。</p>
+<button id="revoke">撤销本次服务授权</button></details>
+</section>
+<aside id="help-panel">
+<h2>2. 核对后调用 Brain</h2><p id="state-label" role="status">尚未接收选段</p>
+<p id="source-trust" class="warning"></p><h3 id="selected-title"></h3><p id="selected-version" class="muted"></p>
+<div id="source-parts" class="source-preview"></div><code id="source-hash"></code>
+<div class="actions"><button id="explain" class="primary" disabled>调用本机 Brain（TestModel）</button><button id="cancel" hidden>取消</button></div>
+<section id="reply-box" hidden><h3>固定检查说明 · 非真实模型回答</h3><p id="reply"></p></section>
+<button id="copy-prompt" disabled>复制带来源的提问</button><p id="copy-status" role="status"></p>
+</aside>
+</div>
+</main>
+<footer class="companion-dock"><div><strong>明确选择，按需调用。</strong><p>Book 未连接 · 付费模型调用 0<br>约拿只显示本页操作状态。</p></div></footer>
+<mygpt-pet id="pet" size="88" status="needs-input" storage-key="mygpt:jonah:selection:v1"></mygpt-pet>
+</body></html>

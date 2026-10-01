@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; font-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>mygpt · 学习工作台演示</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="reader.css">
+  <script type="module" src="reader.js"></script>
+</head>
+<body>
+  <header class="topbar"><a href="../demo/index.html" class="brand">mygpt<span>学习工作台</span></a><span class="badge">交互原型</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">READER × JONAH</p><h1>选一段，再一起想明白。</h1><p>先明确你指的是哪里，再提供帮助。没选择时，约拿安静等待。</p></section>
+    <p class="notice"><strong>模拟演示</strong> · Book 未连接 · 回复为预写样本 · 真实模型调用 <b id="model-calls">0</b></p>
+    <div class="workspace">
+      <section class="reading" aria-labelledby="reading-title">
+        <div class="section-top"><div><p class="eyebrow">合成示例 · 非教材原文</p><h2 id="reading-title">本次阅读</h2></div><label>模式 <select id="mode"><option value="preview">预习</option><option value="learn" selected>学习</option><option value="review">复习</option><option value="practice">刷题</option></select></label></div>
+        <p class="muted">选择具体内容层，不会自动发送请求。切换模式后需要重新选择。</p>
+        <div id="records"></div>
+        <div class="toolbar"><button id="pause" type="button">暂停本次</button><button id="open-panel" type="button">打开帮助面板</button></div>
+        <details class="scope"><summary>这个演示能验证什么？</summary><p>能验证明确选段、请求取消、过期与迟到回复处理，以及约拿状态联动。来源样本由 Python Reader 映射器和 Brain 预先生成；浏览器回放样本，并未实时运行 Python Brain。</p><p>选择有效期是当前浏览器界面的演示规则，不代表正在读取你的学习状态。没有正文持久化、私信读取或外部请求。</p><p>公式以原始 LaTeX 展示；数学排版与真实设备体验待后续验收。</p><button id="revoke" type="button">关闭本页演示（刷新恢复）</button></details>
+      </section>
+      <aside id="help-panel" aria-labelledby="help-heading" tabindex="-1">
+        <div class="section-top"><div><p class="eyebrow">JONAH · 陪伴入口</p><h2 id="help-heading" tabindex="-1">解释这一段</h2></div><button id="close-panel" type="button" aria-label="关闭帮助面板">收起</button></div>
+        <p id="state-label" role="status" aria-live="polite">请先选择具体内容</p>
+        <div id="selected-context" hidden>
+          <h3 id="selected-title"></h3><dl><dt>内容层</dt><dd id="selected-layer"></dd><dt>教材版本</dt><dd id="selected-version"></dd><dt>演示选择有效至</dt><dd id="selected-expiry"></dd></dl>
+          <div id="source-parts" class="source-preview"></div><p id="source-warning" class="warning"></p>
+          <details><summary>查看来源身份</summary><p>下列哈希针对实际样本文本字节，不是 PDF 或整包哈希。</p><code id="selected-hash"></code><code id="selected-ref"></code></details>
+        </div>
+        <p id="empty-message" class="empty">从左侧（手机上方）选一条记录和内容层。<br>打开面板本身不会调用模型。</p>
+        <div class="actions"><button class="primary" id="explain" type="button" disabled>解释这段（演示）</button><button id="cancel" type="button" hidden>取消</button></div>
+        <section id="reply-box" hidden aria-labelledby="reply-heading"><h3 id="reply-heading">预写样本 · 非实时 AI 回答</h3><p id="reply"></p></section>
+        <p class="footnote">回放请求：<span id="request-count">0</span> · 关闭或取消后，迟到回复不再显示。</p>
+      </aside>
+    </div>
+  </main>
+  <footer class="companion-dock"><div><strong>默认安静，随时暂停。</strong><p>点击约拿打开帮助入口。<br>不会自动发送请求。</p><p class="compact-note">紧凑横屏下暂隐角色，帮助面板仍可使用。</p></div></footer>
+  <div class="pet-tools"><button id="toggle-pet" type="button">隐藏约拿</button><span id="pet-fallback" hidden>角色图片不可用，帮助面板仍可使用。</span></div>
+  <mygpt-pet id="pet" status="needs-input" size="88" storage-key="mygpt:jonah:reader-demo:v1"></mygpt-pet>
+  <noscript>请启用 JavaScript 才能使用这个本地交互演示。</noscript>
+</body>
+</html>

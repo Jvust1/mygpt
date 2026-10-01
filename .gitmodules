@@ -1,0 +1,7 @@
+[submodule "third_party/llama.cpp/upstream"]
+	path = third_party/llama.cpp/upstream
+	url = https://github.com/ggml-org/llama.cpp.git
+
+[submodule "third_party/sherpa-onnx/upstream"]
+	path = third_party/sherpa-onnx/upstream
+	url = https://github.com/k2-fsa/sherpa-onnx.git

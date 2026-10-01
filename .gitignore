@@ -19,3 +19,10 @@ coverage/
 Thumbs.db
 .vscode/
 .idea/
+
+# Fused candidate test output and host-JVM acceptance classes
+test-output/
+android_spike/build/
+
+# Default private companion database/token directory, including under brain/.
+.mygpt-local/

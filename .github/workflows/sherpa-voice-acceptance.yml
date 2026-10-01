@@ -1,0 +1,83 @@
+name: sherpa-onnx Android voice acceptance
+
+on:
+  push:
+    branches: [feat/airi-chat-memory-brain-20260929]
+    paths:
+      - '.gitmodules'
+      - 'third_party/sherpa-onnx/**'
+      - 'android_voice_spike/**'
+      - 'android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java'
+      - '.github/workflows/sherpa-voice-acceptance.yml'
+  pull_request:
+    paths:
+      - '.gitmodules'
+      - 'third_party/sherpa-onnx/**'
+      - 'android_voice_spike/**'
+      - 'android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java'
+      - '.github/workflows/sherpa-voice-acceptance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  voice-spike:
+    if: github.repository == 'Jvust/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: \${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+          submodules: recursive
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a
+        with:
+          gradle-version: '8.13'
+
+      - name: Verify source and runtime pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git -C third_party/sherpa-onnx/upstream rev-parse HEAD)"
+          test "$actual" = "040afe360a38e25daaa325ce8889abf93ea02609"
+          grep -q 'v1.13.8' third_party/sherpa-onnx/RUNTIME_PIN.md
+          grep -q '11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf' third_party/sherpa-onnx/RUNTIME_PIN.md
+          echo "sherpa source/runtime pins PASS"
+
+      - name: Build offline voice spike APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle -p android_voice_spike :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Verify APK JNI payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="android_voice_spike/app/build/outputs/apk/debug/app-debug.apk"
+          test -f "$apk"
+          python - <<'PY'
+          import zipfile
+          apk="android_voice_spike/app/build/outputs/apk/debug/app-debug.apk"
+          with zipfile.ZipFile(apk) as z:
+              names=set(z.namelist())
+              native=[n for n in names if n.endswith("/libsherpa-onnx-jni.so")]
+              if "classes.dex" not in names or not native:
+                  raise SystemExit("voice APK missing classes.dex or sherpa JNI")
+              print("Voice APK PASS:", native)
+          PY
+
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: mygpt-sherpa-voice-spike
+          path: android_voice_spike/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 3
