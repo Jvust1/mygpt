@@ -10,6 +10,7 @@ if test "${GITHUB_ACTIONS:-false}" = true && test "${MYGPT_JAVA_SOURCE_TARGET_ON
 fi
 python android_spike/tools/verify_gson_artifact.py "$GSON_JAR"
 python android_spike/tools/verify_lexical_integration.py
+python android_spike/tools/verify_voice_completion.py
 mkdir -p android_spike/build/classes
 if test "${MYGPT_JAVA_SOURCE_TARGET_ONLY:-0}" = 1; then
   # Explicit local fallback for stripped JRE images that contain jdk.compiler
@@ -30,6 +31,7 @@ fi
   android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java \
   android_spike/src/main/java/dev/mygpt/spike/SpinePackageLayout.java \
   android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java \
+  android_spike/src/main/java/dev/mygpt/spike/VoiceOutputCompletion.java \
   android_spike/src/main/java/dev/mygpt/spike/LocalLlmEngine.java \
   android_spike/src/main/java/dev/mygpt/spike/SerializedLocalLlmEngine.java \
   android_spike/src/main/java/dev/mygpt/spike/FloatDragPolicy.java \
@@ -53,6 +55,7 @@ fi
   android_spike/src/test/java/dev/mygpt/spike/SpinePackageLayoutSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/SkinCapabilityCatalogSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/VoicePcmSmoke.java \
+  android_spike/src/test/java/dev/mygpt/spike/VoiceOutputCompletionSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/LocalLlmEngineSmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/FloatDragPolicySmoke.java \
   android_spike/src/test/java/dev/mygpt/spike/OnDeviceCompanionBrainSmoke.java \
@@ -94,3 +97,5 @@ java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.spike.Lexica
 java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.spike.AiriHistoryBudgetSmoke android_spike/src/test/resources/airi-history-golden.json
 
 java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.spike.BookUnicodeBudgetSmoke
+
+java -Xmx128m -cp "android_spike/build/classes:$GSON_JAR" dev.mygpt.spike.VoiceOutputCompletionSmoke
