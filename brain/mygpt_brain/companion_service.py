@@ -29,6 +29,8 @@ from .companion_chat import CompanionChatRuntime, SupersededChatTurn
 from .json_boundary import BoundaryError, load_object
 
 MAX_BODY = 16384
+BODY_READ_TIMEOUT_SECONDS = 5.0
+SOCKET_IO_TIMEOUT_SECONDS = 5.0
 CLIENT_HEADER = "mygpt-companion-native-v1"
 
 
@@ -273,7 +275,7 @@ class CompanionServiceHandler(BaseHTTPRequestHandler):
 
     def setup(self) -> None:
         super().setup()
-        self.connection.settimeout(5)
+        self.connection.settimeout(SOCKET_IO_TIMEOUT_SECONDS)
 
     def _headers(self, status: int, length: int) -> None:
         self.send_response(status)
@@ -354,13 +356,42 @@ class CompanionServiceHandler(BaseHTTPRequestHandler):
         length = int(raw_length)
         if length <= 0 or length > MAX_BODY:
             raise CompanionServiceError("invalid_body_size", 413)
-        raw = self.rfile.read(length)
-        if len(raw) != length:
-            raise CompanionServiceError("incomplete_body", 400)
+        raw = self._read_body(length)
         try:
             return load_object(raw, max_bytes=MAX_BODY)
         except BoundaryError as error:
             raise CompanionServiceError(str(error), 400) from None
+
+    def _read_body(self, length: int) -> bytes:
+        """Bound total body receipt, not just idle time between socket reads.
+
+        Called after header/size validation. read1 performs at most one raw
+        read, allowing the remaining monotonic budget to be set each time.
+        Never request bytes beyond Content-Length, even if more are buffered.
+        Header receipt and provider inference have separate existing limits.
+        """
+        deadline = time.monotonic() + BODY_READ_TIMEOUT_SECONDS
+        raw = bytearray()
+        try:
+            while len(raw) < length:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise CompanionServiceError("request_body_timeout", 408)
+                self.connection.settimeout(remaining)
+                try:
+                    chunk = self.rfile.read1(length - len(raw))
+                except TimeoutError:
+                    raise CompanionServiceError("request_body_timeout", 408) from None
+                if time.monotonic() >= deadline:
+                    raise CompanionServiceError("request_body_timeout", 408)
+                if not chunk:
+                    raise CompanionServiceError("incomplete_body", 400)
+                raw.extend(chunk)
+        finally:
+            # A nearly exhausted receipt budget must not leak into success or
+            # error writes, and does not shorten the separate model deadline.
+            self.connection.settimeout(SOCKET_IO_TIMEOUT_SECONDS)
+        return bytes(raw)
 
     @staticmethod
     def _runtime_error(error: BaseException) -> CompanionServiceError:
