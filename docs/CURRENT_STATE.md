@@ -1,3 +1,13 @@
+## 2026-10-01 · coherent source/recovery checkpoint
+
+The current reviewed companion stack is being preserved as one exact-head
+source/recovery checkpoint. The aggregate gate now also invokes the existing
+source-recovery workflow, proving archive determinism and recovered code alongside
+runtime/SDK/Java checks. No runtime behavior or dependency changes are added.
+See [included paths and outstanding device gates](FUSION_RECOVERY_CHECKPOINT_20261001.md).
+
+---
+
 ## 2026-10-01 · Android TTS callbacks cannot stop a newer utterance
 
 The existing TTS success/failure path now shares a per-utterance completion lease,
