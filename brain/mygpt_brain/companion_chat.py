@@ -200,12 +200,16 @@ class CompanionChatRuntime:
         request = CompanionChatRequest.model_validate(value)
         if request.persona_id != self.persona.persona_id:
             raise ValueError("unknown persona_id")
-        clock = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
         fingerprint = self._fingerprint(request)
 
         async with self._lock:
             if is_current is not None and not is_current():
                 raise SupersededChatTurn("companion turn superseded")
+            # The queue can outlive a Book context's lease. Sample live time
+            # only once this turn is admitted, before any new prompt/history
+            # state. The existing explicit `now` override stays deterministic.
+            # Clock failures propagate: never fall back to an earlier timestamp.
+            clock = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
             cached = self._requests.get(request.request_id)
             if cached is not None:
                 old_fingerprint, old_result = cached
