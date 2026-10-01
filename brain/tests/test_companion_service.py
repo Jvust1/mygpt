@@ -24,6 +24,96 @@ from mygpt_brain.airi_act import ACT_PRESENTATION_INSTRUCTION
 NOW = datetime(2026, 9, 29, 16, 10, tzinfo=timezone.utc)
 
 
+def test_queued_native_book_expiry_blocks_ollama_then_recovers_and_replays(tmp_path, monkeypatch):
+    """Real native HTTP/SQLite and Ollama adapter, with synthetic model HTTP."""
+    import mygpt_brain.companion_chat as chat
+
+    class Clock(datetime):
+        value = NOW
+
+        @classmethod
+        def now(cls, tz=None):
+            return cls.value
+
+    monkeypatch.setattr(chat, "datetime", Clock)
+    entered, queued, release = threading.Event(), threading.Event(), threading.Event()
+    model_calls = []
+
+    async def model_endpoint(request):
+        value = json.loads(request.content)
+        model_calls.append(value)
+        if len(model_calls) == 1:
+            entered.set()
+            while not release.is_set():
+                await asyncio.sleep(0.001)
+        return httpx.Response(200, json={"message": {"content": "Explanation.<|ACT:{\"emotion\":\"think\"}|>"}})
+
+    monkeypatch.setattr("mygpt_brain.providers._ASYNC_CLIENT", lambda **kwargs: httpx.AsyncClient(
+        transport=httpx.MockTransport(model_endpoint), **kwargs))
+    original_fingerprint = CompanionChatRuntime._fingerprint
+
+    def fingerprint(request):
+        result = original_fingerprint(request)
+        if request.request_id == "queued-book":
+            queued.set()
+        return result
+
+    monkeypatch.setattr(CompanionChatRuntime, "_fingerprint", staticmethod(fingerprint))
+    body = {
+        "request_id": "queued-book", "session_id": "book-session", "persona_id": "mygpt-3714430278",
+        "text": "Explain this section", "book_context": {
+            "context": {
+                "schema_version": "mygpt.study-context.v1", "evidence_kind": "SIMULATED",
+                "session_id": "book-session", "course_id": "course", "book_id": "book", "book_version": "v1",
+                "section_id": "section", "source_id": "source", "source_sha256": "b" * 64, "mode": "learn",
+                "captured_at": NOW.isoformat(), "expires_at": (NOW + timedelta(seconds=1)).isoformat(),
+            },
+            "text": "EPHEMERAL_QUEUED_BOOK_INPUT",
+        },
+    }
+    runtime, store = make_runtime(tmp_path, responder=OllamaResponder("synthetic-test-model"))
+    try:
+        with create_companion_server(runtime) as server, ThreadPoolExecutor(max_workers=2) as pool:
+            try:
+                first = pool.submit(call, server, "POST", "/api/v1/chat", token=server.token,
+                                    body=dict(request_id="blocking", session_id="other-session", persona_id=body["persona_id"], text="hold"))
+                assert entered.wait(2)
+                second = pool.submit(call, server, "POST", "/api/v1/chat", token=server.token, body=body)
+                assert queued.wait(2)
+                Clock.value = NOW + timedelta(seconds=1)  # equality is expired
+            finally:
+                release.set()
+            assert first.result(timeout=3)[0] == 200
+            status, expired = second.result(timeout=3)
+            assert status == 409 and expired["code"] == "book_context_expired"
+            assert len(model_calls) == 1
+            assert store.get_receipt("queued-book") is None and store.load_messages("book-session") == []
+            assert "EPHEMERAL_QUEUED_BOOK_INPUT" not in str(model_calls)
+
+            # Same rejected ID can be explicitly retried with newly fresh data.
+            body["book_context"]["context"]["captured_at"] = Clock.value.isoformat()
+            body["book_context"]["context"]["expires_at"] = (Clock.value + timedelta(seconds=1)).isoformat()
+            status, fresh = call(server, "POST", "/api/v1/chat", token=server.token, body=body)
+            assert status == 200 and not fresh["replayed"]
+            assert len(model_calls) == 2 and fresh["presentation_emotion"] == "think"
+            assert any("EPHEMERAL_QUEUED_BOOK_INPUT" in m["content"] and m["role"] == "user"
+                       for m in model_calls[-1]["messages"])
+            assert all("EPHEMERAL_QUEUED_BOOK_INPUT" not in m.content for m in store.load_messages("book-session"))
+    finally:
+        release.set()
+        store.close()
+    Clock.value += timedelta(seconds=2)
+    restored, store = make_runtime(tmp_path, responder=OllamaResponder("synthetic-test-model"))
+    try:
+        with create_companion_server(restored) as server:
+            status, replay = call(server, "POST", "/api/v1/chat", token=server.token, body=body)
+            assert status == 200 and replay["replayed"]
+            assert replay["assistant_message"] == fresh["assistant_message"]
+            assert len(model_calls) == 2 and len(store.load_messages("book-session")) == 3
+    finally:
+        store.close()
+
+
 def test_ollama_act_roundtrip_separates_voice_and_emotion_before_durable_replay(tmp_path, monkeypatch):
     """Real companion HTTP + actual Ollama adapter; model endpoint is stubbed."""
     calls = []

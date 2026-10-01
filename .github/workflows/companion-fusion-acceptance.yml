@@ -9,6 +9,7 @@ on:
       - fix/pipecat-restart-receipts-dot-20260930
       - fix/android-tts-completion-dot-20260930
       - chore/fusion-checkpoint-dot-20261001
+      - fix/book-context-admission-dot-20261001
       - feat/airi-chat-memory-brain-20260929
     paths:
       - 'brain/**'

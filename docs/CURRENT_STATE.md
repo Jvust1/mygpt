@@ -1,3 +1,13 @@
+## 2026-10-01 · queued Book context is rechecked at admission
+
+The runtime now reads live wall time after acquiring its turn lock, closing a
+reproduced stale-context queue gap in the real native HTTP → Ollama-adapter →
+SQLite path. Expiry equality/future captures, cancellation/revocation, clock
+failure and receipt recovery are covered without altering replay semantics or
+persisting raw Book context. See [admission contract and evidence](BOOK_CONTEXT_ADMISSION_20261001.md).
+
+---
+
 ## 2026-10-01 · coherent source/recovery checkpoint
 
 The current reviewed companion stack is being preserved as one exact-head
