@@ -96,6 +96,15 @@ jobs:
           test -x "$MYGPT_CHROMIUM_PATH"
           MYGPT_TEST_OUTPUT="$RUNNER_TEMP/math-preview" node tests/math-preview-browser.cjs
 
+      - name: Preserve synthetic browser proof
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: math-preview-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/math-preview/
+          retention-days: 3
+          if-no-files-found: warn
+
   android-java-boundaries:
     if: github.repository == 'Jvust1/mygpt'
     uses: ./.github/workflows/android-spike.yml

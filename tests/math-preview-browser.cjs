@@ -4,6 +4,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {spawn}=require('node:child_process'),{createHash}=require('node:crypto');
 const root=path.join(__dirname,'..');
+const {pathToFileURL}=require('node:url');
 const sorted=x=>Array.isArray(x)?x.map(sorted):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,sorted(x[k])])):x;
 function address(child){return new Promise((resolve,reject)=>{
   let text='';const stop=()=>{clearTimeout(timer);child.stdout.off('data',data);child.off('error',fail);child.off('exit',exit);};
@@ -18,7 +19,7 @@ function address(child){return new Promise((resolve,reject)=>{
   const check=(name,ok)=>{assert(ok,name);report.checks.push(name);};
   const server=spawn(process.env.MYGPT_PYTHON||'python',['-m','mygpt_brain.local_service','--port','0','--enable-selection-intake','--demo-delay-ms','100'],{
     cwd:root,stdio:['ignore','pipe','pipe'],env:{...process.env,PYTHONPATH:path.join(root,'brain'),PYTHONUNBUFFERED:'1',OTEL_SDK_DISABLED:'true'}});
-  let browser,stderr='';server.stderr.on('data',x=>stderr+=x);
+  let browser,page,stderr='';server.stderr.on('data',x=>stderr+=x);
   try{
     const base=await address(server);
     browser=await chromium.launch({headless:true,...(process.env.MYGPT_CHROMIUM_PATH?{executablePath:process.env.MYGPT_CHROMIUM_PATH,args:['--no-sandbox','--disable-dev-shm-usage']}: {})});
@@ -30,7 +31,7 @@ function address(child){return new Promise((resolve,reject)=>{
       if(u.pathname.startsWith('/api/'))report.apiRequests.push(u.pathname);
       return route.continue();
     });
-    const page=await context.newPage();page.setDefaultTimeout(8000);
+    page=await context.newPage();page.setDefaultTimeout(8000);
     page.on('pageerror',e=>report.errors.push(e.message));
     page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
     await page.goto(base+'/host/brain.html');
@@ -40,7 +41,8 @@ function address(child){return new Promise((resolve,reject)=>{
     await page.locator('#select-record-1').selectOption('a-source');
     check('selected context also renders MathML',await page.locator('#selected-context math').count()>0);
     await page.locator('#explain').click();await page.waitForFunction(()=>document.body.dataset.hostState==='ready');
-    check('existing Brain response and source identity still work',await page.locator('#reply').innerText().then(t=>t.includes('SIMULATED')));
+    const {catalogue}=await import(pathToFileURL(path.join(root,'host/fixtures.js')).href);
+    check('existing Brain response and source identity still work',await page.locator('#reply').innerText()===catalogue.entries.find(e=>e.id==='a-source').fixture_reply);
     await page.goto(base+'/host/selection.html');
     await page.waitForFunction(()=>!document.querySelector('#packet-file').disabled);
     const sample=JSON.parse(fs.readFileSync(path.join(root,'host/examples/selection-demo.json'),'utf8'));
@@ -98,7 +100,7 @@ function address(child){return new Promise((resolve,reject)=>{
     check('actual clear removes old MathML/raw source',await page.locator('#source-parts').textContent()==='');
     check('no external fonts/scripts/network requests',report.externalRequests.length===0);
     check('no browser errors',report.errors.length===0);
-    report.result='PASS';console.log(JSON.stringify(report,null,2));
-  }catch(e){report.result='FAIL';report.failure=e.stack;report.stderr=stderr;throw e;}
-  finally{fs.writeFileSync(path.join(out,'math-preview-browser.json'),JSON.stringify(report,null,2)+'\n');if(browser)await browser.close();server.kill('SIGTERM');}
+    report.result='PASS';
+  }catch(e){report.result='FAIL';report.failure=e.stack;report.stderr=stderr;if(page)await page.screenshot({path:path.join(out,'failure.png'),fullPage:true}).catch(()=>{});throw e;}
+  finally{fs.writeFileSync(path.join(out,'math-preview-browser.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));if(browser)await browser.close();server.kill('SIGTERM');}
 })().catch(e=>{console.error(e);process.exitCode=1;});
