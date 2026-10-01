@@ -1,3 +1,14 @@
+## 2026-10-01 · authoritative review handoff reconciled
+
+Governance now names verified `Jvust1/mygpt` and records the separate draft
+fusion implementation at PR #51 with exact hosted/source evidence. Original
+main/product state, product goals and device requirements are preserved; dated
+zero-runner failures are distinguished from the current successful source-level
+checks. See [current handoff](HANDOFF.md) and [evaluation](EVALUATION_LEDGER.md).
+This reconciliation adds no runtime behavior or adoption/merge decision.
+
+---
+
 ## 2026-10-01 · explicit memory edits retain update ownership
 
 The existing memory store now holds its reentrant lock across the whole update
