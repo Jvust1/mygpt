@@ -9,3 +9,5 @@ main{width:100%;height:100%;overflow-y:auto;overscroll-behavior:contain;padding-
 .compact-note{display:none}body[data-pet-hidden="true"]{grid-template-rows:auto minmax(0,1fr) 56px}
 body[data-pet-hidden="true"] .companion-dock{padding-block:4px}body[data-pet-hidden="true"] .companion-dock p{display:none}
 @media(max-height:480px){body{grid-template-rows:auto minmax(0,1fr) 56px}.companion-dock{padding-block:4px}.companion-dock strong,.companion-dock p{display:none}.companion-dock .compact-note{display:block;font-size:11px}mygpt-pet{display:none!important}}
+
+.math-preview{margin:12px 0;min-width:0;max-width:100%}.math-layout{overflow-x:auto;max-width:100%;padding:12px 4px;font-size:1.15rem}.math-layout math{margin:auto}.math-preview details{margin-top:8px}.math-raw{white-space:pre-wrap;overflow-wrap:anywhere}.math-preview>p{margin:4px 0}

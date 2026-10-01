@@ -1,3 +1,4 @@
+import {renderSourceParts} from './math-preview.js';
 import '../companion/mygpt-pet.js';
 import { catalogue } from './fixtures.js';
 import { createHostController } from './controller.js';
@@ -31,9 +32,7 @@ const element = (tag,text,className) => {
   const node = document.createElement(tag); if (text !== undefined) node.textContent = text;
   if (className) node.className = className; return node;
 };
-function renderParts(target,parts) {
-  target.replaceChildren(...parts.map(p => element(p.kind==='math'?'code':'p',p.kind==='math'?p.latex:p.text,p.kind==='math'?'math':undefined)));
-}
+const renderParts = renderSourceParts;
 for (const rid of new Set(catalogue.entries.map(e=>e.context.source_id))) {
   const choices = catalogue.entries.filter(e=>e.context.source_id===rid);
   const original = JSON.parse(choices.find(e=>e.context.source_layer==='source').evidence_text);
