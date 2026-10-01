@@ -10,6 +10,8 @@ deterministic local boundary.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
+from numbers import Real
 from typing import Any, Mapping
 
 
@@ -55,9 +57,20 @@ class OpenWakeWordGate:
         best_label = ""
         best_score = 0.0
         for label, value in raw.items():
+            # Backend confidence is a real numeric scalar, never a boolean,
+            # numeric string or array. Real also accepts NumPy scalar floats
+            # from the pinned model without importing its optional SDK here.
+            if isinstance(value, bool) or not isinstance(value, Real):
+                continue
             try:
+                # Check exact scalar bounds before float conversion can round
+                # an out-of-range Fraction/extended-precision value to 1.0.
+                if not 0 <= value <= 1:
+                    continue
                 score = float(value)
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if not math.isfinite(score) or not 0.0 <= score <= 1.0:
                 continue
             if score > best_score:
                 best_label = str(label)

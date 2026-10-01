@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_CASES = {
+    "test_actual_numpy_wake_scalars_preserve_valid_confidence_and_reject_bool_arrays",
     "test_voice_to_real_components_to_durable_native_replay",
     "test_book_native_story_keeps_context_ephemeral_and_rejects_expiry",
     "test_real_voice_restart_same_utterance_produces_new_reply_once",
