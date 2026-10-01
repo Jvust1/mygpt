@@ -1,3 +1,10 @@
+# 2026-10-01 — KaTeX selected-formula preview candidate
+
+- Pinned MIT KaTeX 0.18.10 is now invoked by selection/Brain/reader source-part rendering, with native MathML and exact raw fallback
+- No source, prompt, hash, authority or model behavior change; no font/CDN/model dependency
+- Budget/trust rules, actual browser gate and current acceptance limits: [KaTeX preview](KATEX_BOOK_PREVIEW_20261001.md)
+- This candidate is layered on the reviewed main-targeted #56; main remains unchanged
+
 ## 2026-10-01 · coherent candidate prepared for main review
 
 A single draft snapshot is prepared from reviewed PR #55 plus current main's

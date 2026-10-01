@@ -16,10 +16,13 @@ on:
       - fix/memory-noop-result-dot-20261001
       - fix/cli-input-recovery-dot-20261001
       - fix/wake-confidence-boundary-dot-20261001
+      - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
       - feat/airi-chat-memory-brain-20260929
     paths:
       - 'brain/**'
+      - 'host/**'
+      - 'scripts/serve.mjs'
       - 'android_spike/**'
       - 'android_*/**/build.gradle.kts'
       - 'android_*/app/src/main/assets/**'
@@ -83,6 +86,24 @@ jobs:
           python -m unittest discover -s tests -p 'test_*.py' -q
           node --test tests/*.test.mjs
           python -m compileall -q brain/mygpt_brain
+
+      - name: Verify actual local Book math preview in Chromium
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/mygpt-browser" --ignore-scripts --no-audit --no-fund playwright@1.62.1
+          export NODE_PATH="$RUNNER_TEMP/mygpt-browser/node_modules"
+          export MYGPT_CHROMIUM_PATH="$(command -v google-chrome)"
+          test -x "$MYGPT_CHROMIUM_PATH"
+          MYGPT_TEST_OUTPUT="$RUNNER_TEMP/math-preview" node tests/math-preview-browser.cjs
+
+      - name: Preserve synthetic browser proof
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: math-preview-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/math-preview/
+          retention-days: 3
+          if-no-files-found: warn
 
   android-java-boundaries:
     if: github.repository == 'Jvust1/mygpt'

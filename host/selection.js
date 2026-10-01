@@ -1,3 +1,4 @@
+import {renderSourceParts} from './math-preview.js';
 import '../companion/mygpt-pet.js';
 import {createHostController} from './controller.js';
 import {manualPacket} from './selection-manual.js';
@@ -57,10 +58,7 @@ $('import').addEventListener('click',async()=>{
     $('selected-version').textContent=`${source.book_version_id} · ${source.layer} / ${source.portion}`;
     $('source-trust').textContent='USER_SUPPLIED_UNVERIFIED · 仅验证结构与字节身份，不验证教材真实性。';
     $('source-hash').textContent=accepted.context.source_sha256;
-    $('source-parts').replaceChildren(...source.parts.map(part=>{
-      const node=document.createElement(part.kind==='math'?'code':'p');
-      node.textContent=part.kind==='math'?part.latex:part.text;return node;
-    }));
+    renderSourceParts($('source-parts'),source.parts);
     controller=createHostController({catalogue:{schema:'mygpt.host-selection.v1',scope:'LOCAL_UNVERIFIED_SELECTION',
       live_book_connected:false,model_calls:0,entries:[accepted]},adapter});
     controller.subscribe(state=>{

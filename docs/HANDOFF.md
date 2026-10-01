@@ -1,3 +1,7 @@
+# 2026-10-01 — KaTeX preview follow-on
+
+Candidate `feat/katex-book-preview-dot-20261001` builds on #56. It brings one new qualifying upstream into the actual accepted Book formula preview. Read [scope and verification](KATEX_BOOK_PREVIEW_20261001.md) and `third_party/katex/NOTICE.md`. Source-only recovery includes the exact ESM bundle/license without fonts. Hosted browser acceptance must be checked for this candidate; do not infer device acceptance.
+
 ## Aggregate review handoff · main-targeted source snapshot · 2026-10-01
 
 The proposed `feat/companion-fusion-main-dot-20261001` snapshot targets current

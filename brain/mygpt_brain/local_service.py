@@ -25,6 +25,8 @@ MAX_BODY = 8192
 CLIENT_HEADER = "mygpt-reader-brain-v1"
 COOKIE_NAME = "mygpt_local_brain"
 STATIC_FILES = {
+    "/host/math-preview.js": "host/math-preview.js",
+    "/third_party/katex/katex.mjs": "third_party/katex/katex.mjs",
     "/host/selection.html": "host/selection.html",
     "/host/selection.js": "host/selection.js",
     "/host/selection-manual.js": "host/selection-manual.js",

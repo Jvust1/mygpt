@@ -1585,5 +1585,21 @@
       "microphone or audible playback"
     ],
     "review_document": "docs/FUSION_MAIN_REVIEW_20261001.md"
+  },
+  "katex_book_preview_candidate": {
+    "checked_at_utc": "2026-10-01T03:15:00Z",
+    "status": "LOCAL_CANDIDATE_BROWSER_GATE_PENDING",
+    "branch": "feat/katex-book-preview-dot-20261001",
+    "base_commit": "ebc158b02e688925da6e760e1e9a7ef9b52f81e5",
+    "upstream": "KaTeX/KaTeX",
+    "version": "0.18.10",
+    "commit": "411da7029f5c095943c2805ce6db16c2be5f214d",
+    "stars_at_check": 20414,
+    "license": "MIT",
+    "runtime_path": "accepted Book/selection math parts -> host/math-preview.js -> pinned KaTeX render -> native MathML",
+    "source_identity_unchanged": true,
+    "fonts_or_external_service_added": false,
+    "scope_document": "docs/KATEX_BOOK_PREVIEW_20261001.md",
+    "limits": "Local browser process failed before assertions; exact-head hosted browser gate required. No real Book/device/model/math-correctness acceptance."
   }
 }
