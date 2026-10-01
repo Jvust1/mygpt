@@ -1,3 +1,14 @@
+## 2026-10-01 · native body receipt has a total time budget
+
+The actual native HTTP handler now bounds total JSON-body receipt to five
+monotonic seconds instead of resetting an idle-only timeout for each progressing
+read. Expired bodies return 408 before the runtime/provider, release the
+connection slot and preserve the independent inference timeout. Deterministic
+boundary tests and real stalled/progressing socket cases cover the path.
+See [body-only deadline and limits](NATIVE_BODY_DEADLINE_20261001.md).
+
+---
+
 ## 2026-10-01 · queued Book context is rechecked at admission
 
 The runtime now reads live wall time after acquiring its turn lock, closing a
