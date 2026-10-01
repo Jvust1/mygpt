@@ -8,6 +8,7 @@ on:
       - fix/book-unicode-budget-dot-20260930
       - fix/pipecat-restart-receipts-dot-20260930
       - fix/android-tts-completion-dot-20260930
+      - chore/fusion-checkpoint-dot-20261001
       - feat/airi-chat-memory-brain-20260929
     paths:
       - 'brain/**'
@@ -18,6 +19,9 @@ on:
       - 'tests/**'
       - '.github/workflows/companion-fusion-acceptance.yml'
       - '.github/workflows/android-spike.yml'
+      - '.github/workflows/source-delivery.yml'
+      - 'scripts/source_bundle.py'
+      - '.gitmodules'
   workflow_dispatch:
 
 permissions:
@@ -67,5 +71,11 @@ jobs:
   android-java-boundaries:
     if: github.repository == 'Jvust1/mygpt'
     uses: ./.github/workflows/android-spike.yml
+    permissions:
+      contents: read
+
+  source-recovery:
+    if: github.repository == 'Jvust1/mygpt'
+    uses: ./.github/workflows/source-delivery.yml
     permissions:
       contents: read

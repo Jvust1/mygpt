@@ -1,5 +1,6 @@
 name: Source delivery and clean recovery
 on:
+  workflow_call:
   push:
     branches:
       - feat/fusion-source-recovery-dot-20260930
