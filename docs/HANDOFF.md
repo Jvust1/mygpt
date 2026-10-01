@@ -1,3 +1,61 @@
+## Current review handoff · coherent fusion stack · 2026-10-01
+
+Checked at 01:12:45 UTC against public `Jvust1/mygpt` metadata and exact hosted
+evidence. Main remains `bb35f6d34e05ed1de7ac8b3ef71c76f0cbe9f258`. Original product
+PR #15 remains draft at `1f1e1e1db4c053a3a2abdaea1a93aec9aa3ce16d`; its device
+goals, privacy boundaries and acceptance requirements are unchanged.
+
+The separate reviewed implementation is [draft PR #51](https://github.com/Jvust1/mygpt/pull/51),
+`fix/memory-update-atomic-dot-20261001` at
+`8e9c430b4416154560da00e4faeefe999edf25e6`. PRs #31–#51 form a sequential review
+stack on PR #15. Nothing in that stack is merged into main or accepted on a
+physical device. Parallel PR #17 remains separate and is not part of this
+verified path; no live Dot API capability is inferred from it.
+
+### Current verified path
+
+- AIRI reply/emotion parsing and paired history, Python and Android boundaries
+- Pipecat voice framing/interruption and conservative speech presentation
+- Ollama async lifecycle, SQLite receipt recovery and native authorization guards
+- sklearn-derived lexical memory/Unicode recall and strict Gson Android parsing
+- Book prompt bounds and queue-time freshness; native total body-receipt budget
+- Android stale-output callback ownership and explicit-memory edit/delete safety
+
+[Exact-head hosted run](https://github.com/Jvust1/mygpt/actions/runs/36799362430)
+passed on nonzero runners: 764 strict Python + 48 actual-upstream/story cases,
+65 root Python, 66 JavaScript, and 22 Java entrypoints each on Java 8/17. Fresh
+source recovery independently passed 764/65/66/22 and 12+32 loopback/input checks.
+The APK job was skipped, not accepted. Earlier runner-provisioning failures in
+the dated entries below remain historical evidence, not current stack status.
+
+The exact source artifact has 434 tracked files, 4,581,958 archive bytes and
+SHA-256 `10c121a6351346b4efb749778dada8f57f74c835e82241a85dca2eafc7769981`.
+See [artifact and scope](https://github.com/Jvust1/mygpt/actions/runs/36799362430/artifacts/11134538649)
+and [recovery contract](FUSION_SOURCE_RECOVERY_20260930.md). It excludes models,
+private assets and external submodule sources; dependencies remain required.
+Hosted artifacts expire after three days. The embedded manifest is not an
+authenticity signature; preserve and verify the external hash.
+
+### Safe next step and unresolved acceptance
+
+Review/reproduce the immutable implementation checkpoint rather than treating
+this metadata update as another runtime feature. The existing Windows/Xiaomi 14
+route below remains the device route, but no build, device use, signing changes,
+model choice or private asset transfer is implied by this handoff.
+
+Still outstanding: actual Activity/Kotlin/APK/JNI build, Windows/device checks,
+real Book signing/adoption, live model quality, microphone and audible TTS.
+Integration responses/audio are synthetic. Receipt replay does not acknowledge
+audible delivery; callback leases do not prove AudioTrack cancellation. Python
+noncooperative callbacks, body-only HTTP deadlines and per-instance memory locks
+retain their documented limits. Do not merge on source-level CI alone.
+
+`governance/project_state.json` retains the original product track and adds a
+separate `fusion_review_checkpoint` with dated exact evidence. All older sections
+below are preserved as historical handoffs for their stated commits.
+
+---
+
 ## Latest handoff · Xiaomi 14 full matrix + native voice loopback ready · 2026-09-30
 
 Implementation checkpoint: `9920d53800ad1aec741630300283d385825fd986`; Draft PR #15; main untouched.

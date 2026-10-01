@@ -1,3 +1,41 @@
+## E-FUSION-20261001 — coherent draft stack hosted acceptance
+
+**Checked:** 2026-10-01 01:12:45 UTC. **Implementation:** draft [PR #51](https://github.com/Jvust1/mygpt/pull/51),
+`8e9c430b4416154560da00e4faeefe999edf25e6`, public `Jvust1/mygpt`.
+Main and the original PR #15 product/device track remain unchanged; no adoption,
+merge or deployment follows from these checks.
+
+**Exact-head run:** [36799362430](https://github.com/Jvust1/mygpt/actions/runs/36799362430),
+success. Production job `110170011091`, Java 8 `110170011455`, Java 17
+`110170011485`, source recovery `110170011480`; all had nonzero runners and
+executed steps.
+
+- Strict Python: 764 passed, zero failures/skips
+- Actual upstream/component stories: 48 passed, zero failures/skips
+- Root Python: 65; JavaScript: 66
+- Java 8/17: 22 entrypoints each, including 327 Gson, 109 sklearn, 128 AIRI,
+  3520 history-budget and 1288 Book Unicode projections
+- Fresh source recovery: 764 strict, 65 root Python, 66 JavaScript, 22 Java17
+  entrypoints, 12 loopback-launcher and 32 input-boundary checks
+- Android APK job: skipped and not counted as acceptance
+
+**Source:** artifact `11134538649`, 434 source files, 4,581,958-byte source ZIP,
+SHA-256 `10c121a6351346b4efb749778dada8f57f74c835e82241a85dca2eafc7769981`.
+Two hosted builds were byte-identical; recovery used a new directory. Models,
+private assets and pinned external submodule sources are excluded. The archive
+is source-only and not offline dependency-complete.
+
+**Limits:** synthetic model/audio generation; no live teaching-quality, actual
+APK/JNI/Windows/device, Book signing/adoption, microphone or audible-playback
+acceptance. No physical exactly-once speech or forced termination of arbitrary
+callbacks is established. Memory serialization is per instance. Native request
+body deadlines do not cover total header receipt.
+
+Earlier zero-runner results below remain valid observations of their earlier
+commits/runs. They are not the current status of this separate draft stack.
+
+---
+
 ## E021 — fixed LLM quality samples + sherpa native loopback code-ready (2026-09-30)
 
 **Implementation checkpoint:** `9920d53800ad1aec741630300283d385825fd986`

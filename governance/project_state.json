@@ -1,11 +1,11 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-09-30",
-  "repository": "Jvust/mygpt",
+  "updated_date": "2026-10-01",
+  "repository": "Jvust1/mygpt",
   "default_branch": "main",
   "active_branch": "feat/airi-chat-memory-brain-20260929",
   "phase": "COMPANION_V2_XIAOMI14_LLM_QUALITY_VOICE_LOOPBACK_GATE",
-  "status": "DRAFT_AUTOMATED_MATRIX_AND_NATIVE_LOOPBACK_READY_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
+  "status": "DRAFT_AUTOMATED_MATRIX_AND_NATIVE_LOOPBACK_READY_DEVICE_EXECUTION_PENDING",
   "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
   "drive": {
     "folder_name": "mygpt",
@@ -93,8 +93,8 @@
     "Companion V2 / llama / sherpa / prompt-budget current code has not yet run on Xiaomi 14.",
     "Jvust/Book has not yet adopted book-client-sdk-release.aar or proven a matching signing identity.",
     "No default GGUF is accepted before Xiaomi 14 latency/RAM/thermal measurements.",
-    "GitHub hosted Actions still fail before runner allocation (runner_id=0, zero steps).",
-    "Exact-head Windows/Xiaomi 14 acceptance has not yet executed; hosted Actions still fail before runner allocation.",
+    "Current draft fusion stack has hosted Python/Java/source-recovery acceptance; exact-head Android APK, Windows and physical-device gates remain unexecuted.",
+    "Exact-head Windows/Xiaomi 14 acceptance has not yet executed; current hosted source-level success does not satisfy that device gate.",
     "Default GGUF remains a human/device decision after Xiaomi 14 performance + fixed qualitative evidence; no automatic quality winner is allowed.",
     "Real microphone capture and audible TTS playback still require physical-device experience validation even after the synthetic native loopback passes."
   ],
@@ -479,7 +479,7 @@
     "drive_id": "1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK",
     "drive_sha256": "eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09"
   },
-  "as_of": "2026-09-30",
+  "as_of": "2026-10-01",
   "desktop_delivery": {
     "state": "NATIVE_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
     "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
@@ -1450,5 +1450,98 @@
     ],
     "runtime_policy": "validate existing app-private skin first; otherwise install bundled asset through production SpinePackageLayout; manual SAF fallback if unbundled",
     "device_test": "NOT_RUN"
+  },
+  "fusion_review_checkpoint": {
+    "checked_at_utc": "2026-10-01T01:12:45Z",
+    "status": "DRAFT_UNMERGED_SOURCE_LEVEL_ACCEPTANCE_PASS",
+    "repository": "Jvust1/mygpt",
+    "product_track_unchanged": {
+      "active_branch": "feat/airi-chat-memory-brain-20260929",
+      "current_pr": 15,
+      "observed_head": "1f1e1e1db4c053a3a2abdaea1a93aec9aa3ce16d",
+      "main_observed_head": "bb35f6d34e05ed1de7ac8b3ef71c76f0cbe9f258",
+      "note": "Original product/device track remains unchanged. This separate fusion review stack is not merged or adopted into main."
+    },
+    "implementation_pr": 51,
+    "implementation_pr_url": "https://github.com/Jvust1/mygpt/pull/51",
+    "implementation_branch": "fix/memory-update-atomic-dot-20261001",
+    "implementation_head": "8e9c430b4416154560da00e4faeefe999edf25e6",
+    "stack_range": "PR31 through PR51, sequentially based on PR15; all remain draft/unmerged",
+    "parallel_pr17": {
+      "observed_head": "68b61b2783de1b3043bcfcee9fe89e8b16bae19b",
+      "adopted": false,
+      "note": "Separate branch; no verified Dot API integration is claimed by this stack."
+    },
+    "exact_head_acceptance": {
+      "run_id": 36799362430,
+      "url": "https://github.com/Jvust1/mygpt/actions/runs/36799362430",
+      "conclusion": "success",
+      "jobs_with_nonzero_runners": [
+        110170011091,
+        110170011455,
+        110170011480,
+        110170011485
+      ],
+      "python_strict": {
+        "passed": 764,
+        "failed": 0,
+        "skipped": 0
+      },
+      "upstream_stories": {
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0
+      },
+      "root_python": 65,
+      "javascript": 66,
+      "java_entrypoints_each": 22,
+      "java_runtimes": [
+        "8",
+        "17 --release 8"
+      ],
+      "android_apk_job": "SKIPPED_NOT_ACCEPTANCE",
+      "recovered_source": {
+        "python_strict": 764,
+        "root_python": 65,
+        "javascript": 66,
+        "java17_entrypoints": 22,
+        "loopback_launcher_checks": 12,
+        "input_boundary_checks": 32
+      }
+    },
+    "source_recovery": {
+      "artifact_id": 11134538649,
+      "url": "https://github.com/Jvust1/mygpt/actions/runs/36799362430/artifacts/11134538649",
+      "source_commit": "8e9c430b4416154560da00e4faeefe999edf25e6",
+      "source_files": 434,
+      "archive_bytes": 4581958,
+      "sha256": "10c121a6351346b4efb749778dada8f57f74c835e82241a85dca2eafc7769981",
+      "external_submodule_sources_included": false,
+      "models_private_assets_included": false,
+      "scope": "Source only; external dependencies remain required; hosted artifact retention is three days."
+    },
+    "historical_runner_failure": {
+      "scope": "Earlier PR15 attempts, not current fusion-stack runner status",
+      "previous_global_status": "DRAFT_AUTOMATED_MATRIX_AND_NATIVE_LOOPBACK_READY_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
+      "previous_blocker_text": [
+        "GitHub hosted Actions still fail before runner allocation (runner_id=0, zero steps).",
+        "Exact-head Windows/Xiaomi 14 acceptance has not yet executed; hosted Actions still fail before runner allocation."
+      ],
+      "preserved_detail": "Earlier dated candidate validation objects and evaluation entries remain historical evidence."
+    },
+    "remaining_limits": [
+      "Exact Android Activity/Kotlin/APK/JNI and Windows/device acceptance remain unexecuted.",
+      "Real Book signing identity/adoption and physical microphone/audible TTS remain unverified.",
+      "No default GGUF or real provider teaching-quality acceptance.",
+      "Integration model replies/audio generation are synthetic.",
+      "Receipt replay is data recovery, not audible-delivery acknowledgment.",
+      "Android completion leases do not establish native backend lifetime or AudioTrack cancellation.",
+      "Noncooperative Python callbacks may retain runtime locks past deadlines.",
+      "Native total body timeout does not establish a total header/connection deadline.",
+      "Memory edit serialization is per MemoryStore instance, not across independent connections/processes."
+    ],
+    "next_review": "Review the immutable #51 implementation stack and its scoped evidence. Preserve source/license pins and explicit privacy boundaries. Do not merge or claim device acceptance from hosted source-level checks.",
+    "handoff": "docs/HANDOFF.md",
+    "evaluation": "docs/EVALUATION_LEDGER.md#e-fusion-20261001--coherent-draft-stack-hosted-acceptance"
   }
 }
