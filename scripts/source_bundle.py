@@ -18,7 +18,7 @@ ROOT_FILES = {'.gitmodules', '.gitignore', '.gitattributes', 'AGENTS.md', 'SECUR
               'CONTRIBUTING.md', 'SECURITY.md',
               'package.json', 'package-lock.json', 'run_mygpt.py', 'START_HERE.md',
               'desktop.py', 'desktop_adapter.py', 'desktop_runtime.py', 'desktop_state.py',
-              'desktop_workspace.py'}
+              'desktop_workspace.py', 'desktop_chat.py'}
 DIRECTORIES = {'brain', 'host', 'companion', 'demo', 'docs', 'governance', 'scripts', 'tests', '.github',
                'desktop_ui', 'tools', 'android_spike', 'android_llm_spike',
                'android_voice_spike', 'third_party'}

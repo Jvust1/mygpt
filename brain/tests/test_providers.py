@@ -42,6 +42,7 @@ async def test_ollama_projects_authority_and_parses_response(monkeypatch):
     answer=await OllamaResponder("qwen-test")(prompt)
     assert answer=="本地回复"
     assert captured["url"]=="http://127.0.0.1:11434/api/chat"
+    assert set(captured["body"]) == {"model", "stream", "messages"}
     assert captured["client_options"]["trust_env"] is False
     assert captured["client_options"]["follow_redirects"] is False
     assert captured["body"]["messages"][0]=={"role":"system","content":"trusted persona"}
@@ -207,3 +208,49 @@ async def test_cancellation_closes_actual_http_connection(monkeypatch, send_part
         await server.wait_closed()
         for pending in list(handler_tasks): pending.cancel()
         await asyncio.gather(*handler_tasks, return_exceptions=True)
+
+
+@pytest.mark.parametrize("port", [True, False, 0, -1, 65536, "11434"])
+def test_ollama_configurable_port_remains_strict_loopback(port):
+    with pytest.raises(ValueError, match="port"):
+        OllamaResponder("model", port=port)
+
+
+@pytest.mark.asyncio
+async def test_ollama_explicit_port_no_environment_proxy_or_redirect(monkeypatch):
+    def handler(request):
+        assert str(request.url) == "http://127.0.0.1:23456/api/chat"
+        body = json.loads(request.content)
+        assert body["keep_alive"] == "0" and body["options"]["num_predict"] == 2048
+        return httpx.Response(200, json={"message":{"content":"port-specific synthetic reply"}})
+    use_mock(monkeypatch, handler)
+    assert await OllamaResponder("model", port=23456, keep_alive="0", num_predict=2048)(simple_prompt()) == "port-specific synthetic reply"
+
+
+@pytest.mark.parametrize("keep_alive", [0, False, True, "", "5m", "-1", " 0", {}, []])
+def test_ollama_rejects_invalid_explicit_keep_alive(keep_alive):
+    with pytest.raises(ValueError, match="keep_alive"):
+        OllamaResponder("model", keep_alive=keep_alive)
+
+
+@pytest.mark.parametrize("num_predict", [True, False, 0, -1, 2049, "2048", 1.5])
+def test_ollama_rejects_invalid_explicit_output_budget(num_predict):
+    with pytest.raises(ValueError, match="num_predict"):
+        OllamaResponder("model", num_predict=num_predict)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("options,projected", [
+    ({"keep_alive": None, "num_predict": None}, {}),
+    ({"keep_alive": "0"}, {"keep_alive": "0"}),
+    ({"num_predict": 1}, {"options": {"num_predict": 1}}),
+    ({"num_predict": 2048}, {"options": {"num_predict": 2048}}),
+])
+async def test_ollama_only_projects_explicit_optional_fields(monkeypatch, options, projected):
+    def handler(request):
+        body = json.loads(request.content)
+        assert set(body) == {"model", "stream", "messages"} | set(projected)
+        assert {key: body[key] for key in projected} == projected
+        return httpx.Response(200, json={"message": {"content": "synthetic only"}})
+    use_mock(monkeypatch, handler)
+    assert await OllamaResponder("model", **options)(simple_prompt()) == "synthetic only"

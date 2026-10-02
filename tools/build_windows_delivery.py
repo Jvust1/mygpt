@@ -126,6 +126,35 @@ def write_local_archives(package, evidence, destination, report, source_root=ROO
         for path in sorted(destination.glob('*.zip'))), encoding='utf-8')
 
 
+
+def verify_browser_report(browser, exe_sha256):
+    """Reject incomplete/fallback reports before calling the native build a pass."""
+    if any(browser.get(name) is not True for name in
+           ('ok', 'native_math_preview', 'native_text_chat', 'native_text_restart_restore')):
+        raise ValueError('native browser math/text/restart checks did not pass')
+    if (browser.get('os') != 'win32' or browser.get('browser') != 'Microsoft Edge'
+            or not browser.get('browser_version') or browser.get('exe_sha256') != exe_sha256):
+        raise ValueError('exact frozen EXE and Microsoft Edge evidence required')
+    for key, expected in (('synthetic_provider_calls', 2), ('synthetic_model_calls', 2), ('stopped_provider_connection_attempts', 0),
+                          ('live_model_calls', 0), ('javascript_error_count', 0),
+                          ('external_request_count', 0)):
+        if type(browser.get(key)) is not int or browser[key] != expected:
+            raise ValueError('unexpected native verification counter: ' + key)
+    text = browser.get('text_chat', {})
+    ports = (text.get('first_port'), text.get('second_port'))
+    if (text.get('turns') != 2 or text.get('session_id') != 'desktop-local-chat-v1'
+            or any(type(port) is not int or not 1 <= port <= 65535 for port in ports)
+            or text.get('previous_port_reserved') is not True
+            or ports[0] == ports[1] or len(text.get('sqlite_rows', [])) != 4
+            or len(set(text.get('request_ids', []))) != 2):
+        raise ValueError('two-turn SQLite and new-origin restoration evidence required')
+    requests = text.get('read_only_restart_requests', [])
+    if (not requests or not any(row.get('path') == '/desktop-api/chat-history' for row in requests)
+            or any(row.get('method') != 'GET' or row.get('path') == '/desktop-api/local-chat'
+                   for row in requests)):
+        raise ValueError('restart must restore history without a chat POST')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-commit', required=True)
@@ -168,16 +197,19 @@ def main():
                 log.read_bytes() if log.is_file() else b'No synthetic native boot output.\n')
         if json.loads(smoke.read_text(encoding='utf-8')).get('ok') is not True:
             raise RuntimeError('native executable smoke failed')
-    run([sys.executable, 'tools/desktop_browser_test.py', str(exe), str(evidence)], timeout=240)
+    run([sys.executable, 'tools/desktop_browser_test.py', str(exe), str(evidence)], timeout=360)
     browser = json.loads((evidence / 'browser.json').read_text(encoding='utf-8'))
-    if browser.get('ok') is not True or browser.get('native_math_preview') is not True:
-        raise RuntimeError('native browser math preview did not pass')
+    exe_sha256 = hashlib.sha256(exe.read_bytes()).hexdigest()
+    verify_browser_report(browser, exe_sha256)
     run(['git', 'diff', '--exit-code', 'HEAD', '--'])
     report = {
-        'status': 'WINDOWS_NATIVE_AND_MATH_PREVIEW_PASS', 'source_commit': commit,
+        'status': 'WINDOWS_NATIVE_MATH_AND_TEXT_CHAT_PASS', 'source_commit': commit,
         'built_on': sys.platform, 'python': sys.version,
-        'exe_bytes': exe.stat().st_size, 'exe_sha256': hashlib.sha256(exe.read_bytes()).hexdigest(),
+        'exe_bytes': exe.stat().st_size, 'exe_sha256': exe_sha256,
         'native_executable_smoke': True, 'native_math_preview': True,
+        'native_text_chat': True, 'native_text_restart_restore': True,
+        'synthetic_provider_calls': 2, 'synthetic_model_calls': 2, 'live_model_calls': 0,
+        'stopped_provider_connection_attempts': 0,
         'font_binaries_distributed': 0, 'excluded_font_count': len(removed),
         'required_resources': assets, 'exe_published': False,
         'actual_user_device_tested': False, 'live_model_quality_accepted': False,

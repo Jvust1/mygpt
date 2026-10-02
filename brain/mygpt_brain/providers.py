@@ -28,6 +28,9 @@ class OllamaResponder:
         *,
         endpoint: str = "http://127.0.0.1:11434/api/chat",
         timeout_seconds: float = 30.0,
+        port: int = 11434,
+        keep_alive: str | None = None,
+        num_predict: int | None = None,
     ) -> None:
         if not isinstance(model, str) or not model.strip() or len(model) > 160:
             raise ValueError("model must contain 1..160 characters")
@@ -35,8 +38,18 @@ class OllamaResponder:
             raise ValueError("prototype only permits the fixed loopback Ollama endpoint")
         if type(timeout_seconds) not in (int, float) or not 0 < timeout_seconds <= 60:
             raise ValueError("timeout_seconds must be in (0, 60]")
+        if type(port) is not int or not 1 <= port <= 65535:
+            raise ValueError("port must be an integer in 1..65535")
+        if "cloud" in model.lower():
+            raise ValueError("local model name required")
+        if keep_alive is not None and (type(keep_alive) is not str or keep_alive != "0"):
+            raise ValueError("keep_alive must be None or the explicit unload value '0'")
+        if num_predict is not None and (type(num_predict) is not int or not 1 <= num_predict <= 2048):
+            raise ValueError("num_predict must be None or an integer in 1..2048")
+        self.keep_alive = keep_alive
+        self.num_predict = num_predict
         self.model = model.strip()
-        self.endpoint = endpoint
+        self.endpoint = f"http://127.0.0.1:{port}/api/chat"
         self.timeout_seconds = float(timeout_seconds)
 
     async def __call__(self, prompt: ChatPrompt) -> str:
@@ -52,6 +65,12 @@ class OllamaResponder:
             "stream": False,
             "messages": messages,
         }
+        # Preserve the shared Companion/voice provider's existing defaults.
+        # Only callers choosing an explicit policy add these wire fields.
+        if self.keep_alive is not None:
+            payload["keep_alive"] = self.keep_alive
+        if self.num_predict is not None:
+            payload["options"] = {"num_predict": self.num_predict}
         try:
             # Unlike to_thread(urlopen), cancellation exits these async
             # contexts and closes the in-flight HTTP connection. No provider
