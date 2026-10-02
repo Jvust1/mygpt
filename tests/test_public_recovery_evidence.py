@@ -142,7 +142,7 @@ class PublicRecoveryEvidenceTests(unittest.TestCase):
         self.assertEqual(text.count('scripts/source_bundle.py build --commit "$GITHUB_SHA"'),2)
         for required in ('cmp "$OUT/mygpt-source.zip" "$RUNNER_TEMP/source-repeat.zip"',
                          "verified = verify(out / 'mygpt-source.zip', report['sha256'])",'archive.extractall(dest)',
-                         "python -m unittest discover -s tests -p 'test_*.py' -q",'node --test tests/*.test.mjs',
+                         "python -m unittest discover -s tests -p 'test_*.py' -q",'npm test',
                          'python scripts/verify_integrations.py','smoke_selection_intake.py','run_boundary_smoke.sh'):
             self.assertIn(required,text)
         self.assertLess(text.index('run_boundary_smoke.sh'),text.index('scripts/build_public_recovery_evidence.py'))

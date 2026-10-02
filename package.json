@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/serve.mjs",
-    "test": "node --test tests/atlas.test.mjs",
+    "test": "node --test",
     "test:browser": "node tests/browser.cjs"
   },
   "engines": { "node": ">=20" }

@@ -84,7 +84,7 @@ jobs:
           python run_mygpt.py doctor | tee "$OUT/doctor.json"
           python scripts/launcher_smoke.py --output "$OUT/launcher-http.json"
           python -m unittest discover -s tests -p 'test_*.py' -q 2>&1 | tee "$OUT/recovered-root.txt"
-          node --test tests/*.test.mjs 2>&1 | tee "$OUT/recovered-node.txt"
+          npm test 2>&1 | tee "$OUT/recovered-node.txt"
           cd brain
           python scripts/verify_integrations.py --output "$OUT/recovered-brain"
           PYTHONPATH=. python scripts/smoke_selection_intake.py --output "$OUT/recovered-http.json"
