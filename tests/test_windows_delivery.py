@@ -227,6 +227,35 @@ class WindowsWorkflowTests(unittest.TestCase):
         self.assertIn('      - fix/windows-exact-head-dot-20261002', text)
 
 
+class NativeProcessIsolationTests(unittest.TestCase):
+    def test_both_exe_launches_use_clean_python_settings_and_temporary_cwd(self):
+        with tempfile.TemporaryDirectory(prefix='mygpt-native-isolation-') as temp:
+            home = Path(temp).resolve()
+            with patch.dict(os.environ, PYTHONPATH='SYNTHETIC_SOURCE_FALLBACK',
+                            PYTHONHOME='SYNTHETIC_INVALID_PYTHON_HOME',
+                            LOCALAPPDATA='SYNTHETIC_NON_TEST_PROFILE'):
+                options = build.native_process_options(home)
+                result = subprocess.run([sys.executable, '-c',
+                    "import json, os; print(json.dumps({'cwd': os.getcwd(), "
+                    "'pythonpath': os.environ.get('PYTHONPATH'), "
+                    "'pythonhome': os.environ.get('PYTHONHOME'), "
+                    "'profile': os.environ['LOCALAPPDATA']}))"],
+                    **options, check=True, capture_output=True, text=True, timeout=10)
+                self.assertEqual(os.environ['PYTHONPATH'], 'SYNTHETIC_SOURCE_FALLBACK')
+                self.assertEqual(os.environ['PYTHONHOME'], 'SYNTHETIC_INVALID_PYTHON_HOME')
+                self.assertEqual(os.environ['LOCALAPPDATA'], 'SYNTHETIC_NON_TEST_PROFILE')
+            actual = json.loads(result.stdout)
+            self.assertEqual(Path(actual['cwd']), home)
+            self.assertNotEqual(Path(actual['cwd']), ROOT)
+            self.assertIsNone(actual['pythonpath'])
+            self.assertIsNone(actual['pythonhome'])
+            self.assertEqual(Path(actual['profile']), home / 'synthetic-profile')
+        builder = (ROOT / 'tools/build_windows_delivery.py').read_text()
+        browser = (ROOT / 'tools/desktop_browser_test.py').read_text()
+        self.assertIn('**native_process_options(Path(temp))', builder)
+        self.assertIn('**native_process_options(home)', browser)
+
+
 class LocalArchiveCompatibilityTests(unittest.TestCase):
     def test_optional_local_archives_preserve_original_outputs_without_publication(self):
         with tempfile.TemporaryDirectory(prefix='mygpt-local-archive-') as temp:

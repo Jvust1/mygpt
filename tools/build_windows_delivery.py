@@ -80,8 +80,18 @@ def verify_bundled_assets(resource_root, source_root=ROOT):
     return result
 
 
-def run(args, **kwargs):
-    subprocess.run(args, check=True, cwd=ROOT, **kwargs)
+def native_process_options(home):
+    """Keep EXE verification independent of the source CWD and Python settings."""
+    home = Path(home).resolve()
+    env = dict(os.environ)
+    for name in ('PYTHONPATH', 'PYTHONHOME'):
+        env.pop(name, None)
+    env['LOCALAPPDATA'] = str(home / 'synthetic-profile')
+    return {'cwd': home, 'env': env}
+
+
+def run(args, *, cwd=ROOT, **kwargs):
+    subprocess.run(args, check=True, cwd=cwd, **kwargs)
 
 
 def write_local_archives(package, evidence, destination, report, source_root=ROOT):
@@ -150,7 +160,7 @@ def main():
         profile = Path(temp) / 'synthetic-profile'
         try:
             run([str(exe), '--self-test', str(smoke), '--data-dir', str(Path(temp) / 'controller')],
-                env=dict(os.environ, LOCALAPPDATA=str(profile)), timeout=150)
+                **native_process_options(Path(temp)), timeout=150)
         finally:
             # Only this runner-created EXE profile, never the user's default boot log.
             log = profile / 'mygptDesktop/boot.log'

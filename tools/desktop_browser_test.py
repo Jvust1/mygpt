@@ -1,7 +1,6 @@
 """Real Windows executable plus browser math/persistence; synthetic data only."""
 import hashlib
 import json
-import os
 from pathlib import Path
 import subprocess
 import sys
@@ -10,6 +9,7 @@ import time
 from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright, expect
+from build_windows_delivery import native_process_options
 
 KATEX_SHA256 = '694a531495903e374957e9a9c904a402e2f413762635df486c4cf6163320d1aa'
 
@@ -18,7 +18,7 @@ def start(exe, home, tag):
     ready, stop = home / (tag + '.json'), home / (tag + '.stop')
     proc = subprocess.Popen([str(exe), '--headless', '--data-dir', str(home / 'user'),
                              '--ready-file', str(ready), '--stop-file', str(stop)],
-                            env=dict(os.environ, LOCALAPPDATA=str(home / 'synthetic-profile')))
+                            **native_process_options(home))
     try:
         deadline = time.monotonic() + 80
         while not ready.exists():
