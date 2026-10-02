@@ -1,0 +1,105 @@
+{
+  "schema_version": "mygpt_live_skin_ref_v1",
+  "selected": true,
+  "role": "default_first_android_companion_skin",
+  "skin_id": "3714430278",
+  "authority": {
+    "repository": "Jvust/Live",
+    "drive_folder_id": "1StRk6RJ2N8l5-Q0ogpPHFcb1uviOJYCh",
+    "config": {
+      "name": "config.json",
+      "drive_file_id": "1O87dhnMOs2faZvFMWepm2DM-1Lqa51RW"
+    },
+    "preview": {
+      "name": "20260426152945.png",
+      "drive_file_id": "1DwSlVnuGPp6EAOAnECSkNfm0mZeExTZx"
+    },
+    "archive": {
+      "name": "3714430278.zip",
+      "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+      "size_bytes": 12342220
+    },
+    "original_source_package": {
+      "name": "3714430278.lpk",
+      "drive_file_id": "1g0UAayGcezBHKywrSNIdYh9GyCaWZ7G2",
+      "size_bytes": 12557305
+    },
+    "runtime_package": {
+      "name": "3714430278.zip",
+      "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+      "size_bytes": 12342220,
+      "format_role": "decrypted_lpk_runtime_package",
+      "direct_use": true,
+      "preferred": true,
+      "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+      "entries": 13,
+      "uncompressed_bytes": 12340902,
+      "zip_crc": "PASS"
+    }
+  },
+  "policy": {
+    "copy_assets_into_mygpt": false,
+    "live_remains_asset_authority": true,
+    "mygpt_stores_reference_only": true,
+    "renderer_status": "SPINE_4_1_IMPLEMENTED_CI_AND_DEVICE_PENDING",
+    "preferred_runtime_input": "3714430278.zip",
+    "requires_decryption_before_use": false,
+    "distribution_status": "LICENSE_REVIEW_REQUIRED_BEFORE_REDISTRIBUTION",
+    "exact_runtime_package_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+    "package_identity_enforced_by_android_importer": true,
+    "android_first_abi": "arm64-v8a",
+    "runtime_dependency": "com.esotericsoftware.spine:spine-libgdx:4.1.0",
+    "gdx_version": "1.10.0",
+    "runtime_license": "Spine Runtimes License Agreement; distribution remains license-gated"
+  },
+  "format": {
+    "family": "Spine",
+    "export_version": "4.1.20",
+    "entry_count": 13,
+    "primary_runtime_files": [
+      "model.json",
+      "skeleton.bin",
+      "c610_00.atlas",
+      "c610_00.png",
+      "lpk_files.json"
+    ],
+    "atlas_premultiplied_alpha": true,
+    "renderer_candidate": "spine-libgdx:4.1.0",
+    "cubism": false
+  },
+  "motion_map": {
+    "idle": [
+      "idle"
+    ],
+    "tap": [
+      "action",
+      "etc",
+      "no",
+      "pain",
+      "sad",
+      "smile",
+      "special",
+      "surprise",
+      "idle"
+    ],
+    "current_cue_mapping": {
+      "QUIET": "idle",
+      "PAUSED": "freeze-current",
+      "NEEDS_INPUT": "smile",
+      "GENTLE_CHECK_IN": "action"
+    }
+  },
+  "detected_format": {
+    "engine": "Spine",
+    "skeleton_binary_version": "4.1.20",
+    "runtime_line": "4.1",
+    "main_skeleton": "skeleton.bin",
+    "main_atlas": "c610_00.atlas",
+    "main_texture": "c610_00.png",
+    "main_idle_animation": "idle",
+    "alternate_sets": [
+      "aim",
+      "cover"
+    ]
+  }
+}

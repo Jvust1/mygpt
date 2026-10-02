@@ -1,0 +1,35 @@
+{
+  "schema_version": "mygpt.selection-packet.v1",
+  "trust": "USER_SUPPLIED_UNVERIFIED",
+  "source": {
+    "course_id": "demo-course",
+    "book_id": "demo-book",
+    "book_version_id": "demo_book@0123456789abcdef",
+    "section_id": "section-1",
+    "record_id": "record-1",
+    "source_kind": "paragraph",
+    "layer": "source",
+    "layer_id": "original",
+    "portion": "body",
+    "title": "合成演示，不是教材内容",
+    "parts": [
+      {
+        "kind": "text",
+        "text": "两个相同的量相加："
+      },
+      {
+        "kind": "math",
+        "latex": "x+x=2x",
+        "display": true
+      }
+    ],
+    "qualification": "",
+    "parent_sources": [
+      {
+        "record_id": "record-1",
+        "source_parts_sha256": "ae0750ff241c79b9ebbfa191a50a8e9a645b9847cd4d3d543bc755316a06aecf"
+      }
+    ]
+  },
+  "source_sha256": "a1c1e31b67685114325d08eed1e4bd00de0eed68bd31c05f3f98a58d353ab129"
+}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>mygpt · 本机 Brain 学习工作台</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="reader.css">
+  <script type="module" src="brain.js"></script>
+</head>
+<body data-transport="local-python-brain">
+  <header class="topbar"><span class="brand">mygpt<span>本机 Brain 工作台</span></span><span class="badge">受控同机原型</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">READER × PYTHON BRAIN × JONAH</p><h1>选一段，再让本机 Brain 接手。</h1><p>选择与发送分开；浏览器只向同源 loopback 服务提交有界身份请求。</p></section>
+    <p class="notice" id="transport-notice"><strong>正在核对本机 Brain…</strong> · Book 未连接 · TestModel 固定样本 · 付费模型调用 <b id="model-calls">0</b></p>
+    <div class="workspace">
+      <section class="reading" aria-labelledby="reading-title">
+        <div class="section-top"><div><p class="eyebrow">合成示例 · 非教材原文</p><h2 id="reading-title">本次阅读</h2></div><label>模式 <select id="mode" disabled><option value="preview">预习</option><option value="learn" selected>学习</option><option value="review">复习</option><option value="practice">刷题</option></select></label></div>
+        <p class="muted">明确选择内容层本身不调用模型。点击解释后，请求才进入本机 Python Brain。</p>
+        <div id="records"></div>
+        <div class="toolbar"><button id="pause" type="button" disabled>暂停本次</button><button id="open-panel" type="button">打开帮助面板</button></div>
+        <details class="scope"><summary>这一步真的接通了什么？</summary><p>浏览器通过同源 127.0.0.1 服务调用 Python Brain；Brain 重新建立新鲜 ReaderContext、执行 SESSION_STARTED / HELP_REQUESTED，再通过 Pydantic AI TestModel 返回固定合成样本。</p><p>仍未连接真实 Book，也没有真实大模型。服务只接受固定合成目录，不接受浏览器上传任意教材正文；正文来源哈希在 Python 端重新核对。</p><p>临时 HttpOnly 授权只存在内存；Host / Origin / Referer 和固定客户端头均受检查。撤销后需要重启本机服务才能恢复。</p><button id="revoke" type="button">撤销本机 Brain 授权</button></details>
+      </section>
+      <aside id="help-panel" aria-labelledby="help-heading" tabindex="-1">
+        <div class="section-top"><div><p class="eyebrow">JONAH · 本机请求入口</p><h2 id="help-heading" tabindex="-1">解释这一段</h2></div><button id="close-panel" type="button" aria-label="关闭帮助面板">收起</button></div>
+        <p id="state-label" role="status" aria-live="polite">等待本机 Brain 授权</p>
+        <div id="selected-context" hidden>
+          <h3 id="selected-title"></h3><dl><dt>内容层</dt><dd id="selected-layer"></dd><dt>教材版本</dt><dd id="selected-version"></dd><dt>本次选择有效至</dt><dd id="selected-expiry"></dd></dl>
+          <div id="source-parts" class="source-preview"></div><p id="source-warning" class="warning"></p>
+          <details><summary>查看来源身份</summary><p>下列哈希针对实际合成样本文本字节；Python 服务用固定目录重新核对，不接受任意正文。</p><code id="selected-hash"></code><code id="selected-ref"></code></details>
+        </div>
+        <p id="empty-message" class="empty">先选择一条记录和内容层。<br>打开面板不会触发 Python 请求。</p>
+        <div class="actions"><button class="primary" id="explain" type="button" disabled>交给本机 Brain（TestModel）</button><button id="cancel" type="button" hidden>取消</button></div>
+        <section id="reply-box" hidden aria-labelledby="reply-heading"><h3 id="reply-heading">Python Brain · TestModel 固定输出</h3><p id="reply"></p></section>
+        <p class="footnote">本机请求：<span id="request-count">0</span> · 取消/切换后旧响应不得覆盖当前选择。</p>
+      </aside>
+    </div>
+  </main>
+  <footer class="companion-dock"><div><strong>本机服务，默认安静。</strong><p>约拿只反映当前界面请求生命周期，不代表云端模型一直运行。</p><p class="compact-note">紧凑横屏下暂隐角色，帮助面板仍可使用。</p></div></footer>
+  <div class="pet-tools"><button id="toggle-pet" type="button">隐藏约拿</button><span id="pet-fallback" hidden>角色图片不可用，帮助面板仍可使用。</span></div>
+  <mygpt-pet id="pet" status="needs-input" size="88" storage-key="mygpt:jonah:brain-demo:v1"></mygpt-pet>
+  <noscript>请启用 JavaScript 才能使用这个本机交互原型。</noscript>
+</body>
+</html>

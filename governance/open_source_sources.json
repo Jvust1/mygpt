@@ -1,0 +1,606 @@
+{
+  "schema_version": "mygpt_open_source_sources_v1",
+  "updated_date": "2026-09-30",
+  "target": "Book Android + mygpt + Live character companion",
+  "code_copied_by_registry": true,
+  "policy": {
+    "default": "reference-first",
+    "direct_import_requires": [
+      "license verification",
+      "version pin",
+      "Android compatibility check",
+      "security review",
+      "focused benchmark"
+    ],
+    "restricted_or_copyleft": "reference-only until explicit decision"
+  },
+  "counts": {
+    "total": 53,
+    "p0": 19,
+    "p1": 17,
+    "p2": 15,
+    "p3": 2
+  },
+  "sources": [
+    {
+      "repo": "moeru-ai/airi",
+      "area": "Companion chat/session/character agent runtime",
+      "priority": "P0",
+      "mode": "CODE_ADAPTED",
+      "why": "Authority-aware chat, durable sessions, character cards, renderer-neutral emotion protocol and ACT marker parsing integrated into companion runtime.",
+      "url": "https://github.com/moeru-ai/airi",
+      "license_status": "MIT_VERIFIED",
+      "pinned_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
+      "code_copied": true,
+      "local_paths": [
+        "brain/mygpt_brain/conversation.py",
+        "brain/mygpt_brain/session_store.py",
+        "brain/mygpt_brain/character_card.py",
+        "android_spike/src/main/java/dev/mygpt/spike/PresentationEmotion.java",
+        "android_spike/src/main/java/dev/mygpt/spike/AiriActEmotionParser.java",
+        "third_party/airi/LICENSE",
+        "third_party/airi/NOTICE.md"
+      ]
+    },
+    {
+      "repo": "android/nowinandroid",
+      "area": "Android architecture",
+      "priority": "P0",
+      "mode": "ADOPT_PATTERN",
+      "why": "Production-grade Kotlin/Compose modularization, offline-first architecture, testing.",
+      "url": "https://github.com/android/nowinandroid",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "android/compose-samples",
+      "area": "Android UI",
+      "priority": "P0",
+      "mode": "ADOPT_PATTERN",
+      "why": "Official Compose interaction, state, animation and chat UI patterns.",
+      "url": "https://github.com/android/compose-samples",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "android/architecture-samples",
+      "area": "Android architecture",
+      "priority": "P0",
+      "mode": "ADOPT_PATTERN",
+      "why": "Testable state/data/domain separation patterns.",
+      "url": "https://github.com/android/architecture-samples",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "androidx/androidx",
+      "area": "Android platform",
+      "priority": "P1",
+      "mode": "REFERENCE",
+      "why": "Authoritative AndroidX implementation/reference for lifecycle, Room, WorkManager and Compose internals.",
+      "url": "https://github.com/androidx/androidx",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "android/ndk-samples",
+      "area": "Android native",
+      "priority": "P1",
+      "mode": "ADOPT_PATTERN",
+      "why": "JNI/NDK patterns for local inference/audio runtimes.",
+      "url": "https://github.com/android/ndk-samples",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "termux/termux-app",
+      "area": "Android runtime",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Long-running Android process/service and native-runtime integration patterns.",
+      "url": "https://github.com/termux/termux-app",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "firebase/quickstart-android",
+      "area": "Android services",
+      "priority": "P3",
+      "mode": "REFERENCE_ONLY",
+      "why": "Reference for notifications/background integration only; cloud features are not default architecture.",
+      "url": "https://github.com/firebase/quickstart-android",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "princekin-f/EasyFloat",
+      "area": "Floating companion",
+      "priority": "P0",
+      "mode": "CODE_ADAPTED_IN_APP_ONLY",
+      "why": "Permission-free current-activity drag/snap layer for a future mini companion; system overlay remains separately permission-gated.",
+      "url": "https://github.com/princekin-f/EasyFloat",
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "1a65226084a46cafc7ebcb27f0a077aebefa9b0e",
+      "local_paths": [
+        "android_spike/src/main/java/dev/mygpt/spike/FloatDragPolicy.java",
+        "android_spike/app/src/main/java/dev/mygpt/spike/InAppCompanionDragController.java",
+        "third_party/easyfloat/LICENSE",
+        "third_party/easyfloat/NOTICE.md"
+      ]
+    },
+    {
+      "repo": "guolindev/PermissionX",
+      "area": "Permissions",
+      "priority": "P0",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Runtime permission UX for microphone, notifications and related Android permissions.",
+      "url": "https://github.com/guolindev/PermissionX",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "RikkaApps/Shizuku",
+      "area": "Advanced Android privileges",
+      "priority": "P2",
+      "mode": "REFERENCE_ONLY",
+      "why": "Optional advanced privilege architecture; final product must not require it by default.",
+      "url": "https://github.com/RikkaApps/Shizuku",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "ActivityWatch/aw-android",
+      "area": "Supervision signals",
+      "priority": "P0",
+      "mode": "ADOPT_PATTERN",
+      "why": "UsageStats-based local activity observation for low-cost supervision signals.",
+      "url": "https://github.com/ActivityWatch/aw-android",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "googlesamples/android-AppUsageStatistics",
+      "area": "Supervision signals",
+      "priority": "P1",
+      "mode": "REFERENCE_ARCHIVED",
+      "why": "Small authoritative UsageStatsManager sample; archived but still useful API reference.",
+      "url": "https://github.com/googlesamples/android-AppUsageStatistics",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "google/oboe",
+      "area": "Audio",
+      "priority": "P1",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Low-latency Android audio path if voice mode needs native streaming.",
+      "url": "https://github.com/google/oboe",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "square/okhttp",
+      "area": "Networking",
+      "priority": "P0",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Reliable Android HTTP/WebSocket transport for bounded Book/mygpt services.",
+      "url": "https://github.com/square/okhttp",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "square/retrofit",
+      "area": "Networking",
+      "priority": "P1",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Typed service interface option on top of OkHttp.",
+      "url": "https://github.com/square/retrofit",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "sqldelight/sqldelight",
+      "area": "Local persistence",
+      "priority": "P0",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Typed local SQL for companion state, receipts, memory indexes and offline data.",
+      "url": "https://github.com/sqldelight/sqldelight",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "Kotlin/kotlinx.coroutines",
+      "area": "Concurrency",
+      "priority": "P0",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Structured concurrency and Flow for Book events, model tokens and character state.",
+      "url": "https://github.com/Kotlin/kotlinx.coroutines",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "Kotlin/kotlinx.serialization",
+      "area": "Contracts",
+      "priority": "P0",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Stable typed JSON contracts between Book, Live adapters and mygpt.",
+      "url": "https://github.com/Kotlin/kotlinx.serialization",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "InsertKoinIO/koin",
+      "area": "Dependency injection",
+      "priority": "P1",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Lightweight DI for Android modules and runtime swaps.",
+      "url": "https://github.com/InsertKoinIO/koin",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "cashapp/turbine",
+      "area": "Testing",
+      "priority": "P0",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Deterministic Flow testing for event-driven supervision and chat streams.",
+      "url": "https://github.com/cashapp/turbine",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "coil-kt/coil",
+      "area": "Media/UI",
+      "priority": "P1",
+      "mode": "DEPENDENCY_CANDIDATE",
+      "why": "Compose-first image loading and cache patterns for companion assets.",
+      "url": "https://github.com/coil-kt/coil",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "bumptech/glide",
+      "area": "Media/UI",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Mature image/GIF lifecycle and caching reference where Coil is insufficient.",
+      "url": "https://github.com/bumptech/glide",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "ktorio/ktor",
+      "area": "Networking/server",
+      "priority": "P2",
+      "mode": "EVALUATE",
+      "why": "Alternative local client/server stack for Kotlin-first loopback transport.",
+      "url": "https://github.com/ktorio/ktor",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "airbnb/mavericks",
+      "area": "State management",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Unidirectional immutable UI state patterns for complex companion surfaces.",
+      "url": "https://github.com/airbnb/mavericks",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "ggml-org/llama.cpp",
+      "area": "On-device LLM",
+      "priority": "P0",
+      "mode": "SOURCE_PINNED_AND_CODE_ADAPTED",
+      "why": "Pinned full upstream submodule plus isolated Android JNI bridge, GGUF validation/import, local chat and Companion V2 integration.",
+      "url": "https://github.com/ggml-org/llama.cpp",
+      "code_copied": true,
+      "license_status": "MIT_VERIFIED",
+      "pinned_commit": "ba0ba54d93b25faf1e149f4ccedd3e9d84798563",
+      "local_paths": [
+        "third_party/llama.cpp/upstream",
+        "android_llm_spike/bridge",
+        "android_llm_spike/app",
+        "android_llm_spike/companion",
+        "android_spike/src/main/java/dev/mygpt/spike/LocalLlmEngine.java",
+        "android_spike/src/main/java/dev/mygpt/spike/SerializedLocalLlmEngine.java",
+        "android_spike/src/main/java/dev/mygpt/spike/GgufModelProbe.java",
+        "android_spike/src/main/java/dev/mygpt/spike/GgufModelInstaller.java"
+      ]
+    },
+    {
+      "repo": "ggml-org/whisper.cpp",
+      "area": "Speech-to-text",
+      "priority": "P0",
+      "mode": "ENGINE_CANDIDATE",
+      "why": "Offline Android-capable speech recognition and streaming voice command path.",
+      "url": "https://github.com/ggml-org/whisper.cpp",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "k2-fsa/sherpa-onnx",
+      "area": "Offline Android ASR/TTS",
+      "priority": "P0",
+      "mode": "SOURCE_PINNED_AND_CODE_ADAPTED",
+      "why": "Pinned source submodule; Android microphone/PCM, streaming zh/en ASR, Melo zh/en local TTS and external model import paths integrated into Companion V2.",
+      "url": "https://github.com/k2-fsa/sherpa-onnx",
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "040afe360a38e25daaa325ce8889abf93ea02609",
+      "local_paths": [
+        "third_party/sherpa-onnx/upstream",
+        "android_voice_spike",
+        "android_spike/src/main/java/dev/mygpt/spike/VoicePcm.java",
+        "android_spike/app/src/main/java/dev/mygpt/spike/VoiceCaptureSession.java"
+      ],
+      "runtime_version": "v1.13.8",
+      "runtime_commit": "11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf"
+    },
+    {
+      "repo": "pytorch/executorch",
+      "area": "On-device AI",
+      "priority": "P1",
+      "mode": "ENGINE_EVALUATION",
+      "why": "PyTorch-native Android runtime and AAR; benchmark against llama.cpp/ONNX paths.",
+      "url": "https://github.com/pytorch/executorch",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "google-ai-edge/gallery",
+      "area": "On-device GenAI UX",
+      "priority": "P1",
+      "mode": "ADOPT_PATTERN",
+      "why": "Official Android on-device GenAI app patterns for model management and local chat.",
+      "url": "https://github.com/google-ai-edge/gallery",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "google-ai-edge/mediapipe",
+      "area": "On-device perception",
+      "priority": "P2",
+      "mode": "ENGINE_EVALUATION",
+      "why": "Optional local perception/signal processing; not a default surveillance path.",
+      "url": "https://github.com/google-ai-edge/mediapipe",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "microsoft/onnxruntime",
+      "area": "On-device AI",
+      "priority": "P1",
+      "mode": "ENGINE_EVALUATION",
+      "why": "Mature mobile inference runtime for non-LLM classifiers, embeddings and speech models.",
+      "url": "https://github.com/microsoft/onnxruntime",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "mlc-ai/mlc-llm",
+      "area": "On-device LLM",
+      "priority": "P1",
+      "mode": "ENGINE_EVALUATION",
+      "why": "Alternative optimized mobile LLM runtime for benchmarking.",
+      "url": "https://github.com/mlc-ai/mlc-llm",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "ollama/ollama",
+      "area": "Desktop/local model",
+      "priority": "P1",
+      "mode": "ADOPT_PATTERN",
+      "why": "Existing desktop/local-provider interoperability and model lifecycle reference.",
+      "url": "https://github.com/ollama/ollama",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "open-webui/open-webui",
+      "area": "Chat/provider UX",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Provider routing, chat UX and local model management ideas; not a mobile dependency.",
+      "url": "https://github.com/open-webui/open-webui",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "snakers4/silero-vad",
+      "area": "Voice activity detection",
+      "priority": "P1",
+      "mode": "ENGINE_CANDIDATE",
+      "why": "Lightweight VAD to avoid continuous ASR and reduce battery/compute.",
+      "url": "https://github.com/snakers4/silero-vad",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "coqui-ai/TTS",
+      "area": "Text-to-speech",
+      "priority": "P2",
+      "mode": "EVALUATE",
+      "why": "TTS architecture/model reference; verify maintenance and model licenses before adoption.",
+      "url": "https://github.com/coqui-ai/TTS",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "rhasspy/piper",
+      "area": "Text-to-speech",
+      "priority": "P3",
+      "mode": "REFERENCE_ARCHIVED",
+      "why": "Archived fast local TTS implementation; useful historical architecture reference.",
+      "url": "https://github.com/rhasspy/piper",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "OHF-Voice/piper1-gpl",
+      "area": "Text-to-speech",
+      "priority": "P2",
+      "mode": "LICENSE_GATED_REFERENCE",
+      "why": "Current Piper continuation; GPL implications require explicit review before integration.",
+      "url": "https://github.com/OHF-Voice/piper1-gpl",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "area": "Long-term memory",
+      "priority": "P1",
+      "mode": "CODE_ADAPTED",
+      "why": "Explicit local memory lifecycle on Python and Android: add/search/get/update/delete/history plus full-erasure purge on Android.",
+      "url": "https://github.com/mem0ai/mem0",
+      "code_copied": true,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "pinned_commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "local_paths": [
+        "brain/mygpt_brain/memory_store.py",
+        "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt",
+        "third_party/mem0/LICENSE",
+        "third_party/mem0/NOTICE.md"
+      ]
+    },
+    {
+      "repo": "pydantic/pydantic-ai",
+      "area": "Agent runtime",
+      "priority": "P0",
+      "mode": "CURRENT_CORE_AND_REFERENCE",
+      "why": "Already aligned with current Brain/TestModel work; retain as typed agent/runtime reference.",
+      "url": "https://github.com/pydantic/pydantic-ai",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "area": "Agent orchestration",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Durable state-machine/agent graph patterns for supervision workflows.",
+      "url": "https://github.com/langchain-ai/langgraph",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "letta-ai/letta",
+      "area": "Agent memory",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Stateful long-running agent memory patterns.",
+      "url": "https://github.com/letta-ai/letta",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "chroma-core/chroma",
+      "area": "Retrieval",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Embedding/vector retrieval reference; Android final form should prefer lighter local storage unless needed.",
+      "url": "https://github.com/chroma-core/chroma",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "qdrant/qdrant",
+      "area": "Retrieval",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Vector retrieval and filtering architecture for optional desktop/server memory backends.",
+      "url": "https://github.com/qdrant/qdrant",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "Inochi2D/inochi2d",
+      "area": "Character runtime",
+      "priority": "P1",
+      "mode": "ADOPT_PATTERN",
+      "why": "Open real-time 2D puppet SDK; strong reference for renderer abstraction and parameter-driven animation.",
+      "url": "https://github.com/Inochi2D/inochi2d",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "Inochi2D/inochi-session",
+      "area": "Character runtime",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "Reference for driving 2D puppets in a long-running interactive session.",
+      "url": "https://github.com/Inochi2D/inochi-session",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "Live2D/CubismNativeSamples",
+      "area": "Live2D character runtime",
+      "priority": "P0",
+      "mode": "LICENSE_GATED_REFERENCE",
+      "why": "Official native Cubism samples; use to design Live adapter, subject to Live2D SDK/Core licensing.",
+      "url": "https://github.com/Live2D/CubismNativeSamples",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "Live2D/CubismJavaFramework",
+      "area": "Live2D character runtime",
+      "priority": "P0",
+      "mode": "LICENSE_GATED_REFERENCE",
+      "why": "Official Java framework relevant to Android character rendering; Cubism Core is separate.",
+      "url": "https://github.com/Live2D/CubismJavaFramework",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "Live2D/CubismJavaSamples",
+      "area": "Live2D Android samples",
+      "priority": "P0",
+      "mode": "LICENSE_GATED_REFERENCE",
+      "why": "Official Android Studio-friendly sample path for Java/Cubism integration.",
+      "url": "https://github.com/Live2D/CubismJavaSamples",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "EsotericSoftware/spine-runtimes",
+      "area": "Spine character runtime",
+      "priority": "P1",
+      "mode": "LICENSE_GATED_REFERENCE",
+      "why": "Relevant if Live skins include Spine assets; runtime terms require license review.",
+      "url": "https://github.com/EsotericSoftware/spine-runtimes",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "guansss/pixi-live2d-display",
+      "area": "Live2D API design",
+      "priority": "P2",
+      "mode": "REFERENCE",
+      "why": "High-level Live2D interaction/motion API ideas useful for adapter design; web stack is not final Android runtime.",
+      "url": "https://github.com/guansss/pixi-live2d-display",
+      "code_copied": false,
+      "license_status": "VERIFY_BEFORE_DIRECT_IMPORT"
+    },
+    {
+      "repo": "apache/commons-compress",
+      "area": "Model archive import",
+      "priority": "P1",
+      "mode": "PINNED_DEPENDENCY",
+      "why": "Streaming support for official sherpa model archives in ZIP/TAR.BZ2/TAR.GZ while MyGPT retains strict extraction allowlists and size limits.",
+      "url": "https://github.com/apache/commons-compress",
+      "code_copied": false,
+      "license_status": "APACHE_2_0_VERIFIED",
+      "version": "1.28.0",
+      "local_paths": [
+        "android_voice_spike/app/src/main/java/dev/mygpt/voicespike/ModelArchiveReader.java",
+        "third_party/commons-compress/LICENSE",
+        "third_party/commons-compress/NOTICE.md"
+      ]
+    }
+  ]
+}

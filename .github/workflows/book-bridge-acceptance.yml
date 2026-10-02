@@ -1,0 +1,84 @@
+name: Book bridge acceptance (TestModel only)
+
+on:
+  push:
+    branches: [feat/book-live-selection-v1-20260923, feat/integrate-pr6-book-bridge-20260925, feat/desktop-delivery-20260925]
+    paths:
+      - 'brain/**'
+      - 'host/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - '.github/workflows/book-bridge-acceptance.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: book-bridge-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sdk:
+    if: github.repository == 'Jvust/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      PIP_NO_INPUT: '1'
+      OTEL_SDK_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Download the existing exact wheel lock and preserve source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bridge-evidence" "$RUNNER_TEMP/bridge-wheels" "$RUNNER_TEMP/bridge-source"
+          python -m pip download --only-binary=:all: --require-hashes -r brain/requirements-linux-py313.lock -d "$RUNNER_TEMP/bridge-wheels"
+          cp brain/requirements-linux-py313.lock "$RUNNER_TEMP/bridge-wheels/"
+          git archive --format=zip --output="$RUNNER_TEMP/bridge-source/mygpt-exact-source.zip" HEAD
+          git rev-parse HEAD > "$RUNNER_TEMP/bridge-source/source-commit.txt"
+          git rev-parse HEAD^{tree} > "$RUNNER_TEMP/bridge-source/source-tree.txt"
+          sha256sum "$RUNNER_TEMP/bridge-source/mygpt-exact-source.zip" > "$RUNNER_TEMP/bridge-source/source.sha256"
+      - name: Verify all Brain tests in a clean locked environment
+        working-directory: brain
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/bridge-venv"
+          PY="$RUNNER_TEMP/bridge-venv/bin/python"
+          "$PY" -m pip install --no-index --find-links="$RUNNER_TEMP/bridge-wheels" --require-hashes -r requirements-linux-py313.lock
+          "$PY" -m pip check
+          "$PY" scripts/verify_integrations.py --output "$RUNNER_TEMP/bridge-evidence/first"
+          "$PY" scripts/assert_book_bridge_acceptance.py "$RUNNER_TEMP/bridge-evidence/first/tests.xml" --output "$RUNNER_TEMP/bridge-evidence/first/book-receiver.json"
+          "$PY" -m compileall -q mygpt_brain scripts tests
+          python -m venv "$RUNNER_TEMP/bridge-venv-second"
+          PY2="$RUNNER_TEMP/bridge-venv-second/bin/python"
+          "$PY2" -m pip install --no-index --find-links="$RUNNER_TEMP/bridge-wheels" --require-hashes -r requirements-linux-py313.lock
+          "$PY2" -m pip check
+          "$PY2" scripts/verify_integrations.py --output "$RUNNER_TEMP/bridge-evidence/second"
+          "$PY2" scripts/assert_book_bridge_acceptance.py "$RUNNER_TEMP/bridge-evidence/second/tests.xml" --output "$RUNNER_TEMP/bridge-evidence/second/book-receiver.json"
+      - name: Preserve tests and exact source (no git credentials)
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: book-bridge-evidence-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/bridge-evidence/
+            ${{ runner.temp }}/bridge-source/
+          if-no-files-found: error
+          retention-days: 3
+      - name: One-time offline SDK bootstrap for sandbox integration
+        if: ${{ always() && contains(github.event.head_commit.message, '[bootstrap-wheels]') }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: book-bridge-offline-wheels-${{ github.sha }}
+          path: ${{ runner.temp }}/bridge-wheels/
+          if-no-files-found: error
+          retention-days: 1

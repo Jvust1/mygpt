@@ -1,0 +1,97 @@
+name: Integrated companion fusion acceptance
+
+on:
+  push:
+    branches:
+      - feat/companion-fusion-story-dot-20260930
+      - feat/sklearn-unicode-recall-dot-20260930
+      - fix/book-unicode-budget-dot-20260930
+      - fix/pipecat-restart-receipts-dot-20260930
+      - fix/android-tts-completion-dot-20260930
+      - chore/fusion-checkpoint-dot-20261001
+      - fix/book-context-admission-dot-20261001
+      - fix/native-body-deadline-dot-20261001
+      - fix/memory-update-atomic-dot-20261001
+      - docs/fusion-governance-checkpoint-dot-20261001
+      - fix/memory-noop-result-dot-20261001
+      - fix/cli-input-recovery-dot-20261001
+      - fix/wake-confidence-boundary-dot-20261001
+      - feat/companion-fusion-main-dot-20261001
+      - feat/airi-chat-memory-brain-20260929
+    paths:
+      - 'brain/**'
+      - 'android_spike/**'
+      - 'android_*/**/build.gradle.kts'
+      - 'android_*/app/src/main/assets/**'
+      - 'third_party/**'
+      - 'tests/**'
+      - '.github/workflows/companion-fusion-acceptance.yml'
+      - '.github/workflows/android-spike.yml'
+      - '.github/workflows/source-delivery.yml'
+      - 'scripts/source_bundle.py'
+      - '.gitmodules'
+      - 'governance/project_state.json'
+      - 'docs/HANDOFF.md'
+      - 'docs/EVALUATION_LEDGER.md'
+      - '.github/workflows/validate.yml'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - 'SECURITY.md'
+      - '.gitignore'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: companion-fusion-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  production-components:
+    if: github.repository == 'Jvust1/mygpt'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      OTEL_SDK_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Install hash-locked core and already-pinned upstream test extras
+        working-directory: brain
+        run: |
+          python -m pip install --only-binary=:all: --require-hashes -r requirements-linux-py313.lock
+          python -m pip install '.[realtime,lexical-test]'
+          python -m pip check
+      - name: Require full strict Brain acceptance without skips
+        working-directory: brain
+        run: python scripts/verify_integrations.py --output "$RUNNER_TEMP/fusion-brain-evidence"
+      - name: Exercise integrated stories and actual upstream oracles
+        working-directory: brain
+        run: python scripts/verify_fusion_upstreams.py --output "$RUNNER_TEMP/fusion-upstream-evidence"
+      - name: Require repository regressions and compile runtime
+        run: |
+          python -m unittest discover -s tests -p 'test_*.py' -q
+          node --test tests/*.test.mjs
+          python -m compileall -q brain/mygpt_brain
+
+  android-java-boundaries:
+    if: github.repository == 'Jvust1/mygpt'
+    uses: ./.github/workflows/android-spike.yml
+    permissions:
+      contents: read
+
+  source-recovery:
+    if: github.repository == 'Jvust1/mygpt'
+    uses: ./.github/workflows/source-delivery.yml
+    permissions:
+      contents: read

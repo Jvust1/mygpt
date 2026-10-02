@@ -1,0 +1,20 @@
+{
+  "project": "google/gson",
+  "version": "2.14.0",
+  "source_commit": "3ff35d6269894901ab8006258395aafc4b9765cd",
+  "stars": 24236,
+  "checked_date_utc": "2026-09-30",
+  "license": "Apache-2.0",
+  "license_git_blob": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+  "source_blobs": {
+    "gson/src/main/java/com/google/gson/stream/JsonReader.java": "e908c79d8540f476c8f694f5caf9c0a7fa2c637f",
+    "gson/src/main/java/com/google/gson/Strictness.java": "461f1c8d0083b3c4dd99a8a006f279970b235bbe"
+  },
+  "artifact_url": "https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.14.0/gson-2.14.0.jar",
+  "artifact_sha256": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f",
+  "artifact_bytes": 313604,
+  "java_base_class_major": 52,
+  "minimum_java": 8,
+  "minimum_android_api": 21,
+  "usage": "Strict streaming JsonReader only; no reflective POJO mapping"
+}

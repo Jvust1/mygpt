@@ -1,0 +1,9 @@
+Android lexical memory scoring derived from scikit-learn.
+Copyright (c) 2007-2026 The scikit-learn developers. BSD-3-Clause.
+Source: https://github.com/scikit-learn/scikit-learn
+Pinned commit: bbf8863a869f118a1a42422d8cc67ec6c07f2fe0
+Adapted: text.py _char_wb_ngrams, TfidfTransformer.fit/transform;
+pairwise.py cosine_similarity. Fixed 2-3 character word-boundary ngrams,
+smoothed IDF, sublinear TF and L2 cosine. Java sparse maps replace NumPy/SciPy.
+MyGPT adds bounded Unicode lexical preprocessing; no model/index/network.
+Full BSD-3-Clause license is in SCIKIT_LEARN_LICENSE.txt.

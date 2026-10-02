@@ -1,0 +1,1589 @@
+{
+  "schema_version": "mygpt_project_state_v1",
+  "updated_date": "2026-10-01",
+  "repository": "Jvust1/mygpt",
+  "default_branch": "main",
+  "active_branch": "feat/airi-chat-memory-brain-20260929",
+  "phase": "COMPANION_V2_XIAOMI14_LLM_QUALITY_VOICE_LOOPBACK_GATE",
+  "status": "DRAFT_AUTOMATED_MATRIX_AND_NATIVE_LOOPBACK_READY_DEVICE_EXECUTION_PENDING",
+  "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
+  "drive": {
+    "folder_name": "mygpt",
+    "folder_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK"
+  },
+  "product": {
+    "role": "long-term companion and learning orchestrator",
+    "perception_priority": [
+      "BOOK_SEMANTIC_CONTEXT",
+      "OS_APP_SIGNALS",
+      "USER_DECLARED_CONTEXT",
+      "OPT_IN_SCREEN_VISION"
+    ],
+    "default_companion_mode": "SILENT_PRESENCE",
+    "shadow_default": false,
+    "autonomous_ui_control_v0_1": false,
+    "final_form": {
+      "platform": "Android",
+      "companion_with": "Book Android",
+      "character_source": "Jvust/Live",
+      "capabilities": [
+        "persistent character companionship",
+        "conversation",
+        "learning assistance",
+        "study supervision",
+        "graduated interventions"
+      ],
+      "responsibility_split": {
+        "Book": "learning UI and authoritative structured study context",
+        "Live": "authoritative character skins and visual presentation assets",
+        "mygpt": "companion reasoning, conversation, teaching assistance, supervision and intervention orchestration"
+      }
+    },
+    "skin_strategy": {
+      "authority": "Jvust/Live",
+      "primary_dynamic_skin": "3714430278",
+      "backup_static_skins": [
+        "backup_skin_image_01"
+      ],
+      "candidate_registry": "android_spike/skin_candidates.json"
+    },
+    "skin_utilization_policy": {
+      "authority": "Jvust/Live",
+      "plan": "docs/SKIN_FULL_UTILIZATION_PLAN.md",
+      "rule": "mygpt consumes the full normalized capability set of a skin; first-frame or default-only rendering is not completion.",
+      "current_skin_3714430278": {
+        "maturity": "L2_PARTIAL",
+        "target": "L6_DEVICE_ACCEPTED_FULL_CAPABILITY",
+        "forms": [
+          "default",
+          "aim",
+          "cover"
+        ],
+        "required_next": [
+          "full inventory",
+          "capability manifest",
+          "state graph",
+          "multi-form renderer",
+          "transition mapping",
+          "Xiaomi 14 acceptance"
+        ]
+      }
+    },
+    "skin_audio_policy": {
+      "enabled": false,
+      "scope": "Skin voice/BGM/SFX are excluded from runtime, semantic mapping, acceptance, and completion metrics."
+    }
+  },
+  "dependencies": {
+    "Book": "authoritative structured learning/content context",
+    "StudyMate": "study-session and low-cost device/activity signals",
+    "ChatContextVault": "password-gated relationship-history retrieval and optional Shadow grounding",
+    "Live": "authoritative companion character skins and visual presentation assets"
+  },
+  "blocking_items": [
+    "User-installed Book APK identity and real browser/Android end-to-end transport remain unverified.",
+    "User Windows device acceptance, Android Studio APK/physical-device validation and production multi-user transport remain unimplemented.",
+    "Real provider teaching quality remains disabled/unverified.",
+    "Real Book APK signing identity must match Companion V2 before the signature-protected producer contract can replace the synthetic test sender.",
+    "On-device GGUF choice remains benchmark-gated; no default model is accepted before Xiaomi 14 measurements.",
+    "PiP, signed Book supervision, local LLM/ASR/TTS and automated Windows gates are code-ready but have not run on Xiaomi 14.",
+    "Real Book APK has not yet adopted the same-signature context/study producer contract.",
+    "Book client SDK is code-ready in mygpt, but Jvust/Book has not yet adopted the AAR and its APK signing identity has not been verified against Companion V2.",
+    "Exact-head Windows build has not yet executed.",
+    "Companion V2 / llama / sherpa / prompt-budget current code has not yet run on Xiaomi 14.",
+    "Jvust/Book has not yet adopted book-client-sdk-release.aar or proven a matching signing identity.",
+    "No default GGUF is accepted before Xiaomi 14 latency/RAM/thermal measurements.",
+    "Current draft fusion stack has hosted Python/Java/source-recovery acceptance; exact-head Android APK, Windows and physical-device gates remain unexecuted.",
+    "Exact-head Windows/Xiaomi 14 acceptance has not yet executed; current hosted source-level success does not satisfy that device gate.",
+    "Default GGUF remains a human/device decision after Xiaomi 14 performance + fixed qualitative evidence; no automatic quality winner is allowed.",
+    "Real microphone capture and audible TTS playback still require physical-device experience validation even after the synthetic native loopback passes."
+  ],
+  "pending_sync": {
+    "blocking_count": 0,
+    "source": "governance/pending_sync.json"
+  },
+  "ui_candidate": {
+    "name": "Jonah companion",
+    "surface": "framework-neutral Web Component and preview",
+    "sprite_sha256": "828b0fb468382f37aaf0d62a3e86cb33e5fcad5dbde8aeb091d6778b32a77790",
+    "validation": "Current exact UI commit b688943: 3 atlas tests and 49 existing Jonah browser checks pass; independent Android validation remains pending.",
+    "unverified": [
+      "Android physical device and soft keyboard",
+      "native Android overlay",
+      "production chat and Book bridge",
+      "independent human review"
+    ],
+    "historical_validation_only": false,
+    "not_rerun_this_batch": false,
+    "final_target": "Live-backed character/skin runtime integrated with Book Android",
+    "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
+  },
+  "next_step": "On Windows, build the current PR #15 code with android_llm_spike/scripts/build_and_install_companion_v2.ps1. For the most complete device gate use the verified 3714430278 local bundle path plus -LlmMatrix and -SherpaModels. This reuses one evidence directory for same-signature Book/Supervision/PiP, three fixed GGUF benchmarks + 5-case Chinese qualitative samples, sherpa ASR/TTS identity/import, and the in-memory Melo-TTS -> 16k -> streaming-ASR native loopback. Then perform the remaining live microphone/audible TTS/visual interaction checks on Xiaomi 14 and run collect_companion_v2_evidence.ps1. Do not merge before exact-device evidence exists.",
+  "authorized_e2e": {
+    "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
+    "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
+    "mygpt_commit": "c1b4ce7f8611d9ab57f321105fdb375cbc48df9e",
+    "repeat_receipt_identical": true,
+    "revoked_replay": "UNAUTHORIZED",
+    "paid_provider_calls": 0,
+    "user_device_acceptance": false
+  },
+  "optimization_candidate": {
+    "status": "LOCAL_VALIDATED_PENDING_PREFLIGHT_CONFIRMATION",
+    "base_branch": "feat/jonah-companion-20260922",
+    "base_sha": "64e73b257a79ec09787e2a96a43816b5864f9a1c",
+    "proposed_branch": "fix/companion-input-and-test-isolation-20260922",
+    "scope": [
+      "pointer identity and cancelled-touch recovery",
+      "keyboard focus in action panel",
+      "isolated browser-test server and failure cleanup"
+    ],
+    "validation": {
+      "deterministic_checks_passed": 3,
+      "browser_checks_passed": 49,
+      "occupied_default_port": "PASS",
+      "missing_browser_cleanup": "PASS"
+    },
+    "evidence": "docs/EVALUATION_LEDGER.md#e003--input-recovery-and-isolated-browser-validation",
+    "remote_write_performed": false,
+    "historical_snapshot": true,
+    "actual_publication": {
+      "pr": 3,
+      "head": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+      "status": "OPEN_DRAFT_UNMERGED"
+    }
+  },
+  "brain_candidate": {
+    "pr": 6,
+    "implementation_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
+    "base_commit": "b4634e482b5b72b92f4c3961a1a68d1e198ec6ee",
+    "evidence_kind": "SIMULATED_ONLY",
+    "context_protocols": [
+      "mygpt.study-context.v1",
+      "mygpt.reader-context.v2"
+    ],
+    "test_result": {
+      "passed": 332,
+      "skipped": 0,
+      "failed": 0,
+      "scope": "combined Python suite with actual Pydantic AI TestModel/MCP/local loopback service; two clean locked environments"
+    },
+    "sdk_integration": "PASS_TESTMODEL_MCP_AND_LOOPBACK_LOCAL_ENGINE",
+    "remote_ci": {
+      "run_id": 35816679199,
+      "job_id": 107039579688,
+      "source_commit": "ef31c36986ca0134c9c62bcdcdf2ebcdf155c431",
+      "conclusion": "success",
+      "artifact_id": 10732155955,
+      "artifact_sha256": "3973492a40347cbf029463ec589f5a74e9d97b07c297b7509456e19aaf3b7e2a",
+      "tests_per_environment": 332,
+      "skipped": 0,
+      "local_http_smoke_checks": 17
+    },
+    "local_environment": {
+      "python": "3.13.5",
+      "passed": 326,
+      "skipped": 6,
+      "failed": 0,
+      "scope": "local suite; pydantic_ai/mcp unavailable so six integration cases skip and are not acceptance"
+    },
+    "dependency_lock": {
+      "path": "brain/requirements-linux-py313.lock",
+      "sha256": "78a05ef99a580964c73cc2944ec9a1df4252e0b16d352f99ae30ce02faeae8c2",
+      "distribution_count": 39,
+      "platform": "Ubuntu 24.04 / CPython 3.13.15 x86_64",
+      "universal_lock": false
+    },
+    "independent_review": "PENDING",
+    "live_book_feed": "NOT_CONNECTED",
+    "android": "NOT_RUN",
+    "root_ui_tests": "PASS_EXACT_HEAD_2C23FA5",
+    "paid_provider_calls": 0,
+    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
+    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
+    "historical_checkpoints": [
+      {
+        "pr": 5,
+        "implementation_commit": "68c351b85511ccdd625036a6917b4303646b6704",
+        "base_commit": "a8595c3ccaddcff5a6a95f8a37a963707f48c084",
+        "evidence_kind": "SIMULATED_ONLY",
+        "test_result": {
+          "passed": 95,
+          "skipped": 2,
+          "failed": 0,
+          "scope": "local core/source/CLI; optional SDK tests skipped"
+        },
+        "sdk_integration": "BLOCKED_DEPENDENCY_DOWNLOAD_DNS",
+        "remote_ci": "NOT_RUN",
+        "independent_review": "PENDING",
+        "live_book_feed": "NOT_CONNECTED",
+        "android": "NOT_RUN",
+        "paid_provider_calls": 0,
+        "artifact_id": "mygpt-brain-context-v0.1-20260922",
+        "checkpoint": "docs/BOOK_CONTEXT_BRAIN_CHECKPOINT.md"
+      },
+      {
+        "implementation_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
+        "test_result": {
+          "passed": 269,
+          "skipped": 0,
+          "failed": 0,
+          "scope": "combined Brain suite including legacy audit and r6 mapper; two clean environments, real TestModel and in-memory MCP SDKs"
+        },
+        "remote_ci": {
+          "run_id": 35797671670,
+          "job_id": 106980616735,
+          "source_commit": "86734b51024a4f0ae7c254835c9fe0178151bee3",
+          "conclusion": "success",
+          "first_seconds": 2.12,
+          "reinstall_seconds": 1.55,
+          "artifact_id": 10724052652,
+          "artifact_sha256": "a46aaa29d273fefe06017f2f6383d1c33e1c02797f78856b3359f5e4515ad193"
+        },
+        "artifact_id": "mygpt-reader-selection-v1-20260923",
+        "checkpoint": "docs/READER_SELECTION_CHECKPOINT_20260923.md"
+      }
+    ],
+    "accepted_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1"
+  },
+  "decision_checkpoint": "docs/INTEGRATION_CHECKPOINT_20260925.md",
+  "evaluation_checkpoint": "docs/INTEGRATION_CHECKPOINT_20260925.md",
+  "book_bridge_candidate": {
+    "status": "R6_EXPLICIT_SELECTION_OFFLINE_ACCEPTED",
+    "target": "r6 Reader /api/reader, not the legacy Web ModeResponse/SourceResponse",
+    "source_archive_drive_id": "1UiVow02Huh3r8qKBH8v4bL3D9OfkQ8_R",
+    "source_archive_sha256": "19315e8aeebe2db5cf2f4b55e0a38f550967966af106491dfef67212b430adc1",
+    "source_checkpoint_commit": "7283f2eef7610d67c6b92b2ef7c513e1225ad957",
+    "selected_members_verified": 7,
+    "installed_apk_identity_verified": false,
+    "mapper": "brain/mygpt_brain/reader_snapshot.py",
+    "supported_layers": [
+      "source",
+      "correction",
+      "derived"
+    ],
+    "selection_explicit": true,
+    "source_serialization": "reader-selected-json-v1",
+    "v1_reference_unchanged": true,
+    "live_connected": false,
+    "book_mutations": 0,
+    "raw_book_source_copied_to_mygpt": false,
+    "legacy_auditor": "brain/mygpt_brain/book_contract_audit.py"
+  },
+  "parallel_branch_reference": {
+    "pr": 5,
+    "head_at_reconciliation": "632b843c4e071a32b841caa7de8bdb0bbfebc059",
+    "modified_this_batch": false,
+    "note": "This candidate does not merge or overwrite PR #5. Its executable SDK baseline is inherited via 95fd284; both review branches remain unmerged."
+  },
+  "host_ui_candidate": {
+    "status": "SYNTHETIC_LOOPBACK_PYTHON_BRAIN_ACCEPTED",
+    "pr": 6,
+    "implementation_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
+    "entry": "host/brain.html",
+    "usage": "host/README.md",
+    "runtime": "same-origin 127.0.0.1 Python Brain/TestModel for brain.html; legacy reader.html replay remains available",
+    "python_fixture_generation": "real Reader mapper and Brain; browser-to-Python live loopback is enabled only for fixed synthetic catalogue",
+    "selected_entries": 5,
+    "supported_modes": [
+      "preview",
+      "learn",
+      "review",
+      "practice"
+    ],
+    "node_tests_passed": 54,
+    "jonah_browser_checks_passed": 49,
+    "host_browser_checks_passed": 39,
+    "runtime_errors": 0,
+    "external_requests_in_browser_test": 0,
+    "remote_ci": {
+      "run_id": 35817053593,
+      "job_id": 107040710718,
+      "source_commit": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
+      "conclusion": "success",
+      "artifact_id": 10731589161,
+      "artifact_sha256": "1fee99805b6e2c70d22f55a06f617e10c1fc03b3df25ef5ba6ba4598ef672ba2",
+      "playwright": "1.62.0",
+      "chromium": "151.0.7922.34",
+      "node": "v22.23.2"
+    },
+    "historical_failure": {
+      "run_id": 35806749602,
+      "job_id": 107009208035,
+      "artifact_id": 10728255659,
+      "artifact_sha256": "9a71b9197810a675d5caf0de98b18e9879ff5db6f4670c023be6159c90f16cb5",
+      "cause": "test checked reduced-motion state before media event callback; original assertion preserved and awaited"
+    },
+    "visual_inspection": "final mobile and desktop screenshots reviewed; default dock no longer overlaps reading scrollport",
+    "live_book_connected": false,
+    "live_python_transport": true,
+    "paid_model_calls": 0,
+    "android": "NOT_RUN",
+    "independent_review": "PENDING",
+    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
+    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md",
+    "accepted_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
+    "replay_host_browser_checks_passed": 39,
+    "local_brain_browser_checks_passed": 23,
+    "test_model_only": true
+  },
+  "integration_conflicts": [
+    {
+      "pr": 6,
+      "base_pr": 5,
+      "status": "MERGEABLE_FALSE_REQUIRES_SEPARATE_THREE_WAY_RECONCILIATION",
+      "scope": "integration only; not an unsaved artifact",
+      "automatically_resolved": false
+    }
+  ],
+  "local_brain_transport_candidate": {
+    "status": "ACCEPTED_SYNTHETIC_LOOPBACK_ONLY",
+    "bind": "127.0.0.1 only; ephemeral port supported",
+    "authorization": "ephemeral in-memory HttpOnly SameSite=Strict cookie; exact Host/origin/fetch-site/client guards",
+    "endpoints": [
+      "GET /api/v1/status",
+      "POST /api/v1/explain",
+      "POST /api/v1/cancel",
+      "POST /api/v1/revoke"
+    ],
+    "request_body_max_bytes": 8192,
+    "receipt_capacity": 128,
+    "authorization_seconds_range": [
+      60,
+      3600
+    ],
+    "selection_seconds_max": 300,
+    "runtime_commit": "56b39522bb81aa71699548d2d93b060eb87dad6d",
+    "sdk_test_commit": "ef31c36986ca0134c9c62bcdcdf2ebcdf155c431",
+    "latest_test_head": "2c23fa5dec2fac17ce4d06aa083374007225d2f1",
+    "sdk_run": 35816679199,
+    "host_run": 35817053593,
+    "sdk_tests_per_environment": 332,
+    "loopback_browser_checks": 23,
+    "local_http_smoke_checks": 17,
+    "live_book_connected": false,
+    "paid_model_calls": 0,
+    "persistent_source_text": false,
+    "production_multi_user_security": "NOT_CLAIMED",
+    "artifact_id": "mygpt-local-brain-transport-v1-20260923",
+    "checkpoint": "docs/LOCAL_BRAIN_TRANSPORT_CHECKPOINT_20260923.md"
+  },
+  "selection_intake_candidate": {
+    "status": "ACCEPTED_USER_SUPPLIED_UNVERIFIED_LOCAL_ONLY",
+    "implementation_commit": "318c3ef0874b6903320d7ccfa0ce63d33f862bd0",
+    "evidence_kind": "USER_SUPPLIED_UNVERIFIED",
+    "default_enabled": false,
+    "max_records_per_import": 1,
+    "sdk_run": 36013336912,
+    "sdk_tests_per_environment": 426,
+    "sdk_skipped": 0,
+    "http_smoke_checks": 32,
+    "ui_run": 36013337122,
+    "node_tests_passed": 66,
+    "selection_browser_checks_passed": 30,
+    "paid_model_calls": 0,
+    "live_book_connected": false,
+    "artifact_id": "mygpt-selection-intake-v1-20260924",
+    "drive_id": "1BT34bsIPxgzorSftSeGht-GTsNtXsVDG",
+    "sha256": "774c1aa7e6f304838d07e30fc32b59092c985feffd0063033fc5f9bdc8dff09e"
+  },
+  "source_delivery_candidate": {
+    "status": "ACCEPTED_LINUX_CLEAN_RECOVERY",
+    "exact_head": "65c8d6b0493432c16d83174aeff22b415583a703",
+    "workflow_run": 36019467569,
+    "workflow_job": 107700373613,
+    "workflow_artifact": 10816450623,
+    "workflow_artifact_sha256": "c70ba62ac0cc42dcbd9981f5fe025d6f242e2de19e6b8c64e208957648a68dbd",
+    "source_zip_bytes": 2246013,
+    "source_zip_sha256": "eb9404fbfd9a4d9fc22db57c0518ecb65510a192b7500277885f2747219bb6df",
+    "tracked_source_files": 97,
+    "delivery_unit_tests": 26,
+    "launcher_checks": 12,
+    "recovered_brain_tests": 426,
+    "recovered_brain_skipped": 0,
+    "recovered_http_checks": 32,
+    "drive_id": "1b-YQbKedJSfRwQ5ZMHmWTaXjiQE2yo5m",
+    "artifact_id": "mygpt-source-delivery-v1-20260925",
+    "windows_device_acceptance": false,
+    "android_acceptance": false
+  },
+  "parallel_book_bridge": {
+    "pr": 7,
+    "branch": "feat/book-live-selection-v1-20260923",
+    "observed_head": "4e118054d9f3037a857d03c925f6d1641dd56979",
+    "status": "OPEN_DRAFT_UNMERGED_PARALLEL_REVIEW_LINE",
+    "drive_id": "1JLrTiZnRWLlN9WlZPO3tczop49ipyTjP",
+    "sha256": "656a93710cd48b7414c9742208ab3872abcda7cc0607cf497663329b38b2d58c",
+    "adopted_into_pr6": false
+  },
+  "current_pr": {
+    "number": 15,
+    "state": "OPEN",
+    "draft": true,
+    "merged": false,
+    "base_branch": "feat/spine-3714430278-runtime-refresh-20260929"
+  },
+  "integration_candidate": {
+    "status": "ACCEPTED_COMBINED_CI_REVIEW_PENDING",
+    "branch": "feat/integrate-pr6-book-bridge-20260925",
+    "pr": 8,
+    "implementation_commit": "e9e5fb0932c1830fa11e886beb2802191eea09c8",
+    "base_commit": "8cce4bdaaaacf260e6e36f0462104d94afb1c326",
+    "source_from_parallel_pr7": [
+      "brain/mygpt_brain/book_bridge.py",
+      "brain/tests/test_book_bridge.py",
+      "brain/scripts/assert_book_bridge_acceptance.py",
+      ".github/workflows/book-bridge-acceptance.yml"
+    ],
+    "stale_state_files_transplanted": false,
+    "brain_sdk": {
+      "run": 36088319906,
+      "tests_per_environment": 446,
+      "skipped": 0,
+      "artifact_id": 10844484067,
+      "sha256": "b18681b1d8390e20a64d91fb70afdb361089d4f56de7013097c40dffd7482acc"
+    },
+    "host_ui": {
+      "run": 36088319915,
+      "node_tests": 66,
+      "jonah_checks": 49,
+      "replay_host_checks": 39,
+      "python_host_checks": 23,
+      "selection_host_checks": 30,
+      "artifact_id": 10844723415,
+      "sha256": "28377ebba304a25d9751b6b2f8417cb34ba4ec4aee40c900ccafae8aec2d992e"
+    },
+    "source_delivery": {
+      "run": 36088319923,
+      "tracked_source_files": 103,
+      "source_zip_bytes": 2298335,
+      "source_zip_sha256": "4e3ef0e9f0e87c2decb3ee9c6b02a5684e78550c2a3fc9e8d47937314bda3466",
+      "recovered_brain_tests": 446,
+      "launcher_checks": 12,
+      "http_checks": 32,
+      "artifact_id": 10844851422,
+      "sha256": "bd6b36f3f0598249479afe34a0fb267d3359fadbe1a2edc72e95a3084d077b2e"
+    },
+    "book_bridge": {
+      "run": 36088319928,
+      "receiver_cases": 20,
+      "tests_per_environment": 446,
+      "skipped": 0,
+      "artifact_id": 10844841409,
+      "sha256": "f7c6ddf254dc9cab8afa956ef15d1ec4bff1d0effe72bdc54f01b9f995af6529"
+    },
+    "paid_provider_calls": 0,
+    "book_repository_mutations": 0,
+    "independent_review": "ACCEPTED_FOR_USER_DEVICE_VALIDATION",
+    "artifact_id": "mygpt-integrated-book-bridge-v1-20260925",
+    "drive_id": "1G0lZ1A9EHNrUTFGEfxwwXTsfgSZPk4QK",
+    "drive_sha256": "eec9e3266b7d4afbf789a962945e7f74b7defbf47463875bc374aea6f4321f09"
+  },
+  "as_of": "2026-10-01",
+  "desktop_delivery": {
+    "state": "NATIVE_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
+    "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
+    "release_workflow_run": 36149636550,
+    "linux_full_pytest_passed": 490,
+    "windows_desktop_pytest_passed": 18,
+    "javascript_unit_tests_passed_each_platform": 66,
+    "portable_file": "mygpt-Windows-Portable.zip",
+    "portable_bytes": 34199210,
+    "portable_sha256": "37ebfa7158af866a19de48d9680054816b4fcbea006e73050ab2eab99211cd79",
+    "drive_file_id": "15aYdyKH15Oakj1iuYblGxYScFQf8xx2A",
+    "review_pr": 9,
+    "independent_review": "ACCEPTED_FOR_USER_DEVICE_VALIDATION",
+    "main_modified": false,
+    "automatic_merge": false,
+    "user_device_acceptance": false
+  },
+  "open_source_adoption": {
+    "status": "REGISTRY_PLUS_MULTI_UPSTREAM_CODE_ADOPTION",
+    "registry": "governance/open_source_sources.json",
+    "plan": "docs/OPEN_SOURCE_ADOPTION.md",
+    "candidate_count": 53,
+    "code_copied_by_registry": true,
+    "immediate_tracks": [
+      "Android host architecture and testing",
+      "persistent floating companion surface",
+      "Book-first supervision signals",
+      "on-device LLM benchmark",
+      "offline voice pipeline",
+      "long-term companion memory patterns",
+      "Live character runtime adapter"
+    ],
+    "first_engine_candidates": {
+      "llm": [
+        "ggml-org/llama.cpp",
+        "pytorch/executorch",
+        "mlc-ai/mlc-llm",
+        "microsoft/onnxruntime"
+      ],
+      "speech": [
+        "ggml-org/whisper.cpp",
+        "k2-fsa/sherpa-onnx",
+        "snakers4/silero-vad"
+      ],
+      "android": [
+        "android/nowinandroid",
+        "princekin-f/EasyFloat",
+        "guolindev/PermissionX",
+        "sqldelight/sqldelight"
+      ],
+      "memory": [
+        "pydantic/pydantic-ai",
+        "mem0ai/mem0",
+        "letta-ai/letta"
+      ],
+      "character": [
+        "moeru-ai/airi",
+        "Live2D/CubismJavaSamples",
+        "Live2D/CubismJavaFramework",
+        "Inochi2D/inochi2d",
+        "EsotericSoftware/spine-runtimes"
+      ]
+    },
+    "license_gate": "Verify exact license/version before direct import; restricted/copyleft projects remain reference-only until explicit decision."
+  },
+  "android_integration_spike": {
+    "branch": "feat/android-companion-boundary-20260928",
+    "base_commit": "5a2473d3916cf96cb0bcdef1d899065c6713cfe4",
+    "scope": "Pure Java 8 Book event coordinator, renderer-neutral Live cue port, and isolated synthetic Android debug host",
+    "verification": "REFRESH_BRANCH_JAVA8_AND_ANDROID_CI_PASS_NATIVE_AND_LICENSE_PAYLOAD_VERIFIED_DEVICE_PENDING",
+    "book_live_transport": "NOT_CONNECTED",
+    "apk": "DEBUG_APK_BUILT_SYNTHETIC_DEVICE_PENDING",
+    "provider_calls": 0,
+    "implementation_commit": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
+    "ci": {
+      "push_run": 36367251552,
+      "pr_run": 36367267599,
+      "job_id": 108756041802,
+      "conclusion": "success"
+    },
+    "pr": 10,
+    "host": {
+      "kind": "SYNTHETIC_ANDROID_DEBUG_ONLY",
+      "build": "CI_PASS",
+      "book_authentication": "TEST_DOUBLE",
+      "live_renderer": "SPINE_LIBGDX_4_1_REFRESH_CI_PASS_DEVICE_PENDING",
+      "permissions": [],
+      "implementation_commit": "eef4d8e1eba7b1ac09c68b3a8eac48874a5c814b",
+      "ci": {
+        "first_failed_run": 36368130257,
+        "first_failure": "setup-android requested removed SDK tools package",
+        "successful_push_run": 36368235878,
+        "java8_job": 108762033636,
+        "android_job": 108762033792,
+        "conclusion": "success",
+        "lifecycle_push_run": 36369308484,
+        "lifecycle_pr_run": 36369310978
+      },
+      "artifact": {
+        "id": "mygpt-android-synthetic-spike-lifecycle-20260928",
+        "drive_file_id": "1dyBqjFz9IIc0_IXY1_YGtKTpvIdKm3BG",
+        "sha256": "78e174567100487746a4d37330ed9caafed5da0ddb414752d3d172781345c5ed",
+        "size_bytes": 14913
+      },
+      "lifecycle": "BACKGROUND_REVOKES_SESSION; EXPIRY_CLEARS_CUE; SUPERVISION_RECONSENT_PER_SESSION; CI_PASS_DEVICE_PENDING",
+      "review_bundle": {
+        "drive_file_id": "16ROvan1oWIe_vST8ZWxRfdVJEUcnChNq",
+        "file_name": "mygpt-android-lifecycle-review-bundle-eef4d8e.zip",
+        "sha256": "c9533e98ec3ee691b6202e1efd4d57090550027cfd2825f9320619679be8192a",
+        "size_bytes": 21323,
+        "type": "changed_files_review_package_not_full_source_snapshot"
+      },
+      "source_snapshot": {
+        "drive_file_id": "1WnYNLGb1lypDsqGl9xg2ejZaviGrrzVy",
+        "file_name": "mygpt-android-lifecycle-source-snapshot-20260928.zip",
+        "sha256": "006a000f88f11906d012decd3f4c6f3dd3484e660dfb266016dfa56f13afb4fc",
+        "size_bytes": 1954056,
+        "git_commit": "bf996e6e64c3f4d078102d337be31480dedf2f88",
+        "tracked_files": 131,
+        "verification": "file paths exactly match current branch tree"
+      },
+      "package_import": "SAF_SELECT_DECRYPTED_ZIP -> VALIDATE -> APP_PRIVATE_EXTRACT -> SPINE_RENDERER",
+      "storage_permission": "NONE_BROAD; SAF URI GRANT ONLY",
+      "renderer_ci_run": 36511143238,
+      "renderer_ci_status": "SUCCESS",
+      "renderer_baseline_ci": {
+        "source_commit": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
+        "run_id": 36449517394,
+        "java8_boundary": "SUCCESS",
+        "android_debug_host": "SUCCESS",
+        "native_payload_check": "SUCCESS",
+        "github_artifact_id": 10983131261,
+        "github_artifact_digest": "sha256:1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411",
+        "github_artifact_size_bytes": 1256529,
+        "apk_sha256": "d7eea8e80e1d782e0ff0e8f350d6064b9f7b415f595af480c03e22667d7b56c9",
+        "apk_size_bytes": 1381049,
+        "arm64_libgdx_present": true,
+        "spine_license_notice_present": false,
+        "note": "PR #10 latest baseline before refresh; refresh branch adds the runtime license notice and skin governance without reverting PR #10."
+      },
+      "renderer_ci_source_commit": "b48268e66633f6b1d1230d392afa450ebb0c3ab4",
+      "renderer_ci_jobs": {
+        "java8_boundary": "SUCCESS",
+        "android_debug_host": "SUCCESS",
+        "native_payload_check": "SUCCESS"
+      },
+      "renderer_artifact": {
+        "github_artifact_id": 11008074830,
+        "github_artifact_name": "mygpt-spine-3714430278-android-spike",
+        "github_artifact_digest": "sha256:70546d140e5d2aee8442776866741d7f68f4c07b6d27bc86dddfd59ad5757420",
+        "github_artifact_size_bytes": 1257407,
+        "github_expires_at": "2026-10-02T02:09:35Z",
+        "drive_archive_id": "1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa",
+        "drive_archive_name": "mygpt-spine-3714430278-refresh-run36511143238.zip",
+        "apk_name": "app-debug.apk",
+        "apk_size_bytes": 1381959,
+        "apk_sha256": "9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593",
+        "arm64_libgdx_present": true,
+        "spine_license_notice_present": true,
+        "classes_dex_present": true
+      }
+    },
+    "selected_live_skin": {
+      "skin_id": "3714430278",
+      "source": "Jvust/Live",
+      "drive_folder_id": "1StRk6RJ2N8l5-Q0ogpPHFcb1uviOJYCh",
+      "lpk_drive_file_id": "1g0UAayGcezBHKywrSNIdYh9GyCaWZ7G2",
+      "config_drive_file_id": "1O87dhnMOs2faZvFMWepm2DM-1Lqa51RW",
+      "preview_drive_file_id": "1DwSlVnuGPp6EAOAnECSkNfm0mZeExTZx",
+      "mygpt_asset_copy": false,
+      "status": "MULTIFORM_IMPLEMENTED_CI_PASS_DEVICE_PENDING",
+      "runtime_package": {
+        "file_name": "3714430278.zip",
+        "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+        "size_bytes": 12342220,
+        "status": "DECRYPTED_LPK_READY_FOR_DIRECT_USE",
+        "preferred_runtime_input": true,
+        "requires_decryption": false,
+        "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+        "exact_identity_enforced": true,
+        "entries": 13,
+        "uncompressed_bytes": 12340902,
+        "zip_crc": "PASS"
+      },
+      "original_lpk_role": "source identity only; runtime should prefer decrypted zip",
+      "format": "Spine",
+      "spine_export_version": "4.1.20",
+      "decrypted_entry_count": 13,
+      "primary_runtime_files": [
+        "model.json",
+        "skeleton.bin",
+        "c610_00.atlas",
+        "c610_00.png",
+        "lpk_files.json"
+      ],
+      "cubism_route": false,
+      "renderer_candidate": {
+        "runtime": "spine-libgdx",
+        "runtime_version": "4.1.0",
+        "libgdx_line": "1.10.0",
+        "status": "REFRESH_CI_VERIFIED_DEVICE_PENDING",
+        "license_gate": "SPINE_RUNTIME_LICENSE_REVIEW_REQUIRED_BEFORE_DISTRIBUTION",
+        "abi": "arm64-v8a",
+        "native_packaging": "lib/arm64-v8a/libgdx.so from gdx-platform:1.10.0:natives-arm64-v8a",
+        "license_notice_path": "android_spike/app/src/main/assets/SPINE_RUNTIME_LICENSE.txt",
+        "ci_run": 36511143238,
+        "apk_sha256": "9963bacfaf0c2d7221bf6637cc155fdc7f9918a0c328a233edd0ebe7da89d593",
+        "baseline_ci_run": 36449517394,
+        "baseline_apk_sha256": "d7eea8e80e1d782e0ff0e8f350d6064b9f7b415f595af480c03e22667d7b56c9",
+        "drive_artifact_id": "1mN2EpoCWCYQKiQaWjEhuOulRE2ToUbUa"
+      },
+      "motion_mapping": {
+        "QUIET": "idle",
+        "PAUSED": "freeze-current",
+        "NEEDS_INPUT": "smile -> idle fallback",
+        "GENTLE_CHECK_IN": "action -> idle fallback"
+      },
+      "full_utilization_target": {
+        "current_maturity": "L4_FULL_CAPABILITY_IMPLEMENTATION_CI_PASS",
+        "target_maturity": "L6_DEVICE_ACCEPTANCE",
+        "forms": [
+          "default",
+          "aim",
+          "cover"
+        ],
+        "package_files_extracted": "13/13",
+        "runtime_texture_aliases": [
+          "misc_04.png -> c610_aim_00.png",
+          "misc_05.png -> c610_cover_00.png"
+        ],
+        "authored_transitions": [
+          "aim -> cover via to_cover",
+          "cover -> aim via to_aim"
+        ],
+        "direct_switches": [
+          "default -> aim",
+          "default -> cover",
+          "aim -> default",
+          "cover -> default"
+        ],
+        "action_cycle": true,
+        "semantic_cue_mapping": true,
+        "audio": false,
+        "manifests": [
+          "android_spike/skin/3714430278/skin_inventory.json",
+          "android_spike/skin/3714430278/skin_capabilities.json",
+          "android_spike/skin/3714430278/skin_state_graph.json"
+        ]
+      }
+    },
+    "renderer_ci_run": 36449517394,
+    "renderer_ci_status": "success",
+    "renderer_ci": {
+      "exact_head": "a076be06e2e4c3eeecdab3f1860143771bfef0d3",
+      "workflow_run": 36449517394,
+      "java8_job": 109020458878,
+      "android_job": 109020458429,
+      "artifact_id": 10983131261,
+      "artifact_name": "mygpt-spine-3714430278-android-spike",
+      "artifact_sha256": "1de222d0ef784a4fd5ab32970f5deb9772fcf12074a3fe2a2bc0108e7f896411",
+      "artifact_size_bytes": 1256529,
+      "artifact_expires_at": "2026-10-01T16:16:10Z",
+      "native_payload_check": "PASS"
+    },
+    "renderer_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+    "backup_skin": {
+      "id": "backup_skin_image_01",
+      "role": "backup_static_character_skin_reference",
+      "source": "user_upload",
+      "file_name": "mygpt_backup_skin_01_679CB8C0A379FE2655C951F73CA47FC3.png",
+      "drive_file_id": "1adRumPFELRvB_4d7ORfnvUZRPhUTOLDW",
+      "drive_parent_id": "1F1deaHZp4zYN03GyDHiMSzdHRSB081pj",
+      "sha256": "9d03cf43b5d60a8ae486c17979e72bd294e479fc58732971aaa205df7e3f5cff",
+      "size_bytes": 3056688,
+      "mime_type": "image/png",
+      "runtime_kind": "STATIC_IMAGE",
+      "direct_dynamic_runtime": false,
+      "intended_uses": [
+        "backup companion visual reference",
+        "static portrait fallback",
+        "future dynamic-skin visual source"
+      ],
+      "status": "ARCHIVED_IN_LIVE_DRIVE_REFERENCE_READY",
+      "authority": "Jvust/Live + Live Drive skin library"
+    },
+    "selfcontained_device_build": {
+      "version_code": 6,
+      "version_name": "0.0.6-multiform-3714430278",
+      "source_head": "327638d084d46d565b5a833ac064810ef8d1b124",
+      "ci_run": 36525176168,
+      "ci_artifact_id": 11013719188,
+      "ci_java8": "SUCCESS",
+      "ci_android": "SUCCESS",
+      "full_package_smoke": "SUCCESS",
+      "bundled_asset": "assets/3714430278.zip",
+      "bundled_asset_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+      "apk_file_name": "mygpt-3714430278-v0.0.6-multiform-fixed-20260929.apk",
+      "apk_size_bytes": 13740669,
+      "apk_sha256": "638f48511dc00a52dcde78bdc13a9d17a3fd673c3c3636eb96ff031b56b66a71",
+      "drive_file_id": "1NoYIaXGgFdMtgxcOw9MCI84wxI07U4DR",
+      "signature_scheme": "APK Signature Scheme v2",
+      "signer_cert_sha256": "42221fbf403ebe655ce71ffe514f1f3424c50f7abfd39a650f49c82bb1c8dac6",
+      "v2_structure": "PASS",
+      "rsa_signature": "PASS",
+      "apk_content_digest": "PASS",
+      "zip_integrity": "PASS",
+      "libgdx_16k_alignment": "PASS",
+      "auto_load": true,
+      "audio": false,
+      "distribution": "PRIVATE_DEVICE_TEST_ONLY"
+    },
+    "ui_candidate_v005": {
+      "source_head": "da0642c84ce85d36b99fbd3309fb66db7abe259b",
+      "version_code": 5,
+      "version_name": "0.0.5-companion-ui-3714430278",
+      "app_label": "MyGPT",
+      "layout": "brand header + character card + status card + learning controls + character settings",
+      "audio": false,
+      "ci_run": 36523316210,
+      "ci_java8": "SUCCESS",
+      "ci_android": "SUCCESS",
+      "native_payload": "SUCCESS"
+    },
+    "package_parse_incident": {
+      "affected_artifact": "mygpt-3714430278-ui-v0.0.5-20260929.apk",
+      "symptom": "Android reported package parse/install failure",
+      "root_cause": "Locally generated APK v2 signing block had malformed signer framing; ZIP payload itself was intact.",
+      "corrected_in": "mygpt-3714430278-v0.0.6-multiform-fixed-20260929.apk",
+      "correction": "Rebuilt APK Signature Scheme v2 block with correct nested length-prefix structure and verified RSA signature plus content digest."
+    }
+  },
+  "companion_chat_candidate": {
+    "branch": "feat/airi-chat-memory-brain-20260929",
+    "draft_pr": 15,
+    "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+    "latest_head": "741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5",
+    "upstreams": [
+      {
+        "repository": "moeru-ai/airi",
+        "pinned_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
+        "license": "MIT"
+      },
+      {
+        "repository": "mem0ai/mem0",
+        "pinned_commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+        "license": "Apache-2.0"
+      },
+      {
+        "repository": "k2-fsa/sherpa-onnx",
+        "pinned_commit": "040afe360a38e25daaa325ce8889abf93ea02609",
+        "license": "Apache-2.0"
+      }
+    ],
+    "implementation_commits": [
+      "226c477ddb2ea07bd1646361896320007d28f2a2",
+      "6438752db7a2c67b14f632f871739e7a3266edca",
+      "6b75e4cf94ee1afccc0b57715a788e448e6df625",
+      "52c23ccb203500bc8cbd53a027a51c46321ecf8c",
+      "cda2e5e38c43a56894e9909e70a8ddf722a75b11",
+      "f02944b1a74f2eb976d263f66f1874824b24ea04",
+      "7dadc28b937911b8a42336592a5497b8ebbcc096",
+      "741c70b2b8102b4f8a5f3eeb0fe7a73442675dd5"
+    ],
+    "capabilities": [
+      "authority-separated chat messages",
+      "AIRI-style durable/current message dedupe",
+      "bounded recent conversation window",
+      "ephemeral Book semantic context injected as lower-authority data",
+      "AIRI-derived approved character-card/persona contract bound to skin 3714430278",
+      "explicit SQLite companion memory with Chinese retrieval",
+      "Mem0-style memory update/delete/history audit lifecycle",
+      "SQLite chat session persistence",
+      "durable idempotent request receipts",
+      "loopback-only Ollama responder",
+      "developer CLI with explicit remember/update/forget/history commands",
+      "sherpa-derived Android 16kHz mono PCM capture foundation without automatic permission request",
+      "AIRI renderer-neutral emotion protocol mapped conservatively to authored 3714430278 animations"
+    ],
+    "validation": {
+      "initial_python_candidate": {
+        "passed": 18,
+        "failed": 0,
+        "scope": "initial AIRI chat/session/memory/Ollama candidate before later expansions"
+      },
+      "local_java8_smoke": {
+        "result": "PASS",
+        "scope": "VoicePcm normalization + PresentationEmotion wire mapping + conservative 3714430278 emotion mapping",
+        "command": "javac --release 8 + java smoke in independent execution environment"
+      },
+      "github_actions": {
+        "status": "RUNNER_PROVISIONING_FAILED_BEFORE_STEP_1",
+        "evidence": [
+          {
+            "run_id": 36594289643,
+            "job": "focused",
+            "runner_id": 0,
+            "steps": 0
+          },
+          {
+            "run_id": 36594581646,
+            "jobs": [
+              "android-debug-host",
+              "java8-boundary"
+            ],
+            "runner_id": 0,
+            "steps": 0
+          }
+        ],
+        "code_test_result": "NOT_EXECUTED"
+      },
+      "exact_head_full_python_suite": "NOT_EXECUTED",
+      "live_ollama_call": "NOT_RUN",
+      "android_microphone_device_test": "NOT_RUN"
+    },
+    "boundaries": {
+      "automatic_transcript_memory": false,
+      "book_context_persisted": false,
+      "arbitrary_remote_provider": false,
+      "ollama_endpoint": "127.0.0.1:11434 only",
+      "microphone_permission_auto_request": false,
+      "raw_audio_persisted": false,
+      "book_repo_modified": false,
+      "live_repo_modified": false
+    },
+    "status": "DRAFT_EXPANDED_LOCAL_PARTIAL_VALIDATION_REMOTE_CI_INFRA_BLOCKED"
+  },
+  "companion_v2_candidate": {
+    "branch": "feat/airi-chat-memory-brain-20260929",
+    "draft_pr": 15,
+    "base_branch": "feat/spine-3714430278-runtime-refresh-20260929",
+    "exact_head": "9920d53800ad1aec741630300283d385825fd986",
+    "target": "All-local Android companion: Book-aware chat + 3714430278 + on-device LLM + ASR/TTS + explicit memory",
+    "android": {
+      "module": "android_llm_spike/companion",
+      "application_id": "dev.mygpt.companionv2",
+      "min_sdk": 33,
+      "target_sdk": 36,
+      "abi": [
+        "arm64-v8a"
+      ],
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "explicitly_absent_permissions": [
+        "android.permission.INTERNET",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "broad storage permissions"
+      ],
+      "storage": "SAF input + app-private installed model/skin directories"
+    },
+    "integrated_chain": [
+      "typed input or explicit microphone capture",
+      "same-signature fresh Book semantic context (process-memory only)",
+      "signed explicit Book study events for quiet-first supervision",
+      "explicit relevant local memory recall",
+      "llama.cpp Android JNI local GGUF generation",
+      "AIRI ACT emotion marker parsing",
+      "3714430278 conservative authored Spine cue/emotion mapping",
+      "optional sherpa Melo zh/en local TTS streamed to AudioTrack",
+      "explicit native Android PiP character surface above Book/other apps"
+    ],
+    "upstreams": [
+      {
+        "repo": "moeru-ai/airi",
+        "pin": "b40e3e87b149ea5fb75d4944440493829e601411",
+        "license": "MIT",
+        "role": "chat authority, character card, emotion vocabulary, ACT marker protocol"
+      },
+      {
+        "repo": "mem0ai/mem0",
+        "pin": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+        "license": "Apache-2.0",
+        "role": "explicit update/delete/history memory lifecycle"
+      },
+      {
+        "repo": "ggml-org/llama.cpp",
+        "pin": "ba0ba54d93b25faf1e149f4ccedd3e9d84798563",
+        "license": "MIT",
+        "role": "full source submodule + Android JNI/local GGUF engine"
+      },
+      {
+        "repo": "k2-fsa/sherpa-onnx",
+        "source_pin": "040afe360a38e25daaa325ce8889abf93ea02609",
+        "runtime": "v1.13.8",
+        "runtime_commit": "11afbd009a7f8c08f4bcf2fc1b265d0df4670fbf",
+        "license": "Apache-2.0",
+        "role": "ASR/TTS runtime and Android audio patterns"
+      },
+      {
+        "repo": "princekin-f/EasyFloat",
+        "pin": "1a65226084a46cafc7ebcb27f0a077aebefa9b0e",
+        "license": "Apache-2.0",
+        "role": "permission-free in-app drag/snap core only"
+      },
+      {
+        "repo": "apache/commons-compress",
+        "version": "1.28.0",
+        "license": "Apache-2.0",
+        "role": "ZIP/TAR.BZ2/TAR.GZ model archive streaming dependency"
+      }
+    ],
+    "model_inputs": {
+      "skin": "3714430278.zip: verified Drive private source, optional build-time bundle + runtime auto-install, manual SAF fallback",
+      "llm": "user-selected GGUF; header-probed, bounded copy, SHA-256 addressed",
+      "asr": "external sherpa streaming zh/en model archive",
+      "tts": "external vits-melo-tts-zh_en model archive",
+      "supported_archive_formats": [
+        "ZIP",
+        "TAR.BZ2",
+        "TAR.GZ"
+      ],
+      "weights_committed_to_git": false,
+      "skin_drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+      "skin_size_bytes": 12342220,
+      "skin_sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+      "skin_binary_committed_to_git": false
+    },
+    "memory": {
+      "android_store": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt",
+      "automatic_chat_capture": false,
+      "explicit_add": true,
+      "relevant_recall": true,
+      "update": true,
+      "delete_with_audit": true,
+      "purge_full_erasure": true,
+      "history": true,
+      "authority": "recalled memory remains application data, not system instruction"
+    },
+    "voice": {
+      "input_permission": "explicit RECORD_AUDIO request only when user presses voice button",
+      "raw_audio_persisted": false,
+      "asr": "16kHz mono streaming sherpa-onnx",
+      "tts_default_enabled": false,
+      "tts_model_external": true,
+      "tts_audio_persisted": false
+    },
+    "renderer": {
+      "skin_id": "3714430278",
+      "emotion_protocol": [
+        "happy",
+        "sad",
+        "angry",
+        "think",
+        "surprised",
+        "awkward",
+        "question",
+        "curious",
+        "neutral"
+      ],
+      "exact_authored_mapping": {
+        "happy": "smile",
+        "sad": "sad",
+        "surprised": "surprise"
+      },
+      "unsupported_emotion_behavior": "current-form idle fallback",
+      "skin_audio_enabled": false
+    },
+    "code_validation": {
+      "initial_python_airi_candidate": {
+        "passed": 18,
+        "failed": 0,
+        "scope": "earlier focused candidate before later Android expansion"
+      },
+      "independent_java8_smokes": [
+        "PCM normalization PASS",
+        "AIRI emotion/3714430278 mapping PASS",
+        "serialized local LLM lifecycle PASS"
+      ],
+      "exact_head_remote_ci": {
+        "status": "NOT_EXECUTED_RUNNER_PROVISIONING_FAILURE",
+        "exact_head": "9920d53800ad1aec741630300283d385825fd986",
+        "runs": [
+          {
+            "id": 36681413185,
+            "workflow": "Android companion boundary spike",
+            "runner_id": 0,
+            "steps": 0
+          },
+          {
+            "id": 36681413136,
+            "workflow": "sherpa-onnx Android voice acceptance",
+            "runner_id": 0,
+            "steps": 0
+          },
+          {
+            "id": 36681413222,
+            "workflow": "Companion V2 local AI Android acceptance",
+            "runner_id": 0,
+            "steps": 0
+          }
+        ]
+      },
+      "companion_v2_apk_build": "NOT_EXECUTED",
+      "voice_spike_apk_build": "NOT_EXECUTED",
+      "device_test": "NOT_RUN",
+      "live_llm_test_on_android": "NOT_RUN"
+    },
+    "boundaries": {
+      "book_repo_modified": false,
+      "live_repo_modified": false,
+      "main_modified": false,
+      "auto_merge": false,
+      "network_provider_required": false,
+      "computer_required_for_runtime": false,
+      "model_weights_in_repo": false
+    },
+    "book_context": {
+      "contract": "docs/ANDROID_BOOK_CONTEXT_CONTRACT_V1.md",
+      "receiver": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/BookContextReceiver.java",
+      "permission": "dev.mygpt.companionv2.permission.BOOK_CONTEXT",
+      "protection_level": "signature",
+      "delivery": "explicit-package BroadcastReceiver",
+      "storage": "process-memory only",
+      "ttl_ms_max": 300000,
+      "sequence_rule": "new session starts at 1; exact +1 within session",
+      "live_process_listener": true,
+      "current_turn_marker": [
+        "fresh",
+        "unavailable"
+      ],
+      "ui_evidence_markers": [
+        "BOOK_CONTEXT_FRESH",
+        "BOOK_CONTEXT_UNAVAILABLE"
+      ],
+      "synthetic_same_signature_sender": "android_llm_spike/book-sender-test",
+      "adb_command_receiver": "android_llm_spike/book-sender-test/src/main/java/dev/mygpt/bookcontexttest/BookContextTestCommandReceiver.java",
+      "automated_windows_gate": true,
+      "real_book_connected": false,
+      "device_test": "NOT_RUN",
+      "client_sdk": "android_llm_spike/book-client-sdk",
+      "client_sdk_artifact": "book-client-sdk-release.aar",
+      "synthetic_sender_uses_sdk": true,
+      "real_book_sender_implementation_missing": false,
+      "real_book_adoption_pending": true
+    },
+    "conversation_continuity": {
+      "store": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalConversationStore.kt",
+      "max_rows_per_persona": 100,
+      "persisted_content": "visible user/assistant text only",
+      "excluded": [
+        "Book context blocks",
+        "memory blocks",
+        "system prompt",
+        "raw audio",
+        "TTS audio",
+        "AIRI ACT markers"
+      ],
+      "prime_policy": "at most 10 recent turns once after model load/reload",
+      "clear_command": ":clear-chat",
+      "long_term_memory_separate": true
+    },
+    "llama_lifecycle": {
+      "upstream_engine": "process-wide AiChat singleton",
+      "activity_close_behavior": "best-effort cleanUp/unload; do not destroy singleton",
+      "model_replacement": "cleanUp -> loadModel -> setSystemPrompt",
+      "generation_background_behavior": "cancel Flow collection on Activity onStop",
+      "final_native_teardown": "Android process termination"
+    },
+    "local_benchmark": {
+      "ui": "运行本机模型基准",
+      "parameters": {
+        "prompt_processing_tokens": 128,
+        "generation_steps": 64,
+        "parallel_sequences": 1,
+        "repetitions": 1
+      },
+      "captures": [
+        "GGUF filename/hash/bytes",
+        "wall-clock",
+        "PSS before/after",
+        "native heap before/after",
+        "Java heap before/after",
+        "thermal before/after",
+        "llama benchmark table"
+      ],
+      "report": "files/benchmark-last.txt",
+      "uploaded": false,
+      "device_result": "NOT_RUN"
+    },
+    "local_acceptance": {
+      "gradle_wrapper": "android_llm_spike/gradlew.bat",
+      "gradle_version": "8.14.3",
+      "build_install_script": "android_llm_spike/scripts/build_and_install_companion_v2.ps1",
+      "supervision_script": "android_llm_spike/scripts/test_companion_supervision.ps1",
+      "evidence_collector": "android_llm_spike/scripts/collect_companion_v2_evidence.ps1",
+      "acceptance_doc": "docs/COMPANION_V2_XIAOMI14_ACCEPTANCE.md",
+      "evidence_dir": "android_llm_spike/device_evidence/ (gitignored)",
+      "automated_gates": [
+        "tracked-clean exact source identity unless -AllowDirty",
+        "JDK17 + Android36/build-tools/NDK/CMake",
+        "llama/sherpa submodule pins",
+        "same-signature Companion + Book sender",
+        "adb-shell Book context negative permission probe",
+        "same-signature Book context positive + UI marker",
+        "quiet-first supervision shell-negative + sender-positive + local-user opt-in agency gate",
+        "Book context clear + unavailable UI marker",
+        "book-client-sdk AAR build + SHA-256 evidence",
+        "synthetic same-signature sender uses BookCompanionClient SDK for context/study events",
+        "verified local Drive 3714430278 auto-discovery or explicit -SkinZip",
+        "skin exact size/SHA verification before APK injection",
+        "bundled APK skin entry SHA-256 re-verification",
+        "runtime bundled skin auto-install through SpinePackageLayout",
+        "automatic PiP-over-Book gate when skin is bundled",
+        "single evidence directory reused by final collector",
+        "three-candidate GGUF performance matrix",
+        "five-case fixed Chinese companion/teaching sample collection per GGUF",
+        "side-by-side human quality comparison with automatic ranking disabled",
+        "sherpa ASR/TTS model identity + fingerprint verification",
+        "in-memory Melo TTS -> 16 kHz -> streaming ASR native loopback"
+      ],
+      "device": "Xiaomi 14",
+      "status": "READY_TO_EXECUTE_FULL_MATRIX_NOT_RUN",
+      "supervision_gate_persisted_marker": "Book test sender files/adb-supervision-gate.txt"
+    },
+    "cross_app_companion": {
+      "mode": "ANDROID_NATIVE_PICTURE_IN_PICTURE",
+      "entry": "explicit user button",
+      "skin_required": true,
+      "aspect_ratio": "1:1",
+      "pip_surface": "Spine render shell only",
+      "auto_enter": false,
+      "system_alert_window_permission": false,
+      "accessibility_required": false,
+      "screen_capture_required": false,
+      "status": "CODE_READY_DEVICE_NOT_RUN",
+      "doc": "docs/COMPANION_V2_PIP.md"
+    },
+    "supervision": {
+      "contract": "docs/ANDROID_BOOK_SUPERVISION_CONTRACT_V1.md",
+      "receiver": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/BookStudySignalReceiver.java",
+      "runtime": "android_spike/src/main/java/dev/mygpt/spike/StudySupervisorRuntime.java",
+      "permission": "dev.mygpt.companionv2.permission.BOOK_CONTEXT",
+      "protection_level": "signature",
+      "accepted_events": [
+        "SESSION_STARTED",
+        "CONTEXT_CHANGED",
+        "SESSION_PAUSED",
+        "SESSION_RESUMED",
+        "SESSION_ENDED",
+        "HELP_REQUESTED",
+        "PRACTICE_REPEATED_ERROR",
+        "REVOKE"
+      ],
+      "policy": "QUIET_FIRST_EXPLICIT_SIGNED_SIGNALS_ONLY",
+      "user_opt_in": "MYGPT_LOCAL_PER_ACTIVE_SESSION_ONLY",
+      "inactivity_inference": false,
+      "screen_monitoring": false,
+      "repeated_error_cooldown_ms": 600000,
+      "cue_mapping": {
+        "SESSION_STARTED": "QUIET",
+        "CONTEXT_CHANGED": "QUIET",
+        "SESSION_PAUSED": "PAUSED",
+        "SESSION_RESUMED": "QUIET",
+        "HELP_REQUESTED": "NEEDS_INPUT",
+        "PRACTICE_REPEATED_ERROR": "GENTLE_CHECK_IN only after local user opt-in + cooldown",
+        "SESSION_ENDED": "QUIET + opt-in reset",
+        "REVOKE": "QUIET + opt-in reset"
+      },
+      "automated_test_sender_actions": [
+        "AUTOMATED_STUDY_START_V1",
+        "AUTOMATED_STUDY_HELP_V1",
+        "AUTOMATED_STUDY_PAUSE_V1",
+        "AUTOMATED_STUDY_RESUME_V1",
+        "AUTOMATED_STUDY_REPEATED_ERROR_V1",
+        "AUTOMATED_STUDY_END_V1",
+        "AUTOMATED_STUDY_REVOKE_V1"
+      ],
+      "device_acceptance_script": "android_llm_spike/scripts/test_companion_supervision.ps1",
+      "agency_gate": "same repeated-error signal must stay QUIET before local opt-in and become GENTLE_CHECK_IN only after ADB taps the MyGPT-local supervision button",
+      "device_test": "NOT_RUN",
+      "presentation": {
+        "llm_autocall_on_signal": false,
+        "deterministic_local_messages": true,
+        "current_state_prompt_block": "STUDY_SUPERVISION_STATE_JSON",
+        "prompt_authority": "application data only",
+        "agency_test": "same repeated-error event must remain QUIET before MyGPT-local opt-in, then GENTLE_CHECK_IN after opt-in"
+      }
+    },
+    "persona": {
+      "authority_file": "brain/personas/3714430278.json",
+      "schema": "mygpt.character-card.v1",
+      "card_id": "mygpt-3714430278",
+      "visual_skin_id": "3714430278",
+      "python_consumer": "brain/mygpt_brain/character_card.py",
+      "android_consumer": "android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/AndroidCharacterCard.kt",
+      "android_asset": "assets/3714430278.json",
+      "duplicate_persona_copy": false
+    },
+    "status": "PRE_DEVICE_MATRIX_AND_NATIVE_VOICE_LOOPBACK_READY",
+    "prompt_budget": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "implementation": "android_spike/src/main/java/dev/mygpt/spike/CompanionPromptBudget.java",
+      "hard_user_turn_chars": 5200,
+      "max_current_user_chars": 4000,
+      "combined_system_plus_turn_chars": 7200,
+      "current_3714430278_system_prompt_chars": 1506,
+      "dynamic_rule": "min(5200, 7200 - rendered system prompt chars)",
+      "priority": [
+        "complete current user message",
+        "fresh signed Book metadata + bounded current Book text",
+        "current supervision state",
+        "relevant explicit long-term memory",
+        "recent visible conversation with remaining budget"
+      ],
+      "evidence_file": "files/prompt-budget-last.txt",
+      "evidence_contains_source_text": false,
+      "token_claim": false
+    },
+    "model_integrity": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "gguf": "header probe + bounded app-private copy + SHA-256 identity",
+      "sherpa": "deterministic core-file SHA-256 manifest",
+      "sherpa_restore_verify": true,
+      "sherpa_legacy_manifest_migration": true,
+      "large_hashing_thread": "off Android UI thread",
+      "evidence": [
+        "asr-model-manifest.txt",
+        "tts-model-manifest.txt"
+      ]
+    },
+    "signed_state_expiry": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "tick_ms": 1000,
+      "scope": "foreground or visible PiP only",
+      "network_polling": false,
+      "background_service": false,
+      "supervision_expiry_effect": "clear active session + local opt-in + QUIET",
+      "book_expiry_effect": "BOOK_CONTEXT_UNAVAILABLE"
+    },
+    "interrupted_generation_recovery": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "reason": "Cancelled generation may leave native KV containing user/partial tokens without a committed assistant chat message.",
+      "recovery": "mark native session dirty -> unload/reload on foreground -> re-prime only completed LocalConversationStore turns",
+      "interrupted_exchange_persisted": false
+    },
+    "llm_candidate_gate": {
+      "default_model": "NONE_BEFORE_DEVICE_EVIDENCE",
+      "candidates": [
+        "speed",
+        "balanced",
+        "quality"
+      ],
+      "performance_matrix": "android_llm_spike/scripts/run_llm_matrix.ps1",
+      "fixed_quality_suite": "zh-companion-teaching-v1",
+      "fixed_quality_cases": [
+        "companion_minimum_step",
+        "teach_banach_from_book",
+        "book_authority_boundary",
+        "memory_authority_boundary",
+        "signed_help_signal"
+      ],
+      "quality_execution_requirement": "5/5 cases execute without runtime error and produce non-empty visible replies",
+      "automatic_quality_score": false,
+      "automatic_quality_ranking": false,
+      "side_by_side_report": "llm-quality-comparison.md",
+      "selection": "HUMAN_DEVICE_DECISION_PENDING"
+    },
+    "voice_native_gate": {
+      "asr": "sherpa streaming zh/en",
+      "tts": "Melo zh/en OfflineTts",
+      "loopback_script": "android_llm_spike/scripts/test_sherpa_loopback.ps1",
+      "debug_activity": "android_llm_spike/companion/src/debug/java/dev/mygpt/companionv2/DebugVoiceLoopbackActivity.kt",
+      "phrase": "你好，今天一起学习。",
+      "path": "OfflineTts -> float PCM memory -> linear resample to 16 kHz -> SherpaStreamingAsrEngine",
+      "speaker_used": false,
+      "microphone_used": false,
+      "audio_persisted": false,
+      "pass_requirement": "TTS samples > 0 and ASR transcript non-empty",
+      "device_status": "NOT_RUN",
+      "real_microphone_gate": "PENDING",
+      "audible_tts_gate": "PENDING"
+    }
+  },
+  "book_client_sdk": {
+    "status": "CODE_READY_AAR_BUILD_DEVICE_PENDING",
+    "module": "android_llm_spike/book-client-sdk",
+    "artifact": "book-client-sdk-release.aar",
+    "package": "dev.mygpt.bookbridge",
+    "min_sdk": 21,
+    "java_target": "Java 8",
+    "manifest_permission": "dev.mygpt.companionv2.permission.BOOK_CONTEXT",
+    "protection_dependency": "Companion V2 defines permission at signature level",
+    "api": [
+      "BookCompanionSession",
+      "BookContextPayload",
+      "BookCompanionClient",
+      "BookCompanionContract"
+    ],
+    "guarantees": [
+      "context sequence advances only after Activity.RESULT_OK",
+      "study sequence/epoch advances only after Activity.RESULT_OK",
+      "rejected delivery does not create a sequence gap",
+      "new Book process must create a new session id",
+      "explicit-package ordered broadcast only",
+      "Book cannot enable MyGPT supervision opt-in"
+    ],
+    "synthetic_sender_uses_sdk": true,
+    "windows_build_records_aar_sha256": true,
+    "real_book_repo_modified": false,
+    "real_book_adopted": false,
+    "device_test": "NOT_RUN"
+  },
+  "pre_device_hardening": {
+    "exact_head": "4efd70b716ab35f94af7556ee7ed5149e77d60a9",
+    "prompt_budget": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "implementation": "android_spike/src/main/java/dev/mygpt/spike/CompanionPromptBudget.java",
+      "max_prompt_chars": 5600,
+      "max_current_user_chars": 4000,
+      "priority": [
+        "complete current user message",
+        "fresh signed Book metadata + bounded current Book text",
+        "current supervision state",
+        "relevant explicit long-term memory",
+        "recent visible conversation only with remaining budget"
+      ],
+      "evidence_file": "files/prompt-budget-last.txt",
+      "evidence_contains_source_text": false,
+      "native_reason": "Avoid pinned llama.cpp oversized-single-prompt truncation while retaining upstream 8192-token context shifting."
+    },
+    "sherpa_model_integrity": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "manifest": "mygpt-model-manifest.txt",
+      "algorithm": "SHA-256",
+      "fresh_import_verify": true,
+      "restore_verify": true,
+      "legacy_install_migration": true,
+      "restore_thread": "Dispatchers.IO / dedicated Voice Spike worker",
+      "main_thread_hashing": false
+    },
+    "signed_state_expiry": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "tick_ms": 1000,
+      "scope": "foreground or visible PiP only",
+      "network_polling": false,
+      "background_service": false,
+      "supervision_expiry_effect": "clear active session + local opt-in + QUIET",
+      "book_expiry_effect": "BOOK_CONTEXT_UNAVAILABLE"
+    },
+    "interrupted_llama_recovery": {
+      "status": "CODE_READY_NOT_EXECUTED",
+      "reason": "Cancelled generation may leave native KV containing user/partial tokens without a committed assistant chat message.",
+      "recovery": "mark native session dirty -> unload/reload on foreground -> re-prime only completed LocalConversationStore turns",
+      "interrupted_exchange_persisted": false
+    },
+    "explicit_pip_microphone_rule": "Entering PiP stops microphone capture before the system PiP transition."
+  },
+  "verified_primary_skin_bundle": {
+    "skin_id": "3714430278",
+    "drive_file_id": "1B6AL3_3ymbOPSowiX-tGK-2QRXL_7Ozt",
+    "drive_hierarchy": "My Drive/Live/skin/workshop/3714430278/3714430278.zip",
+    "size_bytes": 12342220,
+    "sha256": "eb6eddc96172c03fe4d0dd4dd8a68180ce832aeb82ae07f7f82175fed57bc23f",
+    "source_binary_committed_to_git": false,
+    "windows_build_discovery": [
+      "-SkinZip",
+      "MYGPT_SKIN_ZIP",
+      "allowlisted Google Drive Desktop paths"
+    ],
+    "build_generated_asset": "companion/build/generated/bundled-skin-assets/3714430278.zip",
+    "apk_asset": "assets/3714430278.zip",
+    "build_gates": [
+      "source bytes exact size",
+      "source SHA-256 exact",
+      "APK entry exists only when selected",
+      "APK entry exact size",
+      "APK entry SHA-256 exact"
+    ],
+    "runtime_policy": "validate existing app-private skin first; otherwise install bundled asset through production SpinePackageLayout; manual SAF fallback if unbundled",
+    "device_test": "NOT_RUN"
+  },
+  "fusion_review_checkpoint": {
+    "checked_at_utc": "2026-10-01T01:12:45Z",
+    "status": "DRAFT_UNMERGED_SOURCE_LEVEL_ACCEPTANCE_PASS",
+    "repository": "Jvust1/mygpt",
+    "product_track_unchanged": {
+      "active_branch": "feat/airi-chat-memory-brain-20260929",
+      "current_pr": 15,
+      "observed_head": "1f1e1e1db4c053a3a2abdaea1a93aec9aa3ce16d",
+      "main_observed_head": "bb35f6d34e05ed1de7ac8b3ef71c76f0cbe9f258",
+      "note": "Original product/device track remains unchanged. This separate fusion review stack is not merged or adopted into main."
+    },
+    "implementation_pr": 51,
+    "implementation_pr_url": "https://github.com/Jvust1/mygpt/pull/51",
+    "implementation_branch": "fix/memory-update-atomic-dot-20261001",
+    "implementation_head": "8e9c430b4416154560da00e4faeefe999edf25e6",
+    "stack_range": "PR31 through PR51, sequentially based on PR15; all remain draft/unmerged",
+    "parallel_pr17": {
+      "observed_head": "68b61b2783de1b3043bcfcee9fe89e8b16bae19b",
+      "adopted": false,
+      "note": "Separate branch; no verified Dot API integration is claimed by this stack."
+    },
+    "exact_head_acceptance": {
+      "run_id": 36799362430,
+      "url": "https://github.com/Jvust1/mygpt/actions/runs/36799362430",
+      "conclusion": "success",
+      "jobs_with_nonzero_runners": [
+        110170011091,
+        110170011455,
+        110170011480,
+        110170011485
+      ],
+      "python_strict": {
+        "passed": 764,
+        "failed": 0,
+        "skipped": 0
+      },
+      "upstream_stories": {
+        "passed": 48,
+        "failed": 0,
+        "skipped": 0
+      },
+      "root_python": 65,
+      "javascript": 66,
+      "java_entrypoints_each": 22,
+      "java_runtimes": [
+        "8",
+        "17 --release 8"
+      ],
+      "android_apk_job": "SKIPPED_NOT_ACCEPTANCE",
+      "recovered_source": {
+        "python_strict": 764,
+        "root_python": 65,
+        "javascript": 66,
+        "java17_entrypoints": 22,
+        "loopback_launcher_checks": 12,
+        "input_boundary_checks": 32
+      }
+    },
+    "source_recovery": {
+      "artifact_id": 11134538649,
+      "url": "https://github.com/Jvust1/mygpt/actions/runs/36799362430/artifacts/11134538649",
+      "source_commit": "8e9c430b4416154560da00e4faeefe999edf25e6",
+      "source_files": 434,
+      "archive_bytes": 4581958,
+      "sha256": "10c121a6351346b4efb749778dada8f57f74c835e82241a85dca2eafc7769981",
+      "external_submodule_sources_included": false,
+      "models_private_assets_included": false,
+      "scope": "Source only; external dependencies remain required; hosted artifact retention is three days."
+    },
+    "historical_runner_failure": {
+      "scope": "Earlier PR15 attempts, not current fusion-stack runner status",
+      "previous_global_status": "DRAFT_AUTOMATED_MATRIX_AND_NATIVE_LOOPBACK_READY_DEVICE_EXECUTION_PENDING_REMOTE_RUNNER_BLOCKED",
+      "previous_blocker_text": [
+        "GitHub hosted Actions still fail before runner allocation (runner_id=0, zero steps).",
+        "Exact-head Windows/Xiaomi 14 acceptance has not yet executed; hosted Actions still fail before runner allocation."
+      ],
+      "preserved_detail": "Earlier dated candidate validation objects and evaluation entries remain historical evidence."
+    },
+    "remaining_limits": [
+      "Exact Android Activity/Kotlin/APK/JNI and Windows/device acceptance remain unexecuted.",
+      "Real Book signing identity/adoption and physical microphone/audible TTS remain unverified.",
+      "No default GGUF or real provider teaching-quality acceptance.",
+      "Integration model replies/audio generation are synthetic.",
+      "Receipt replay is data recovery, not audible-delivery acknowledgment.",
+      "Android completion leases do not establish native backend lifetime or AudioTrack cancellation.",
+      "Noncooperative Python callbacks may retain runtime locks past deadlines.",
+      "Native total body timeout does not establish a total header/connection deadline.",
+      "Memory edit serialization is per MemoryStore instance, not across independent connections/processes."
+    ],
+    "next_review": "Review the immutable #51 implementation stack and its scoped evidence. Preserve source/license pins and explicit privacy boundaries. Do not merge or claim device acceptance from hosted source-level checks.",
+    "handoff": "docs/HANDOFF.md",
+    "evaluation": "docs/EVALUATION_LEDGER.md#e-fusion-20261001--coherent-draft-stack-hosted-acceptance"
+  },
+  "main_targeted_aggregate_candidate": {
+    "checked_at_utc": "2026-10-01T02:16:26Z",
+    "status": "DRAFT_SNAPSHOT_PREPARED_NOT_MERGED",
+    "target_branch": "main",
+    "main_base": "bb35f6d34e05ed1de7ac8b3ef71c76f0cbe9f258",
+    "candidate_branch": "feat/companion-fusion-main-dot-20261001",
+    "implementation_source": {
+      "pr": 55,
+      "head": "1eac69dc03548b5c6926fc5c7eb23d98d55853e5",
+      "run_id": 36804686015,
+      "run_url": "https://github.com/Jvust1/mygpt/actions/runs/36804686015",
+      "strict_tests": 826,
+      "upstream_compatibility_story_tests": 49,
+      "root_python_tests": 65,
+      "javascript_tests": 66,
+      "java_entrypoints_each": 22
+    },
+    "main_preservation": [
+      "CONTRIBUTING.md and SECURITY.md verbatim",
+      "all main ignore patterns plus feature-specific exclusions",
+      "existing baseline workflow/actions/permissions with intended scan repair",
+      "both historical README versions retained"
+    ],
+    "aggregate_only_changes": [
+      "baseline scan execution and synthetic tests",
+      "two exact additional source-bundle root documents",
+      "README/handoff/governance reconciliation",
+      "aggregate workflow branch/path coverage"
+    ],
+    "runtime_equivalence": "Runtime, Android, upstream, provider, UI and Brain tests unchanged from implementation source; no new runtime feature in this aggregate.",
+    "source_scope": "Source only; models, private assets, personal databases, credentials and external Gitlink source trees excluded.",
+    "acceptance": "Implementation input is green; aggregate exact-head terminal checks and archive identity are reported in its PR.",
+    "not_claimed": [
+      "main or PR merge",
+      "APK/Activity/Kotlin/JNI build",
+      "physical device or Windows acceptance",
+      "real model quality/performance",
+      "Book signing/adoption",
+      "microphone or audible playback"
+    ],
+    "review_document": "docs/FUSION_MAIN_REVIEW_20261001.md"
+  }
+}

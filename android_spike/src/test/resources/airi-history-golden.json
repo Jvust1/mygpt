@@ -1,0 +1,3570 @@
+{
+  "source_commit": "b40e3e87b149ea5fb75d4944440493829e601411",
+  "cases": [
+    {
+      "id": "airi-0",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "airi-1",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "id": "airi-2",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-3",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "airi-4",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 5,
+      "kept_indices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-5",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 6,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "airi-6",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id": "airi-7",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        4
+      ]
+    },
+    {
+      "id": "airi-8",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "airi-9",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        10
+      ]
+    },
+    {
+      "id": "airi-10",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-11",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "airi-12",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "airi-13",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-14",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "airi-15",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "id": "airi-16",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-17",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "id": "airi-18",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "id": "airi-19",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "airi-20",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-21",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "airi-22",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        7
+      ]
+    },
+    {
+      "id": "airi-23",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-24",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        11
+      ]
+    },
+    {
+      "id": "airi-25",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "airi-26",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "id": "airi-27",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id": "airi-28",
+      "roles": [
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "airi-29",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "id": "airi-30",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        9,
+        10
+      ]
+    },
+    {
+      "id": "airi-31",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "airi-32",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-33",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-34",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-35",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        4
+      ]
+    },
+    {
+      "id": "airi-36",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "airi-37",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-38",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-39",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 5,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "airi-40",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 5,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "airi-41",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-42",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "id": "airi-43",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "airi-44",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-45",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-46",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "airi-47",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 6,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "airi-48",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id": "airi-49",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "airi-50",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        7
+      ]
+    },
+    {
+      "id": "airi-51",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "id": "airi-52",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        10
+      ]
+    },
+    {
+      "id": "airi-53",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "airi-54",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        18
+      ]
+    },
+    {
+      "id": "airi-55",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-56",
+      "roles": [
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "airi-57",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-58",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-59",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "airi-60",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        12,
+        13
+      ]
+    },
+    {
+      "id": "airi-61",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "airi-62",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-63",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        5
+      ]
+    },
+    {
+      "id": "airi-64",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "airi-65",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-66",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "airi-67",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "airi-68",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "airi-69",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id": "airi-70",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "airi-71",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "airi-72",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "id": "airi-73",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "id": "airi-74",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 5,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "airi-75",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "id": "airi-76",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-77",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "airi-78",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        8
+      ]
+    },
+    {
+      "id": "airi-79",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-80",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        10
+      ]
+    },
+    {
+      "id": "airi-81",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "airi-82",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 5,
+      "kept_indices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "id": "airi-83",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-84",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "airi-85",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "id": "airi-86",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-87",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "airi-88",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-89",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 6,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "airi-90",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id": "airi-91",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        4
+      ]
+    },
+    {
+      "id": "airi-92",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "airi-93",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        10
+      ]
+    },
+    {
+      "id": "airi-94",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-95",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        14
+      ]
+    },
+    {
+      "id": "airi-96",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "airi-97",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-98",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "airi-99",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "id": "airi-100",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-101",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "id": "airi-102",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "id": "airi-103",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "airi-104",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-105",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "airi-106",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        7
+      ]
+    },
+    {
+      "id": "airi-107",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-108",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        11
+      ]
+    },
+    {
+      "id": "airi-109",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 5,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "airi-110",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "id": "airi-111",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id": "airi-112",
+      "roles": [
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "airi-113",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "id": "airi-114",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        9,
+        10
+      ]
+    },
+    {
+      "id": "airi-115",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "airi-116",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-117",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-118",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-119",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        4
+      ]
+    },
+    {
+      "id": "airi-120",
+      "roles": [
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "airi-121",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "airi-122",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 3,
+      "kept_indices": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "airi-123",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 4,
+      "kept_indices": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "airi-124",
+      "roles": [
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 5,
+      "kept_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "airi-125",
+      "roles": [
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user"
+      ],
+      "limit": 7,
+      "kept_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "id": "airi-126",
+      "roles": [
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "user",
+        "assistant",
+        "assistant",
+        "assistant"
+      ],
+      "limit": 1,
+      "kept_indices": [
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "id": "airi-127",
+      "roles": [
+        "user",
+        "assistant",
+        "assistant",
+        "assistant",
+        "user",
+        "user",
+        "assistant"
+      ],
+      "limit": 2,
+      "kept_indices": [
+        4,
+        5,
+        6
+      ]
+    }
+  ]
+}

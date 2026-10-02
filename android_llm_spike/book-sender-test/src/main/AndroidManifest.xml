@@ -1,0 +1,33 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="dev.mygpt.companionv2.permission.BOOK_CONTEXT" />
+
+    <application
+        android:allowBackup="false"
+        android:label="Book Context Test Sender"
+        android:supportsRtl="true">
+        <activity
+            android:name=".BookContextTestActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".BookContextTestCommandReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_SEND_CONTEXT_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_CLEAR_CONTEXT_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_REVOKE_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_END_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_REPEATED_ERROR_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_RESUME_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_PAUSE_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_HELP_V1" />
+                <action android:name="dev.mygpt.bookcontexttest.action.AUTOMATED_STUDY_START_V1" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
