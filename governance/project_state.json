@@ -1,12 +1,12 @@
 {
   "schema_version": "mygpt_project_state_v1",
-  "updated_date": "2026-10-01",
+  "updated_date": "2026-10-02",
   "repository": "Jvust1/mygpt",
   "default_branch": "main",
-  "active_branch": "feat/airi-chat-memory-brain-20260929",
-  "phase": "COMPANION_V2_XIAOMI14_LLM_QUALITY_VOICE_LOOPBACK_GATE",
-  "status": "DRAFT_AUTOMATED_MATRIX_AND_NATIVE_LOOPBACK_READY_DEVICE_EXECUTION_PENDING",
-  "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
+  "active_branch": "fix/android-required-gate-dot-20261002",
+  "phase": "BOUNDED_AUDIT_REMEDIATION",
+  "status": "DRAFT_REVIEW_CANDIDATE_RELEASE_BLOCKED",
+  "security_status": "PUBLIC_DRAFT_REVIEW_BRANCH_UNPROTECTED",
   "drive": {
     "folder_name": "mygpt",
     "folder_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK"
@@ -118,7 +118,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "On Windows, build the current PR #15 code with android_llm_spike/scripts/build_and_install_companion_v2.ps1. For the most complete device gate use the verified 3714430278 local bundle path plus -LlmMatrix and -SherpaModels. This reuses one evidence directory for same-signature Book/Supervision/PiP, three fixed GGUF benchmarks + 5-case Chinese qualitative samples, sherpa ASR/TTS identity/import, and the in-memory Melo-TTS -> 16k -> streaming-ASR native loopback. Then perform the remaining live microphone/audible TTS/visual interaction checks on Xiaomi 14 and run collect_companion_v2_evidence.ps1. Do not merge before exact-device evidence exists.",
+  "next_step": "Verify this draft exact head: actual Android assembleDebug and native/classes.dex/license checks plus fail-closed aggregate. Keep APK unpublished pending distribution entitlement. Then separately resolve receipt growth without silently deleting durable history; main merge and physical-device acceptance require separate approval/evidence.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -1601,5 +1601,33 @@
     "fonts_or_external_service_added": false,
     "scope_document": "docs/KATEX_BOOK_PREVIEW_20261001.md",
     "limits": "Local browser process failed before assertions; exact-head hosted browser gate required. No real Book/device/model/math-correctness acceptance."
+  },
+  "audit_remediation_20261002": {
+    "status": "DRAFT_LOCAL_VERIFICATION_HOSTED_PENDING",
+    "branch": "fix/android-required-gate-dot-20261002",
+    "base_commit": "5bbc3a165e648327abe625b04590dbce33812178",
+    "audit_document_commit": "0776119ccae16deacbb92884860c75fd3f806aea",
+    "audit_implementation_baseline": "1e766c00d7ccb857d7d5a858e7af776f66b611df",
+    "scope": [
+      "MYGPT-001 Android build and fail-closed required-job gates",
+      "scoped current-state reconciliation"
+    ],
+    "remaining_release_blockers": [
+      "MYGPT-002 durable/history/request retention growth confirmed",
+      "MYGPT-003 main has no product implementation",
+      "MYGPT-004 remaining historical document/manifest consistency cleanup",
+      "Spine APK distribution entitlement not verified",
+      "real Android/Windows/Book/model/microphone/TTS acceptance remains unproven"
+    ],
+    "apk_artifact_policy": "BUILD_AND_VERIFY_ON_RUNNER_METADATA_ONLY_NO_APK_UPLOAD",
+    "previous_current_fields": {
+      "active_branch": "feat/airi-chat-memory-brain-20260929",
+      "phase": "COMPANION_V2_XIAOMI14_LLM_QUALITY_VOICE_LOOPBACK_GATE",
+      "status": "DRAFT_AUTOMATED_MATRIX_AND_NATIVE_LOOPBACK_READY_DEVICE_EXECUTION_PENDING",
+      "security_status": "REGISTERED_PROTECTED_REVIEW_BRANCH",
+      "next_step": "On Windows, build the current PR #15 code with android_llm_spike/scripts/build_and_install_companion_v2.ps1. For the most complete device gate use the verified 3714430278 local bundle path plus -LlmMatrix and -SherpaModels. This reuses one evidence directory for same-signature Book/Supervision/PiP, three fixed GGUF benchmarks + 5-case Chinese qualitative samples, sherpa ASR/TTS identity/import, and the in-memory Melo-TTS -> 16k -> streaming-ASR native loopback. Then perform the remaining live microphone/audible TTS/visual interaction checks on Xiaomi 14 and run collect_companion_v2_evidence.ps1. Do not merge before exact-device evidence exists."
+    },
+    "verification_document": "docs/AUDIT_REMEDIATION_20261002.md",
+    "exact_head_result_location": "The draft PR records the exact candidate SHA, hosted run and artifact identities; no historical run is acceptance of this candidate."
   }
 }

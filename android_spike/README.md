@@ -30,7 +30,7 @@ With Android SDK 35, JDK 17 and Gradle 8.13 installed:
 gradle -p android_spike :app:assembleDebug --no-daemon
 ```
 
-The debug APK appears at `android_spike/app/build/outputs/apk/debug/app-debug.apk`. CI builds and uploads it as a short-lived test artifact. Do not use this package to assess actual Book transport, Live WPK animation, model teaching quality, or cross-app overlays.
+The debug APK appears at `android_spike/app/build/outputs/apk/debug/app-debug.apk`. CI builds and verifies it, but uploads only exact-commit hashes and the required payload inventory as short-lived JSON evidence. The APK itself is not uploaded: Spine runtime distribution entitlement has not been verified (see `SPINE_EVALUATION_NOTICE.md`). A successful metadata check is neither a downloadable APK delivery nor device acceptance. Do not use this package to assess actual Book transport, Live WPK animation, model teaching quality, or cross-app overlays.
 
 ## 3714430278 Spine renderer implementation
 

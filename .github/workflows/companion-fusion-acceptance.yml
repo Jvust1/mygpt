@@ -16,6 +16,7 @@ on:
       - fix/memory-noop-result-dot-20261001
       - fix/cli-input-recovery-dot-20261001
       - fix/wake-confidence-boundary-dot-20261001
+      - fix/android-required-gate-dot-20261002
       - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
       - feat/airi-chat-memory-brain-20260929
@@ -32,6 +33,7 @@ on:
       - '.github/workflows/android-spike.yml'
       - '.github/workflows/source-delivery.yml'
       - 'scripts/source_bundle.py'
+      - 'scripts/assert_required_jobs.py'
       - '.gitmodules'
       - 'governance/project_state.json'
       - 'docs/HANDOFF.md'
@@ -116,3 +118,19 @@ jobs:
     uses: ./.github/workflows/source-delivery.yml
     permissions:
       contents: read
+
+  fusion-required-gate:
+    if: ${{ always() }}
+    needs: [production-components, android-java-boundaries, source-recovery]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Require every aggregate component to execute successfully
+        env:
+          REQUIRED_JOB_RESULTS: ${{ toJSON(needs) }}
+        run: python scripts/assert_required_jobs.py production-components android-java-boundaries source-recovery

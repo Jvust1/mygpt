@@ -20,6 +20,8 @@ on:
       - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/CompanionV2Activity.kt'
       - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt'
       - '.github/workflows/android-spike.yml'
+      - 'scripts/assert_required_jobs.py'
+      - 'tests/test_android_required_gate.py'
   pull_request:
     paths:
       - 'android_spike/**'
@@ -36,6 +38,8 @@ on:
       - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/CompanionV2Activity.kt'
       - 'android_llm_spike/companion/src/main/java/dev/mygpt/companionv2/LocalCompanionMemoryStore.kt'
       - '.github/workflows/android-spike.yml'
+      - 'scripts/assert_required_jobs.py'
+      - 'tests/test_android_required_gate.py'
 
 permissions:
   contents: read
@@ -79,7 +83,7 @@ jobs:
           bash android_spike/tools/run_boundary_smoke.sh
 
   android-debug-host:
-    if: github.repository == 'Jvust/mygpt'
+    if: github.repository == 'Jvust1/mygpt'
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
@@ -110,23 +114,31 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          import zipfile
-          apk = "android_spike/app/build/outputs/apk/debug/app-debug.apk"
-          with zipfile.ZipFile(apk) as z:
-              names = set(z.namelist())
-              required = "lib/arm64-v8a/libgdx.so"
-              if required not in names:
-                  raise SystemExit(f"missing {required}")
-              if "classes.dex" not in names:
-                  raise SystemExit("missing classes.dex")
-              if "assets/SPINE_RUNTIME_LICENSE.txt" not in names:
-                  raise SystemExit("missing Spine runtime license notice")
-              print("APK native payload PASS:", required)
-          PY
+          python android_spike/tools/verify_debug_apk.py \
+            android_spike/app/build/outputs/apk/debug/app-debug.apk \
+            --source-commit "$GITHUB_SHA" \
+            --output "$RUNNER_TEMP/android-build-evidence/apk-evidence.json"
+      # Spine evaluation is not authorization to distribute a runtime APK.
+      # Retain only exact-commit hashes and the three required public payload entries.
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: mygpt-spine-3714430278-android-spike
-          path: android_spike/app/build/outputs/apk/debug/app-debug.apk
+          name: mygpt-android-build-evidence-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/android-build-evidence/apk-evidence.json
           if-no-files-found: error
           retention-days: 3
+
+  android-required-gate:
+    if: ${{ always() }}
+    needs: [java8-boundary, android-debug-host]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Require Java and actual Android APK build success
+        env:
+          REQUIRED_JOB_RESULTS: ${{ toJSON(needs) }}
+        run: python scripts/assert_required_jobs.py java8-boundary android-debug-host

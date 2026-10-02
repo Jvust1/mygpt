@@ -1,3 +1,26 @@
+# 2026-10-02 — bounded audit remediation candidate
+
+This independent draft is based on PR #57 at
+`5bbc3a165e648327abe625b04590dbce33812178`, not the older PR #48
+snapshot reviewed by [the 2026-10-02 audit](https://github.com/Jvust1/mygpt/blob/0776119ccae16deacbb92884860c75fd3f806aea/docs/AUDIT_REPORT_20261002.md).
+Main remains a governance-only branch at `0776119ccae16deacbb92884860c75fd3f806aea`.
+
+Current bounded change: correct the APK job's repository guard; make skipped,
+failed, cancelled or missing Android/aggregate prerequisites fail closed; run
+actual APK payload checks. Only exact-commit metadata is uploaded. Spine APK
+redistribution is still unapproved, so no downloadable APK/device acceptance is
+claimed. See [audit reconciliation and verification](AUDIT_REMEDIATION_20261002.md).
+
+The prior implementation, provider/Book/Live authority, data retention and all
+existing PRs remain unchanged. Long-run history/receipt growth remains a
+confirmed release blocker. The final exact-head CI result belongs to this PR;
+older green runs below must not be reused as its acceptance.
+
+## Historical implementation checkpoints
+
+The dated entries below describe their stated commits and are historical inputs,
+not the current candidate's source identity or final CI status.
+
 # 2026-10-01 — KaTeX selected-formula preview candidate
 
 - Pinned MIT KaTeX 0.18.10 is now invoked by selection/Brain/reader source-part rendering, with native MathML and exact raw fallback
