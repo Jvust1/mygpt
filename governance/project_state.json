@@ -3,9 +3,9 @@
   "updated_date": "2026-10-02",
   "repository": "Jvust1/mygpt",
   "default_branch": "main",
-  "active_branch": "fix/android-required-gate-dot-20261002",
+  "active_branch": "fix/lossless-receipt-storage-dot-20261002",
   "phase": "BOUNDED_AUDIT_REMEDIATION",
-  "status": "DRAFT_REVIEW_CANDIDATE_RELEASE_BLOCKED",
+  "status": "DRAFT_LOSSLESS_STORAGE_REMEDIATION_RELEASE_BLOCKED",
   "security_status": "PUBLIC_DRAFT_REVIEW_BRANCH_UNPROTECTED",
   "drive": {
     "folder_name": "mygpt",
@@ -118,7 +118,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Verify this draft exact head: actual Android assembleDebug and native/classes.dex/license checks plus fail-closed aggregate. Keep APK unpublished pending distribution entitlement. Then separately resolve receipt growth without silently deleting durable history; main merge and physical-device acceptance require separate approval/evidence.",
+  "next_step": "Verify this independent receipt/cache draft on its exact head, including fixed 1k/10k synthetic growth and existing production/Android/source gates. Then address Windows exact-head and governance consistency. Retention policy, main merge, distribution entitlement and physical-device acceptance remain separate decisions/evidence.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -1603,7 +1603,7 @@
     "limits": "Local browser process failed before assertions; exact-head hosted browser gate required. No real Book/device/model/math-correctness acceptance."
   },
   "audit_remediation_20261002": {
-    "status": "DRAFT_LOCAL_VERIFICATION_HOSTED_PENDING",
+    "status": "INPUT_BASELINE_ACCEPTED_HOSTED_ANDROID_AND_AGGREGATE",
     "branch": "fix/android-required-gate-dot-20261002",
     "base_commit": "5bbc3a165e648327abe625b04590dbce33812178",
     "audit_document_commit": "0776119ccae16deacbb92884860c75fd3f806aea",
@@ -1628,6 +1628,40 @@
       "next_step": "On Windows, build the current PR #15 code with android_llm_spike/scripts/build_and_install_companion_v2.ps1. For the most complete device gate use the verified 3714430278 local bundle path plus -LlmMatrix and -SherpaModels. This reuses one evidence directory for same-signature Book/Supervision/PiP, three fixed GGUF benchmarks + 5-case Chinese qualitative samples, sherpa ASR/TTS identity/import, and the in-memory Melo-TTS -> 16k -> streaming-ASR native loopback. Then perform the remaining live microphone/audible TTS/visual interaction checks on Xiaomi 14 and run collect_companion_v2_evidence.ps1. Do not merge before exact-device evidence exists."
     },
     "verification_document": "docs/AUDIT_REMEDIATION_20261002.md",
-    "exact_head_result_location": "The draft PR records the exact candidate SHA, hosted run and artifact identities; no historical run is acceptance of this candidate."
+    "exact_head_result_location": "The draft PR records the exact candidate SHA, hosted run and artifact identities; no historical run is acceptance of this candidate.",
+    "verified_commit": "a5862faf8e976ca310bb4d743fea78c5c8211d01",
+    "verified_run_id": 36964436329,
+    "verified_pr": 58
+  },
+  "receipt_storage_remediation_20261002": {
+    "branch": "fix/lossless-receipt-storage-dot-20261002",
+    "base_commit": "a5862faf8e976ca310bb4d743fea78c5c8211d01",
+    "status": "LOCAL_VERIFIED_HOSTED_EXACT_HEAD_PENDING",
+    "schema_version": 2,
+    "upgrade_rule": "Stop all old processes and keep a private local pre-upgrade backup; no mixed-version use or in-place downgrade.",
+    "durable_runtime_cache_entries": 0,
+    "history_deleted": false,
+    "old_receipt_bytes_preserved": true,
+    "automatic_memory_writes": false,
+    "retention_policy_complete": false,
+    "single_session_10000_turns": {
+      "sqlite_bytes": 17952768,
+      "receipt_payload_bytes": 8937668,
+      "messages": 20001,
+      "receipts": 10000,
+      "max_provider_rows": 20,
+      "elapsed_seconds": 152.055,
+      "scope": "Synthetic Linux local measurement; full result ID expansion remains O(history)."
+    },
+    "local_tests": {
+      "strict_brain": 862,
+      "upstream_component": 49,
+      "root_python": 85,
+      "failed": 0,
+      "skipped": 0,
+      "javascript": 70
+    },
+    "document": "docs/RECEIPT_STORAGE_BOUNDS_20261002.md",
+    "hosted_evidence": "Final exact candidate SHA/run/artifacts are recorded in this draft PR, not inferred from the input baseline."
   }
 }
