@@ -1,8 +1,8 @@
 {
   "schema_version": "mygpt_artifact_manifest_v1",
-  "updated_date": "2026-09-29",
+  "updated_date": "2026-10-02",
   "project": {
-    "repository": "Jvust/mygpt",
+    "repository": "Jvust1/mygpt",
     "drive_root_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
     "drive_root_name": "mygpt"
   },
