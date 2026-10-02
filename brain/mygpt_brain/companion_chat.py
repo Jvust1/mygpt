@@ -149,7 +149,12 @@ class SupersededChatTurn(RuntimeError):
 
 
 class CompanionChatRuntime:
-    """Bounded in-memory session runtime with explicit SQLite-backed memories."""
+    """Companion runtime with a bounded provider window and explicit memories.
+
+    Durable history/receipts are read through SQLite with zero retained runtime
+    cache entries. Without a session store, lossless history/replay remain in
+    memory and are intentionally not advertised as bounded retention.
+    """
 
     def __init__(
         self,
@@ -187,6 +192,12 @@ class CompanionChatRuntime:
         ).hexdigest()
 
     def session_messages(self, session_id: str) -> list[ChatMessage]:
+        if isinstance(self.session_store, ChatSessionStore):
+            return self.session_store.load_messages(session_id, persona_id=self.persona.persona_id)
+        if self.session_store is not None:
+            if self.session_store.session_persona(session_id) != self.persona.persona_id:
+                return []
+            return self.session_store.load_messages(session_id)
         return list(self._sessions.get(session_id, []))
 
     async def send(
@@ -224,20 +235,27 @@ class CompanionChatRuntime:
                     if old_fingerprint != fingerprint:
                         raise ValueError("request_id conflict")
                     restored = CompanionChatResult.model_validate(result_value)
-                    self._requests[request.request_id] = (fingerprint, restored)
                     return restored.model_copy(update={"replayed": True})
 
-            messages = self._sessions.get(request.session_id)
-            if messages is None:
-                messages = (
-                    self.session_store.load_messages(request.session_id)
-                    if self.session_store is not None else []
-                )
-                if self.session_store is not None:
-                    durable_persona = self.session_store.session_persona(request.session_id)
-                    if durable_persona is not None and durable_persona != self.persona.persona_id:
-                        raise ValueError("session belongs to another persona")
-                self._sessions[request.session_id] = messages
+            compacted_prefix: list[str] = []
+            commit_options: dict = {}
+            if isinstance(self.session_store, ChatSessionStore):
+                state = self.session_store.load_prompt_state(request.session_id, self.recent_turn_limit)
+                if state.persona_id is not None and state.persona_id != self.persona.persona_id:
+                    raise ValueError("session belongs to another persona")
+                messages = state.messages
+                compacted_prefix = state.compacted_message_ids
+                commit_options["expected_revision"] = state.revision
+                commit_options["expected_deletion_epoch"] = state.deletion_epoch
+            elif self.session_store is not None:
+                # Preserve the legacy injected-store protocol. Only the concrete
+                # SQLite store promises snapshot/revision checks and tail reads.
+                durable_persona = self.session_store.session_persona(request.session_id)
+                if durable_persona is not None and durable_persona != self.persona.persona_id:
+                    raise ValueError("session belongs to another persona")
+                messages = self.session_store.load_messages(request.session_id)
+            else:
+                messages = self._sessions.get(request.session_id, [])
             created_system = False
             if not messages:
                 # Stage the persona with the exchange. A rejected/failed first
@@ -267,6 +285,7 @@ class CompanionChatRuntime:
                 candidate_messages,
                 recent_turn_limit=self.recent_turn_limit,
             )
+            window.compacted_message_ids[:0] = compacted_prefix
             memories = tuple(
                 self.memory_store.search(request.text, namespace=request.persona_id, limit=8)
             )
@@ -362,8 +381,10 @@ class CompanionChatRuntime:
                         fingerprint=fingerprint,
                         result=result.model_dump(mode="json"),
                         completed_at=clock,
+                        **commit_options,
                     )
-                messages.extend((user, assistant))
-                self._sessions[request.session_id] = messages
-                self._requests[request.request_id] = (fingerprint, result)
+                else:
+                    messages.extend((user, assistant))
+                    self._sessions[request.session_id] = messages
+                    self._requests[request.request_id] = (fingerprint, result)
             return result

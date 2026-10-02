@@ -1,3 +1,19 @@
+# 2026-10-02 — lossless receipt/cache remediation candidate
+
+Current review branch: `fix/lossless-receipt-storage-dot-20261002`, based on
+verified PR #58 at `a5862faf8e976ca310bb4d743fea78c5c8211d01`.
+New normal receipts use verified history-prefix references; durable runtimes
+retain no cross-request history/result caches. Existing history and replay
+outputs are preserved. See [scope, migration and actual measurements](RECEIPT_STORAGE_BOUNDS_20261002.md).
+
+Stop all older processes before the schema-v2 upgrade; keep any user database
+backup local/private. Automatic retention/deletion is not added. Full result ID
+expansion still costs O(history), nondurable mode remains unbounded, and the
+whole MYGPT-002 retention finding is not closed. This draft's exact-head hosted
+result is recorded in its PR, separately from the verified #58 input baseline.
+
+## Historical input checkpoints
+
 # 2026-10-02 — bounded audit remediation candidate
 
 This independent draft is based on PR #57 at

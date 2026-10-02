@@ -16,6 +16,7 @@ on:
       - fix/memory-noop-result-dot-20261001
       - fix/cli-input-recovery-dot-20261001
       - fix/wake-confidence-boundary-dot-20261001
+      - fix/lossless-receipt-storage-dot-20261002
       - fix/android-required-gate-dot-20261002
       - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
@@ -83,6 +84,23 @@ jobs:
       - name: Exercise integrated stories and actual upstream oracles
         working-directory: brain
         run: python scripts/verify_fusion_upstreams.py --output "$RUNNER_TEMP/fusion-upstream-evidence"
+      - name: Require linear new receipt storage and zero durable runtime caches
+        working-directory: brain
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/receipt-growth"
+          python scripts/verify_receipt_growth.py --rounds 1000 10000 \
+            --output "$RUNNER_TEMP/receipt-growth/growth.json"
+          git rev-parse HEAD > "$RUNNER_TEMP/receipt-growth/source-commit.txt"
+      - name: Preserve synthetic receipt storage evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: receipt-growth-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/receipt-growth/
+          retention-days: 3
+          if-no-files-found: error
       - name: Require repository regressions and compile runtime
         run: |
           python -m unittest discover -s tests -p 'test_*.py' -q
