@@ -1,4 +1,6 @@
 """Execute artifact-root HTTP regressions; do not substitute for Windows EXE CI."""
+import asyncio
+import copy
 import hashlib
 import http.client
 import importlib.util
@@ -7,11 +9,14 @@ import os
 from pathlib import Path
 import re
 import shutil
+import socket
+import sqlite3
 import subprocess
 import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+from uuid import uuid4
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +27,10 @@ from mygpt_brain.local_service import STATIC_FILES
 SPEC = importlib.util.spec_from_file_location('windows_delivery_test', ROOT / 'tools/build_windows_delivery.py')
 build = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(build)
+sys.path.insert(0, str(ROOT / 'tools'))
+BROWSER_SPEC = importlib.util.spec_from_file_location('native_browser_test', ROOT / 'tools/desktop_browser_test.py')
+native_browser = importlib.util.module_from_spec(BROWSER_SPEC)
+BROWSER_SPEC.loader.exec_module(native_browser)
 WINDOWS = ROOT / '.github/workflows/desktop-delivery.yml'
 FUSION = ROOT / '.github/workflows/companion-fusion-acceptance.yml'
 
@@ -215,15 +224,17 @@ class WindowsWorkflowTests(unittest.TestCase):
                      'native-install-report.json', 'installed-dependencies.json', 'dependency-tests.xml',
                      'dependency-tests.txt', 'pytest.xml', 'pytest.txt',
                      'node-tests.txt', 'build.txt', 'build-evidence.json', 'native-smoke.json', 'browser.json',
-                     'native-self-test-diagnostics.txt', 'native-browser-diagnostics.txt', 'native-math.png'}
+                     'native-self-test-diagnostics.txt', 'native-browser-diagnostics.txt', 'native-math.png',
+                     'native-text-chat.png', 'native-text-restored.png'}
         self.assertEqual(paths, {'${{ runner.temp }}/windows-evidence/' + name for name in filenames})
         self.assertEqual(text.count('uses: actions/upload-artifact@'), 1)
         self.assertNotIn('boot.log', block)
         self.assertNotIn('Copy-Item', text)
         self.assertIn('if-no-files-found: error', text)
         browser = (ROOT / 'tools/desktop_browser_test.py').read_text()
-        self.assertEqual(browser.count('page.screenshot('), 1)
-        self.assertIn("page.screenshot(path=str(out / 'native-math.png'), full_page=True)", browser)
+        self.assertEqual(browser.count('page.screenshot('), 3)
+        for screenshot in ('native-math.png', 'native-text-chat.png', 'native-text-restored.png'):
+            self.assertIn(f"page.screenshot(path=str(out / '{screenshot}'), full_page=True)", browser)
 
     def test_changes_to_native_builder_ui_and_workflow_trigger_aggregate(self):
         text = FUSION.read_text()
@@ -260,6 +271,205 @@ class NativeProcessIsolationTests(unittest.TestCase):
         browser = (ROOT / 'tools/desktop_browser_test.py').read_text()
         self.assertIn('**native_process_options(Path(temp))', builder)
         self.assertIn('**native_process_options(home)', browser)
+
+
+
+class SyntheticTextEvidenceTests(unittest.TestCase):
+    def test_previous_port_reservation_prevents_reuse_without_contacting_listener(self):
+        original = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        original.bind(('127.0.0.1', 0))
+        original.listen(1)
+        port = original.getsockname()[1]
+        try:
+            with self.assertRaises((TimeoutError, OSError)):
+                with native_browser.reserve_previous_port(port, timeout=0):
+                    self.fail('must not share or replace an existing listener')
+        finally:
+            original.close()
+        with native_browser.reserve_previous_port(port, timeout=0) as held:
+            self.assertEqual(held.getsockname(), ('127.0.0.1', port))
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as other:
+                other.bind(('127.0.0.1', 0))
+                other.listen(1)
+                self.assertNotEqual(other.getsockname()[1], port)
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as collision:
+                with self.assertRaises(OSError):
+                    collision.bind(('127.0.0.1', port))
+        self.assertEqual(held.fileno(), -1)
+
+    def test_windows_reservation_uses_exclusive_option_before_binding(self):
+        with patch.object(native_browser.sys, 'platform', 'win32'), \
+             patch.object(native_browser.socket, 'SO_EXCLUSIVEADDRUSE', 123456, create=True), \
+             patch.object(native_browser.socket, 'socket') as factory:
+            with native_browser.reserve_previous_port(10001):
+                factory.return_value.setsockopt.assert_called_once_with(socket.SOL_SOCKET, 123456, 1)
+                factory.return_value.bind.assert_called_once_with(('127.0.0.1', 10001))
+                factory.return_value.listen.assert_called_once_with(1)
+            factory.return_value.close.assert_called_once()
+            names = [entry[0] for entry in factory.return_value.method_calls]
+            self.assertEqual(names, ['setsockopt', 'bind', 'listen', 'close'])
+
+    def test_test_owned_provider_records_exact_wire_bytes_and_stops_generation(self):
+        provider = native_browser.SyntheticOllama()
+        self.addCleanup(provider.close)
+        for index, (prompt, reply) in enumerate(native_browser.SYNTHETIC_TURNS):
+            messages = [{'role': 'system', 'content': 'Synthetic persona only'}]
+            for old_prompt, old_reply in native_browser.SYNTHETIC_TURNS[:index]:
+                messages.extend([{'role': 'user', 'content': old_prompt},
+                                 {'role': 'assistant', 'content': old_reply}])
+            messages.append({'role': 'user', 'content': prompt})
+            raw = json.dumps({'model': native_browser.SYNTHETIC_MODEL, 'stream': False,
+                              'messages': messages}, ensure_ascii=False).encode('utf-8')
+            connection = http.client.HTTPConnection('127.0.0.1', provider.port, timeout=3)
+            try:
+                connection.request('POST', '/api/chat', body=raw,
+                                   headers={'Content-Type': 'application/json'})
+                response = connection.getresponse()
+                self.assertEqual(response.status, 200)
+                self.assertEqual(json.loads(response.read())['message']['content'], reply)
+            finally:
+                connection.close()
+            self.assertEqual(provider.snapshot()[index]['body_utf8'].encode('utf-8'), raw)
+        native_browser.verify_provider_requests(provider.snapshot())
+        broken = copy.deepcopy(provider.snapshot())
+        body = json.loads(broken[1]['body_utf8'])
+        body['messages'] = [body['messages'][0], body['messages'][-1]]
+        broken[1]['body_utf8'] = json.dumps(body, ensure_ascii=False)
+        broken[1]['body_sha256'] = hashlib.sha256(broken[1]['body_utf8'].encode('utf-8')).hexdigest()
+        with self.assertRaises(AssertionError):
+            native_browser.verify_provider_requests(broken)
+        provider.stop_provider()
+        self.assertFalse(provider.thread.is_alive())
+        with socket.create_connection(('127.0.0.1', provider.port), timeout=3) as refused:
+            # No HTTP responder remains; an attempted provider call cannot succeed.
+            self.assertEqual(refused.recv(1), b'')
+        self.assertEqual(provider.stopped_connection_attempts, 1)
+        self.assertEqual(len(provider.snapshot()), 2)
+
+    def make_chat_database(self, path):
+        from mygpt_brain.companion_chat import CompanionChatRuntime, CompanionPersona
+        from mygpt_brain.session_store import ChatSessionStore
+        store = ChatSessionStore(path)
+        request_ids = [str(uuid4()), str(uuid4())]
+        replies = iter(pair[1] for pair in native_browser.SYNTHETIC_TURNS)
+
+        async def responder(_):
+            return next(replies)
+
+        runtime = CompanionChatRuntime(
+            persona=CompanionPersona(persona_id=native_browser.CHAT_PERSONA,
+                display_name='Synthetic verification', visual_skin_id='synthetic',
+                instructions='Synthetic fixed persona'), responder=responder, session_store=store)
+
+        async def send():
+            for request_id, (prompt, _) in zip(request_ids, native_browser.SYNTHETIC_TURNS):
+                await runtime.send({'request_id': request_id, 'session_id': native_browser.CHAT_SESSION,
+                                    'persona_id': native_browser.CHAT_PERSONA, 'text': prompt})
+
+        try:
+            asyncio.run(send())
+            messages = [message.model_dump(mode='json')
+                        for message in store.load_messages(native_browser.CHAT_SESSION)
+                        if message.role != 'system']
+        finally:
+            store.close()
+            runtime.memory_store.close()
+        return {'session_id': native_browser.CHAT_SESSION, 'messages': messages,
+                'next_before': None}, request_ids
+
+    def test_sqlite_evidence_requires_verbatim_text_order_pairs_and_durable_receipts(self):
+        with tempfile.TemporaryDirectory(prefix='mygpt-text-evidence-') as temp:
+            path = Path(temp) / 'chat.sqlite3'
+            history, request_ids = self.make_chat_database(path)
+            rows = native_browser.verify_chat_sqlite(path, history, request_ids)
+            self.assertEqual(len(rows), 4)
+            for mutation in ('text', 'pair', 'receipt'):
+                with self.subTest(mutation=mutation):
+                    connection = sqlite3.connect(path)
+                    try:
+                        connection.execute('BEGIN')
+                        if mutation == 'text':
+                            connection.execute('UPDATE chat_messages SET content=? WHERE message_id=?',
+                                               ('changed', rows[0]['message_id']))
+                        elif mutation == 'pair':
+                            connection.execute('UPDATE chat_messages SET reply_to_message_id=? WHERE message_id=?',
+                                               ('wrong', rows[1]['message_id']))
+                        else:
+                            connection.execute('DELETE FROM chat_request_receipts WHERE request_id=?',
+                                               (request_ids[0],))
+                        connection.commit()
+                        with self.assertRaises(AssertionError):
+                            native_browser.verify_chat_sqlite(path, history, request_ids)
+                        if mutation == 'text':
+                            connection.execute('UPDATE chat_messages SET content=? WHERE message_id=?',
+                                               (rows[0]['content'], rows[0]['message_id']))
+                        elif mutation == 'pair':
+                            connection.execute('UPDATE chat_messages SET reply_to_message_id=? WHERE message_id=?',
+                                               (rows[0]['message_id'], rows[1]['message_id']))
+                        connection.commit()
+                    finally:
+                        connection.close()
+            # Missing databases must never be silently created by verification.
+            with self.assertRaises(AssertionError):
+                native_browser.verify_chat_sqlite(Path(temp) / 'absent.sqlite3', history, request_ids)
+            self.assertFalse((Path(temp) / 'absent.sqlite3').exists())
+
+    def valid_report(self):
+        return {'ok': True, 'os': 'win32', 'browser': 'Microsoft Edge', 'browser_version': 'synthetic',
+                'exe_sha256': 'a'*64, 'native_math_preview': True, 'native_text_chat': True,
+                'native_text_restart_restore': True, 'synthetic_provider_calls': 2, 'synthetic_model_calls': 2,
+                'stopped_provider_connection_attempts': 0, 'live_model_calls': 0,
+                'javascript_error_count': 0, 'external_request_count': 0,
+                'text_chat': {'session_id': native_browser.CHAT_SESSION, 'turns': 2,
+                    'first_port': 10001, 'second_port': 10002, 'previous_port_reserved': True,
+                    'sqlite_rows': [{}, {}, {}, {}],
+                    'request_ids': ['synthetic-a', 'synthetic-b'],
+                    'read_only_restart_requests': [{'method': 'GET', 'path': '/desktop-api/chat-history'}]}}
+
+    def test_builder_requires_native_edge_text_sqlite_restart_and_zero_restore_calls(self):
+        report = self.valid_report()
+        build.verify_browser_report(report, 'a'*64)
+        for key in report:
+            with self.subTest(missing=key):
+                missing = copy.deepcopy(report)
+                del missing[key]
+                with self.assertRaises(ValueError):
+                    build.verify_browser_report(missing, 'a'*64)
+        for key, value in [('browser', 'Chromium fallback'), ('exe_sha256', 'b'*64),
+                           ('native_text_chat', 1), ('synthetic_provider_calls', 3), ('synthetic_model_calls', 0),
+                           ('stopped_provider_connection_attempts', 1), ('live_model_calls', 1),
+                           ('javascript_error_count', 1), ('external_request_count', 1)]:
+            with self.subTest(key=key, value=value):
+                changed = copy.deepcopy(report)
+                changed[key] = value
+                with self.assertRaises(ValueError):
+                    build.verify_browser_report(changed, 'a'*64)
+        for key, value in [('second_port', 10001), ('first_port', True), ('previous_port_reserved', False),
+                           ('sqlite_rows', [{}, {}]),
+                           ('request_ids', ['same', 'same']), ('read_only_restart_requests', []),
+                           ('read_only_restart_requests', [{'method': 'POST', 'path': '/desktop-api/local-chat'}])]:
+            with self.subTest(text_key=key):
+                changed = copy.deepcopy(report)
+                changed['text_chat'][key] = value
+                with self.assertRaises(ValueError):
+                    build.verify_browser_report(changed, 'a'*64)
+
+    def test_browser_script_keeps_native_boundary_and_has_no_fallback_browser(self):
+        text = (ROOT / 'tools/desktop_browser_test.py').read_text()
+        self.assertIn("pw.chromium.launch(channel='msedge', headless=True)", text)
+        self.assertNotIn('Chromium fallback', text)
+        self.assertIn('provider.stop_provider()', text)
+        self.assertIn("home / 'user/data/chat.sqlite3'", text)
+        self.assertIn("mode=ro", text)
+        self.assertIn('response.request.post_data_json', text)
+        self.assertIn('messages.all_text_contents() == expected', text)
+        self.assertIn('assert after_rows == before_rows', text)
+        self.assertIn("entry['method'] == 'GET'", text)
+        self.assertIn('provider.stopped_connection_attempts == 0', text)
+        self.assertIn('with reserve_previous_port(first_port):', text)
+        self.assertIn("oversized = '测' * 4001", text)
+        self.assertIn("input_value() == oversized", text)
+        self.assertIn("to_contain_text('不会截断或发送')", text)
 
 
 class LocalArchiveCompatibilityTests(unittest.TestCase):

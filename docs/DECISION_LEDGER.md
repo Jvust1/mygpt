@@ -114,3 +114,7 @@ Companion V2 uses Android Picture-in-Picture as the first cross-application 3714
 
 ## D038 — supervision is explicit Book signal + local MyGPT consent
 MyGPT does not infer attention, motivation or failure from inactivity, screen observation or time spent. Supervision cues are driven only by same-signature explicit Book study events plus MyGPT-local per-session user consent. Book cannot enable supervision. PRACTICE_REPEATED_ERROR stays QUIET without opt-in and can yield GENTLE_CHECK_IN only after local opt-in and the cooldown gate. End/revoke clears consent.
+
+
+## D039 — desktop text recovery reuses companion persistence
+The existing desktop form now uses the companion runtime and SQLite paired-message/receipt transaction, with a server-owned session independent of ephemeral browser origin. A hash-only durable dispatch claim prevents failed or interrupted same-ID reexecution; only a successful receipt establishes saved state. History reads are protected, paginated and never invoke the model. Conversation storage is separate from notes/long-term memory, and the existing learning backup explicitly excludes chat. See [desktop text contract](DESKTOP_TEXT_CHAT_20261002.md). New exact-head frozen-EXE/Edge verification and separately authorized real-model testing are required; prior checkpoint evidence is not inherited.

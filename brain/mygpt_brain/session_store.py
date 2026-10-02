@@ -108,6 +108,17 @@ class ChatSessionStore:
                            ON DELETE CASCADE
                    )"""
             )
+            # Additive dispatch journal: failed/ambiguous desktop requests must
+            # not contact the provider again merely because a client retries.
+            # No transcript copy, retention policy, or schema-2 rewrite.
+            self._db.execute(
+                """CREATE TABLE IF NOT EXISTS chat_dispatch_claims(
+                       request_id TEXT PRIMARY KEY,
+                       session_id TEXT NOT NULL,
+                       fingerprint TEXT NOT NULL,
+                       generation TEXT NOT NULL
+                   )"""
+            )
             if row is not None and row["value"] == "1":
                 self._db.execute("ALTER TABLE chat_sessions ADD COLUMN revision TEXT NOT NULL DEFAULT ''")
                 self._db.execute("ALTER TABLE chat_request_receipts ADD COLUMN compacted_prefix_json TEXT")
@@ -125,6 +136,62 @@ class ChatSessionStore:
 
     def __exit__(self, *_args) -> None:
         self.close()
+
+    def claim_dispatch(self, request_id: str, session_id: str, fingerprint: str) -> tuple[bool, str]:
+        """Persist the no-reexecution boundary before contacting a provider.
+
+        A false fresh flag requires receipt recovery or an explicit unknown-outcome
+        error, never a second dispatch. The generation binds admission to this
+        claim lifecycle, including deletion before the runtime history snapshot. Claims retain hashes only and intentionally
+        survive missing/failed exchanges; they are not proof of a saved reply.
+        Explicit delete_session removes that session's claims with its history.
+        """
+        with self._lock, self._db:
+            self._db.execute("BEGIN IMMEDIATE")
+            prior = self._db.execute(
+                "SELECT session_id, fingerprint, generation FROM chat_dispatch_claims WHERE request_id=?",
+                (request_id,),
+            ).fetchone()
+            if prior is not None:
+                if (prior["session_id"], prior["fingerprint"]) != (session_id, fingerprint):
+                    raise ValueError("request_id_conflict")
+                return False, str(prior["generation"])
+            generation = uuid4().hex
+            self._db.execute(
+                "INSERT INTO chat_dispatch_claims(request_id,session_id,fingerprint,generation) VALUES(?,?,?,?)",
+                (request_id, session_id, fingerprint, generation),
+            )
+            return True, generation
+
+    def dispatch_is_current(self, request_id: str, generation: str) -> bool:
+        with self._lock:
+            return self._db.execute(
+                "SELECT 1 FROM chat_dispatch_claims WHERE request_id=? AND generation=?",
+                (request_id, generation),
+            ).fetchone() is not None
+
+    def history_page(self, session_id: str, *, persona_id: str,
+                     before: int | None = None, limit: int = 40) -> dict:
+        """Bounded keyset page of saved visible messages; never load all bodies."""
+        if type(limit) is not int or not 1 <= limit <= 100:
+            raise ValueError("invalid_history_limit")
+        if before is not None and (type(before) is not int or not 1 <= before <= 2**63-1):
+            raise ValueError("invalid_history_cursor")
+        cursor_clause = "AND m.ordinal<?" if before is not None else ""
+        params = (session_id, persona_id, before, limit + 1) if before is not None else (session_id, persona_id, limit + 1)
+        with self._lock:
+            rows = self._db.execute(
+                """SELECT m.* FROM chat_messages m JOIN chat_sessions s USING(session_id)
+                   WHERE m.session_id=? AND s.persona_id=? AND m.role IN ('user','assistant')
+                   """ + cursor_clause + " ORDER BY m.ordinal DESC LIMIT ?",
+                params,
+            ).fetchall()
+        page = rows[:limit]
+        return {
+            "session_id": session_id,
+            "messages": [m.model_dump(mode="json") for m in self._messages_from_rows(list(reversed(page)))],
+            "next_before": int(page[-1]["ordinal"]) if len(rows) > limit else None,
+        }
 
     def load_messages(self, session_id: str, *, persona_id: str | None = None) -> list[ChatMessage]:
         with self._lock:
@@ -378,7 +445,11 @@ class ChatSessionStore:
             cur = self._db.execute(
                 "DELETE FROM chat_sessions WHERE session_id=?", (session_id,)
             )
-            if cur.rowcount > 0:
+            claims = self._db.execute(
+                "DELETE FROM chat_dispatch_claims WHERE session_id=?", (session_id,)
+            )
+            deleted = cur.rowcount > 0 or claims.rowcount > 0
+            if deleted:
                 epoch = int(self._db.execute("SELECT value FROM chat_meta WHERE key='deletion_epoch'").fetchone()[0])
                 self._db.execute("UPDATE chat_meta SET value=? WHERE key='deletion_epoch'", (str(epoch + 1),))
-        return cur.rowcount > 0
+        return deleted

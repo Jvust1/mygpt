@@ -3,6 +3,7 @@ name: Integrated companion fusion acceptance
 on:
   push:
     branches:
+      - feat/desktop-text-history-dot-20261002
       - feat/companion-fusion-story-dot-20260930
       - feat/sklearn-unicode-recall-dot-20260930
       - fix/book-unicode-budget-dot-20260930

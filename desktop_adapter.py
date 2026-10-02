@@ -15,13 +15,17 @@ BOUNDARY='不自动抓屏或控制其他应用；没有后台云推理。真实�
 class Service:
     def __init__(self,server):
         self.server=server.start();self.url=server.origin+'/desktop/';self.health_url=self.url
-    def close(self):self.server.close()
+    def close(self):
+        try:self.server.httpd.desktop_chat.close()
+        finally:self.server.close()
 
 
 def start(home,root,intake=False):
     server=create_local_server(root=root,authorization_seconds=3600,enable_selection_intake=intake)
     try:return Service(extend(server,home))
-    except BaseException:server.close();raise
+    except BaseException:
+        if hasattr(server.httpd, 'desktop_chat'):server.httpd.desktop_chat.close()
+        server.close();raise
 
 
 def self_test(home,root):

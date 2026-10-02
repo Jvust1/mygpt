@@ -7,7 +7,7 @@ from unittest.mock import patch
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'brain'))
 from desktop_adapter import start
-from desktop_workspace import local_chat, NoRedirect
+from desktop_chat import validate_request
 
 class WorkspaceHTTPTests(unittest.TestCase):
     def setUp(self):
@@ -45,7 +45,7 @@ class WorkspaceHTTPTests(unittest.TestCase):
         status=self.httpd.engine.status()
         self.assertEqual(status['requests_started'],0);self.assertFalse(status['selection_intake_enabled'])
     def test_consent_required_before_any_local_call(self):
-        with patch('desktop_workspace.build_opener') as op:
+        with patch('desktop_chat.OllamaResponder') as op:
             status=self.call('/desktop-api/local-chat',{'consent':False,'port':11434,'model':'test','prompt':'x'},self.headers())[0]
             self.assertEqual(status,400);op.assert_not_called()
     def test_invalid_backup_preserves_state(self):
@@ -54,20 +54,12 @@ class WorkspaceHTTPTests(unittest.TestCase):
         self.assertEqual(self.httpd.workspace.read(),before)
 
 class LocalModelBoundaryTests(unittest.TestCase):
-    def test_mock_response_no_real_model(self):
-        with patch('desktop_workspace.build_opener') as op:
-            op.return_value.open.return_value.__enter__.return_value.read.return_value=b'{"message":{"content":"mock only"}}'
-            r=local_chat({'consent':True,'port':11434,'model':'test-local','prompt':'one question'})
-            self.assertEqual(r['reply'],'mock only');self.assertFalse(r['quality_verified'])
-            req=op.return_value.open.call_args.args[0]
-            self.assertEqual(req.full_url,'http://127.0.0.1:11434/api/chat')
-            self.assertFalse(json.loads(req.data)['stream'])
     def test_cloud_model_and_invalid_port_refused(self):
+        from uuid import uuid4
         for port,model in [(0,'test'),(True,'test'),(65536,'test'),(11434,'test-cloud')]:
-            with patch('desktop_workspace.build_opener') as op:
-                with self.assertRaises(ValueError):local_chat({'consent':True,'port':port,'model':model,'prompt':'x'})
+            with patch('desktop_chat.OllamaResponder') as op:
+                with self.assertRaises(ValueError):
+                    validate_request({'consent':True,'port':port,'model':model,'prompt':'x','request_id':str(uuid4())})
                 op.assert_not_called()
-    def test_redirect_not_followed(self):
-        with self.assertRaises(ValueError):NoRedirect().redirect_request(None,None,None,None,None,'https://external.invalid')
 
 if __name__=='__main__':unittest.main()
