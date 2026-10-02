@@ -3,6 +3,7 @@
 Hosted frozen-EXE/Edge coverage lives in tools/desktop_browser_test.py.
 """
 import asyncio
+from contextlib import closing
 import http.client
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -104,9 +105,13 @@ class DesktopChatTests(unittest.TestCase):
         self.assertIn({'role':'assistant','content':self.provider.reply},self.provider.calls[1]['messages'])
         self.assertEqual(self.httpd.desktop_chat.runtime._sessions,{})
         self.assertEqual(self.httpd.desktop_chat.runtime._requests,{})
-        with sqlite3.connect(self.home/'data/chat.sqlite3') as db:
+        with closing(sqlite3.connect(self.home/'data/chat.sqlite3')) as db:
             self.assertEqual(db.execute('SELECT COUNT(*) FROM chat_request_receipts').fetchone()[0],2)
             self.assertEqual(db.execute("SELECT COUNT(*) FROM chat_messages WHERE role!='system'").fetchone()[0],4)
+        # A Connection transaction context alone does not close the handle.
+        # Retain the reference so this regression also detects leaks on Linux.
+        with self.assertRaises(sqlite3.ProgrammingError):
+            db.execute('SELECT 1')
         self.provider.close();self.provider.close=lambda:None
         old_port=self.httpd.server_port;self.restart()
         self.assertNotEqual(self.httpd.server_port,old_port)
