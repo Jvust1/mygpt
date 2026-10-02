@@ -21,6 +21,7 @@ on:
       - fix/dependency-locks-dot-20261002
       - fix/governance-checkpoint-dot-20261002
       - fix/npm-discovery-dot-20261002
+      - fix/llama-native-gate-dot-20261002
       - fix/android-required-gate-dot-20261002
       - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
@@ -35,6 +36,9 @@ on:
       - '.github/workflows/desktop-delivery.yml'
       - 'scripts/serve.mjs'
       - 'android_spike/**'
+      - 'android_llm_spike/**'
+      - 'scripts/verify_llama_*.py'
+      - '.github/workflows/llama-android-acceptance.yml'
       - 'android_*/**/build.gradle.kts'
       - 'android_*/app/src/main/assets/**'
       - 'third_party/**'
@@ -164,6 +168,12 @@ jobs:
     permissions:
       contents: read
 
+  llama-native:
+    if: github.repository == 'Jvust1/mygpt'
+    uses: ./.github/workflows/llama-android-acceptance.yml
+    permissions:
+      contents: read
+
   source-recovery:
     if: github.repository == 'Jvust1/mygpt'
     uses: ./.github/workflows/source-delivery.yml
@@ -179,7 +189,7 @@ jobs:
 
   fusion-required-gate:
     if: ${{ always() }}
-    needs: [production-components, android-java-boundaries, source-recovery, windows-desktop]
+    needs: [production-components, android-java-boundaries, llama-native, source-recovery, windows-desktop]
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:
@@ -191,4 +201,4 @@ jobs:
       - name: Require every aggregate component to execute successfully
         env:
           REQUIRED_JOB_RESULTS: ${{ toJSON(needs) }}
-        run: python scripts/assert_required_jobs.py production-components android-java-boundaries source-recovery windows-desktop
+        run: python scripts/assert_required_jobs.py production-components android-java-boundaries llama-native source-recovery windows-desktop

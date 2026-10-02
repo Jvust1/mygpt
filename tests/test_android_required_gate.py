@@ -77,9 +77,9 @@ class WorkflowWiringTests(unittest.TestCase):
     def test_aggregate_always_requires_the_entire_reusable_workflow(self):
         body = job(FUSION, "fusion-required-gate")
         self.assertIn("if: ${{ always() }}", body)
-        self.assertIn("needs: [production-components, android-java-boundaries, source-recovery, windows-desktop]", body)
+        self.assertIn("needs: [production-components, android-java-boundaries, llama-native, source-recovery, windows-desktop]", body)
         self.assertIn("REQUIRED_JOB_RESULTS: ${{ toJSON(needs) }}", body)
-        self.assertIn("run: python scripts/assert_required_jobs.py production-components android-java-boundaries source-recovery windows-desktop", body)
+        self.assertIn("run: python scripts/assert_required_jobs.py production-components android-java-boundaries llama-native source-recovery windows-desktop", body)
         self.assertNotIn("continue-on-error", body)
         self.assertIn("uses: ./.github/workflows/android-spike.yml", job(FUSION, "android-java-boundaries"))
 
