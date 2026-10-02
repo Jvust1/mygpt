@@ -19,6 +19,7 @@ on:
       - fix/lossless-receipt-storage-dot-20261002
       - fix/windows-exact-head-dot-20261002
       - fix/dependency-locks-dot-20261002
+      - fix/governance-checkpoint-dot-20261002
       - fix/android-required-gate-dot-20261002
       - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
@@ -42,6 +43,7 @@ on:
       - '.github/workflows/source-delivery.yml'
       - 'scripts/source_bundle.py'
       - 'scripts/assert_required_jobs.py'
+      - 'scripts/validate_governance.py'
       - '.gitmodules'
       - 'governance/project_state.json'
       - 'docs/HANDOFF.md'
@@ -131,6 +133,7 @@ jobs:
           if-no-files-found: error
       - name: Require repository regressions and compile runtime
         run: |
+          python scripts/validate_governance.py
           python -m unittest discover -s tests -p 'test_*.py' -q
           node --test tests/*.test.mjs
           python -m compileall -q brain/mygpt_brain

@@ -1,76 +1,60 @@
-# mygpt · 从这里启动
+# mygpt · 启动、恢复与升级
 
-当前交付是 **完整源码候选**，不是 APK，也不是已接入 GPT 的成品。包含 Jonah、浏览器界面、Python Brain、选段导入、测试和依赖清单，不再需要按顺序拼接旧增量 ZIP。第三方 Python/浏览器依赖、模型权重和 Git 历史不在包内。
+<!-- governance-checkpoint {"repository":"Jvust1/mygpt","branch":"fix/dependency-locks-dot-20261002","tested_commit":"68ea57e1aec5488b6ff24973f7ef2b781ca29bff","pr":61,"run_id":36973557038} -->
 
-## 现在可以实际使用的路径
+最后已验证源码 checkpoint：[Draft PR #61](https://github.com/Jvust1/mygpt/pull/61)，分支 `fix/dependency-locks-dot-20261002`，
+提交 `68ea57e1aec5488b6ff24973f7ef2b781ca29bff`；[run 36973557038](https://github.com/Jvust1/mygpt/actions/runs/36973557038) 9 个 job 全部成功。
+这是已验证输入源码的记录；本次文档/校验器 checkout 的身份和新 CI 必须另外取得，不能继承这次绿灯。
 
-浏览器明确选择或输入一段内容 → 用户预览并同意 → 127.0.0.1 本机 Python → 来源/时效/权限校验 → Brain → TestModel 固定确认回复。
+本次新的公开恢复 artifact 仅为 source-recovery-evidence 中的 JSON/hash 摘要，不含完整源码 ZIP 或原始日志。完整 build/恢复验收仍执行，但旧源码树含历史私有引用，暂不重新公开整包；#61 的 source ID/hash 只是历史验证记录，不能当成本次可下载源码交付。完整包仅可通过另行批准的私有交付取得。
 
-**TestModel 不是大语言模型。** 它用于证明输入、来源身份、取消、过期和返回链路正确，不能依据固定确认回复认为已经得到真实讲解。真实 Book 自动读取和付费模型均未启用。自己导入的内容永远标为 `USER_SUPPLIED_UNVERIFIED`，不会冒充已认证的 Book 来源。
+## 先保证数据安全
 
-## 1. 验证并解压完整源码
+源码 ZIP、依赖、模型和私有皮肤是不同输入。源码包不包含离线依赖、外部 Gitlink 源码、模型或用户数据库。
+恢复到新的目录，先比对可信外部 SHA-256；内部 SOURCE_MANIFEST 不是签名。
+升级 schema 2 前先停止全部旧进程，并在本机私有位置备份完整旧数据目录；不要上传数据库。
+禁止新旧进程混用同一数据库，也不要原地降级。旧回执保持原字节，本轮没有迁移真实用户数据。
 
-从本批交付的正式清单取得 `mygpt-source.zip` 对应 SHA-256。Windows PowerShell 可执行 `Get-FileHash .\mygpt-source.zip -Algorithm SHA256`，Linux 可用 `sha256sum mygpt-source.zip`，先比较外部清单，再解压到一个**新的**目录，不覆盖旧项目。
-
-源码包含 `SOURCE_MANIFEST.json`，逐项记录文件、Git blob、SHA-256 和固定 source commit。内部清单不能单独证明真实性，外部哈希也必须来自可信交付记录。代码内验证器支持 `python scripts/source_bundle.py verify <ZIP路径> --sha256 <正式哈希>`；验证器本身也应来自可信源码。
-
-## 2. 创建隔离 Python 环境
-
-需要 Python 3.11+；本项目固定 SDK 的正式回归环境是 Linux CPython 3.13 x86_64。安装是使用者显式执行的网络操作，启动器不会自行下载安装。以下命令在完整源码根目录执行。
-
-Windows PowerShell（命令形式可用，当前没有 Windows 实机验收）：
-
-```powershell
-py -3.13 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".\brain[test,integrations]"
-.\.venv\Scripts\python.exe run_mygpt.py doctor
+```sh
+python scripts/source_bundle.py verify /path/to/mygpt-source.zip --sha256 9e77a8f3f315f3a5abfc53d410f93721de857a3fc6a86964423ce0870b4c4949
 ```
 
-Linux CPython 3.13 x86_64，可使用已验证的哈希锁：
+上述哈希只属于 #61 的 472 源文件输入包，另有一个 SOURCE_MANIFEST 成员；本次修改后的源码需另行打包和验证。
+
+## 最短本地合成演示
+
+在新源码根目录创建独立环境。正式基线为 Linux CPython 3.13 x86_64；安装是使用者显式网络操作，启动器不会安装或下载模型。
 
 ```sh
 python3.13 -m venv .venv
 .venv/bin/python -m pip install --only-binary=:all: --require-hashes -r brain/requirements-linux-py313.lock
 .venv/bin/python run_mygpt.py doctor
+.venv/bin/python run_mygpt.py start
 ```
 
-不要把 Linux 单平台 wheel 锁套到 Windows、macOS 或 Android。其他平台的顶层依赖安装不等于已经获得相同的可复现性或设备验收。`doctor` 是只读检查，报告缺失源码/角色资源、Python 版本以及固定顶层依赖是否匹配；READY 不等于所有传递依赖、浏览器或设备均已测试。
+在同一电脑打开控制台打印的 `http://127.0.0.1:<port>/host/brain.html`。TestModel 返回固定确认回复，不是真实模型讲解。
+要明确开启本次的一条内容输入，改用 `run_mygpt.py start --enable-selection-intake`，再打开 `/host/selection.html`；必须预览、同意后才发送到本机。
+内容标为 USER_SUPPLIED_UNVERIFIED，不能冒充真实 Book；授权过期/撤销后重新显式启动。Ctrl+C 停止。
+数学预览已有 pinned KaTeX/MathML 与原始 LaTeX fallback；不保证数学正确性。
 
-## 3. 启动
+Windows PowerShell 的合成开发演示：
 
-用同一虚拟环境解释器执行（以下用 `python` 表示它）：
-
-```sh
-# 只启动固定合成样例；默认不接收自选文件或文字
-python run_mygpt.py start
-
-# 明确启用本次服务的一条内容输入功能
-python run_mygpt.py start --enable-selection-intake
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".\brain[test,integrations]"
+.\.venv\Scripts\python.exe run_mygpt.py doctor
+.\.venv\Scripts\python.exe run_mygpt.py start
 ```
 
-服务打印 `http://127.0.0.1:<随机端口>`。在同一电脑浏览器打开：
+Hosted Windows #61 的 EXE/Edge 与原生 Python 哈希锁安装均已通过；上面的简短开发安装命令本身不是该完整锁流程，也不是用户设备验收。完整 Linux/Windows 锁流程见 #61 源码中的 docs/PYTHON_DEPENDENCY_LOCKS_20261002.md；勿将其 cross-target 生成报告冒充 native 安装证据。
+不要将 Linux wheel 锁用于 Windows/macOS/Android。doctor READY 不是所有平台/功能通过。
 
-- `/host/brain.html`：固定样例，已有 Jonah 入口；
-- `/host/selection.html`：导入选段或手动输入；需要上方显式开启 intake。
+已有自己选定并安装的 Ollama 聊天模型时，开发者可显式执行 `python brain/scripts/chat_local_ollama.py --model YOUR_INSTALLED_CHAT_MODEL`。
+该路径的真实模型质量仍未验收；长期记忆只接受显式命令，`:forget` 删除活动记忆但保留审计，并非彻底清除。
 
-只选择文件不会发送。先预览，再勾选同意，最后点击发送到本机；只有进一步明确请求才进入 Brain。可取消、清除选段、撤销本次授权。正文只在本机进程内存中暂存，不自动上传云端或保存到 GitHub/Drive；不要拿密码、私人聊天或金融账户内容作样例。
+## 故障与下一步
 
-终端按 Ctrl+C 停止。撤销或授权超时后应停止并重新显式启动，刷新页面不能恢复已撤销的服务授权。服务只有 loopback 监听，不能在手机中把 `127.0.0.1` 当电脑地址；本批不开放局域网、不建隧道、不改防火墙。
-
-## 常见阻塞
-
-`BLOCKED`：按 doctor 的 missing_files/dependencies 处理。缺文件时恢复完整源码而不是只拷 host 目录；缺 SDK 或版本不符时先修复独立虚拟环境。不要为了通过检查删掉版本约束。
-
-`selection intake disabled`：使用者必须显式以 `--enable-selection-intake` 启动，不通过更改前端标识绕过。
-
-回复是固定文本：这是当前明确边界，并非模型账号风控或故障。当前还不提供真实智能讲解。
-
-公式：输入合同保留 LaTeX，但界面仍以原始 LaTeX 展示，尚未完成正式数学排版。浏览器自动化视口通过也不是 Android APK、软键盘或跨 App 悬浮窗验收。
-
-## 开发与恢复
-
-代码/状态以 GitHub 当前非默认分支为权威，完整源码 ZIP 是固定版本恢复点。后续治理提交可能比包内状态更新，应先读最新 `governance/project_state.json`。旧增量包仍是历史证据，不删除。
-
-打包器从指定 40 位 commit 的 Git blobs 读取，不读取未提交工作树；拒绝非白名单路径、链接、字体/密钥/缓存/模型文件和超限内容。它不是对普通源码中潜藏秘密的全面 DLP 审计。打包与校验不会改 Git ref，不安装依赖。详情见源码内脚本和测试。
-
-开发用例：`python -m unittest discover -s tests -p 'test_*.py' -v`；Brain 严格集成用例使用 `brain/scripts/verify_integrations.py`，零跳过才可验收。正式 run、哈希和剩余问题以本批 checkpoint/PR 与成果清单为准。
+缺文件先恢复完整包，缺依赖在独立环境修复，不移除版本限制。loopback 只用于同一台电脑；手机的 127.0.0.1 不是电脑，不自动建隧道或开放防火墙。
+Android/真机路线见 [Companion V2 验收](docs/COMPANION_V2_XIAOMI14_ACCEPTANCE.md)，执行前仍须确认设备、私有输入及许可权限。
+当前状态与证据：[CURRENT_STATE](docs/CURRENT_STATE.md)、[检查点](docs/GOVERNANCE_CHECKPOINT_20261002.md)。
+旧启动说明的公开不可变来源与 bytes/SHA 见 [HISTORICAL 索引](docs/HISTORICAL_GOVERNANCE_LEDGER_20261002.md)；索引不含原文。
