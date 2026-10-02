@@ -49,7 +49,7 @@ class DependencyWorkflowTests(unittest.TestCase):
         self.assertIn('brain/tests/test_dependency_lock.py brain/tests/test_acceptance_tools.py', windows)
         self.assertIn('dependency-tests.xml', windows)
         self.assertIn('scripts/assert_required_jobs.py windows-native', windows)
-        self.assertIn('needs: [production-components, android-java-boundaries, source-recovery, windows-desktop]', linux)
+        self.assertIn('needs: [production-components, android-java-boundaries, llama-native, source-recovery, windows-desktop]', linux)
 
     def test_only_fixed_sha_actions_and_source_only_recovery_scope(self):
         for name in ('companion-fusion-acceptance.yml', 'desktop-delivery.yml'):

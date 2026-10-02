@@ -22,3 +22,8 @@ gradle -p android_llm_spike :bridge:assembleRelease
 
 The source pin is the git submodule commit recorded in
 `third_party/llama.cpp/NOTICE.md`.
+
+The [bounded native CI gate](../docs/LLAMA_NATIVE_BUILD_GATE_20261002.md) builds
+this existing library, bridge and local app without models or private assets.
+Its explicit CI-only stable-NDK override and metadata-only evidence do not
+change normal local builds or establish inference/device acceptance.
