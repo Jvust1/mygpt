@@ -1,0 +1,70 @@
+{
+  "actual_npm_ci_invocations": 4,
+  "base_source_commit": "f08c1d9695b34e40fb735159a12b3a53b71686de",
+  "browser_binary_hash_locked": false,
+  "browser_launched": false,
+  "checkout_identity": "UNCOMMITTED_LOCAL_CANDIDATE_BASE_PLUS_DELTA",
+  "clean_installs": [
+    {
+      "complete_installed_set": {
+        "playwright": "1.62.1",
+        "playwright-core": "1.62.1"
+      },
+      "independent_empty_cache": true,
+      "independent_empty_prefix": true,
+      "input_bytes_unchanged": true,
+      "npm_ls_exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "complete_installed_set": {
+        "playwright": "1.62.1",
+        "playwright-core": "1.62.1"
+      },
+      "independent_empty_cache": true,
+      "independent_empty_prefix": true,
+      "input_bytes_unchanged": true,
+      "npm_ls_exit_code": 0,
+      "status": "PASS"
+    }
+  ],
+  "corrupt_core_sri": {
+    "diagnostic": "EINTEGRITY",
+    "exit_code": 1,
+    "independent_empty_cache": true,
+    "input_bytes_unchanged": true,
+    "status": "REJECTED"
+  },
+  "failed": 0,
+  "hosted_ci_run": false,
+  "inputs": {
+    "package-lock.json": {
+      "bytes": 1687,
+      "sha256": "e47305046a39eaf97b5c6ffe362711c4319a2016903c89d7b3f00e17cab913a2"
+    },
+    "package.json": {
+      "bytes": 129,
+      "sha256": "453ec533b6594cc278408288b2e8dc7072f0427c7bc174ccc19a1ff3d7fae589"
+    }
+  },
+  "javascript_tests": 70,
+  "manifest_lock_mismatch": {
+    "diagnostic": "EUSAGE_MANIFEST_LOCK_OUT_OF_SYNC",
+    "exit_code": 1,
+    "input_bytes_unchanged": true,
+    "status": "REJECTED"
+  },
+  "node": "v24.19.0",
+  "npm": "11.9.0",
+  "observed_date_utc": "2026-10-02",
+  "offline_browser_lock_tests": 7,
+  "physical_device_acceptance": false,
+  "platform": "linux",
+  "root_python_tests": 204,
+  "schema": "mygpt_browser_npm_local_acceptance_v1",
+  "scope": "LOCAL_LINUX_NPM_CONTENT_LOCK_ONLY",
+  "skipped": 0,
+  "status": "PASS",
+  "strict_python_tests": 912,
+  "upstream_component_tests": 49
+}
