@@ -3,15 +3,37 @@
   "version": "2026.09.25-rc1",
   "branch": "feat/desktop-delivery-20260925",
   "base_commit": "fa09ad5ed93e3159edd585843a4f082d09f680b2",
-  "status": "NATIVE_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
+  "status": "HISTORICAL_PACKAGE_NOT_CURRENT_CANDIDATE_ACCEPTANCE",
   "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
   "release_workflow_run": 36149636550,
   "identity_note": "The distributed package uses release_source_commit. This subsequent governance-only commit is not preclaimed as its build source.",
-  "source_systems_unchanged": ["Book", "StudyMate", "ChatContextVault"],
-  "features": ["companion", "explicit_focus_sessions", "local_notes", "revision_conflict_rejection", "idempotent_backup_merge", "opt_in_local_ollama_request", "preserved_volatile_selection_intake"],
-  "limits": ["no_native_system_overlay", "no_automatic_cloud_sync", "no_automatic_screen_capture", "live_model_quality_unverified", "real_book_bridge_device_acceptance_pending", "unsigned_executable"],
+  "source_systems_unchanged": [
+    "Book",
+    "StudyMate",
+    "ChatContextVault"
+  ],
+  "features": [
+    "companion",
+    "explicit_focus_sessions",
+    "local_notes",
+    "revision_conflict_rejection",
+    "idempotent_backup_merge",
+    "opt_in_local_ollama_request",
+    "preserved_volatile_selection_intake"
+  ],
+  "limits": [
+    "no_native_system_overlay",
+    "no_automatic_cloud_sync",
+    "no_automatic_screen_capture",
+    "live_model_quality_unverified",
+    "real_book_bridge_device_acceptance_pending",
+    "unsigned_executable"
+  ],
   "native_windows_tests": "PASS_ON_GITHUB_HOSTED_WINDOWS_AND_MICROSOFT_EDGE",
-  "local_persistence_tests": {"passed": 8, "failed": 0},
+  "local_persistence_tests": {
+    "passed": 8,
+    "failed": 0
+  },
   "local_full_sdk_tests": "LOCAL_DEPENDENCIES_UNAVAILABLE; full SDK acceptance performed on exact pinned Linux CI instead",
   "verification_result": {
     "linux_full_pytest_passed": 490,
@@ -41,7 +63,12 @@
     "bytes": 36004941,
     "uploaded_snapshot_sha256": "61bf91be7b2d3545c76c9489d45000dd8eb595433c122fbf2fa20ad1ed1b4a37",
     "github_artifact_id": 10870638144,
-    "contents": ["portable app", "exact source and tests", "Linux and Windows evidence", "checksums"],
+    "contents": [
+      "portable app",
+      "exact source and tests",
+      "Linux and Windows evidence",
+      "checksums"
+    ],
     "readback_scope": "Drive ID, name, byte count and parent verified; no claim of independent provider checksum readback"
   },
   "source_recovery": {
@@ -54,5 +81,12 @@
   "provider_calls_during_implementation": 0,
   "actual_user_device_tested": false,
   "pending_sync_this_release": [],
-  "other_project_pending_sync": "Unchanged; this closes only the specified desktop artifacts"
+  "other_project_pending_sync": "Unchanged; this closes only the specified desktop artifacts",
+  "historical_status": "NATIVE_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
+  "current_review": {
+    "branch": "fix/windows-exact-head-dot-20261002",
+    "input_commit": "16a731c47aa4c03956745caa63b5fbe0610e6cba",
+    "document": "docs/WINDOWS_EXACT_HEAD_20261002.md",
+    "scope": "Current candidate verification; no new public portable release. All original package identities below remain historical."
+  }
 }

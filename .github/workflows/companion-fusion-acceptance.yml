@@ -17,6 +17,7 @@ on:
       - fix/cli-input-recovery-dot-20261001
       - fix/wake-confidence-boundary-dot-20261001
       - fix/lossless-receipt-storage-dot-20261002
+      - fix/windows-exact-head-dot-20261002
       - fix/android-required-gate-dot-20261002
       - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
@@ -24,6 +25,11 @@ on:
     paths:
       - 'brain/**'
       - 'host/**'
+      - 'desktop*.py'
+      - 'desktop_ui/**'
+      - 'tools/build_windows_delivery.py'
+      - 'tools/desktop_browser_test.py'
+      - '.github/workflows/desktop-delivery.yml'
       - 'scripts/serve.mjs'
       - 'android_spike/**'
       - 'android_*/**/build.gradle.kts'
@@ -137,9 +143,16 @@ jobs:
     permissions:
       contents: read
 
+  windows-desktop:
+    if: github.repository == 'Jvust1/mygpt'
+    needs: production-components
+    uses: ./.github/workflows/desktop-delivery.yml
+    permissions:
+      contents: read
+
   fusion-required-gate:
     if: ${{ always() }}
-    needs: [production-components, android-java-boundaries, source-recovery]
+    needs: [production-components, android-java-boundaries, source-recovery, windows-desktop]
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:
@@ -151,4 +164,4 @@ jobs:
       - name: Require every aggregate component to execute successfully
         env:
           REQUIRED_JOB_RESULTS: ${{ toJSON(needs) }}
-        run: python scripts/assert_required_jobs.py production-components android-java-boundaries source-recovery
+        run: python scripts/assert_required_jobs.py production-components android-java-boundaries source-recovery windows-desktop

@@ -1,3 +1,19 @@
+# 2026-10-02 — Windows exact-head and frozen math-resource candidate
+
+Current review branch: `fix/windows-exact-head-dot-20261002`, based on verified
+PR #59 at `16a731c47aa4c03956745caa63b5fbe0610e6cba`.
+The current aggregate now requires actual Windows native EXE/browser/restart
+verification. The frozen KaTeX runtime and full MIT notices are explicitly
+packaged; CI publishes only bounded synthetic evidence, not software binaries.
+See [scope, local reproduction, commands and remaining gates](WINDOWS_EXACT_HEAD_20261002.md).
+
+The current candidate's exact head and final hosted result belong to its PR.
+Do not reuse the older Windows portable package or the #59 Linux/Android result
+as proof of this new Windows build. Main stays unchanged and release remains
+blocked on the separate policy/device/model/distribution requirements.
+
+## Historical input checkpoints
+
 # 2026-10-02 — lossless receipt/cache remediation candidate
 
 Current review branch: `fix/lossless-receipt-storage-dot-20261002`, based on

@@ -3,9 +3,9 @@
   "updated_date": "2026-10-02",
   "repository": "Jvust1/mygpt",
   "default_branch": "main",
-  "active_branch": "fix/lossless-receipt-storage-dot-20261002",
+  "active_branch": "fix/windows-exact-head-dot-20261002",
   "phase": "BOUNDED_AUDIT_REMEDIATION",
-  "status": "DRAFT_LOSSLESS_STORAGE_REMEDIATION_RELEASE_BLOCKED",
+  "status": "DRAFT_REVIEW_CANDIDATE_RELEASE_BLOCKED",
   "security_status": "PUBLIC_DRAFT_REVIEW_BRANCH_UNPROTECTED",
   "drive": {
     "folder_name": "mygpt",
@@ -118,7 +118,7 @@
     "final_target": "Live-backed character/skin runtime integrated with Book Android",
     "current_role": "Jonah remains a validated interaction prototype, not the final character-content authority"
   },
-  "next_step": "Verify this independent receipt/cache draft on its exact head, including fixed 1k/10k synthetic growth and existing production/Android/source gates. Then address Windows exact-head and governance consistency. Retention policy, main merge, distribution entitlement and physical-device acceptance remain separate decisions/evidence.",
+  "next_step": "Finish exact-head native Windows acceptance and inspect its synthetic evidence, then reconcile remaining governance and release decisions. Keep lossless receipt limits, no automatic history deletion, no public binary distribution and all physical-device/model gates explicit.",
   "authorized_e2e": {
     "status": "PASS_ARCHIVE_BACKED_READONLY_TESTMODEL",
     "book_authority_commit": "bf7aa490639bc2b2fcf382623b915d54f6cecf07",
@@ -1636,7 +1636,7 @@
   "receipt_storage_remediation_20261002": {
     "branch": "fix/lossless-receipt-storage-dot-20261002",
     "base_commit": "a5862faf8e976ca310bb4d743fea78c5c8211d01",
-    "status": "LOCAL_VERIFIED_HOSTED_EXACT_HEAD_PENDING",
+    "status": "INPUT_BASELINE_ACCEPTED_HOSTED_STORAGE_AND_AGGREGATE",
     "schema_version": 2,
     "upgrade_rule": "Stop all old processes and keep a private local pre-upgrade backup; no mixed-version use or in-place downgrade.",
     "durable_runtime_cache_entries": 0,
@@ -1662,6 +1662,27 @@
       "javascript": 70
     },
     "document": "docs/RECEIPT_STORAGE_BOUNDS_20261002.md",
-    "hosted_evidence": "Final exact candidate SHA/run/artifacts are recorded in this draft PR, not inferred from the input baseline."
+    "hosted_evidence": "Final exact candidate SHA/run/artifacts are recorded in this draft PR, not inferred from the input baseline.",
+    "verified_commit": "16a731c47aa4c03956745caa63b5fbe0610e6cba",
+    "verified_run_id": 36966318787,
+    "verified_pr": 59
+  },
+  "windows_exact_head_review_20261002": {
+    "branch": "fix/windows-exact-head-dot-20261002",
+    "base_commit": "16a731c47aa4c03956745caa63b5fbe0610e6cba",
+    "status": "DRAFT_IMPLEMENTATION_HOSTED_ACCEPTANCE_TRACKED_IN_PR",
+    "document": "docs/WINDOWS_EXACT_HEAD_20261002.md",
+    "required_gate": "fusion-required-gate requires production-components, android-java-boundaries, source-recovery and windows-desktop",
+    "scope": [
+      "repair verified missing KaTeX frozen resource",
+      "actual Windows native EXE/browser/math/restart",
+      "metadata and synthetic screenshot only in CI",
+      "preserve explicit private local ZIP packaging"
+    ],
+    "exe_published": false,
+    "actual_user_device_tested": false,
+    "distribution_license_verified": false,
+    "cross_platform_hash_lock_complete": false,
+    "current_acceptance_source": "Exact GitHub Actions run at the current draft PR head; do not reuse historical package acceptance."
   }
 }
