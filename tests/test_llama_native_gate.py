@@ -188,9 +188,10 @@ class ConfiguredToolchainTests(unittest.TestCase):
         self.report = self.root / "android_llm_spike/build/native-ci-config.properties"
         self.report.parent.mkdir(parents=True)
         self.write_config()
-        compiler = Path(self.private["ndk"]) / "bin/clang++"
+        compiler = Path(self.private["ndk"]) / "toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
         compiler.parent.mkdir(parents=True)
         compiler.write_text("synthetic compiler placeholder")
+        compiler.chmod(0o700)
         self.cache_data = {"CMAKE_COMMAND": self.private["cmake"], "CMAKE_MAKE_PROGRAM": self.private["ninja"],
                            "ANDROID_NDK": self.private["ndk"], "CMAKE_CXX_COMPILER": str(compiler),
                            "ANDROID_PLATFORM": "android-33", "CMAKE_BUILD_TYPE": "Release",
@@ -201,6 +202,12 @@ class ConfiguredToolchainTests(unittest.TestCase):
             cache.parent.mkdir(parents=True)
             cache.write_text("ANDROID_ABI:STRING=" + abi + "\n" + ''.join(k + ':STRING=' + v + '\n' for k, v in self.cache_data.items()))
             self.caches.append(cache)
+            report = cache.parent / "CMakeFiles" / toolchain.CMAKE / "CMakeCXXCompiler.cmake"
+            report.parent.mkdir(parents=True)
+            report.write_text('set(CMAKE_CXX_COMPILER "' + str(compiler) + '")\n'
+                              'set(CMAKE_CXX_COMPILER_ID "Clang")\n'
+                              'set(CMAKE_CXX_COMPILER_LOADED 1)\n'
+                              'set(CMAKE_CXX_COMPILER_ID_RUN 1)\n')
         self.kleidiai = self.caches[0].parent / "kleidiai-v1.24.0-src.tar.gz"
         self.kleidiai.write_bytes(b"SYNTHETIC ARCHIVE")
 
@@ -276,6 +283,79 @@ class ConfiguredToolchainTests(unittest.TestCase):
         for cache in self.caches:
             cache.write_text(cache.read_text().replace(self.cache_data['CMAKE_HOME_DIRECTORY'], '/wrong/source'))
         with self.assertRaises(ValueError):
+            self.inspect()
+
+    def test_compiler_report_is_required_even_when_compiler_cache_entry_exists(self):
+        for cache in self.caches:
+            report = cache.parent / 'CMakeFiles' / toolchain.CMAKE / 'CMakeCXXCompiler.cmake'
+            original = report.read_text()
+            report.unlink()
+            with self.subTest(abi=cache.parent.name), self.assertRaisesRegex(ValueError, '^native_compiler_report_missing$'):
+                self.inspect()
+            report.write_text(original)
+
+    def test_generated_compiler_report_accepts_legitimately_uncached_ndk_compiler(self):
+        for cache in self.caches:
+            cache.write_text('\n'.join(line for line in cache.read_text().splitlines()
+                                       if not line.startswith('CMAKE_CXX_COMPILER:')) + '\n')
+        self.assertTrue(self.inspect()['configured_toolchain_verified'])
+
+    def test_forged_or_malformed_compiler_reports_fail_closed(self):
+        report = self.caches[0].parent / 'CMakeFiles' / toolchain.CMAKE / 'CMakeCXXCompiler.cmake'
+        original = report.read_text()
+        compiler = self.cache_data['CMAKE_CXX_COMPILER']
+        changes = [original.replace('"Clang"', '"GNU"'),
+                   original.replace('"' + compiler + '"', '"${PRIVATE-SENTINEL}"'),
+                   original.replace('"' + compiler + '"', '"relative/clang++"'),
+                   original + 'set(CMAKE_CXX_COMPILER "' + compiler + '")\n',
+                   original + '  SET(CMAKE_CXX_COMPILER "' + compiler + '")\n',
+                   original.replace('set(CMAKE_CXX_COMPILER ', 'set(FAKE_CXX_COMPILER '),
+                   original.replace('"' + compiler + '"', compiler)]
+        for text in changes:
+            with self.subTest(kind=changes.index(text)):
+                report.write_text(text)
+                with self.assertRaises(ValueError) as caught:
+                    self.inspect()
+                self.assertNotIn('PRIVATE-SENTINEL', str(caught.exception))
+        report.write_text(original)
+
+    def test_generated_compiler_loaded_and_id_run_flags_are_required(self):
+        report = self.caches[0].parent / 'CMakeFiles' / toolchain.CMAKE / 'CMakeCXXCompiler.cmake'
+        original = report.read_text()
+        for field in ('CMAKE_CXX_COMPILER_LOADED', 'CMAKE_CXX_COMPILER_ID_RUN'):
+            for replacement in ('', 'set(' + field + ' 0)', 'set(' + field + ' "1")'):
+                report.write_text(original.replace('set(' + field + ' 1)', replacement))
+                with self.subTest(field=field, replacement=replacement), self.assertRaises(ValueError):
+                    self.inspect()
+        report.write_text(original)
+
+    def test_external_or_wrong_ndk_compiler_cannot_satisfy_generated_report(self):
+        report = self.caches[0].parent / 'CMakeFiles' / toolchain.CMAKE / 'CMakeCXXCompiler.cmake'
+        original = report.read_text()
+        external = self.root / 'outside-ndk/clang++'
+        inside_wrong = Path(self.private['ndk']) / 'toolchains/llvm/prebuilt/linux-x86_64/bin/wrong-clang++'
+        for path in (external, inside_wrong):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('synthetic executable placeholder')
+            path.chmod(0o700)
+            report.write_text(original.replace(self.cache_data['CMAKE_CXX_COMPILER'], str(path)))
+            with self.subTest(kind=path.name), self.assertRaisesRegex(ValueError, '^native_compiler_executable$'):
+                self.inspect()
+        report.write_text(original)
+        compiler = Path(self.cache_data['CMAKE_CXX_COMPILER'])
+        original_binary = compiler.read_bytes()
+        compiler.unlink()
+        compiler.symlink_to(external)
+        with self.assertRaisesRegex(ValueError, '^native_compiler_executable$'):
+            self.inspect()
+        compiler.unlink()
+        compiler.write_bytes(original_binary)
+        compiler.chmod(0o700)
+
+    def test_present_compiler_cache_must_match_generated_report(self):
+        cache = self.caches[0]
+        cache.write_text(cache.read_text().replace(self.cache_data['CMAKE_CXX_COMPILER'], '/outside/PRIVATE-SENTINEL'))
+        with self.assertRaisesRegex(ValueError, '^native_compiler_cache_mismatch$'):
             self.inspect()
 
     def test_source_and_upstream_identity_cannot_be_inherited(self):

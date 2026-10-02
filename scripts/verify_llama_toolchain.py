@@ -29,6 +29,8 @@ LIB = LLAMA / "examples/llama.android/lib"
 
 
 TOOLCHAIN_ERROR_CODES = frozenset((
+    "native_compiler_report_missing", "native_compiler_report_invalid", "native_compiler_id",
+    "native_compiler_executable", "native_compiler_cache_mismatch",
     'cmake_duplicate_key', 'cmake_installation_layout', 'cmake_version',
     'existing_license_missing', 'finalized_dsl_mismatch', 'gradle_distribution_duplicate',
     'gradle_distribution_hash', 'gradle_distribution_path', 'gradle_installation_bytes',
@@ -179,6 +181,45 @@ def read_cache(path):
     return result
 
 
+def verify_native_compiler(cache, data, ndk):
+    """Read CMake's generated compiler identity without executing its script.
+
+    The Android NDK sets CMAKE_CXX_COMPILER as a normal CMake variable, so a
+    CMakeCache.txt entry is optional. CMake 3.31.6 persists the selected compiler
+    in CMakeFiles/3.31.6/CMakeCXXCompiler.cmake independently of cache storage.
+    """
+    report = cache.parent / "CMakeFiles" / CMAKE / "CMakeCXXCompiler.cmake"
+    require(report.is_file() and not report.is_symlink(), "native_compiler_report_missing")
+    text = report.read_text(encoding="utf-8")
+
+    def literal(name, quoted=True):
+        # This is a bounded reader for the exact generated set(...) records,
+        # not an interpreter. Variables, escapes and duplicate setters fail.
+        setters = re.findall(r"(?m)^[ \t]*(?i:set)[ \t]*\([ \t]*" + name + r"(?=\s|\))[^\r\n]*$", text)
+        require(len(setters) == 1, "native_compiler_report_invalid")
+        value_pattern = r'"([^"\\\r\n]*)"' if quoted else r'([0-9]+)'
+        match = re.fullmatch(r'[ \t]*(?i:set)[ \t]*\([ \t]*' + name
+                             + r'[ \t]+' + value_pattern + r'[ \t]*\)[ \t]*', setters[0])
+        require(match is not None, "native_compiler_report_invalid")
+        return match[1]
+
+    require(literal("CMAKE_CXX_COMPILER_ID") == "Clang", "native_compiler_id")
+    require(literal("CMAKE_CXX_COMPILER_LOADED", quoted=False) == "1"
+            and literal("CMAKE_CXX_COMPILER_ID_RUN", quoted=False) == "1", "native_compiler_report_invalid")
+    declared = Path(literal("CMAKE_CXX_COMPILER"))
+    require(declared.is_absolute() and "$" not in str(declared), "native_compiler_report_invalid")
+    ndk = Path(ndk).resolve(strict=True)
+    expected = ndk / "toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
+    require(expected.is_file() and declared.is_file(), "native_compiler_executable")
+    compiler, expected = declared.resolve(strict=True), expected.resolve(strict=True)
+    require(compiler == expected and compiler.is_relative_to(ndk)
+            and compiler.is_relative_to((ndk / "toolchains/llvm/prebuilt/linux-x86_64/bin").resolve())
+            and os.access(compiler, os.X_OK), "native_compiler_executable")
+    if "CMAKE_CXX_COMPILER" in data:
+        cached = Path(data["CMAKE_CXX_COMPILER"])
+        require(cached.is_absolute() and cached.resolve() == compiler, "native_compiler_cache_mismatch")
+
+
 def configured_toolchain(root, private, source_commit):
     verify_source(root, source_commit)
     require(type(private) is dict and set(private) == {"sdk", "ndk", "java", "java_version", "cmake", "ninja", "licenses_verified", "gradle"}, "preflight_fields")
@@ -219,8 +260,7 @@ def configured_toolchain(root, private, source_commit):
                            ("CMAKE_MAKE_PROGRAM", private["ninja"]),
                            ("ANDROID_NDK", private["ndk"])):
             require(key in data and Path(data[key]).resolve() == Path(value).resolve(), "native_configuration_path")
-        compiler = Path(data.get("CMAKE_CXX_COMPILER", "")).resolve()
-        require(compiler.is_relative_to(Path(private["ndk"])) and compiler.is_file(), "native_configuration_compiler")
+        verify_native_compiler(cache, data, private["ndk"])
         require(data.get("ANDROID_PLATFORM") == "android-33" and data.get("CMAKE_BUILD_TYPE") in ("Release", "Debug"),
                 "native_configuration_target")
     require(selected and observed_abis == {"arm64-v8a", "x86_64"}, "native_configuration_incomplete")

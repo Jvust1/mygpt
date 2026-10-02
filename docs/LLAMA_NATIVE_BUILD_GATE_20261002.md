@@ -52,10 +52,19 @@ Global CMake's actual installation prefix is supplied through `cmake.dir` in
 private runner-local `local.properties`, together with `sdk.dir`. Finalized DSL
 records the SDK selected by AGP, plugin version, NDK, SDK levels, build-tools,
 CMake version and ABI scope. The post-build check rechecks installed components
-and licenses and reads the actual CMake caches' compiler, NDK, CMake, Ninja,
+and licenses and reads the actual CMake configuration's compiler, NDK, CMake, Ninja,
 Android target and ABI configuration. Only caches whose `CMAKE_HOME_DIRECTORY`
 is the exact pinned library `src/main/cpp` count; nested FetchContent host
 sub-build caches are excluded, and both declared native ABIs remain required.
+Each selected main cache requires its generated
+`CMakeFiles/3.31.6/CMakeCXXCompiler.cmake` report. A bounded text parser reads the
+unique compiler, Clang ID and loaded/ID-run markers without executing CMake.
+The compiler must resolve to the prechecked NDK's executable `clang++` target
+within that NDK's LLVM `bin` directory. CMake may legitimately omit a compiler
+cache entry when its toolchain sets an ordinary variable; if a cache entry is
+present, it must match the generated report. Missing, duplicate, malformed or
+conflicting evidence fails with fixed diagnostic codes. This is configured
+compiler identity evidence after the separate successful native build step.
 Merely being present on PATH is not
 accepted as proof that the build selected a tool. `CMAKE_BUILD_TYPE` must be
 `Release` or `Debug`; this check deliberately does not bind each CMake cache or
@@ -151,4 +160,6 @@ or execute Android code.
 References: [Android Components finalizeDsl](https://developer.android.com/reference/tools/gradle-api/8.13/com/android/build/api/variant/LibraryAndroidComponentsExtension),
 [custom CMake installation](https://developer.android.com/studio/projects/install-ndk),
 [official Gradle distribution checksums](https://gradle.org/release-checksums/),
+[CMake 3.31.6 compiler variable/cache handling](https://github.com/Kitware/CMake/blob/v3.31.6/Modules/CMakeDetermineCompiler.cmake),
+[generated compiler report](https://github.com/Kitware/CMake/blob/v3.31.6/Modules/CMakeCXXCompiler.cmake.in),
 [pinned setup-gradle provisioning](https://github.com/gradle/actions/blob/ed408507eac070d1f99cc633dbcf757c94c7933a/sources/src/execution/provision.ts).
