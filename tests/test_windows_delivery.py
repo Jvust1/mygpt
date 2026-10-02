@@ -154,7 +154,11 @@ class WindowsWorkflowTests(unittest.TestCase):
         self.assertNotRegex(text, re.compile(r'^  (push|pull_request|workflow_dispatch):', re.MULTILINE))
         self.assertNotIn('feat/desktop-delivery-20260925', text)
         self.assertNotIn('continue-on-error', text)
-        self.assertNotIn('brain/tests', text)
+        # Only these platform-safe lock tools may run here; full Brain/POSIX
+        # suites remain mandatory on Linux and forbidden in the Windows job.
+        lock_cases = 'brain/tests/test_dependency_lock.py brain/tests/test_acceptance_tools.py'
+        self.assertEqual(text.count(lock_cases), 1)
+        self.assertNotIn('brain/tests', text.replace(lock_cases, ''))
         body = job(WINDOWS, 'windows-native')
         self.assertIn("if: github.repository == 'Jvust1/mygpt'", body)
         self.assertIn('runs-on: windows-latest', body)
@@ -207,7 +211,9 @@ class WindowsWorkflowTests(unittest.TestCase):
         text = WINDOWS.read_text()
         block = text.split('          path: |\n', 1)[1].split('          retention-days:', 1)[0]
         paths = {line.strip() for line in block.splitlines() if line.strip()}
-        filenames = {'source-commit.txt', 'dependencies.txt', 'pytest.xml', 'pytest.txt',
+        filenames = {'source-commit.txt', 'dependencies.txt', 'dependency-preflight.json',
+                     'native-install-report.json', 'installed-dependencies.json', 'dependency-tests.xml',
+                     'dependency-tests.txt', 'pytest.xml', 'pytest.txt',
                      'node-tests.txt', 'build.txt', 'build-evidence.json', 'native-smoke.json', 'browser.json',
                      'native-self-test-diagnostics.txt', 'native-browser-diagnostics.txt', 'native-math.png'}
         self.assertEqual(paths, {'${{ runner.temp }}/windows-evidence/' + name for name in filenames})

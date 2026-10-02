@@ -18,6 +18,7 @@ on:
       - fix/wake-confidence-boundary-dot-20261001
       - fix/lossless-receipt-storage-dot-20261002
       - fix/windows-exact-head-dot-20261002
+      - fix/dependency-locks-dot-20261002
       - fix/android-required-gate-dot-20261002
       - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
@@ -78,12 +79,33 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24'
-      - name: Install hash-locked core and already-pinned upstream test extras
-        working-directory: brain
+      - name: Restore complete Linux dependency closure in a clean environment
+        shell: bash
         run: |
-          python -m pip install --only-binary=:all: --require-hashes -r requirements-linux-py313.lock
-          python -m pip install '.[realtime,lexical-test]'
-          python -m pip check
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/fusion-dependencies"
+          mkdir -p "$OUT"
+          python -m venv "$RUNNER_TEMP/fusion-venv"
+          PY="$RUNNER_TEMP/fusion-venv/bin/python"
+          echo "$RUNNER_TEMP/fusion-venv/bin" >> "$GITHUB_PATH"
+          LOCK=brain/requirements-linux-py313-full.lock
+          "$PY" brain/scripts/verify_dependency_lock.py "$LOCK" --project brain --bootstrap-output "$OUT/bootstrap.lock"
+          "$PY" -m pip --isolated install --index-url https://pypi.org/simple --only-binary=:all: --require-hashes -r "$OUT/bootstrap.lock"
+          # Only the exact hash-reviewed docopt 0.6.2 sdist is allowed. No isolated build downloads.
+          "$PY" -m pip --isolated download --index-url https://pypi.org/simple --only-binary=:all: --no-binary=docopt --no-build-isolation --require-hashes -r "$LOCK" -d "$RUNNER_TEMP/fusion-artifacts"
+          "$PY" -m pip --isolated install --no-cache-dir --no-index --find-links="$RUNNER_TEMP/fusion-artifacts" --only-binary=:all: --no-binary=docopt --no-build-isolation --require-hashes --force-reinstall -r "$LOCK" --report "$OUT/native-install-report.json"
+          "$PY" -m pip --isolated install --no-index --no-build-isolation --no-deps ./brain
+          "$PY" -m pip check
+          "$PY" brain/scripts/verify_dependency_lock.py "$LOCK" --project brain --installed --install-report "$OUT/native-install-report.json" --output "$OUT/installed.json"
+          git rev-parse HEAD > "$OUT/source-commit.txt"
+      - name: Preserve dependency hashes and actual native install evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: linux-dependencies-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/fusion-dependencies/
+          retention-days: 3
+          if-no-files-found: error
       - name: Require full strict Brain acceptance without skips
         working-directory: brain
         run: python scripts/verify_integrations.py --output "$RUNNER_TEMP/fusion-brain-evidence"
