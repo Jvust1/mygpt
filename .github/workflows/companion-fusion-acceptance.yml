@@ -20,6 +20,7 @@ on:
       - fix/windows-exact-head-dot-20261002
       - fix/dependency-locks-dot-20261002
       - fix/governance-checkpoint-dot-20261002
+      - fix/npm-discovery-dot-20261002
       - fix/android-required-gate-dot-20261002
       - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
@@ -38,6 +39,7 @@ on:
       - 'android_*/app/src/main/assets/**'
       - 'third_party/**'
       - 'tests/**'
+      - 'package.json'
       - '.github/workflows/companion-fusion-acceptance.yml'
       - '.github/workflows/android-spike.yml'
       - '.github/workflows/source-delivery.yml'
@@ -135,7 +137,7 @@ jobs:
         run: |
           python scripts/validate_governance.py
           python -m unittest discover -s tests -p 'test_*.py' -q
-          node --test tests/*.test.mjs
+          npm test
           python -m compileall -q brain/mygpt_brain
 
       - name: Verify actual local Book math preview in Chromium
