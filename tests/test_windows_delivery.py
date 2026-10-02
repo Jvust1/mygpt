@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -95,6 +96,22 @@ class ArtifactRootTests(unittest.TestCase):
         self.start_server()
         for name in ('LICENSE', 'NOTICE.md', 'fonts/KaTeX_Main-Regular.woff2'):
             self.assertEqual(self.get('/third_party/katex/' + name)[0], 404)
+
+    def test_allowlisted_scripts_ignore_host_mime_registry_without_changing_bytes(self):
+        self.start_server()
+        scripts = {route: path for route, path in STATIC_FILES.items()
+                   if route.endswith(('.js', '.mjs'))}
+        self.assertIn('/third_party/katex/katex.mjs', scripts)
+        for guessed in ('text/plain', 'text/html', None):
+            with patch('mygpt_brain.local_service.mimetypes.guess_type', return_value=(guessed, None)):
+                for route, path in scripts.items():
+                    with self.subTest(guessed=guessed, route=route):
+                        status, content_type, raw = self.get(route)
+                        self.assertEqual(status, 200)
+                        self.assertEqual(content_type, 'text/javascript; charset=utf-8')
+                        self.assertEqual(raw, (ROOT / path).read_bytes())
+                self.assertEqual(self.get('/third_party/katex/private.js')[0], 404)
+                self.assertEqual(self.get('/third_party/katex/LICENSE')[0], 404)
 
     def test_each_missing_or_changed_required_resource_fails(self):
         report = build.verify_bundled_assets(self.artifact)
@@ -220,6 +237,11 @@ class LocalArchiveCompatibilityTests(unittest.TestCase):
             (source / 'docs/DESKTOP_DELIVERY.md').write_text(
                 'Synthetic local archive instructions\n', encoding='utf-8', newline='\n')
             subprocess.run(['git', 'init', '-q'], cwd=source, check=True, capture_output=True)
+            # Reproduce Windows conversion settings, then apply the real repository's
+            # no-conversion policy. Archive and working bytes must remain identical.
+            for key, value in (('core.autocrlf', 'true'), ('core.eol', 'crlf')):
+                subprocess.run(['git', 'config', key, value], cwd=source, check=True, capture_output=True)
+            (source / '.gitattributes').write_bytes((ROOT / '.gitattributes').read_bytes())
             subprocess.run(['git', 'add', '.'], cwd=source, check=True, capture_output=True)
             subprocess.run(['git', '-c', 'user.name=synthetic-test', '-c', 'user.email=test@example.invalid',
                             'commit', '-qm', 'synthetic archive fixture'], cwd=source, check=True, capture_output=True)

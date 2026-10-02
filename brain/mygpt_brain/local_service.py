@@ -215,7 +215,10 @@ class LocalBrainHandler(BaseHTTPRequestHandler):
             body = path.read_bytes()
         except OSError:
             self._error(LocalServiceError("not_found", 404)); return
-        content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        # Module MIME must not depend on host registry overrides (Windows may
+        # classify .mjs as text/plain). This applies only after STATIC_FILES lookup.
+        content_type = ("text/javascript" if path.suffix.lower() in (".js", ".mjs")
+                        else mimetypes.guess_type(path.name)[0] or "application/octet-stream")
         if content_type.startswith("text/") or content_type in ("application/javascript",):
             content_type += "; charset=utf-8"
         self._send(200, body, content_type, cookie=self.path in ("/host/brain.html", "/host/selection.html"))
