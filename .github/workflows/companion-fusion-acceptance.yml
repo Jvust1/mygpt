@@ -22,6 +22,7 @@ on:
       - fix/governance-checkpoint-dot-20261002
       - fix/npm-discovery-dot-20261002
       - fix/llama-native-gate-dot-20261002
+      - fix/browser-tool-lock-dot-20261002
       - fix/android-required-gate-dot-20261002
       - feat/katex-book-preview-dot-20261001
       - feat/companion-fusion-main-dot-20261001
@@ -33,6 +34,7 @@ on:
       - 'desktop_ui/**'
       - 'tools/build_windows_delivery.py'
       - 'tools/desktop_browser_test.py'
+      - 'tools/browser/**'
       - '.github/workflows/desktop-delivery.yml'
       - 'scripts/serve.mjs'
       - 'android_spike/**'
@@ -147,7 +149,10 @@ jobs:
       - name: Verify actual local Book math preview in Chromium
         shell: bash
         run: |
-          npm install --prefix "$RUNNER_TEMP/mygpt-browser" --ignore-scripts --no-audit --no-fund playwright@1.62.1
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mygpt-browser"
+          cp tools/browser/package.json tools/browser/package-lock.json "$RUNNER_TEMP/mygpt-browser/"
+          npm ci --prefix "$RUNNER_TEMP/mygpt-browser" --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org
           export NODE_PATH="$RUNNER_TEMP/mygpt-browser/node_modules"
           export MYGPT_CHROMIUM_PATH="$(command -v google-chrome)"
           test -x "$MYGPT_CHROMIUM_PATH"
