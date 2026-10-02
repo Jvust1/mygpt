@@ -346,6 +346,23 @@ class BuildFailureDiagnosticTests(unittest.TestCase):
         self.assertNotIn('SECRET-SENTINEL', result.stdout)
 
 
+class KotlinContinuationSourceTests(unittest.TestCase):
+    """Source regressions for the exact hosted compiler failure, not compilation."""
+    def setUp(self):
+        self.source = (ROOT / 'android_llm_spike/app/src/main/java/dev/mygpt/llmaspike/MainActivity.kt').read_text()
+
+    def test_model_import_status_is_one_parenthesized_expression(self):
+        self.assertIn('''status.text = ("已导入 · GGUF v${installed.header.version}"
+                    + " · tensors ${installed.header.tensorCount}"
+                    + " · ${installed.sizeBytes / (1024L * 1024L)} MiB"
+                    + " · SHA-256 ${installed.sha256.take(12)}…")''', self.source)
+
+    def test_reply_emotion_and_intensity_are_one_parenthesized_expression(self):
+        self.assertIn('''reply.text = (parsed.visibleText.trim()
+                    + "\\n\\n情绪：${parsed.emotion.wireValue}"
+                    + " · 强度：${"%.2f".format(parsed.intensity)}")''', self.source)
+
+
 class NativeWorkflowTests(unittest.TestCase):
     def test_reusable_only_single_job_and_three_existing_targets(self):
         text = WORKFLOW.read_text()

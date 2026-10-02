@@ -125,10 +125,10 @@ class MainActivity : AppCompatActivity() {
                     .putString(PREF_MODEL_PATH, installed.file.absolutePath)
                     .putString(PREF_MODEL_SHA256, installed.sha256)
                     .apply()
-                status.text = "已导入 · GGUF v${installed.header.version}"
+                status.text = ("已导入 · GGUF v${installed.header.version}"
                     + " · tensors ${installed.header.tensorCount}"
                     + " · ${installed.sizeBytes / (1024L * 1024L)} MiB"
-                    + " · SHA-256 ${installed.sha256.take(12)}…"
+                    + " · SHA-256 ${installed.sha256.take(12)}…")
                 loadButton.isEnabled = true
             }.onFailure { error ->
                 status.text = "导入失败 · ${error.javaClass.simpleName}"
@@ -201,9 +201,9 @@ class MainActivity : AppCompatActivity() {
                     AiriActEmotionParser.parse(raw.toString())
                 }
             }.onSuccess { parsed ->
-                reply.text = parsed.visibleText.trim()
+                reply.text = (parsed.visibleText.trim()
                     + "\n\n情绪：${parsed.emotion.wireValue}"
-                    + " · 强度：${"%.2f".format(parsed.intensity)}"
+                    + " · 强度：${"%.2f".format(parsed.intensity)}")
                 input.setText("")
                 input.isEnabled = true
                 sendButton.isEnabled = true
