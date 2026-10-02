@@ -1,0 +1,160 @@
+{
+  "schema": "mygpt.verified-checkpoint-evidence.v1",
+  "provenance": "Retained public GitHub API metadata and observed test/archive results, not signed evidence. Offline checks establish consistency only; re-query exact source/run before new publication or acceptance.",
+  "public_metadata": {
+    "retrieved_at": "2026-10-02T06:35:25Z",
+    "run": {
+      "id": 36973557038,
+      "name": "Integrated companion fusion acceptance",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "head_branch": "fix/dependency-locks-dot-20261002",
+      "head_sha": "68ea57e1aec5488b6ff24973f7ef2b781ca29bff",
+      "html_url": "https://github.com/Jvust1/mygpt/actions/runs/36973557038",
+      "url": "https://api.github.com/repos/Jvust1/mygpt/actions/runs/36973557038",
+      "created_at": "2026-10-02T06:26:29Z",
+      "updated_at": "2026-10-02T06:34:42Z"
+    },
+    "repository": {
+      "id": 1378360688,
+      "full_name": "Jvust1/mygpt",
+      "html_url": "https://github.com/Jvust1/mygpt"
+    },
+    "artifacts": [
+      {
+        "id": 11212940613,
+        "node_id": "MDg6QXJ0aWZhY3QxMTIxMjk0MDYxMw==",
+        "name": "source-delivery-68ea57e1aec5488b6ff24973f7ef2b781ca29bff-1",
+        "size_in_bytes": 2692742,
+        "url": "https://api.github.com/repos/Jvust1/mygpt/actions/artifacts/11212940613",
+        "archive_download_url": "https://api.github.com/repos/Jvust1/mygpt/actions/artifacts/11212940613/zip",
+        "expired": false,
+        "digest": "sha256:c1ff55b49537b30e3778f0e370cd1fd7c0a4458cbcbbdec8f7b2fb5c7c80eb28",
+        "created_at": "2026-10-02T06:27:42Z",
+        "updated_at": "2026-10-02T06:27:42Z",
+        "expires_at": "2026-10-05T06:27:41Z",
+        "workflow_run": {
+          "id": 36973557038,
+          "repository_id": 1378360688,
+          "head_repository_id": 1378360688,
+          "head_branch": "fix/dependency-locks-dot-20261002",
+          "head_sha": "68ea57e1aec5488b6ff24973f7ef2b781ca29bff"
+        }
+      },
+      {
+        "id": 11212461882,
+        "node_id": "MDg6QXJ0aWZhY3QxMTIxMjQ2MTg4Mg==",
+        "name": "windows-native-68ea57e1aec5488b6ff24973f7ef2b781ca29bff-1",
+        "size_in_bytes": 215906,
+        "url": "https://api.github.com/repos/Jvust1/mygpt/actions/artifacts/11212461882",
+        "archive_download_url": "https://api.github.com/repos/Jvust1/mygpt/actions/artifacts/11212461882/zip",
+        "expired": false,
+        "digest": "sha256:c4cec4edd09bd9c1fda65ac6c9ab69d72d5a92fa3817b6215edd2455967f4afe",
+        "created_at": "2026-10-02T06:33:48Z",
+        "updated_at": "2026-10-02T06:33:48Z",
+        "expires_at": "2026-10-05T06:33:47Z",
+        "workflow_run": {
+          "id": 36973557038,
+          "repository_id": 1378360688,
+          "head_repository_id": 1378360688,
+          "head_branch": "fix/dependency-locks-dot-20261002",
+          "head_sha": "68ea57e1aec5488b6ff24973f7ef2b781ca29bff"
+        }
+      }
+    ]
+  },
+  "successful_jobs": 9,
+  "validation": {
+    "strict_python": 912,
+    "upstream_component": 49,
+    "root_python": 103,
+    "javascript": 70,
+    "windows_tests": 31,
+    "windows_subtests": 147,
+    "native_executable_checks": 5,
+    "edge_browser_checks": 23,
+    "failed": 0,
+    "skipped": 0,
+    "external_browser_requests": 0,
+    "live_model_calls": 0,
+    "android_host_actual_build": "PASS",
+    "java8_boundaries": "PASS",
+    "java17_boundaries": "PASS",
+    "source_recovery": "PASS",
+    "physical_device_acceptance": false,
+    "scope_note": "Suite scopes overlap; do not sum counts. Android host build does not establish Companion V2/llama/sherpa JNI or physical-device acceptance.",
+    "dependency_lock_tool_tests": 66,
+    "linux_native_locked_packages": 85,
+    "windows_native_locked_packages": 54,
+    "native_dependency_install_report_and_installed_set": "PASS_EXACT_NAME_VERSION_SHA256",
+    "javascript_errors": 0
+  },
+  "source_bundle": {
+    "sha256": "9e77a8f3f315f3a5abfc53d410f93721de857a3fc6a86964423ce0870b4c4949",
+    "sha256_scope": "INNER_SOURCE_ZIP",
+    "bytes": 5466032
+  },
+  "windows_evidence": {
+    "sha256": "c4cec4edd09bd9c1fda65ac6c9ab69d72d5a92fa3817b6215edd2455967f4afe",
+    "sha256_scope": "DOWNLOADED_EVIDENCE_ZIP",
+    "files": 17
+  },
+  "source_bundle_manifest": {
+    "schema": "mygpt.source-bundle.v2",
+    "repository": "Jvust1/mygpt",
+    "source_commit": "68ea57e1aec5488b6ff24973f7ef2b781ca29bff",
+    "files_count": 472,
+    "original_manifest_sha256": "df42b175a031a6e31236aed9aa02dd29d73b2aeef3b438d3023f50f48427c240"
+  },
+  "historical_originals": [
+    {
+      "path": "README.md",
+      "bytes": 5380,
+      "sha256": "2bbfdcadbf5895a3c8e6fea7d537ac5903a802fe7fc390b8352002f18ce5c1ca"
+    },
+    {
+      "path": "START_HERE.md",
+      "bytes": 5340,
+      "sha256": "37dc5f6647762fd3d5163e59804e7cafa7b0f3a557a296495d4fb38e6a52dc7f"
+    },
+    {
+      "path": "docs/CURRENT_STATE.md",
+      "bytes": 63838,
+      "sha256": "1ceb4f3429cf3476866b8c8d2d6de410677843f3801bc6344d4930866fddddc8"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "bytes": 34570,
+      "sha256": "6cc9ebdb731db3d6d7c80eded796f1439325bacefabb79ae0c7d2d32d7abf168"
+    },
+    {
+      "path": "governance/project_state.json",
+      "bytes": 72504,
+      "sha256": "cc74c7ca5b80953a3d28f1a2e892859577e28904de7043af34fc93fb71430ded"
+    },
+    {
+      "path": "governance/artifact_manifest.json",
+      "bytes": 35714,
+      "sha256": "5d7c2e35750f3e6a0e1de475a562967b70d46b14807bb43c4697ab9b593391c6"
+    },
+    {
+      "path": "governance/desktop_delivery_current.json",
+      "bytes": 3906,
+      "sha256": "e2f82dcc8f7deab694ff98e625a627eb1b357ba934971a4c53dd68b393ef84e4"
+    },
+    {
+      "path": "SECURITY_POLICY.md",
+      "bytes": 70,
+      "sha256": "6144929aaae5d9de5580b00bd29ef8dd1fa4d1afa70115714678ffd4ac4aea0e"
+    }
+  ],
+  "historical_source_manifest": {
+    "schema": "mygpt.source-bundle.v2",
+    "repository": "Jvust1/mygpt",
+    "source_commit": "765419ff740c6b4076dd818dc709bef6e46ada34",
+    "files_count": 466,
+    "original_manifest_sha256": "f6c9b408a43e490898d6f7cba633e129af2f73b3cf696caecf5a7bf3d507ba7c",
+    "external_source_zip_sha256": "5465615f2a9f3a201df43be92183901fc3227dead1c1d435cf0c3a150ef300dd"
+  }
+}

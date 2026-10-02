@@ -83,8 +83,8 @@ jobs:
           cd "$SRC"
           python run_mygpt.py doctor | tee "$OUT/doctor.json"
           python scripts/launcher_smoke.py --output "$OUT/launcher-http.json"
-          python -m unittest discover -s tests -p 'test_*.py' -q
-          node --test tests/*.test.mjs
+          python -m unittest discover -s tests -p 'test_*.py' -q 2>&1 | tee "$OUT/recovered-root.txt"
+          node --test tests/*.test.mjs 2>&1 | tee "$OUT/recovered-node.txt"
           cd brain
           python scripts/verify_integrations.py --output "$OUT/recovered-brain"
           PYTHONPATH=. python scripts/smoke_selection_intake.py --output "$OUT/recovered-http.json"
@@ -98,11 +98,20 @@ jobs:
             -o "$GSON_JAR"
           cd "$RUNNER_TEMP/recovered-source"
           bash android_spike/tools/run_boundary_smoke.sh | tee "$RUNNER_TEMP/source-evidence/recovered-java.txt"
-      - name: Preserve source and bounded recovery evidence
-        if: always()
+      - name: Create public hash-only recovery summary after all gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/build_public_recovery_evidence.py \
+            --evidence-dir "$RUNNER_TEMP/source-evidence" \
+            --repeat-archive "$RUNNER_TEMP/source-repeat.zip" \
+            --recovered-root "$RUNNER_TEMP/recovered-source" \
+            --source-commit "$GITHUB_SHA" \
+            --output "$RUNNER_TEMP/public-recovery-summary.json"
+      - name: Preserve public recovery metadata only
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: source-delivery-${{ github.sha }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/source-evidence/
+          name: source-recovery-evidence-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/public-recovery-summary.json
           retention-days: 3
-          if-no-files-found: warn
+          if-no-files-found: error

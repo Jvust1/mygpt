@@ -1,92 +1,31 @@
 {
   "schema": "mygpt_desktop_delivery_v1",
-  "version": "2026.09.25-rc1",
-  "branch": "feat/desktop-delivery-20260925",
-  "base_commit": "fa09ad5ed93e3159edd585843a4f082d09f680b2",
-  "status": "HISTORICAL_PACKAGE_NOT_CURRENT_CANDIDATE_ACCEPTANCE",
-  "release_source_commit": "0fc965263b42b8a12e0cb7b006f4b1bdcd137596",
-  "release_workflow_run": 36149636550,
-  "identity_note": "The distributed package uses release_source_commit. This subsequent governance-only commit is not preclaimed as its build source.",
-  "source_systems_unchanged": [
-    "Book",
-    "StudyMate",
-    "ChatContextVault"
-  ],
-  "features": [
-    "companion",
-    "explicit_focus_sessions",
-    "local_notes",
-    "revision_conflict_rejection",
-    "idempotent_backup_merge",
-    "opt_in_local_ollama_request",
-    "preserved_volatile_selection_intake"
-  ],
-  "limits": [
-    "no_native_system_overlay",
-    "no_automatic_cloud_sync",
-    "no_automatic_screen_capture",
-    "live_model_quality_unverified",
-    "real_book_bridge_device_acceptance_pending",
-    "unsigned_executable"
-  ],
-  "native_windows_tests": "PASS_ON_GITHUB_HOSTED_WINDOWS_AND_MICROSOFT_EDGE",
-  "local_persistence_tests": {
-    "passed": 8,
-    "failed": 0
-  },
-  "local_full_sdk_tests": "LOCAL_DEPENDENCIES_UNAVAILABLE; full SDK acceptance performed on exact pinned Linux CI instead",
+  "status": "HOSTED_WINDOWS_CHECKPOINT_PASS_USER_DEVICE_PENDING",
+  "repository": "Jvust1/mygpt",
+  "branch": "fix/dependency-locks-dot-20261002",
+  "release_source_commit": "68ea57e1aec5488b6ff24973f7ef2b781ca29bff",
+  "release_workflow_run": 36973557038,
+  "identity_note": "Verification only: no new release, no EXE distribution, no acceptance of later checkout.",
   "verification_result": {
-    "linux_full_pytest_passed": 490,
-    "windows_desktop_pytest_passed": 18,
-    "javascript_unit_tests_passed_each_platform": 66,
-    "failed": 0,
-    "skipped": 0,
+    "windows_tests": 31,
+    "windows_subtests": 147,
     "native_executable_checks": 5,
-    "actual_edge_browser_checks": 13,
-    "package_manifest_files_verified": 1644,
-    "zip_crc": "PASS",
-    "pe_architecture": "x64",
-    "fonts_distributed": 0,
-    "scope_note": "Platform suites overlap and are not summed. Strict legacy offline/AF_UNIX guards and POSIX Git mode tests remain unchanged on Linux; real Windows HTTP/storage/EXE/Edge are tested separately on the same code commit."
+    "edge_browser_checks": 23,
+    "failed": 0,
+    "skipped": 0
   },
-  "portable": {
-    "file": "mygpt-Windows-Portable.zip",
-    "bytes": 34199210,
-    "sha256": "37ebfa7158af866a19de48d9680054816b4fcbea006e73050ab2eab99211cd79",
-    "launch": "Extract entire archive and run mygpt/mygpt.exe; preserve _internal"
-  },
-  "archive": {
-    "status": "UPLOADED_METADATA_READBACK_VERIFIED",
-    "drive_folder_id": "10OOHa0ZtpSrMPQTIVAj514roE0SqfpYK",
-    "drive_file_id": "15aYdyKH15Oakj1iuYblGxYScFQf8xx2A",
-    "file": "mygpt-Windows-完整交付-20260925.zip",
-    "bytes": 36004941,
-    "uploaded_snapshot_sha256": "61bf91be7b2d3545c76c9489d45000dd8eb595433c122fbf2fa20ad1ed1b4a37",
-    "github_artifact_id": 10870638144,
-    "contents": [
-      "portable app",
-      "exact source and tests",
-      "Linux and Windows evidence",
-      "checksums"
-    ],
-    "readback_scope": "Drive ID, name, byte count and parent verified; no claim of independent provider checksum readback"
-  },
-  "source_recovery": {
-    "delivered": "mygpt-Source-and-Tests.zip exported from the exact release commit",
-    "legacy_scripts_source_bundle": "UNCHANGED; original allowlist does not yet cover new desktop paths. Do not claim the old bundler is compatible with this expanded tree."
-  },
-  "main_modified": false,
-  "pr_merged": false,
-  "independent_review": "ACCEPTED_FOR_USER_DEVICE_VALIDATION",
-  "provider_calls_during_implementation": 0,
   "actual_user_device_tested": false,
-  "pending_sync_this_release": [],
-  "other_project_pending_sync": "Unchanged; this closes only the specified desktop artifacts",
-  "historical_status": "NATIVE_WINDOWS_DELIVERY_REVIEWED_USER_DEVICE_PENDING",
+  "exe_published": false,
   "current_review": {
-    "branch": "fix/windows-exact-head-dot-20261002",
-    "input_commit": "16a731c47aa4c03956745caa63b5fbe0610e6cba",
-    "document": "docs/WINDOWS_EXACT_HEAD_20261002.md",
-    "scope": "Current candidate verification; no new public portable release. All original package identities below remain historical."
+    "branch": "fix/dependency-locks-dot-20261002",
+    "source_commit": "68ea57e1aec5488b6ff24973f7ef2b781ca29bff",
+    "run_id": 36973557038,
+    "artifact_id": 11212461882,
+    "document": "docs/GOVERNANCE_CHECKPOINT_20261002.md"
+  },
+  "historical_package": {
+    "ledger": "docs/HISTORICAL_GOVERNANCE_LEDGER_20261002.md",
+    "original_path": "governance/desktop_delivery_current.json",
+    "status": "HISTORICAL_PACKAGE_NOT_CURRENT_ACCEPTANCE"
   }
 }
