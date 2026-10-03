@@ -156,7 +156,7 @@ class HttpsCallbackTests(unittest.TestCase):
 
     def test_real_tls_public_pin_hostname_sni_and_exact_body(self):
         transport = self.transport()
-        payload = '{"fixture":"涔?}'.encode()
+        payload = '{"fixture":"书"}'.encode()
         with patch.object(h, '_dial_pinned', self.fixture_dial):
             status, raw = transport.post('https://callback.test/hook', payload, {'Content-Type': 'application/json'})
         self.assertEqual((status, raw), (200, b'{"ok":true}'))

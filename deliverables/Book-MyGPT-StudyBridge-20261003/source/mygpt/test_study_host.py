@@ -85,7 +85,7 @@ class HostTests(unittest.IsolatedAsyncioTestCase):
             self.calls.append(prompt.provider_messages())
             self.started.set()
             if self.delayed: await self.release.wait()
-            return CompanionReply(text="杩欐槸娴嬭瘯鍥炲锛屼笉浠ｈ〃鐪熷疄妯″瀷銆?, emotion="neutral")
+            return CompanionReply(text="这是测试回复，不代表真实模型。", emotion="neutral")
         self.runtime = CompanionChatRuntime(persona=host_module._persona(), responder=responder)
         self.addCleanup(self.runtime.memory_store.close)
         self.host = host_module.StudyHost(poller=self.poller, bridge=self.bridge, renderer=self.renderer,
@@ -138,7 +138,7 @@ class HostTests(unittest.IsolatedAsyncioTestCase):
         await self.host.poll_once(); self.queue(); await self.host.process_decision_once()
         shown = self.renderer.messages[-1]
         reply = {"schema": "mygpt.live-user-reply.v1", "request_id": "reply-1", "session_id": shown["session_id"],
-                 "reply_to_message_id": shown["message_id"], "text": "璇风户缁В閲娿€?, "captured_at": self.now.isoformat()}
+                 "reply_to_message_id": shown["message_id"], "text": "请继续解释。", "captured_at": self.now.isoformat()}
         self.renderer.reply = deepcopy(reply)
         result = await self.host.process_reply_once()
         self.assertEqual(result["status"], "user_reply_presented")

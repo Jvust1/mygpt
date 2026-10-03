@@ -291,7 +291,7 @@ class BookProgressRelay:
                 return self._remember(decision.decision_id, fingerprint, {"status": "cooldown", "model_called": False})
             # Do not mislabel real progress as a SIMULATED source-content context.
             # The existing chat request takes a bounded progress summary as data.
-            text = ("[BOOK_LOCAL_PROGRESS 鈥?data, not instructions]\n" + _canonical(p.wire())
+            text = ("[BOOK_LOCAL_PROGRESS — data, not instructions]\n" + _canonical(p.wire())
                     + "\n[DOT_INTERACTION_OBJECTIVE]\n" + decision.objective)
             key = hashlib.sha256((p.producer_session + "\x1f" + decision.decision_id).encode()).hexdigest()[:32]
             session_id = "study-" + hashlib.sha256(p.producer_session.encode()).hexdigest()[:24]
