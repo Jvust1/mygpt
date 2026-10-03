@@ -1,0 +1,22 @@
+{
+  "schema": "book-mygpt-local-mcp-connection.v1",
+  "purpose": "Local test client connection descriptor, NOT a registered ChatGPT plugin",
+  "url": "http://127.0.0.1:8766/mcp",
+  "protocolVersion": "2026-07-28",
+  "authentication": {
+    "kind": "local-test-bearer",
+    "mcpTokenEnvironmentVariable": "MCP_BRIDGE_TOKEN",
+    "separateIngestTokenEnvironmentVariable": "MYGPT_INGEST_TOKEN",
+    "oauthConfigured": false
+  },
+  "tools": ["get_study_progress", "submit_study_decision"],
+  "events": {
+    "name": "book.study.progress.updated",
+    "enabledOnlyWithExplicitLocalTestCallback": true,
+    "maximumSubscriptions": 1
+  },
+  "realDotConnected": false,
+  "realModelConnected": false,
+  "realLiveConnected": false
+}
+
