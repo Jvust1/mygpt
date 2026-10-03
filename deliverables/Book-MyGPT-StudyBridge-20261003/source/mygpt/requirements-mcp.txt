@@ -1,0 +1,5 @@
+# Existing mygpt source plus the additive local bridge. Versions actually tested.
+pydantic==2.13.4
+httpx==0.28.1
+standardwebhooks==1.1.0
+
